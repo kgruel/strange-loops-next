@@ -14,6 +14,7 @@ writer that must agree with it byte for byte.
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `spec/` | prose; [`spec/record.md`](spec/record.md) is layer 0, [`spec/laws.md`](spec/laws.md) indexes each law, its theorem and its vectors |
 | `core/` | the Go core: a module with no requires; package `loops` is its whole public API, everything else is under `internal/` |
+| `core/kdl/` | a KDL v2 parser (a format library, budgeted on its own), passing the official test suite |
 | `cli/` | the CLI module; for now only `cmd/budget`, the budget checker |
 | `interop/js/` | a small, independent JS writer for layer 0 |
 | `budget.json` | token budgets per package and the core's surface budget |
