@@ -13,7 +13,8 @@
           "value": "v19",
           "prev": [],
           "occurred": 150,
-          "emitted": 150
+          "emitted": 150,
+          "n": 0
         },
         {
           "id": "r:00000016",
@@ -22,7 +23,8 @@
           "value": "v22",
           "prev": [],
           "occurred": 200,
-          "emitted": 210
+          "emitted": 210,
+          "n": 0
         }
       ],
       [
@@ -33,7 +35,8 @@
           "value": "v22",
           "prev": [],
           "occurred": 200,
-          "emitted": 210
+          "emitted": 210,
+          "n": 0
         },
         {
           "id": "r:00000013",
@@ -42,7 +45,8 @@
           "value": "v19",
           "prev": [],
           "occurred": 150,
-          "emitted": 150
+          "emitted": 150,
+          "n": 0
         }
       ]
     ]

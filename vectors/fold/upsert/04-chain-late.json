@@ -13,7 +13,8 @@
           "value": "v18",
           "prev": ["r:00000011"],
           "occurred": 200,
-          "emitted": 200
+          "emitted": 200,
+          "n": 0
         },
         {
           "id": "r:00000011",
@@ -22,7 +23,8 @@
           "value": "v17",
           "prev": [],
           "occurred": 100,
-          "emitted": 100
+          "emitted": 100,
+          "n": 0
         }
       ]
     ]

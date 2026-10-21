@@ -1,0 +1,15 @@
+{
+  "vector": "01-empty",
+  "layer": "fold/extrema",
+  "laws": ["extrema.set"],
+  "source": "model",
+  "input": {
+    "orders": [
+      []
+    ]
+  },
+  "expect": {
+    "min": null,
+    "max": null
+  }
+}

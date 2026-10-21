@@ -1,0 +1,107 @@
+{
+  "vector": "02-mixed-signs",
+  "layer": "fold/sum",
+  "laws": ["sum.perm"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        },
+        {
+          "id": "r:00000022",
+          "kind": "decision",
+          "key": "load",
+          "value": "v34",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": -3
+        },
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "value": "v35",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 40
+        }
+      ],
+      [
+        {
+          "id": "r:00000022",
+          "kind": "decision",
+          "key": "load",
+          "value": "v34",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": -3
+        },
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "value": "v35",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 40
+        },
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        }
+      ],
+      [
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "value": "v35",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 40
+        },
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        },
+        {
+          "id": "r:00000022",
+          "kind": "decision",
+          "key": "load",
+          "value": "v34",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": -3
+        }
+      ]
+    ]
+  },
+  "expect": 42
+}

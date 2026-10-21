@@ -57,4 +57,38 @@ def Upsert.winner (s : Upsert) (k : String) : Option Record :=
 def Upsert.others (s : Upsert) (k : String) : List Record :=
   (s.heads.filter (·.key == k)).drop 1
 
+/-! ## Latest
+
+Latest is Upsert with a single key: the newest head, and any other heads as
+a fork. It follows `prev` chains instead of trusting clocks.
+-/
+
+def Latest.fold (xs : List Record) : Upsert := Upsert.fold Upsert.empty xs
+
+def Latest.winner (s : Upsert) : Option Record := s.heads.head?
+
+def Latest.others (s : Upsert) : List Record := s.heads.drop 1
+
+/-! ## Sum, Min, Max
+
+Over an exact numeric field. Sum counts repeats, like Count; Min and Max
+don't.
+-/
+
+def Sum.step (s : Int) (r : Record) : Int := s + r.n
+
+def Sum.fold (s : Int) (xs : List Record) : Int := xs.foldl Sum.step s
+
+def Max.step : Option Int → Record → Option Int
+  | none, r => some r.n
+  | some m, r => some (max m r.n)
+
+def Max.fold (s : Option Int) (xs : List Record) : Option Int := xs.foldl Max.step s
+
+def Min.step : Option Int → Record → Option Int
+  | none, r => some r.n
+  | some m, r => some (min m r.n)
+
+def Min.fold (s : Option Int) (xs : List Record) : Option Int := xs.foldl Min.step s
+
 end Loops

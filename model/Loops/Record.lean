@@ -16,6 +16,8 @@ structure Record where
   prev     : List Nat
   occurred : Nat
   emitted  : Nat
+  /-- A numeric payload field the numeric folds read. Exact: an integer. -/
+  n        : Int := 0
   deriving Repr, DecidableEq, Inhabited
 
 /-- Content order, newest first: `occurred`, then `emitted`, then id. -/

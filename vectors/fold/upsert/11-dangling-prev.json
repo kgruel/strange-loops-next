@@ -13,7 +13,8 @@
           "value": "v21",
           "prev": [],
           "occurred": 120,
-          "emitted": 120
+          "emitted": 120,
+          "n": 0
         },
         {
           "id": "r:00000018",
@@ -22,7 +23,8 @@
           "value": "v24",
           "prev": ["r:00000099"],
           "occurred": 400,
-          "emitted": 400
+          "emitted": 400,
+          "n": 0
         }
       ],
       [
@@ -33,7 +35,8 @@
           "value": "v24",
           "prev": ["r:00000099"],
           "occurred": 400,
-          "emitted": 400
+          "emitted": 400,
+          "n": 0
         },
         {
           "id": "r:00000015",
@@ -42,7 +45,8 @@
           "value": "v21",
           "prev": [],
           "occurred": 120,
-          "emitted": 120
+          "emitted": 120,
+          "n": 0
         }
       ]
     ]
