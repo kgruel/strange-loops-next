@@ -1,0 +1,17 @@
+name = "model"
+version = "0.1.0"
+defaultTargets = ["Loops", "Laws", "gen"]
+
+[[lean_lib]]
+name = "Loops"
+
+[[lean_lib]]
+name = "Laws"
+
+[[lean_lib]]
+name = "Gen"
+roots = ["Gen.Json"]
+
+[[lean_exe]]
+name = "gen"
+root = "Gen.Main"

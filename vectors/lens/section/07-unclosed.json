@@ -1,0 +1,23 @@
+{
+  "vector": "07-unclosed",
+  "layer": "lens/section",
+  "laws": ["lens.refuse"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      },
+      {
+        "id": "decision:cache",
+        "body": ["No cache until reads are slow."]
+      }
+    ],
+    "text": ["::: decision:auth", "Use OAuth device flow."]
+  },
+  "expect": {
+    "parsed": null,
+    "refused": true
+  }
+}

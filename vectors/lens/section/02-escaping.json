@@ -1,0 +1,25 @@
+{
+  "vector": "02-escaping",
+  "layer": "lens/section",
+  "laws": ["lens.escaping"],
+  "source": "model",
+  "input": {
+    "base": [],
+    "text": ["::: notes", "\\:::", "\\::: decision:auth", "\\:::x", "\\\\", "\\\\:::", "  ::: indented", "::", "", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "notes",
+        "body": [":::", "::: decision:auth", ":::x", "\\", "\\:::", "  ::: indented", "::", ""]
+      }
+    ],
+    "normalized": ["::: notes", "\\:::", "\\::: decision:auth", "\\:::x", "\\\\", "\\\\:::", "  ::: indented", "::", "", ":::"],
+    "outcomes": [
+      {
+        "unknown": "notes"
+      }
+    ],
+    "applied": []
+  }
+}

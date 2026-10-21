@@ -1,0 +1,51 @@
+{
+  "vector": "05-unknown-section",
+  "layer": "lens/section",
+  "laws": ["lens.nothing-dropped"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      },
+      {
+        "id": "decision:cache",
+        "body": ["No cache until reads are slow."]
+      }
+    ],
+    "text": ["::: decision:auth", "Use OAuth device flow.", "", "Revisit in Q3.", ":::", "::: decision:cache", "No cache until reads are slow.", ":::", "::: decision:queue", "Use SQS.", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      },
+      {
+        "id": "decision:cache",
+        "body": ["No cache until reads are slow."]
+      },
+      {
+        "id": "decision:queue",
+        "body": ["Use SQS."]
+      }
+    ],
+    "normalized": ["::: decision:auth", "Use OAuth device flow.", "", "Revisit in Q3.", ":::", "::: decision:cache", "No cache until reads are slow.", ":::", "::: decision:queue", "Use SQS.", ":::"],
+    "outcomes": [
+      {
+        "unknown": "decision:queue"
+      }
+    ],
+    "applied": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      },
+      {
+        "id": "decision:cache",
+        "body": ["No cache until reads are slow."]
+      }
+    ]
+  }
+}

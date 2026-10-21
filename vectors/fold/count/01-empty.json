@@ -1,0 +1,12 @@
+{
+  "vector": "01-empty",
+  "layer": "fold/count",
+  "laws": ["count.perm"],
+  "source": "model",
+  "input": {
+    "orders": [
+      []
+    ]
+  },
+  "expect": 0
+}

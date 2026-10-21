@@ -1,0 +1,24 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lean
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Proofs check
+        working-directory: model
+        run: lake build --wfail
+      - name: Vectors are a pure render of the model
+        working-directory: model
+        run: |
+          lake exe gen ../vectors
+          git diff --exit-code -- ../vectors
+          test -z "$(git status --porcelain -- ../vectors)"

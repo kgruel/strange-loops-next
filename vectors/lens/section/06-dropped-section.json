@@ -1,0 +1,43 @@
+{
+  "vector": "06-dropped-section",
+  "layer": "lens/section",
+  "laws": ["lens.nothing-dropped", "lens.absence-not-edit"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      },
+      {
+        "id": "decision:cache",
+        "body": ["No cache until reads are slow."]
+      }
+    ],
+    "text": ["::: decision:auth", "Use OAuth device flow.", "", "Revisit in Q3.", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      }
+    ],
+    "normalized": ["::: decision:auth", "Use OAuth device flow.", "", "Revisit in Q3.", ":::"],
+    "outcomes": [
+      {
+        "absent": "decision:cache"
+      }
+    ],
+    "applied": [
+      {
+        "id": "decision:auth",
+        "body": ["Use OAuth device flow.", "", "Revisit in Q3."]
+      },
+      {
+        "id": "decision:cache",
+        "body": ["No cache until reads are slow."]
+      }
+    ]
+  }
+}
