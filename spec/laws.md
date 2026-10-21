@@ -34,6 +34,21 @@ store, an id names one record.
 | normal form | `normalize_idem` | normalizing twice is normalizing once | every lens vector |
 | `lens.refuse` | (by construction) | malformed text is refused, not guessed at | `lens/section/07`–`09` |
 
+## Record (`model/Laws/Record.lean`)
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `record.erasure` | `erase_keeps_id`, `erase_idem` | forgetting the opening never changes the id | `record/08`, every `erased_line` |
+| `record.commit` | `opening_checks` | a record's own salt and payload open its commitment | every sealed record vector |
+| `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about` or `prev` never changes the id | `record/02`, `03` |
+| `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
+| UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
+| `record.refuse` | (by construction) | a bad envelope is refused with a stated reason | `record/20`–`28` |
+
+The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
+computed by reference code in `model/Gen/` that checks itself against
+FIPS 180-4 and RFC 8032 values before it writes anything.
+
 ## Simplifications in step 0
 
 * Ids are numbers standing for content hashes, written as fixed-width hex

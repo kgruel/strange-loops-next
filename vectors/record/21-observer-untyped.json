@@ -1,0 +1,21 @@
+{
+  "vector": "21-observer-untyped",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "kyle",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "observer-not-typed"
+  }
+}

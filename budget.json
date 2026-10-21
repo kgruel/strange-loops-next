@@ -1,0 +1,8 @@
+{
+  "tokens": {
+    "core": 4000,
+    "core/internal/record": 8000,
+    "cli/cmd/budget": 4000
+  },
+  "surface": 34
+}

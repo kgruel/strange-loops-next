@@ -1,0 +1,32 @@
+{
+  "vector": "07-payload-not-object",
+  "layer": "record",
+  "laws": ["record.canonical"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "payloads": [
+      ["a payload can be any JSON value", 7]
+    ],
+    "salt": "zu4cxjyu3szpyazrkauzaodxna",
+    "seed": "jpairczaap3nqstmrszbjgpwkrjvfwtbw6gplbcgwfqb4ubyub5a"
+  },
+  "expect": {
+    "env_canonical": "{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}",
+    "payload_canonical": "[\"a payload can be any JSON value\",7]",
+    "commit": "h:nutfqvx3ueetuqauuafxppdyzxmopzhumqlj4cphnq3wa6khksoq",
+    "id_preimage": "{\"commit\":\"h:nutfqvx3ueetuqauuafxppdyzxmopzhumqlj4cphnq3wa6khksoq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}}",
+    "id": "r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq",
+    "signing_input": "loops/record/v1:r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq",
+    "key": "k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q",
+    "ed25519": "xg2ylpqjbgj5uw5dbbx43n37ikgx4dfoqkwctzeaahp3wr34rwbxlntcly5g3agyq4ot3bxm477bpkqc3xay5h2uydbq4ayr75ds6ay",
+    "line": "{\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq\",\"payload\":[\"a payload can be any JSON value\",7],\"salt\":\"zu4cxjyu3szpyazrkauzaodxna\",\"sig\":{\"ed25519\":\"xg2ylpqjbgj5uw5dbbx43n37ikgx4dfoqkwctzeaahp3wr34rwbxlntcly5g3agyq4ot3bxm477bpkqc3xay5h2uydbq4ayr75ds6ay\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}",
+    "erased_line": "{\"commit\":\"h:nutfqvx3ueetuqauuafxppdyzxmopzhumqlj4cphnq3wa6khksoq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq\",\"sig\":{\"ed25519\":\"xg2ylpqjbgj5uw5dbbx43n37ikgx4dfoqkwctzeaahp3wr34rwbxlntcly5g3agyq4ot3bxm477bpkqc3xay5h2uydbq4ayr75ds6ay\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}"
+  }
+}

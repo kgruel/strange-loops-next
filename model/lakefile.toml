@@ -10,7 +10,7 @@ name = "Laws"
 
 [[lean_lib]]
 name = "Gen"
-roots = ["Gen.Json"]
+roots = ["Gen.Json", "Gen.Sha2", "Gen.Ed25519", "Gen.Records"]
 
 [[lean_exe]]
 name = "gen"

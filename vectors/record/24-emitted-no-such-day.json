@@ -1,0 +1,21 @@
+{
+  "vector": "24-emitted-no-such-day",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-02-29T00:00:00Z"
+      }
+    ],
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "emitted-not-rfc3339"
+  }
+}

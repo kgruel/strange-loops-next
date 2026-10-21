@@ -1,0 +1,22 @@
+{
+  "vector": "27-prev-not-record",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00",
+        "prev": ["topic:auth"]
+      }
+    ],
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "prev-not-record-id"
+  }
+}

@@ -1,7 +1,9 @@
 # Vectors
 
-Written by `model/` (`lake exe gen ../vectors`); never edit by hand. CI
-regenerates them and fails on any difference.
+`fold/`, `lens/` and `record/` are written by `model/` (`lake exe gen
+../vectors`); never edit them by hand. CI regenerates them and fails on any
+difference. `standard/` holds test data from the standards themselves; see
+its README.
 
 Every file has the same envelope:
 
@@ -32,3 +34,14 @@ implementation folds each order separately; every one must produce
 `expect` is either `{"parsed": null, "refused": true}` or the parsed
 document, its normal form, the outcomes (`accepted`, `unknown`, `absent`)
 and the base with the outcomes applied.
+
+## `record`
+
+A sealed vector gives `input.envs` (envelope variants that must all give the
+same id), `input.payloads` (payload variants that must all give the same
+commitment), the `salt` and the signing key's `seed` (both base32).
+`expect` pins every intermediate: the canonical envelope and payload, the
+commitment, the id's preimage, the id, the signing key and signature, and
+the stored line before and after erasure.
+
+A refused vector has `expect.refused`: the reason, per `spec/record.md`.

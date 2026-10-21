@@ -11,9 +11,11 @@ inductive J where
   | null
   | bool (b : Bool)
   | num (n : Nat)
+  | int (i : Int)
   | str (s : String)
   | arr (xs : List J)
   | obj (kvs : List (String × J))
+  deriving Inhabited
 
 def hex4 (n : Nat) : String :=
   let d := Nat.toDigits 16 n
@@ -36,6 +38,7 @@ partial def J.render (ind : Nat) : J → String
   | .null => "null"
   | .bool b => toString b
   | .num n => toString n
+  | .int i => toString i
   | .str s => escape s
   | .arr [] => "[]"
   | .arr xs =>
