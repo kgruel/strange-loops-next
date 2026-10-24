@@ -7,7 +7,7 @@ jobs:
   model:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Lean
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
@@ -22,3 +22,38 @@ jobs:
           lake exe gen ../vectors
           git diff --exit-code -- ../vectors
           test -z "$(git status --porcelain -- ../vectors)"
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: core/go.mod
+      - name: Format
+        run: test -z "$(gofmt -l core cli)"
+      - name: Vet
+        run: go vet ./core/... ./cli/...
+      - name: Vectors
+        working-directory: core
+        run: go test ./...
+
+  interop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: The JS writer agrees on every vector
+        run: node interop/js/check.mjs vectors
+
+  budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: core/go.mod
+      - name: Tokens, surface, requires, tests
+        run: go run ./cli/cmd/budget

@@ -1,0 +1,32 @@
+{
+  "vector": "09-leap-second",
+  "layer": "record",
+  "laws": ["record.emitted"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2016-12-31T23:59:60Z"
+      }
+    ],
+    "payloads": [
+      {}
+    ],
+    "salt": "pjalwghla3qrhdckghgyc6xs74",
+    "seed": "jpairczaap3nqstmrszbjgpwkrjvfwtbw6gplbcgwfqb4ubyub5a"
+  },
+  "expect": {
+    "env_canonical": "{\"emitted\":\"2016-12-31T23:59:60Z\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}",
+    "payload_canonical": "{}",
+    "commit": "h:pgnujpgy6el2hs7c5yndwrbfw52fauzgulbxas6brm2nrvs5sojq",
+    "id_preimage": "{\"commit\":\"h:pgnujpgy6el2hs7c5yndwrbfw52fauzgulbxas6brm2nrvs5sojq\",\"env\":{\"emitted\":\"2016-12-31T23:59:60Z\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}}",
+    "id": "r:bpmpzc3ribklqwswukh3ahxvwt22iyofalgpllyyz6qmpmqmgrqq",
+    "signing_input": "loops/record/v1:r:bpmpzc3ribklqwswukh3ahxvwt22iyofalgpllyyz6qmpmqmgrqq",
+    "key": "k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q",
+    "ed25519": "kzbrywqanvut74wycqg7lfrz6oqz7qo74lcj4uj5cepnldywpboqzj6svhmdibr35gca5zyihw65m35thpoghxexytpphz4omlfcqdi",
+    "line": "{\"env\":{\"emitted\":\"2016-12-31T23:59:60Z\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:bpmpzc3ribklqwswukh3ahxvwt22iyofalgpllyyz6qmpmqmgrqq\",\"payload\":{},\"salt\":\"pjalwghla3qrhdckghgyc6xs74\",\"sig\":{\"ed25519\":\"kzbrywqanvut74wycqg7lfrz6oqz7qo74lcj4uj5cepnldywpboqzj6svhmdibr35gca5zyihw65m35thpoghxexytpphz4omlfcqdi\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}",
+    "erased_line": "{\"commit\":\"h:pgnujpgy6el2hs7c5yndwrbfw52fauzgulbxas6brm2nrvs5sojq\",\"env\":{\"emitted\":\"2016-12-31T23:59:60Z\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:bpmpzc3ribklqwswukh3ahxvwt22iyofalgpllyyz6qmpmqmgrqq\",\"sig\":{\"ed25519\":\"kzbrywqanvut74wycqg7lfrz6oqz7qo74lcj4uj5cepnldywpboqzj6svhmdibr35gca5zyihw65m35thpoghxexytpphz4omlfcqdi\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}"
+  }
+}

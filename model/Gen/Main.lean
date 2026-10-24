@@ -1,5 +1,6 @@
 import Loops
 import Gen.Json
+import Gen.Records
 
 /-!
 # Gen: write the vectors
@@ -161,15 +162,19 @@ def orFail : Except String J → IO J
 
 def main (args : List String) : IO UInt32 := do
   let dir : System.FilePath := args.headD "../vectors"
-  for sub in ["fold", "lens"] do
+  for sub in ["fold", "lens", "record"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
   let upsert ← upsertCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/upsert" c fun o => jUpsert (Upsert.fold .empty o)))
   let lens ← lensCases.mapM fun c => do pure (c.name, ← orFail (lensVector c))
+  let records ← match Gen.Records.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
   writeAll dir "fold/count" count
   writeAll dir "fold/upsert" upsert
   writeAll dir "lens/section" lens
-  IO.println s!"wrote {count.length + upsert.length + lens.length} vectors to {dir}"
+  writeAll dir "record" records
+  IO.println s!"wrote {count.length + upsert.length + lens.length + records.length} vectors to {dir}"
   return 0

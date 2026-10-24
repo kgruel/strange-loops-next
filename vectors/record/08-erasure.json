@@ -1,0 +1,35 @@
+{
+  "vector": "08-erasure",
+  "layer": "record",
+  "laws": ["record.erasure"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:s4jm5fu3i4grmk7q47lp2e3wux6z7absagaqpdnirlvesy4hz6fq",
+        "emitted": "2026-03-04T10:12:44-05:00",
+        "about": ["r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a"]
+      }
+    ],
+    "payloads": [
+      {
+        "body": "Called the customer back at 555-0100"
+      }
+    ],
+    "salt": "zoollojotkeuvnx7w2jubg64oe",
+    "seed": "c5lcxpsspsjseib4ylflgqpiku3lw6j2h4dan2on4kmzk4z74phq"
+  },
+  "expect": {
+    "env_canonical": "{\"about\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"emitted\":\"2026-03-04T10:12:44-05:00\",\"kind\":\"note\",\"observer\":\"sl:s4jm5fu3i4grmk7q47lp2e3wux6z7absagaqpdnirlvesy4hz6fq\"}",
+    "payload_canonical": "{\"body\":\"Called the customer back at 555-0100\"}",
+    "commit": "h:s3252sdywcoievoov4ztxt6qfcsfdx4nizerhpuumwfkesspcmqq",
+    "id_preimage": "{\"commit\":\"h:s3252sdywcoievoov4ztxt6qfcsfdx4nizerhpuumwfkesspcmqq\",\"env\":{\"about\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"emitted\":\"2026-03-04T10:12:44-05:00\",\"kind\":\"note\",\"observer\":\"sl:s4jm5fu3i4grmk7q47lp2e3wux6z7absagaqpdnirlvesy4hz6fq\"}}",
+    "id": "r:fr4jp7phlkz44ytk3m67bxeex5oyrca7m64iknwfrhuzrrshacda",
+    "signing_input": "loops/record/v1:r:fr4jp7phlkz44ytk3m67bxeex5oyrca7m64iknwfrhuzrrshacda",
+    "key": "k:3ze3lu46rsxqbje6cf3entscoa3vhyqufgqok6x6txzl7kzrcolq",
+    "ed25519": "y36olzrie3thxfawvpotlbpc4dokgym7vvklt5wakvh52l4ek5bep2fvz3gz3q3zzvtgeqizp53mas7toijvazmgald3di6otr264bi",
+    "line": "{\"env\":{\"about\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"emitted\":\"2026-03-04T10:12:44-05:00\",\"kind\":\"note\",\"observer\":\"sl:s4jm5fu3i4grmk7q47lp2e3wux6z7absagaqpdnirlvesy4hz6fq\"},\"id\":\"r:fr4jp7phlkz44ytk3m67bxeex5oyrca7m64iknwfrhuzrrshacda\",\"payload\":{\"body\":\"Called the customer back at 555-0100\"},\"salt\":\"zoollojotkeuvnx7w2jubg64oe\",\"sig\":{\"ed25519\":\"y36olzrie3thxfawvpotlbpc4dokgym7vvklt5wakvh52l4ek5bep2fvz3gz3q3zzvtgeqizp53mas7toijvazmgald3di6otr264bi\",\"key\":\"k:3ze3lu46rsxqbje6cf3entscoa3vhyqufgqok6x6txzl7kzrcolq\"}}",
+    "erased_line": "{\"commit\":\"h:s3252sdywcoievoov4ztxt6qfcsfdx4nizerhpuumwfkesspcmqq\",\"env\":{\"about\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"emitted\":\"2026-03-04T10:12:44-05:00\",\"kind\":\"note\",\"observer\":\"sl:s4jm5fu3i4grmk7q47lp2e3wux6z7absagaqpdnirlvesy4hz6fq\"},\"id\":\"r:fr4jp7phlkz44ytk3m67bxeex5oyrca7m64iknwfrhuzrrshacda\",\"sig\":{\"ed25519\":\"y36olzrie3thxfawvpotlbpc4dokgym7vvklt5wakvh52l4ek5bep2fvz3gz3q3zzvtgeqizp53mas7toijvazmgald3di6otr264bi\",\"key\":\"k:3ze3lu46rsxqbje6cf3entscoa3vhyqufgqok6x6txzl7kzrcolq\"}}"
+  }
+}
