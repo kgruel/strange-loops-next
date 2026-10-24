@@ -17,9 +17,9 @@ def Count.step (n : Nat) (_ : Record) : Nat := n + 1
 
 def Count.fold (n : Nat) (xs : List Record) : Nat := xs.foldl Count.step n
 
-/-! ## Upsert
+/-! ## LatestBy
 
-Upsert keeps the records nothing names in `prev` (the heads), newest first,
+LatestBy keeps the records nothing names in `prev` (the heads), newest first,
 and every id some `prev` names. A key's winner is its newest head; any other
 heads for the key are a fork, shown as a conflict.
 -/
@@ -34,40 +34,40 @@ def insertRec (r : Record) : List Record → List Record
   | [] => [r]
   | h :: t => if Newer r h then r :: h :: t else if r = h then h :: t else h :: insertRec r t
 
-structure Upsert where
+structure LatestBy where
   named : List Nat
   heads : List Record
   deriving Repr, DecidableEq, Inhabited
 
-def Upsert.step (s : Upsert) (r : Record) : Upsert :=
+def LatestBy.step (s : LatestBy) (r : Record) : LatestBy :=
   let named := r.prev.foldl (fun ns n => insertId n ns) s.named
   let heads := s.heads.filter (fun h => !r.prev.contains h.id)
   { named := named
     heads := if named.contains r.id then heads else insertRec r heads }
 
-def Upsert.empty : Upsert := ⟨[], []⟩
+def LatestBy.empty : LatestBy := ⟨[], []⟩
 
-def Upsert.fold (s : Upsert) (xs : List Record) : Upsert := xs.foldl Upsert.step s
+def LatestBy.fold (s : LatestBy) (xs : List Record) : LatestBy := xs.foldl LatestBy.step s
 
 /-- The winner for a key: its newest head. -/
-def Upsert.winner (s : Upsert) (k : String) : Option Record :=
+def LatestBy.winner (s : LatestBy) (k : String) : Option Record :=
   s.heads.find? (·.key == k)
 
 /-- The other heads for a key: non-empty means the key is forked. -/
-def Upsert.others (s : Upsert) (k : String) : List Record :=
+def LatestBy.others (s : LatestBy) (k : String) : List Record :=
   (s.heads.filter (·.key == k)).drop 1
 
 /-! ## Latest
 
-Latest is Upsert with a single key: the newest head, and any other heads as
+Latest is LatestBy with a single key: the newest head, and any other heads as
 a fork. It follows `prev` chains instead of trusting clocks.
 -/
 
-def Latest.fold (xs : List Record) : Upsert := Upsert.fold Upsert.empty xs
+def Latest.fold (xs : List Record) : LatestBy := LatestBy.fold LatestBy.empty xs
 
-def Latest.winner (s : Upsert) : Option Record := s.heads.head?
+def Latest.winner (s : LatestBy) : Option Record := s.heads.head?
 
-def Latest.others (s : Upsert) : List Record := s.heads.drop 1
+def Latest.others (s : LatestBy) : List Record := s.heads.drop 1
 
 /-! ## Sum, Min, Max
 

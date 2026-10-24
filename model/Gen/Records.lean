@@ -69,7 +69,7 @@ structure Case where
   payloads : List Json
   key : String := "kyle"
 
-def sealedVector (c : Case) : Except String J := do
+def storedVector (c : Case) : Except String J := do
   let env := c.envs.headD default
   let payload := c.payloads.headD .null
   if let some why := env.problem then throw s!"record/{c.name}: unexpectedly refused: {why}"
@@ -119,7 +119,7 @@ def grantId : String :=
   (make { kind := "grant", observer := kyle, emitted := "2026-10-20T12:00:00Z" }
     (saltFor "grant") (.obj [("to", .str wren)])).id H
 
-def sealedCases : List Case := [
+def storedCases : List Case := [
   { name := "01-minimal", laws := ["record.id", "record.commit", "record.sign"],
     envs := [note], payloads := [.obj [("body", .str "hello")]] },
   { name := "02-full-envelope", laws := ["record.id", "record.sets"],
@@ -208,8 +208,8 @@ def selfCheck : Except String Unit := do
 
 def vectors : Except String (List (String × J)) := do
   selfCheck
-  let sealed ← sealedCases.mapM fun c => do pure (c.name, ← sealedVector c)
+  let stored ← storedCases.mapM fun c => do pure (c.name, ← storedVector c)
   let refused ← refusedCases.mapM fun (n, e) => do pure (n, ← refusedVector n e)
-  return sealed ++ refused
+  return stored ++ refused
 
 end Gen.Records

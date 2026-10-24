@@ -1,21 +1,11 @@
 {
-  "vector": "03-chain",
-  "layer": "fold/upsert",
-  "laws": ["upsert.set"],
+  "vector": "04-chain-late",
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set"],
   "source": "model",
   "input": {
     "orders": [
       [
-        {
-          "id": "r:00000011",
-          "kind": "decision",
-          "key": "topic:auth",
-          "value": "v17",
-          "prev": [],
-          "occurred": 100,
-          "emitted": 100,
-          "n": 0
-        },
         {
           "id": "r:00000012",
           "kind": "decision",
@@ -24,6 +14,16 @@
           "prev": ["r:00000011"],
           "occurred": 200,
           "emitted": 200,
+          "n": 0
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
           "n": 0
         }
       ]

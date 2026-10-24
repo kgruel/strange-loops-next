@@ -10,22 +10,22 @@ Every file has the same envelope:
 ```json
 {
   "vector": "02-fork",
-  "layer": "fold/upsert",
-  "laws": ["upsert.set", "upsert.order"],
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set", "latest-by.order"],
   "source": "model",
   "input": { },
   "expect": { }
 }
 ```
 
-## `fold/count`, `fold/upsert`, `fold/latest`, `fold/sum`, `fold/extrema`
+## `fold/count`, `fold/latest-by`, `fold/latest`, `fold/sum`, `fold/extrema`
 
 `input.orders` lists one or more arrival orders of the same records. An
 implementation folds each order separately; every one must produce
 `expect` (except `count.repeats`, which has one order).
 
 * Count: `expect` is the number.
-* Upsert: `expect.heads` (newest first), `expect.named` (ascending), and
+* LatestBy: `expect.heads` (newest first), `expect.named` (ascending), and
   per key the `winner` and the `others` (a fork when non-empty).
 * Latest: the `winner` and the `others`.
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
@@ -36,7 +36,7 @@ of `value` and `n`.
 
 ## `fold/heads`
 
-Answers worked out from Upsert's heads. `expect.max` is the largest `n`
+Answers worked out from LatestBy's heads. `expect.max` is the largest `n`
 among the readable heads (`value`, `null` if none) and how many heads were
 unreadable (`unread`); `expect["limit-2"]` is the two newest heads.
 
@@ -63,11 +63,11 @@ and the base with the outcomes applied.
 
 ## `record`
 
-A sealed vector gives `input.envs` (envelope variants that must all give the
+A stored-record vector gives `input.envs` (envelope variants that must all give the
 same id), `input.payloads` (payload variants that must all give the same
 commitment), the `salt` and the signing key's `seed` (both base32).
 `expect` pins every intermediate: the canonical envelope and payload, the
 commitment, the id's preimage, the id, the signing key and signature, and
 the stored line before and after erasure.
 
-A refused vector has `expect.refused`: the reason, per `spec/record.md`.
+A refused vector has `expect.refused`: the reason, per `protocol/record.md`.

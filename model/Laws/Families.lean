@@ -9,8 +9,8 @@ import Laws.Numeric
   several places is `dedup`, and it doesn't matter which place is read first.
 * **Accumulating folds: the set decides.** Any step that commutes gives the
   same state for the same set, and a late record folds onto the cached state.
-* **Folds over heads: the set decides.** Any answer worked out from Upsert's
-  state inherits `Upsert.set_decides`.
+* **Folds over heads: the set decides.** Any answer worked out from LatestBy's
+  state inherits `LatestBy.set_decides`.
 * **Why there are two.** A bounded state can't follow `prev`: Max can't be
   kept current over heads from its own state.
 * **No false resurrection.** A view folds to the same heads, so withholding or
@@ -126,18 +126,18 @@ theorem Min.acc_fold (xs : List Record) : Min.acc.fold xs = Min.fold none xs := 
 /-! ## Folds over heads -/
 
 /-- The set decides, for every answer worked out from the heads. -/
-theorem OverHeads.set_decides {σ} (answer : Upsert → σ) {xs ys : List Record}
+theorem OverHeads.set_decides {σ} (answer : LatestBy → σ) {xs ys : List Record}
     (hx : Addressed xs) (hy : Addressed ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
     OverHeads.fold answer xs = OverHeads.fold answer ys := by
   unfold OverHeads.fold
-  rw [Upsert.set_decides hx hy h]
+  rw [LatestBy.set_decides hx hy h]
 
 /-- A late record folds onto the cached heads. -/
-theorem OverHeads.late {σ} (answer : Upsert → σ) {xs ys : List Record} (r : Record)
+theorem OverHeads.late {σ} (answer : LatestBy → σ) {xs ys : List Record} (r : Record)
     (hx : Addressed (xs ++ [r])) (hy : Addressed ys) (h : ∀ q, q ∈ ys ↔ q ∈ xs ∨ q = r) :
-    answer ((Upsert.fold .empty xs).step r) = OverHeads.fold answer ys := by
-  have e : (Upsert.fold .empty xs).step r = Upsert.fold .empty (xs ++ [r]) := by
-    rw [← Upsert.batch]; rfl
+    answer ((LatestBy.fold .empty xs).step r) = OverHeads.fold answer ys := by
+  have e : (LatestBy.fold .empty xs).step r = LatestBy.fold .empty (xs ++ [r]) := by
+    rw [← LatestBy.batch]; rfl
   rw [e]
   exact OverHeads.set_decides answer hx hy fun q => by rw [h]; simp
 
@@ -155,7 +155,7 @@ def cx.c : Record :=
 1 in the other. No step from Max's state can know which. -/
 theorem Max.cannot_follow_prev :
     ¬ ∃ g : Option Int → Record → Option Int, ∀ xs r, Distinct (xs ++ [r]) →
-      g (Max.fold none xs) r = (OverHeads.fold Upsert.maxHeads (xs ++ [r])).value := by
+      g (Max.fold none xs) r = (OverHeads.fold LatestBy.maxHeads (xs ++ [r])).value := by
   rintro ⟨g, hg⟩
   have h₁ := hg [cx.a, cx.b] cx.c (by unfold Distinct; decide)
   have h₂ := hg [cx.b] cx.c (by unfold Distinct; decide)
@@ -188,21 +188,21 @@ theorem erase_view : View Record.erase where
   envelope r := by simp [SameEnvelope, Record.erase]
   hides r := by simp [Record.erase]
 
-theorem Upsert.inv_of {xs : List Record} (hx : Addressed xs) :
-    Upsert.Inv (Upsert.fold .empty xs) xs := by
-  simpa using Upsert.inv_fold xs Upsert.inv_empty (by simpa using hx)
+theorem LatestBy.inv_of {xs : List Record} (hx : Addressed xs) :
+    LatestBy.Inv (LatestBy.fold .empty xs) xs := by
+  simpa using LatestBy.inv_fold xs LatestBy.inv_empty (by simpa using hx)
 
 /-- A view folds to the same `prev` bookkeeping and the same heads, with their
 payloads hidden as the view hides them. -/
-theorem Upsert.view {f : Record → Record} (hf : View f) {xs : List Record}
+theorem LatestBy.view {f : Record → Record} (hf : View f) {xs : List Record}
     (hx : Addressed xs) :
-    Upsert.fold .empty (xs.map f) =
-      ⟨(Upsert.fold .empty xs).named, (Upsert.fold .empty xs).heads.map f⟩ := by
-  have hs := Upsert.inv_of hx
-  have ht := Upsert.inv_of (hf.addressed hx)
+    LatestBy.fold .empty (xs.map f) =
+      ⟨(LatestBy.fold .empty xs).named, (LatestBy.fold .empty xs).heads.map f⟩ := by
+  have hs := LatestBy.inv_of hx
+  have ht := LatestBy.inv_of (hf.addressed hx)
   have prev_eq : ∀ r, (f r).prev = r.prev := fun r => (hf.envelope r).2.2.2.1
   have id_eq : ∀ r, (f r).id = r.id := fun r => (hf.envelope r).1
-  refine Upsert.inv_ext ht ⟨hs.named_sorted, ?_, ?_, ?_⟩ fun _ => Iff.rfl
+  refine LatestBy.inv_ext ht ⟨hs.named_sorted, ?_, ?_, ?_⟩ fun _ => Iff.rfl
   · intro n
     rw [hs.named_mem]
     simp only [mem_map]
@@ -225,22 +225,22 @@ theorem Upsert.view {f : Record → Record} (hf : View f) {xs : List Record}
       exact hn ⟨f q, ⟨q, hq, rfl⟩, by rw [prev_eq, id_eq]; exact hq'⟩
 
 /-- Every view sees the same records as heads, whatever it can read of them. -/
-theorem Upsert.view_head_ids {f : Record → Record} (hf : View f) {xs : List Record}
+theorem LatestBy.view_head_ids {f : Record → Record} (hf : View f) {xs : List Record}
     (hx : Addressed xs) :
-    (Upsert.fold .empty (xs.map f)).heads.map (·.id) =
-      (Upsert.fold .empty xs).heads.map (·.id) := by
-  rw [Upsert.view hf hx, map_map]
+    (LatestBy.fold .empty (xs.map f)).heads.map (·.id) =
+      (LatestBy.fold .empty xs).heads.map (·.id) := by
+  rw [LatestBy.view hf hx, map_map]
   exact map_congr_left fun r _ => (hf.envelope r).1
 
 /-- No false resurrection: a record something supersedes is never a head, in
 any view. -/
-theorem Upsert.no_false_resurrection {f : Record → Record} (hf : View f)
+theorem LatestBy.no_false_resurrection {f : Record → Record} (hf : View f)
     {xs : List Record} (hx : Addressed xs) {r q : Record} (hq : q ∈ xs) (hr : r.id ∈ q.prev) :
-    ∀ h ∈ (Upsert.fold .empty (xs.map f)).heads, h.id ≠ r.id := by
+    ∀ h ∈ (LatestBy.fold .empty (xs.map f)).heads, h.id ≠ r.id := by
   intro h hh e
-  rw [Upsert.view hf hx] at hh
+  rw [LatestBy.view hf hx] at hh
   obtain ⟨g, hg, rfl⟩ := mem_map.1 hh
-  obtain ⟨-, hn⟩ := ((Upsert.inv_of hx).heads_mem g).1 hg
+  obtain ⟨-, hn⟩ := ((LatestBy.inv_of hx).heads_mem g).1 hg
   rw [(hf.envelope g).1] at e
   exact hn ⟨q, hq, e ▸ hr⟩
 
@@ -284,11 +284,11 @@ theorem Acc.select_set_decides {σ} (f : Acc σ) (w : Where) {xs ys : List Recor
     ((p.filter _).filter _).length_eq]
 
 /-- Max over heads counts the heads a view hides. -/
-theorem Upsert.maxHeads_view {f : Record → Record} (hf : View f) {xs : List Record}
+theorem LatestBy.maxHeads_view {f : Record → Record} (hf : View f) {xs : List Record}
     (hx : Addressed xs) :
-    (OverHeads.fold Upsert.maxHeads (xs.map f)).unread =
-      ((Upsert.fold .empty xs).heads.filter fun h => (f h).shown != .here).length := by
-  simp only [OverHeads.fold, Upsert.maxHeads, Upsert.view hf hx, filter_map, length_map]
+    (OverHeads.fold LatestBy.maxHeads (xs.map f)).unread =
+      ((LatestBy.fold .empty xs).heads.filter fun h => (f h).shown != .here).length := by
+  simp only [OverHeads.fold, LatestBy.maxHeads, LatestBy.view hf hx, filter_map, length_map]
   rfl
 
 end Loops

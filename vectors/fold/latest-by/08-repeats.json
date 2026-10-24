@@ -1,7 +1,7 @@
 {
   "vector": "08-repeats",
-  "layer": "fold/upsert",
-  "laws": ["upsert.repeats"],
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.repeats"],
   "source": "model",
   "input": {
     "orders": [

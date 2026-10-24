@@ -8,21 +8,21 @@ vectors; the model is what the vectors come from.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| incremental = batch | `Count.batch`, `Upsert.batch` | folding `xs` then `ys` is folding `xs ++ ys` | every fold vector |
+| incremental = batch | `Count.batch`, `LatestBy.batch` | folding `xs` then `ys` is folding `xs ++ ys` | every fold vector |
 | `count.perm` | `Count.perm` | arrival order doesn't change a count | `fold/count/01`, `02` |
 | `count.repeats` | `Count.repeats` | a repeated delivery is counted again, so the store must hand each id over once | `fold/count/03` |
-| `upsert.set` | `Upsert.set_decides` | the state depends only on the set of records folded | `fold/upsert/*` |
-| `upsert.order` | `Upsert.perm` | winners follow content order: `prev`, then `occurred`, `emitted`, id | `fold/upsert/02`, `05`, `06` |
-| `upsert.repeats` | `Upsert.repeats` | re-delivering records changes nothing | `fold/upsert/08` |
-| `upsert.converge` | `Upsert.converge` | two places syncing in either direction reach the same state | `fold/upsert/09` |
+| `latest-by.set` | `LatestBy.set_decides` | the state depends only on the set of records folded | `fold/latest-by/*` |
+| `latest-by.order` | `LatestBy.perm` | winners follow content order: `prev`, then `occurred`, `emitted`, id | `fold/latest-by/02`, `05`, `06` |
+| `latest-by.repeats` | `LatestBy.repeats` | re-delivering records changes nothing | `fold/latest-by/08` |
+| `latest-by.converge` | `LatestBy.converge` | two places syncing in either direction reach the same state | `fold/latest-by/09` |
 
-| `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is Upsert with one key, so it inherits Upsert's laws | `fold/latest/*` |
+| `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is LatestBy with one key, so it inherits LatestBy's laws | `fold/latest/*` |
 | `sum.perm` | `Sum.perm` | arrival order doesn't change a sum | `fold/sum/01`, `02` |
 | `sum.repeats` | `Sum.repeats` | a repeated delivery is added again, so the store must hand each id over once | `fold/sum/03` |
 | `extrema.set` | `Max.set_decides`, `Min.set_decides` | Min and Max depend only on the set of records | `fold/extrema/*` |
 
 Incremental = batch holds for every step fold by construction. The law with
-teeth is `upsert.set`: it is what lets late arrivals, re-sent segments and
+teeth is `latest-by.set`: it is what lets late arrivals, re-sent segments and
 two-way syncs agree. It needs content addressing (`Addressed`): within a
 store, an id names one record.
 
@@ -36,7 +36,7 @@ too.
 Every fold depends only on the set of records it is handed. Folds come in
 two families, each with one law: **accumulating** folds (Count, Sum, Min,
 Max) have a step that commutes; folds **over heads** follow `prev`, keep
-Upsert's state and work their answer out from it. A late record folds onto
+LatestBy's state and work their answer out from it. A late record folds onto
 the cached state in both, so there is no partial rewind.
 
 | Law | Theorem | Says | Vectors |
@@ -48,9 +48,9 @@ the cached state in both, so there is no partial rewind.
 | `heads.set` | `OverHeads.set_decides` | any answer worked out from the heads depends only on the set | `fold/heads/*` |
 | `heads.late` | `OverHeads.late` | a late record folds onto the cached heads | (follows from `heads.set`) |
 | `heads.why` | `Max.cannot_follow_prev` | a bounded state can't follow `prev`: Max can't be kept current from its own state | `fold/heads/01`, `02` |
-| `view.no-resurrection` | `Upsert.view`, `Upsert.view_head_ids`, `Upsert.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
+| `view.no-resurrection` | `LatestBy.view`, `LatestBy.view_head_ids`, `LatestBy.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
 | `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
-| `result.unread` | `Upsert.maxHeads_view` | a result counts the covered records it couldn't read | `fold/view/04`, `fold/select/*` |
+| `result.unread` | `LatestBy.maxHeads_view` | a result counts the covered records it couldn't read | `fold/view/04`, `fold/select/*` |
 | `result.full` | `Acc.select_full` | with every payload here, nothing is unread and the result is the plain fold | `fold/select/03` |
 | `select.set` | `Acc.select_set_decides` | what is read and what is unread depend only on the set | `fold/select/*` |
 
@@ -82,7 +82,7 @@ conjectures, checked by vectors and fuzzing until proved; `lake build
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
 | `record.erasure` | `erase_keeps_id`, `erase_idem` | forgetting the opening never changes the id | `record/08`, every `erased_line` |
-| `record.commit` | `opening_checks` | a record's own salt and payload open its commitment | every sealed record vector |
+| `record.commit` | `opening_checks` | a record's own salt and payload open its commitment | every stored record vector |
 | `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about` or `prev` never changes the id | `record/02`, `03` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |

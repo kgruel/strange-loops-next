@@ -5,7 +5,7 @@ import Loops.Fold
 
 * **Incremental = batch.** Folding `xs` then `ys` equals folding `xs ++ ys`.
   This holds for every step fold by construction (`List.foldl_append`).
-* **The set decides.** Upsert's state depends only on which records were
+* **The set decides.** LatestBy's state depends only on which records were
   folded: not their order, not repeats. So late arrivals, re-delivered
   segments and syncs in either direction all converge.
 * **Count needs the store.** Count is order-free but counts repeats, so the
@@ -22,9 +22,9 @@ theorem Count.batch (n : Nat) (xs ys : List Record) :
     Count.fold (Count.fold n xs) ys = Count.fold n (xs ++ ys) := by
   simp [Count.fold, List.foldl_append]
 
-theorem Upsert.batch (s : Upsert) (xs ys : List Record) :
-    Upsert.fold (Upsert.fold s xs) ys = Upsert.fold s (xs ++ ys) := by
-  simp [Upsert.fold, List.foldl_append]
+theorem LatestBy.batch (s : LatestBy) (xs ys : List Record) :
+    LatestBy.fold (LatestBy.fold s xs) ys = LatestBy.fold s (xs ++ ys) := by
+  simp [LatestBy.fold, List.foldl_append]
 
 /-! ## Count -/
 
@@ -43,7 +43,7 @@ theorem Count.perm {xs ys : List Record} (h : xs ~ ys) (n : Nat) :
 theorem Count.repeats (xs : List Record) : Count.fold 0 (xs ++ xs) = 2 * Count.fold 0 xs := by
   simp [Count.fold_eq]; omega
 
-/-! ## Upsert: building blocks -/
+/-! ## LatestBy: building blocks -/
 
 theorem mem_insertId {x n : Nat} {l : List Nat} : x ∈ insertId n l ↔ x = n ∨ x ∈ l := by
   induction l with
@@ -129,23 +129,23 @@ theorem sorted_insertRec {r : Record} {l : List Record} (h : l.Pairwise Newer)
         · exact hxr
         · exact h.1 a ha
 
-/-! ## Upsert: what the state means -/
+/-! ## LatestBy: what the state means -/
 
 /-- `s` is the state of having folded exactly the records `xs`. -/
-structure Upsert.Inv (s : Upsert) (xs : List Record) : Prop where
+structure LatestBy.Inv (s : LatestBy) (xs : List Record) : Prop where
   named_sorted : s.named.Pairwise (· < ·)
   named_mem : ∀ n, n ∈ s.named ↔ ∃ r ∈ xs, n ∈ r.prev
   heads_sorted : s.heads.Pairwise Newer
   heads_mem : ∀ h, h ∈ s.heads ↔ h ∈ xs ∧ ¬ ∃ r ∈ xs, h.id ∈ r.prev
 
-theorem Upsert.inv_empty : Upsert.Inv Upsert.empty [] :=
-  ⟨by simp [Upsert.empty], by simp [Upsert.empty], by simp [Upsert.empty], by simp [Upsert.empty]⟩
+theorem LatestBy.inv_empty : LatestBy.Inv LatestBy.empty [] :=
+  ⟨by simp [LatestBy.empty], by simp [LatestBy.empty], by simp [LatestBy.empty], by simp [LatestBy.empty]⟩
 
-theorem Upsert.inv_step {s : Upsert} {xs : List Record} {r : Record}
-    (hs : Upsert.Inv s xs) (ha : Addressed (xs ++ [r])) : Upsert.Inv (s.step r) (xs ++ [r]) := by
+theorem LatestBy.inv_step {s : LatestBy} {xs : List Record} {r : Record}
+    (hs : LatestBy.Inv s xs) (ha : Addressed (xs ++ [r])) : LatestBy.Inv (s.step r) (xs ++ [r]) := by
   have hnamed : ∀ n, n ∈ (s.step r).named ↔ ∃ q ∈ xs ++ [r], n ∈ q.prev := by
     intro n
-    simp only [Upsert.step, mem_insertIds, hs.named_mem, mem_append, mem_singleton]
+    simp only [LatestBy.step, mem_insertIds, hs.named_mem, mem_append, mem_singleton]
     constructor
     · rintro (h | ⟨q, hq, hn⟩)
       · exact ⟨r, Or.inr rfl, h⟩
@@ -174,7 +174,7 @@ theorem Upsert.inv_step {s : Upsert} {xs : List Record} {r : Record}
     hs.heads_sorted.sublist (filter_sublist)
   refine ⟨?_, hnamed, ?_, ?_⟩
   · exact sorted_insertIds hs.named_sorted
-  · simp only [Upsert.step]
+  · simp only [LatestBy.step]
     split
     · exact hfsorted
     · apply sorted_insertRec hfsorted
@@ -212,18 +212,18 @@ theorem Upsert.inv_step {s : Upsert} {xs : List Record} {r : Record}
         · exact Or.inr ⟨hx, hn⟩
         · exact Or.inl (mem_singleton.1 hx)
 
-theorem Upsert.inv_fold {s : Upsert} {ys : List Record} (xs : List Record)
-    (hs : Upsert.Inv s ys) (ha : Addressed (ys ++ xs)) : Upsert.Inv (Upsert.fold s xs) (ys ++ xs) := by
+theorem LatestBy.inv_fold {s : LatestBy} {ys : List Record} (xs : List Record)
+    (hs : LatestBy.Inv s ys) (ha : Addressed (ys ++ xs)) : LatestBy.Inv (LatestBy.fold s xs) (ys ++ xs) := by
   induction xs generalizing s ys with
-  | nil => simpa [Upsert.fold] using hs
+  | nil => simpa [LatestBy.fold] using hs
   | cons x xs ih =>
     have ha' : Addressed (ys ++ [x]) := fun a ha₁ b hb₁ => ha a (by simp at ha₁ ⊢; grind) b (by simp at hb₁ ⊢; grind)
-    have := ih (Upsert.inv_step hs ha') (by simpa using ha)
-    simpa [Upsert.fold] using this
+    have := ih (LatestBy.inv_step hs ha') (by simpa using ha)
+    simpa [LatestBy.fold] using this
 
 /-- Two states that each mean "folded these records" are the same state. -/
-theorem Upsert.inv_ext {s t : Upsert} {xs ys : List Record}
-    (hs : Upsert.Inv s xs) (ht : Upsert.Inv t ys) (hset : ∀ r, r ∈ xs ↔ r ∈ ys) : s = t := by
+theorem LatestBy.inv_ext {s t : LatestBy} {xs ys : List Record}
+    (hs : LatestBy.Inv s xs) (ht : LatestBy.Inv t ys) (hset : ∀ r, r ∈ xs ↔ r ∈ ys) : s = t := by
   have hn : s.named = t.named := by
     apply Perm.eq_of_pairwise (le := (· < ·)) (fun a b _ _ h₁ h₂ => by omega)
       hs.named_sorted ht.named_sorted
@@ -241,27 +241,27 @@ theorem Upsert.inv_ext {s t : Upsert} {xs ys : List Record}
     · rintro ⟨hx, hn⟩; exact ⟨hx, fun ⟨q, hq, h'⟩ => hn ⟨q, (hset q).1 hq, h'⟩⟩
   cases s; cases t; simp_all
 
-/-! ## Upsert: the set decides -/
+/-! ## LatestBy: the set decides -/
 
-theorem Upsert.set_decides {xs ys : List Record} (hx : Addressed xs) (hy : Addressed ys)
-    (hset : ∀ r, r ∈ xs ↔ r ∈ ys) : Upsert.fold Upsert.empty xs = Upsert.fold Upsert.empty ys :=
-  Upsert.inv_ext (by simpa using Upsert.inv_fold xs Upsert.inv_empty (by simpa using hx))
-    (by simpa using Upsert.inv_fold ys Upsert.inv_empty (by simpa using hy)) hset
+theorem LatestBy.set_decides {xs ys : List Record} (hx : Addressed xs) (hy : Addressed ys)
+    (hset : ∀ r, r ∈ xs ↔ r ∈ ys) : LatestBy.fold LatestBy.empty xs = LatestBy.fold LatestBy.empty ys :=
+  LatestBy.inv_ext (by simpa using LatestBy.inv_fold xs LatestBy.inv_empty (by simpa using hx))
+    (by simpa using LatestBy.inv_fold ys LatestBy.inv_empty (by simpa using hy)) hset
 
 /-- Arrival order doesn't matter. -/
-theorem Upsert.perm {xs ys : List Record} (hx : Addressed xs) (h : xs ~ ys) :
-    Upsert.fold Upsert.empty xs = Upsert.fold Upsert.empty ys :=
-  Upsert.set_decides hx (fun a ha b hb => hx a (h.mem_iff.2 ha) b (h.mem_iff.2 hb)) (fun _ => h.mem_iff)
+theorem LatestBy.perm {xs ys : List Record} (hx : Addressed xs) (h : xs ~ ys) :
+    LatestBy.fold LatestBy.empty xs = LatestBy.fold LatestBy.empty ys :=
+  LatestBy.set_decides hx (fun a ha b hb => hx a (h.mem_iff.2 ha) b (h.mem_iff.2 hb)) (fun _ => h.mem_iff)
 
 /-- Re-delivering records changes nothing. -/
-theorem Upsert.repeats {xs : List Record} (hx : Addressed xs) :
-    Upsert.fold Upsert.empty (xs ++ xs) = Upsert.fold Upsert.empty xs :=
-  Upsert.set_decides (fun a ha b hb => hx a (by simpa using ha) b (by simpa using hb)) hx (by simp)
+theorem LatestBy.repeats {xs : List Record} (hx : Addressed xs) :
+    LatestBy.fold LatestBy.empty (xs ++ xs) = LatestBy.fold LatestBy.empty xs :=
+  LatestBy.set_decides (fun a ha b hb => hx a (by simpa using ha) b (by simpa using hb)) hx (by simp)
 
 /-- Two places that sync in either direction converge. -/
-theorem Upsert.converge {xs ys : List Record} (h : Addressed (xs ++ ys)) :
-    Upsert.fold (Upsert.fold Upsert.empty xs) ys = Upsert.fold (Upsert.fold Upsert.empty ys) xs := by
-  rw [Upsert.batch, Upsert.batch]
-  exact Upsert.perm h perm_append_comm
+theorem LatestBy.converge {xs ys : List Record} (h : Addressed (xs ++ ys)) :
+    LatestBy.fold (LatestBy.fold LatestBy.empty xs) ys = LatestBy.fold (LatestBy.fold LatestBy.empty ys) xs := by
+  rw [LatestBy.batch, LatestBy.batch]
+  exact LatestBy.perm h perm_append_comm
 
 end Loops

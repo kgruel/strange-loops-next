@@ -1,7 +1,7 @@
 {
   "vector": "01-one",
-  "layer": "fold/upsert",
-  "laws": ["upsert.set"],
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set"],
   "source": "model",
   "input": {
     "orders": [

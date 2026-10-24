@@ -10,7 +10,7 @@ order they arrive in. Folds come in two families, each with one law:
   so their state stays small and a late record folds onto it.
 * Folds **over heads** follow `prev`. A new record can supersede one the
   answer rests on, and only the heads know what comes back, so the state is
-  Upsert's and the answer is worked out from it.
+  LatestBy's and the answer is worked out from it.
 
 A reader may hold only envelopes for some records. Supersession reads only
 envelopes, so a view never brings back a replaced record. A `where` test on
@@ -55,12 +55,12 @@ def Min.acc : Acc (Option Int) :=
 
 /-! ## Folds over heads -/
 
-/-- A fold over heads: Upsert's state, and an answer worked out from it. -/
-def OverHeads.fold {σ} (answer : Upsert → σ) (xs : List Record) : σ :=
-  answer (Upsert.fold .empty xs)
+/-- A fold over heads: LatestBy's state, and an answer worked out from it. -/
+def OverHeads.fold {σ} (answer : LatestBy → σ) (xs : List Record) : σ :=
+  answer (LatestBy.fold .empty xs)
 
 /-- `limit`: the newest `k` heads, in content order. -/
-def Upsert.limit (k : Nat) (s : Upsert) : List Record := s.heads.take k
+def LatestBy.limit (k : Nat) (s : LatestBy) : List Record := s.heads.take k
 
 /-! ## Reading what a reader holds -/
 
@@ -105,7 +105,7 @@ def Acc.select {σ} (f : Acc σ) (w : Where) (xs : List Record) : Result σ :=
 
 /-- Max over the current values: the largest readable head, and how many heads
 were unreadable. -/
-def Upsert.maxHeads (s : Upsert) : Result (Option Int) :=
+def LatestBy.maxHeads (s : LatestBy) : Result (Option Int) :=
   ⟨((s.heads.filter (·.shown == .here)).map (·.n)).max?,
     (s.heads.filter (·.shown != .here)).length⟩
 

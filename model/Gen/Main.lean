@@ -33,7 +33,7 @@ def jRecord (r : Record) : J :=
   | .here => .obj (env ++ [("value", .str r.value)] ++ rest ++ [("n", .int r.n)])
   | s => .obj (env ++ rest ++ [("shown", jShown s)])
 
-def jUpsert (s : Upsert) : J :=
+def jLatestBy (s : LatestBy) : J :=
   let keys := s.heads.foldl (fun ks h => if ks.contains h.key then ks else ks ++ [h.key]) []
   .obj [("heads", .arr (s.heads.map (.str ∘ idText ∘ (·.id)))),
     ("named", .arr (s.named.map (.str ∘ idText))),
@@ -123,18 +123,18 @@ def jOptInt : Option Int → J
   | some i => .int i
   | none => .null
 
-def upsertCases : List FoldCase := [
-  ⟨"01-one", ["upsert.set"], [[r1]]⟩,
-  ⟨"02-fork", ["upsert.set", "upsert.order"], rotations [r1, r3]⟩,
-  ⟨"03-chain", ["upsert.set"], [[r1, r2]]⟩,
-  ⟨"04-chain-late", ["upsert.set"], [[r2, r1]]⟩,
-  ⟨"05-emitted-breaks-tie", ["upsert.order"], rotations [r3, r6]⟩,
-  ⟨"06-id-breaks-tie", ["upsert.order"], rotations [r6, r7]⟩,
-  ⟨"07-merge", ["upsert.set"], rotations [r1, r2, r3, r4]⟩,
-  ⟨"08-repeats", ["upsert.repeats"], [[r1, r3], [r1, r3, r1, r3], [r3, r1, r3]]⟩,
-  ⟨"09-converge", ["upsert.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
-  ⟨"10-two-keys", ["upsert.set"], rotations [r1, r5, r3]⟩,
-  ⟨"11-dangling-prev", ["upsert.set"], rotations [r5, r8]⟩
+def latestByCases : List FoldCase := [
+  ⟨"01-one", ["latest-by.set"], [[r1]]⟩,
+  ⟨"02-fork", ["latest-by.set", "latest-by.order"], rotations [r1, r3]⟩,
+  ⟨"03-chain", ["latest-by.set"], [[r1, r2]]⟩,
+  ⟨"04-chain-late", ["latest-by.set"], [[r2, r1]]⟩,
+  ⟨"05-emitted-breaks-tie", ["latest-by.order"], rotations [r3, r6]⟩,
+  ⟨"06-id-breaks-tie", ["latest-by.order"], rotations [r6, r7]⟩,
+  ⟨"07-merge", ["latest-by.set"], rotations [r1, r2, r3, r4]⟩,
+  ⟨"08-repeats", ["latest-by.repeats"], [[r1, r3], [r1, r3, r1, r3], [r3, r1, r3]]⟩,
+  ⟨"09-converge", ["latest-by.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
+  ⟨"10-two-keys", ["latest-by.set"], rotations [r1, r5, r3]⟩,
+  ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩
 ]
 
 def headsCases : List FoldCase := [
@@ -146,7 +146,7 @@ def headsCases : List FoldCase := [
 def jResult (r : Result (Option Int)) : J :=
   .obj [("value", jOptInt r.value), ("unread", .num r.unread)]
 
-def jHeads (s : Upsert) : J :=
+def jHeads (s : LatestBy) : J :=
   .obj [("max", jResult s.maxHeads),
     ("limit-2", .arr ((s.limit 2).map (.str ∘ idText ∘ (·.id))))]
 
@@ -169,19 +169,19 @@ def viewCases : List ViewCase := [
   ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [0x33]⟩
 ]
 
-def jViewState (s : Upsert) : J :=
+def jViewState (s : LatestBy) : J :=
   .obj [("heads", .arr (s.heads.map fun h => .obj [("id", .str (idText h.id)), ("shown", jShown h.shown)])),
     ("max", jResult s.maxHeads)]
 
 def viewVector (c : ViewCase) : Except String J := do
   let orders := rotations (c.records.map c.view)
-  let results := orders.map fun o => jViewState (Upsert.fold .empty o)
+  let results := orders.map fun o => jViewState (LatestBy.fold .empty o)
   let first := results.headD .null
   if !(results.all (·.render 0 == first.render 0)) then
     throw s!"fold/view/{c.name}: arrival orders disagree"
   -- a view sees the same heads as a reader holding everything
-  let full := (Upsert.fold .empty c.records).heads.map (·.id)
-  if (Upsert.fold .empty (c.records.map c.view)).heads.map (·.id) != full then
+  let full := (LatestBy.fold .empty c.records).heads.map (·.id)
+  if (LatestBy.fold .empty (c.records.map c.view)).heads.map (·.id) != full then
     throw s!"fold/view/{c.name}: a view changed the heads"
   return vector c.name "fold/view" c.laws
     (.obj [("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
@@ -307,10 +307,10 @@ def main (args : List String) : IO UInt32 := do
   let extrema ← extremaCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/extrema" c fun o =>
       .obj [("min", jOptInt (Min.fold none o)), ("max", jOptInt (Max.fold none o))]))
-  let upsert ← upsertCases.mapM fun c => do
-    pure (c.name, ← orFail (foldVector "fold/upsert" c fun o => jUpsert (Upsert.fold .empty o)))
+  let latestBy ← latestByCases.mapM fun c => do
+    pure (c.name, ← orFail (foldVector "fold/latest-by" c fun o => jLatestBy (LatestBy.fold .empty o)))
   let heads ← headsCases.mapM fun c => do
-    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (Upsert.fold .empty o)))
+    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (LatestBy.fold .empty o)))
   let views ← viewCases.mapM fun c => do pure (c.name, ← orFail (viewVector c))
   let selects ← selectCases.mapM fun c => do pure (c.name, ← orFail (selectVector c))
   let lens ← lensCases.mapM fun c => do pure (c.name, ← orFail (lensVector c))
@@ -318,7 +318,7 @@ def main (args : List String) : IO UInt32 := do
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
   writeAll dir "fold/count" count
-  writeAll dir "fold/upsert" upsert
+  writeAll dir "fold/latest-by" latestBy
   writeAll dir "fold/latest" latest
   writeAll dir "fold/sum" sum
   writeAll dir "fold/extrema" extrema
@@ -327,5 +327,5 @@ def main (args : List String) : IO UInt32 := do
   writeAll dir "fold/select" selects
   writeAll dir "lens/section" lens
   writeAll dir "record" records
-  IO.println s!"wrote {count.length + upsert.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length} vectors to {dir}"
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length} vectors to {dir}"
   return 0

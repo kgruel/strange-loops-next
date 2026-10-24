@@ -1,7 +1,7 @@
 {
-  "vector": "09-converge",
-  "layer": "fold/upsert",
-  "laws": ["upsert.converge"],
+  "vector": "10-two-keys",
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set"],
   "source": "model",
   "input": {
     "orders": [
@@ -17,16 +17,6 @@
           "n": 0
         },
         {
-          "id": "r:00000013",
-          "kind": "decision",
-          "key": "topic:auth",
-          "value": "v19",
-          "prev": [],
-          "occurred": 150,
-          "emitted": 150,
-          "n": 0
-        },
-        {
           "id": "r:00000015",
           "kind": "decision",
           "key": "topic:cache",
@@ -37,13 +27,13 @@
           "n": 0
         },
         {
-          "id": "r:00000012",
+          "id": "r:00000013",
           "kind": "decision",
           "key": "topic:auth",
-          "value": "v18",
-          "prev": ["r:00000011"],
-          "occurred": 200,
-          "emitted": 200,
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
           "n": 0
         }
       ],
@@ -59,13 +49,35 @@
           "n": 0
         },
         {
-          "id": "r:00000012",
+          "id": "r:00000013",
           "kind": "decision",
           "key": "topic:auth",
-          "value": "v18",
-          "prev": ["r:00000011"],
-          "occurred": 200,
-          "emitted": 200,
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:00000013",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
           "n": 0
         },
         {
@@ -79,25 +91,25 @@
           "n": 0
         },
         {
-          "id": "r:00000013",
+          "id": "r:00000015",
           "kind": "decision",
-          "key": "topic:auth",
-          "value": "v19",
+          "key": "topic:cache",
+          "value": "v21",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "occurred": 120,
+          "emitted": 120,
           "n": 0
         }
       ]
     ]
   },
   "expect": {
-    "heads": ["r:00000012", "r:00000013", "r:00000015"],
-    "named": ["r:00000011"],
+    "heads": ["r:00000013", "r:00000015", "r:00000011"],
+    "named": [],
     "keys": {
       "topic:auth": {
-        "winner": "r:00000012",
-        "others": ["r:00000013"]
+        "winner": "r:00000013",
+        "others": ["r:00000011"]
       },
       "topic:cache": {
         "winner": "r:00000015",

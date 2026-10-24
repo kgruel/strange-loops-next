@@ -1,7 +1,7 @@
 # strange-loops
 
 Records in, folds and ticks out, lenses back to text. A rewrite from first
-principles: the product is **the spec, its vectors and one implementation**.
+principles: the product is **the protocol, its vectors and one implementation**.
 
 Step 1 is in: layer 0, the record, in the model, in Go and in a small JS
 writer that must agree with it byte for byte.
@@ -12,7 +12,7 @@ writer that must agree with it byte for byte.
 |---|---|
 | `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), and `gen`, which writes the vectors |
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
-| `spec/` | prose; [`spec/record.md`](spec/record.md) is layer 0, [`spec/laws.md`](spec/laws.md) indexes each law, its theorem and its vectors |
+| `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `core/` | the Go core: a module with no requires; package `loops` is its whole public API, everything else is under `internal/` |
 | `cli/` | the CLI module; for now only `cmd/budget`, the budget checker |
 | `interop/js/` | a small, independent JS writer for layer 0 |

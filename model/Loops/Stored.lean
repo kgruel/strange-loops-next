@@ -2,7 +2,7 @@ import Loops.Envelope
 import Loops.Base32
 
 /-!
-# Sealing a record
+# Storing a record
 
 A record commits to its payload and is named by its envelope and that
 commitment:
