@@ -30,7 +30,29 @@ implementation folds each order separately; every one must produce
 * Latest: the `winner` and the `others`.
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
-Each record carries `n`, the integer the numeric folds read.
+Each record carries `n`, the integer the numeric folds read. A record whose
+payload the reader doesn't hold has `shown` (`withheld` or `erased`) instead
+of `value` and `n`.
+
+## `fold/heads`
+
+Answers worked out from Upsert's heads. `expect.max` is the largest `n`
+among the readable heads (`value`, `null` if none) and how many heads were
+unreadable (`unread`); `expect["limit-2"]` is the two newest heads.
+
+## `fold/view`
+
+Some records arrive without their payload. `expect.heads` lists the heads
+newest first, each with what the reader holds (`shown`): the same heads a
+reader holding everything gets. `expect.max` is as in `fold/heads`.
+
+## `fold/select`
+
+`input.where` is a test as a spec writes it. A test on the envelope always
+answers; a test on a payload the reader doesn't hold answers unknown.
+`expect.count` and `expect.sum` give the `value` over the selected, readable
+records and how many covered records were `unread`: unknown to the test, or
+selected but needed by the fold and not held. Count needs no payload.
 
 ## `lens/section`
 

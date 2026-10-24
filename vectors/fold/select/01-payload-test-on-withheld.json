@@ -1,0 +1,118 @@
+{
+  "vector": "01-payload-test-on-withheld",
+  "layer": "fold/select",
+  "laws": ["result.unread", "select.set"],
+  "source": "model",
+  "input": {
+    "where": {
+      "n": {
+        "at-least": 0
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        },
+        {
+          "id": "r:00000022",
+          "kind": "decision",
+          "key": "load",
+          "value": "v34",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": -3
+        },
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "shown": "withheld"
+        }
+      ],
+      [
+        {
+          "id": "r:00000022",
+          "kind": "decision",
+          "key": "load",
+          "value": "v34",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": -3
+        },
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        }
+      ],
+      [
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        },
+        {
+          "id": "r:00000022",
+          "kind": "decision",
+          "key": "load",
+          "value": "v34",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": -3
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "count": {
+      "value": 1,
+      "unread": 1
+    },
+    "sum": {
+      "value": 5,
+      "unread": 1
+    }
+  }
+}

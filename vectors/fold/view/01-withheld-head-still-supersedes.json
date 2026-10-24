@@ -1,0 +1,64 @@
+{
+  "vector": "01-withheld-head-still-supersedes",
+  "layer": "fold/view",
+  "laws": ["view.no-resurrection"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        },
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "shown": "withheld"
+        }
+      ],
+      [
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "heads": [
+      {
+        "id": "r:00000012",
+        "shown": "withheld"
+      }
+    ],
+    "max": {
+      "value": null,
+      "unread": 1
+    }
+  }
+}

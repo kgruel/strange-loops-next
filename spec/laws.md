@@ -31,6 +31,39 @@ addition isn't associative, so the order records arrive in would change a
 sum, and `sum.perm` would be false. Decimals, if they come, must be exact
 too.
 
+## Two families, views and honest results (`model/Laws/Families.lean`)
+
+Every fold depends only on the set of records it is handed. Folds come in
+two families, each with one law: **accumulating** folds (Count, Sum, Min,
+Max) have a step that commutes; folds **over heads** follow `prev`, keep
+Upsert's state and work their answer out from it. A late record folds onto
+the cached state in both, so there is no partial rewind.
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `input.distinct` | `Distinct.addressed`, `distinct_dedup`, `mem_dedup` | a fold is handed each id once; `dedup` is the realm's union | (the read path) |
+| `input.union` | `dedup_union` | the union doesn't depend on which place is read first | (the read path) |
+| `acc.set` | `Acc.set_decides` | any step that commutes gives the same state for the same set | every count, sum, extrema vector |
+| `acc.late` | `Acc.late` | a late record folds onto the cached state | (follows from `acc.set`) |
+| `heads.set` | `OverHeads.set_decides` | any answer worked out from the heads depends only on the set | `fold/heads/*` |
+| `heads.late` | `OverHeads.late` | a late record folds onto the cached heads | (follows from `heads.set`) |
+| `heads.why` | `Max.cannot_follow_prev` | a bounded state can't follow `prev`: Max can't be kept current from its own state | `fold/heads/01`, `02` |
+| `view.no-resurrection` | `Upsert.view`, `Upsert.view_head_ids`, `Upsert.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
+| `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
+| `result.unread` | `Upsert.maxHeads_view` | a result counts the covered records it couldn't read | `fold/view/04`, `fold/select/*` |
+| `result.full` | `Acc.select_full` | with every payload here, nothing is unread and the result is the plain fold | `fold/select/03` |
+| `select.set` | `Acc.select_set_decides` | what is read and what is unread depend only on the set | `fold/select/*` |
+
+`view.no-resurrection` holds because `prev`, ids and times are on the
+envelope, which every reader holds. A `where` test on the envelope always
+answers; one on a missing payload answers unknown, and the result counts it.
+
+**Proof policy.** The model and its vectors are required at every step.
+`the set decides` (in each family) and `view.no-resurrection` define what the
+system means and must be proved. Other laws may be listed here as
+conjectures, checked by vectors and fuzzing until proved; `lake build
+--wfail` keeps `sorry` out of the build.
+
 ## Lens: keyed sections (`model/Laws/Lens.lean`)
 
 | Law | Theorem | Says | Vectors |

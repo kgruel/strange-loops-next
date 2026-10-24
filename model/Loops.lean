@@ -5,4 +5,5 @@ import Loops.Envelope
 import Loops.Seal
 import Loops.Record
 import Loops.Fold
+import Loops.Families
 import Loops.Lens

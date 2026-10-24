@@ -1,0 +1,61 @@
+{
+  "vector": "02-superseded-max-leaves",
+  "layer": "fold/heads",
+  "laws": ["heads.set"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:00000032",
+          "kind": "decision",
+          "key": "host:b",
+          "value": "v50",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": 9
+        },
+        {
+          "id": "r:00000033",
+          "kind": "decision",
+          "key": "host:b",
+          "value": "v51",
+          "prev": ["r:00000032"],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 1
+        }
+      ],
+      [
+        {
+          "id": "r:00000033",
+          "kind": "decision",
+          "key": "host:b",
+          "value": "v51",
+          "prev": ["r:00000032"],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 1
+        },
+        {
+          "id": "r:00000032",
+          "kind": "decision",
+          "key": "host:b",
+          "value": "v50",
+          "prev": [],
+          "occurred": 110,
+          "emitted": 110,
+          "n": 9
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "max": {
+      "value": 1,
+      "unread": 0
+    },
+    "limit-2": ["r:00000033"]
+  }
+}

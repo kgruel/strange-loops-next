@@ -1,0 +1,277 @@
+{
+  "vector": "03-limit-newest-first",
+  "layer": "fold/heads",
+  "laws": ["heads.set"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        },
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v18",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "n": 0
+        },
+        {
+          "id": "r:00000013",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0
+        },
+        {
+          "id": "r:00000015",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v21",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 0
+        },
+        {
+          "id": "r:00000018",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v24",
+          "prev": ["r:00000099"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v18",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "n": 0
+        },
+        {
+          "id": "r:00000013",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0
+        },
+        {
+          "id": "r:00000015",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v21",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 0
+        },
+        {
+          "id": "r:00000018",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v24",
+          "prev": ["r:00000099"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:00000013",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0
+        },
+        {
+          "id": "r:00000015",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v21",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 0
+        },
+        {
+          "id": "r:00000018",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v24",
+          "prev": ["r:00000099"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        },
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v18",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:00000015",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v21",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 0
+        },
+        {
+          "id": "r:00000018",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v24",
+          "prev": ["r:00000099"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        },
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v18",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "n": 0
+        },
+        {
+          "id": "r:00000013",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:00000018",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v24",
+          "prev": ["r:00000099"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0
+        },
+        {
+          "id": "r:00000011",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v17",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0
+        },
+        {
+          "id": "r:00000012",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v18",
+          "prev": ["r:00000011"],
+          "occurred": 200,
+          "emitted": 200,
+          "n": 0
+        },
+        {
+          "id": "r:00000013",
+          "kind": "decision",
+          "key": "topic:auth",
+          "value": "v19",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0
+        },
+        {
+          "id": "r:00000015",
+          "kind": "decision",
+          "key": "topic:cache",
+          "value": "v21",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "max": {
+      "value": 0,
+      "unread": 0
+    },
+    "limit-2": ["r:00000018", "r:00000012"]
+  }
+}
