@@ -21,7 +21,7 @@ def idText (n : Nat) : String :=
 def jRecord (r : Record) : J :=
   .obj [("id", .str (idText r.id)), ("kind", .str r.kind), ("key", .str r.key),
     ("value", .str r.value), ("prev", .arr (r.prev.map (.str ∘ idText))),
-    ("occurred", .num r.occurred), ("emitted", .num r.emitted)]
+    ("occurred", .num r.occurred), ("emitted", .num r.emitted), ("n", .int r.n)]
 
 def jUpsert (s : Upsert) : J :=
   let keys := s.heads.foldl (fun ks h => if ks.contains h.key then ks else ks ++ [h.key]) []
@@ -63,6 +63,11 @@ def r6 := rec 0x16 "topic:auth" 200 (emitted := 210)
 def r7 := rec 0x17 "topic:auth" 200 (emitted := 210)
 def r8 := rec 0x18 "topic:cache" 400 (prev := [0x99])
 
+def n1 := { rec 0x21 "load" 100 with n := 5 }
+def n2 := { rec 0x22 "load" 110 with n := -3 }
+def n3 := { rec 0x23 "load" 120 with n := 40 }
+def n4 := { rec 0x24 "load" 130 with n := 40 }
+
 /-! ## Fold cases -/
 
 structure FoldCase where
@@ -78,6 +83,30 @@ def countCases : List FoldCase := [
   ⟨"02-three", ["count.perm"], rotations [r1, r3, r5]⟩,
   ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩
 ]
+
+def latestCases : List FoldCase := [
+  ⟨"01-chain", ["latest.set"], rotations [r1, r2]⟩,
+  ⟨"02-fork", ["latest.set"], rotations [r1, r3]⟩,
+  ⟨"03-merge", ["latest.set"], rotations [r1, r2, r3, r4]⟩,
+  ⟨"04-repeats", ["latest.repeats"], [[r1, r3], [r3, r1, r3, r1]]⟩
+]
+
+def sumCases : List FoldCase := [
+  ⟨"01-empty", ["sum.perm"], [[]]⟩,
+  ⟨"02-mixed-signs", ["sum.perm"], rotations [n1, n2, n3]⟩,
+  ⟨"03-repeats-counted", ["sum.repeats"], [[n1, n2, n3, n1, n2, n3]]⟩
+]
+
+def extremaCases : List FoldCase := [
+  ⟨"01-empty", ["extrema.set"], [[]]⟩,
+  ⟨"02-mixed-signs", ["extrema.set"], rotations [n1, n2, n3]⟩,
+  ⟨"03-ties", ["extrema.set"], rotations [n3, n4, n1]⟩,
+  ⟨"04-repeats", ["extrema.set"], [[n1, n2], [n2, n1, n2, n2, n1]]⟩
+]
+
+def jOptInt : Option Int → J
+  | some i => .int i
+  | none => .null
 
 def upsertCases : List FoldCase := [
   ⟨"01-one", ["upsert.set"], [[r1]]⟩,
@@ -97,7 +126,8 @@ def foldVector (layer : String) (c : FoldCase) (result : List Record → J) : Ex
   let results := c.orders.map result
   let first := results.headD .null
   -- every arrival order must agree, as the laws say
-  if c.laws.any (· != "count.repeats") && !(results.all (·.render 0 == first.render 0)) then
+  if c.laws.any (fun l => l != "count.repeats" && l != "sum.repeats") &&
+      !(results.all (·.render 0 == first.render 0)) then
     throw s!"{layer}/{c.name}: arrival orders disagree"
   return vector c.name layer c.laws
     (.obj [("orders", .arr (c.orders.map fun o => .arr (o.map jRecord)))]) first
@@ -166,6 +196,18 @@ def main (args : List String) : IO UInt32 := do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
+  let latest ← latestCases.mapM fun c => do
+    pure (c.name, ← orFail (foldVector "fold/latest" c fun o =>
+      let s := Latest.fold o
+      .obj [("winner", match Latest.winner s with
+          | some r => .str (idText r.id)
+          | none => .null),
+        ("others", .arr ((Latest.others s).map (.str ∘ idText ∘ (·.id))))]))
+  let sum ← sumCases.mapM fun c => do
+    pure (c.name, ← orFail (foldVector "fold/sum" c fun o => .int (Sum.fold 0 o)))
+  let extrema ← extremaCases.mapM fun c => do
+    pure (c.name, ← orFail (foldVector "fold/extrema" c fun o =>
+      .obj [("min", jOptInt (Min.fold none o)), ("max", jOptInt (Max.fold none o))]))
   let upsert ← upsertCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/upsert" c fun o => jUpsert (Upsert.fold .empty o)))
   let lens ← lensCases.mapM fun c => do pure (c.name, ← orFail (lensVector c))
@@ -174,7 +216,10 @@ def main (args : List String) : IO UInt32 := do
     | .error e => throw (IO.userError e)
   writeAll dir "fold/count" count
   writeAll dir "fold/upsert" upsert
+  writeAll dir "fold/latest" latest
+  writeAll dir "fold/sum" sum
+  writeAll dir "fold/extrema" extrema
   writeAll dir "lens/section" lens
   writeAll dir "record" records
-  IO.println s!"wrote {count.length + upsert.length + lens.length + records.length} vectors to {dir}"
+  IO.println s!"wrote {count.length + upsert.length + latest.length + sum.length + extrema.length + lens.length + records.length} vectors to {dir}"
   return 0

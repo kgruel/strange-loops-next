@@ -1,0 +1,12 @@
+{
+  "vector": "01-empty",
+  "layer": "fold/sum",
+  "laws": ["sum.perm"],
+  "source": "model",
+  "input": {
+    "orders": [
+      []
+    ]
+  },
+  "expect": 0
+}

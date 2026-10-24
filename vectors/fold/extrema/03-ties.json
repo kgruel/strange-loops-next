@@ -1,0 +1,110 @@
+{
+  "vector": "03-ties",
+  "layer": "fold/extrema",
+  "laws": ["extrema.set"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "value": "v35",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 40
+        },
+        {
+          "id": "r:00000024",
+          "kind": "decision",
+          "key": "load",
+          "value": "v36",
+          "prev": [],
+          "occurred": 130,
+          "emitted": 130,
+          "n": 40
+        },
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        }
+      ],
+      [
+        {
+          "id": "r:00000024",
+          "kind": "decision",
+          "key": "load",
+          "value": "v36",
+          "prev": [],
+          "occurred": 130,
+          "emitted": 130,
+          "n": 40
+        },
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        },
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "value": "v35",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 40
+        }
+      ],
+      [
+        {
+          "id": "r:00000021",
+          "kind": "decision",
+          "key": "load",
+          "value": "v33",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 5
+        },
+        {
+          "id": "r:00000023",
+          "kind": "decision",
+          "key": "load",
+          "value": "v35",
+          "prev": [],
+          "occurred": 120,
+          "emitted": 120,
+          "n": 40
+        },
+        {
+          "id": "r:00000024",
+          "kind": "decision",
+          "key": "load",
+          "value": "v36",
+          "prev": [],
+          "occurred": 130,
+          "emitted": 130,
+          "n": 40
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "min": 5,
+    "max": 40
+  }
+}

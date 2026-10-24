@@ -18,7 +18,7 @@ Every file has the same envelope:
 }
 ```
 
-## `fold/count`, `fold/upsert`
+## `fold/count`, `fold/upsert`, `fold/latest`, `fold/sum`, `fold/extrema`
 
 `input.orders` lists one or more arrival orders of the same records. An
 implementation folds each order separately; every one must produce
@@ -27,6 +27,10 @@ implementation folds each order separately; every one must produce
 * Count: `expect` is the number.
 * Upsert: `expect.heads` (newest first), `expect.named` (ascending), and
   per key the `winner` and the `others` (a fork when non-empty).
+* Latest: the `winner` and the `others`.
+* Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
+
+Each record carries `n`, the integer the numeric folds read.
 
 ## `lens/section`
 

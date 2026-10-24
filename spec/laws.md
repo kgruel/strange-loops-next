@@ -16,10 +16,20 @@ vectors; the model is what the vectors come from.
 | `upsert.repeats` | `Upsert.repeats` | re-delivering records changes nothing | `fold/upsert/08` |
 | `upsert.converge` | `Upsert.converge` | two places syncing in either direction reach the same state | `fold/upsert/09` |
 
+| `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is Upsert with one key, so it inherits Upsert's laws | `fold/latest/*` |
+| `sum.perm` | `Sum.perm` | arrival order doesn't change a sum | `fold/sum/01`, `02` |
+| `sum.repeats` | `Sum.repeats` | a repeated delivery is added again, so the store must hand each id over once | `fold/sum/03` |
+| `extrema.set` | `Max.set_decides`, `Min.set_decides` | Min and Max depend only on the set of records | `fold/extrema/*` |
+
 Incremental = batch holds for every step fold by construction. The law with
 teeth is `upsert.set`: it is what lets late arrivals, re-sent segments and
 two-way syncs agree. It needs content addressing (`Addressed`): within a
 store, an id names one record.
+
+The numeric folds read an **exact** field: an integer. Over floating point,
+addition isn't associative, so the order records arrive in would change a
+sum, and `sum.perm` would be false. Decimals, if they come, must be exact
+too.
 
 ## Lens: keyed sections (`model/Laws/Lens.lean`)
 
