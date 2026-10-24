@@ -1,4 +1,4 @@
-import Loops.Families
+import Loops.Things
 import Loops.Json
 
 /-!
@@ -13,10 +13,12 @@ the closed vocabulary with an optional `where`.
   always answers; a test on a payload field answers unknown when the payload
   is missing. A `where` map holds when every test does (Kleene's and).
 * **Accumulating slots** (count, sum, min, max) select, then fold.
-* **Slots over heads** (latest-by, collect) let supersession run on what the
-  envelope selects, then apply payload tests to the heads. Filtering first
-  would bring back a record whose successor no longer matches, or whose
-  successor's payload is withheld.
+* **Slots over heads** (latest-by, collect) read each thing's state, which
+  supersession has already settled over everything the reader holds
+  (`Loops.Things`); `from` and the envelope tests then choose heads, and the
+  payload tests filter them. Selecting first would bring back a record whose
+  successor is of another kind, or no longer matches, or is withheld.
+* `about` is a set, so a test on it asks whether the record is about a thing.
 
 Step 2 accepts these keys. `ticks`, `boundary` and the other spec keys are
 recognized and carried, not yet evaluated; `as`, `by`, `order`, `set` and
@@ -62,23 +64,31 @@ structure Cond where
   op : Op
   deriving Repr, DecidableEq
 
-/-- What a field holds for this reader, or `none` when its payload is missing. -/
-def Field.read : Field → Record → Option (Option Val)
-  | .kind, r => some (some (.str r.kind))
-  | .about, r => some (some (.str r.key))
-  | .payload f, r => if r.shown = .here then some (r.get f) else none
+/-- The values a field holds for this reader (none, one, or a set, as for
+`about`), or `none` when its payload is missing. -/
+def Field.read : Field → Record → Option (List Val)
+  | .kind, r => some [.str r.kind]
+  | .about, r => some (r.about.map .str)
+  | .payload f, r => if r.shown = .here then some (r.get f).toList else none
 
-/-- An operator on what a field holds. `not` is the complement of `is`, and
-`absent` of `present`; `at-least` and `below` hold only for numbers. -/
-def Op.test : Op → Option Val → Bool
-  | .is v, x => x == some v
-  | .not v, x => x != some v
-  | .present, x => x.isSome
-  | .absent, x => x.isNone
-  | .atLeast i, some (.int j) => decide (i ≤ j)
-  | .below i, some (.int j) => decide (j < i)
-  | .atLeast _, _ => false
-  | .below _, _ => false
+def Val.atLeast (i : Int) : Val → Bool
+  | .int j => decide (i ≤ j)
+  | _ => false
+
+def Val.below (i : Int) : Val → Bool
+  | .int j => decide (j < i)
+  | _ => false
+
+/-- An operator on what a field holds. `is` asks whether a value is among
+them and `not` is its complement; `absent` is the complement of `present`;
+`at-least` and `below` hold only for numbers. -/
+def Op.test : Op → List Val → Bool
+  | .is v, xs => xs.contains v
+  | .not v, xs => !xs.contains v
+  | .present, xs => !xs.isEmpty
+  | .absent, xs => xs.isEmpty
+  | .atLeast i, xs => xs.any (Val.atLeast i)
+  | .below i, xs => xs.any (Val.below i)
 
 def Cond.eval (c : Cond) (r : Record) : Tri :=
   match c.field.read r with
@@ -105,7 +115,7 @@ inductive FoldType where
   | sum (field : String)
   | min (field : String)
   | max (field : String)
-  /-- By `about`, following `prev`; Latest is its newest head. -/
+  /-- Per thing, following `prev`; Latest is a thing's newest head. -/
   | latestBy
   /-- Every selected record newest first, or only the heads when following
   `prev`; at most `limit` of them. -/
@@ -123,37 +133,60 @@ inductive SlotValue where
   | nat (r : Result Nat)
   | int (r : Result Int)
   | opt (r : Result (Option Int))
+  /-- Latest-by: each thing with its current records (more than one is a fork). -/
+  | things (ts : List (String × List (Nat × Shown))) (unread : Nat)
+  /-- Collect: records newest first. -/
   | heads (hs : List (Nat × Shown)) (unread : Nat)
   deriving Repr, DecidableEq
 
 def Record.unlinked (r : Record) : Record := { r with prev := [] }
 
-/-- What a slot over heads folds: the records its envelope tests select,
-unlinked when it doesn't follow `prev`. -/
-def headsInput (cs : List Cond) (follow : Bool) (xs : List Record) : List Record :=
-  let ys := xs.filter (Cond.all (cs.filter (·.field.onEnvelope)) · == .yes)
-  if follow then ys else ys.map Record.unlinked
+/-- Newest first, each once. -/
+def newestFirst (xs : List Record) : List Record :=
+  (LatestBy.fold .empty (xs.map Record.unlinked)).heads
 
-/-- Over heads: supersession runs on what the envelope tests select; the
-payload tests then apply to the heads. -/
-def headsOf (cs : List Cond) (follow : Bool) (limit : Option Nat) (xs : List Record) :
-    SlotValue :=
-  let pay := cs.filter (!·.field.onEnvelope)
-  let s := LatestBy.fold .empty (headsInput cs follow xs)
-  let kept := s.heads.filter (Cond.all pay · == .yes)
-  let shown := match limit with
-    | some k => kept.take k
-    | none => kept
-  .heads (shown.map fun h => (h.id, h.shown)) (s.heads.filter (Cond.all pay · == .unknown)).length
+def limitTo {α : Type} : Option Nat → List α → List α
+  | some k, xs => xs.take k
+  | none, xs => xs
 
-def Slot.run (s : Slot) (xs : List Record) : SlotValue :=
+def shownIds (hs : List Record) : List (Nat × Shown) := hs.map fun h => (h.id, h.shown)
+
+/-- A head the slot asks about: `from` takes it and its envelope tests hold. -/
+def chosen (sel : Record → Bool) (cs : List Cond) (h : Record) : Bool :=
+  sel h && Cond.all (cs.filter (·.field.onEnvelope)) h == .yes
+
+def payTest (cs : List Cond) (h : Record) : Tri := Cond.all (cs.filter (!·.field.onEnvelope)) h
+
+/-- Latest-by: each thing's current records, as `perThing` settled them, that
+the slot chooses and whose payload tests hold. -/
+def latestOf (sel : Record → Bool) (cs : List Cond) (xs : List Record) : SlotValue :=
+  let per := (perThing xs).map fun (t, s) => (t, s.heads.filter (chosen sel cs))
+  let kept := per.filterMap fun (t, hs) =>
+    match hs.filter (payTest cs · == .yes) with
+    | [] => none
+    | ks => some (t, shownIds ks)
+  let unknown := per.flatMap fun (_, hs) => hs.filter (payTest cs · == .unknown)
+  .things kept (idsOf unknown).length
+
+/-- Collect: every chosen record, or with `follow` every current one, newest
+first. -/
+def collectOf (sel : Record → Bool) (cs : List Cond) (follow : Bool) (limit : Option Nat)
+    (xs : List Record) : SlotValue :=
+  let pool := if follow then (perThing xs).flatMap (·.2.heads) else xs
+  let hs := newestFirst (pool.filter (chosen sel cs))
+  .heads (shownIds (limitTo limit (hs.filter (payTest cs · == .yes))))
+    (hs.filter (payTest cs · == .unknown)).length
+
+/-- Accumulating slots select with `from` and `where`, then fold. -/
+def Slot.run (s : Slot) (sel : Record → Bool) (xs : List Record) : SlotValue :=
+  let ev := fun r => if sel r then Cond.all s.cond r else Tri.no
   match s.type with
-  | .count => .nat (Count.acc.select (Cond.all s.cond) xs)
-  | .sum f => .int ((Sum.on f).select (Cond.all s.cond) xs)
-  | .min f => .opt ((Min.on f).select (Cond.all s.cond) xs)
-  | .max f => .opt ((Max.on f).select (Cond.all s.cond) xs)
-  | .latestBy => headsOf s.cond true none xs
-  | .collect follow limit => headsOf s.cond follow limit xs
+  | .count => .nat (Count.acc.select ev xs)
+  | .sum f => .int ((Sum.on f).select ev xs)
+  | .min f => .opt ((Min.on f).select ev xs)
+  | .max f => .opt ((Max.on f).select ev xs)
+  | .latestBy => latestOf sel s.cond xs
+  | .collect follow limit => collectOf sel s.cond follow limit xs
 
 /-! ## The spec -/
 
@@ -173,13 +206,19 @@ structure Spec where
 
 /-- Selection reads only the envelope. -/
 def Source.takes (s : Source) (r : Record) : Bool :=
-  (s.kinds.isEmpty || s.kinds.contains r.kind) && s.about.all (· == r.key)
+  (s.kinds.isEmpty || s.kinds.contains r.kind) && s.about.all r.about.contains
 
-def Spec.select (sp : Spec) (xs : List Record) : List Record :=
-  xs.filter fun r => sp.sources.any (·.takes r)
+def Spec.takes (sp : Spec) (r : Record) : Bool := sp.sources.any (·.takes r)
 
-def Spec.run (sp : Spec) (xs : List Record) : List (String × SlotValue) :=
-  sp.slots.map fun s => (s.name, s.run (sp.select xs))
+def Spec.select (sp : Spec) (xs : List Record) : List Record := xs.filter sp.takes
+
+/-- Run a spec over the records a reader holds (one per id, as `settle` gives
+them). Records not entitled to their `prev` are refused first; `may` is the
+store's rule for who may replace whom. -/
+def Spec.run (sp : Spec) (xs : List Record) (may : Record → Record → Bool := fun _ _ => true) :
+    List (String × SlotValue) :=
+  let ys := admit may xs
+  sp.slots.map fun s => (s.name, s.run sp.takes ys)
 
 /-! ## From JSON -/
 

@@ -9,7 +9,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000016",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v22",
           "prev": [],
           "occurred": 200,
@@ -31,7 +31,7 @@
         {
           "id": "r:00000016",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v22",
           "prev": [],
           "occurred": 200,
@@ -41,7 +41,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -52,13 +52,10 @@
     ]
   },
   "expect": {
-    "heads": ["r:00000016", "r:00000013"],
-    "named": [],
-    "keys": {
-      "topic:auth": {
-        "winner": "r:00000016",
-        "others": ["r:00000013"]
-      }
+    "topic:auth": {
+      "heads": ["r:00000016", "r:00000013"],
+      "winner": "r:00000016",
+      "others": ["r:00000013"]
     }
   }
 }

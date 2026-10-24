@@ -9,7 +9,7 @@
         {
           "id": "r:00000023",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v35",
           "prev": [],
           "occurred": 120,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000024",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v36",
           "prev": [],
           "occurred": 130,
@@ -29,7 +29,7 @@
         {
           "id": "r:00000021",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v33",
           "prev": [],
           "occurred": 100,
@@ -41,7 +41,7 @@
         {
           "id": "r:00000024",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v36",
           "prev": [],
           "occurred": 130,
@@ -51,7 +51,7 @@
         {
           "id": "r:00000021",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v33",
           "prev": [],
           "occurred": 100,
@@ -61,7 +61,7 @@
         {
           "id": "r:00000023",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v35",
           "prev": [],
           "occurred": 120,
@@ -73,7 +73,7 @@
         {
           "id": "r:00000021",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v33",
           "prev": [],
           "occurred": 100,
@@ -83,7 +83,7 @@
         {
           "id": "r:00000023",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v35",
           "prev": [],
           "occurred": 120,
@@ -93,7 +93,7 @@
         {
           "id": "r:00000024",
           "kind": "decision",
-          "key": "load",
+          "about": ["load"],
           "value": "v36",
           "prev": [],
           "occurred": 130,

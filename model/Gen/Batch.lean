@@ -34,10 +34,27 @@ def cites := draft none "batch-c"
 def revise := draft (some "@d2") "batch-d2"
   { kind := "decision", observer := kyle, emitted := at0, about := ["topic:auth"], prev := ["@d"] }
   (.obj [("choice", .str "passkeys, with a recovery code")])
+-- a decision already in the store, about the same topic
+def heldAuth : Stored :=
+  make
+    { kind := "decision", observer := kyle, emitted := "2026-10-23T09:00:00Z",
+      about := ["topic:auth"] }
+    (saltFor "held-auth") (.obj [("choice", .str "device flow")])
+def heldAuthId : String := heldAuth.id H
+
+/-- What the store holds besides the batch: each id and its `about`. -/
+def held : List (String × List String) := [(heldAuthId, ["topic:auth"]), (r1Id, [])]
+
 def outside := draft none "batch-o"
-  { kind := "note", observer := kyle, emitted := at0, about := ["@d2", "topic:auth"],
-    prev := [r1Id] }
-  (.obj [("body", .str "see the revision")])
+  { kind := "decision", observer := kyle, emitted := at0, about := ["@d2", "topic:auth"],
+    prev := [heldAuthId] }
+  (.obj [("choice", .str "passkeys")])
+def unknownPrev := draft none "batch-u"
+  { kind := "decision", observer := kyle, emitted := at0, about := ["topic:auth"], prev := [grantId] }
+  (.obj [])
+def unrelated := draft none "batch-n"
+  { kind := "note", observer := kyle, emitted := at0, about := ["topic:cache"], prev := ["@d"] }
+  (.obj [])
 
 def cycleA := draft (some "@a") "batch-a"
   { kind := "note", observer := kyle, emitted := at0, prev := ["@b"] } (.obj [])
@@ -54,7 +71,9 @@ def cases : List Case := [
   ⟨"02-chain-and-real-ids", ["batch.meaning"], [decide1, revise, outside]⟩,
   ⟨"10-unknown-label", ["batch.refuse"], [cites]⟩,
   ⟨"11-duplicate-label", ["batch.refuse"], [decide1, { decide1 with salt := saltFor "batch-d-again" }]⟩,
-  ⟨"12-cycle", ["batch.refuse"], [cycleA, cycleB]⟩
+  ⟨"12-cycle", ["batch.refuse"], [cycleA, cycleB]⟩,
+  ⟨"13-prev-unknown", ["batch.refuse"], [unknownPrev]⟩,
+  ⟨"14-prev-unrelated", ["batch.refuse"], [decide1, unrelated]⟩
 ]
 
 def jDraft (d : Draft) : J :=
@@ -77,8 +96,8 @@ def checkMeaning (ds : List Draft) (rs : List Stored) : Bool :=
 def sortStr (xs : List String) : List String := sortBy utf16 xs
 
 def batchVector (c : Case) : Except String J := do
-  let outcomes := (rotations c.drafts).map (resolveBatch H)
-  let expect ← match resolveBatch H c.drafts with
+  let outcomes := (rotations c.drafts).map (resolveBatch H (held.lookup ·))
+  let expect ← match resolveBatch H (held.lookup ·) c.drafts with
     | .ok rs =>
       if !checkMeaning c.drafts rs then throw s!"batch/{c.name}: not the batch's meaning"
       let ids := sortStr (rs.map (·.id H))
@@ -93,7 +112,9 @@ def batchVector (c : Case) : Except String J := do
       for o in outcomes do
         if let .ok _ := o then throw s!"batch/{c.name}: a rotation was accepted"
       pure (J.obj [("refused", .str why)])
-  return vector c.name "batch" c.laws (.obj [("drafts", .arr (c.drafts.map jDraft))]) expect
+  return vector c.name "batch" c.laws
+    (.obj [("held", .arr (held.map fun (i, about) => .obj [("id", .str i), ("about", .arr (about.map .str))])),
+      ("drafts", .arr (c.drafts.map jDraft))]) expect
 
 def vectors : Except String (List (String × J)) :=
   cases.mapM fun c => do pure (c.name, ← batchVector c)

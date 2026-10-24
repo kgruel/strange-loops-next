@@ -1,0 +1,34 @@
+{
+  "vector": "13-prev-unknown",
+  "layer": "batch",
+  "laws": ["batch.refuse"],
+  "source": "model",
+  "input": {
+    "held": [
+      {
+        "id": "r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua",
+        "about": ["topic:auth"]
+      },
+      {
+        "id": "r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a",
+        "about": []
+      }
+    ],
+    "drafts": [
+      {
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"],
+          "prev": ["r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq"]
+        },
+        "salt": "2opvao7k6aoeqr5chjhfcjaviq",
+        "payload": {}
+      }
+    ]
+  },
+  "expect": {
+    "refused": "prev-unknown"
+  }
+}

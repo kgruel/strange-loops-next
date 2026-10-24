@@ -1,0 +1,49 @@
+{
+  "vector": "01-erased-without-record-is-withheld",
+  "layer": "realm",
+  "laws": ["settle.set", "settle.keeps"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000051",
+        "kind": "load",
+        "about": ["host:a"],
+        "value": "",
+        "prev": [],
+        "occurred": 100,
+        "emitted": 100,
+        "n": 40
+      },
+      {
+        "id": "r:00000051",
+        "kind": "load",
+        "about": ["host:a"],
+        "prev": [],
+        "occurred": 100,
+        "emitted": 100,
+        "shown": "erased"
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000051",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "host:a": {
+        "heads": ["r:00000051"],
+        "winner": "r:00000051",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 40,
+      "unread": 0
+    }
+  }
+}

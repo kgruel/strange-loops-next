@@ -1,5 +1,6 @@
 import Loops.Spec
 import Laws.Families
+import Laws.Things
 
 /-!
 # Laws of the spec
@@ -15,8 +16,9 @@ import Laws.Families
   envelopes, so a view selects the same records.
 * **The set decides, for every spec.** Every slot gives the same value for
   the same set of records.
-* **No false resurrection, in a slot.** A latest-by slot under a view folds
-  to the full reader's heads, with payloads hidden.
+* **Selection comes after supersession.** Slots over heads read each thing's
+  state over everything held; under a view, that state is the full reader's
+  with payloads hidden.
 -/
 
 namespace Loops
@@ -25,24 +27,29 @@ open List
 
 /-! ## Operators -/
 
-theorem Op.not_is (v : Val) (x : Option Val) : (Op.not v).test x = !(Op.is v).test x := rfl
+theorem Op.not_is (v : Val) (xs : List Val) : (Op.not v).test xs = !(Op.is v).test xs := rfl
 
-theorem Op.absent_present (x : Option Val) : Op.absent.test x = !Op.present.test x := by
-  cases x <;> rfl
+theorem Op.absent_present (xs : List Val) : Op.absent.test xs = !Op.present.test xs := by
+  cases xs <;> rfl
 
 theorem Op.atLeast_below (i j : Int) :
-    (Op.atLeast i).test (some (.int j)) = !(Op.below i).test (some (.int j)) := by
-  simp only [Op.test, decide_eq_decide, ← decide_not]
+    (Op.atLeast i).test [.int j] = !(Op.below i).test [.int j] := by
+  simp only [Op.test, any_cons, any_nil, Bool.or_false, Val.atLeast, Val.below, ← decide_not]
+  simp only [decide_eq_decide]
   omega
 
 /-- `at-least` and `below` hold only for numbers. -/
-theorem Op.ordered_numbers_only (i : Int) {x : Option Val} (h : ∀ j, x ≠ some (.int j)) :
-    (Op.atLeast i).test x = false ∧ (Op.below i).test x = false := by
-  rcases x with _ | (s | j | b)
-  · exact ⟨rfl, rfl⟩
-  · exact ⟨rfl, rfl⟩
-  · exact absurd rfl (h j)
-  · exact ⟨rfl, rfl⟩
+theorem Op.ordered_numbers_only (i : Int) {xs : List Val} (h : ∀ v ∈ xs, ∀ j, v ≠ .int j) :
+    (Op.atLeast i).test xs = false ∧ (Op.below i).test xs = false := by
+  simp only [Op.test, any_eq_false]
+  constructor <;> intro v hv <;> cases v <;> simp [Val.atLeast, Val.below] <;> exact absurd rfl (h _ hv _)
+
+/-- A test on `about` asks whether the record is about a thing. -/
+theorem Cond.about_is (t : String) (r : Record) :
+    Cond.eval ⟨.about, .is (.str t)⟩ r = .ofBool (r.about.contains t) := by
+  simp only [Cond.eval, Field.read, Op.test]
+  congr 1
+  cases h : r.about.contains t <;> simp_all
 
 /-! ## Totality -/
 
@@ -87,11 +94,11 @@ theorem Tri.and_refines {a a' b b' : Tri} (ha : a.Refines a') (hb : b.Refines b'
 
 theorem Cond.eval_view {f : Record → Record} (hf : View f) (c : Cond) (r : Record) :
     (c.eval (f r)).Refines (c.eval r) := by
-  obtain ⟨-, hk, ha, -, -, -⟩ := hf.envelope r
+  have he := hf.envelope r
   rcases c with ⟨fld, op⟩
   cases fld with
-  | kind => exact Or.inr (by simp [Cond.eval, Field.read, hk])
-  | about => exact Or.inr (by simp [Cond.eval, Field.read, ha])
+  | kind => exact Or.inr (by simp [Cond.eval, Field.read, he.kind])
+  | about => exact Or.inr (by simp [Cond.eval, Field.read, he.about])
   | payload n =>
     rcases hf.hides r with e | e
     · exact Or.inr (by rw [e])
@@ -120,8 +127,12 @@ theorem Cond.all_envelope_view {f : Record → Record} (hf : View f) {cs : List 
 
 theorem Source.takes_view {f : Record → Record} (hf : View f) (s : Source) (r : Record) :
     s.takes (f r) = s.takes r := by
-  obtain ⟨-, hk, ha, -, -, -⟩ := hf.envelope r
-  simp [Source.takes, hk, ha]
+  have he := hf.envelope r
+  simp [Source.takes, he.kind, he.about]
+
+theorem Spec.takes_view {f : Record → Record} (hf : View f) (sp : Spec) (r : Record) :
+    sp.takes (f r) = sp.takes r := by
+  simp [Spec.takes, Source.takes_view hf]
 
 /-- Selection reads only envelopes: a view selects the same records. -/
 theorem Spec.select_view {f : Record → Record} (hf : View f) (sp : Spec) (xs : List Record) :
@@ -130,79 +141,84 @@ theorem Spec.select_view {f : Record → Record} (hf : View f) (sp : Spec) (xs :
   congr 1
   apply filter_congr
   intro r _
-  simp [Function.comp, Source.takes_view hf]
+  simp [Function.comp, Spec.takes_view hf]
 
 /-! ## The set decides, for every spec -/
 
-theorem Distinct.filter {xs : List Record} (p : Record → Bool) (h : Distinct xs) :
-    Distinct (xs.filter p) :=
-  Nodup.sublist ((filter_sublist).map _) h
+theorem Addressed.filter {xs : List Record} (p : Record → Bool) (h : Addressed xs) :
+    Addressed (xs.filter p) := fun a ha b hb => h a (mem_filter.1 ha).1 b (mem_filter.1 hb).1
 
-theorem headsInput_addressed (cs : List Cond) (follow : Bool) {xs : List Record}
-    (hx : Distinct xs) : Addressed (headsInput cs follow xs) := by
-  have hf := (hx.filter (Cond.all (cs.filter (·.field.onEnvelope)) · == .yes)).addressed
-  unfold headsInput
-  split
-  · exact hf
-  · intro a' ha' b' hb' e
-    obtain ⟨a, ha, rfl⟩ := mem_map.1 ha'
-    obtain ⟨b, hb, rfl⟩ := mem_map.1 hb'
-    rw [hf a ha b hb e]
+theorem Addressed.unlinked {xs : List Record} (h : Addressed xs) :
+    Addressed (xs.map Record.unlinked) := by
+  intro a' ha' b' hb' e
+  obtain ⟨a, ha, rfl⟩ := mem_map.1 ha'
+  obtain ⟨b, hb, rfl⟩ := mem_map.1 hb'
+  rw [h a ha b hb e]
 
-theorem mem_headsInput (cs : List Cond) (follow : Bool) {xs ys : List Record}
-    (h : ∀ r, r ∈ xs ↔ r ∈ ys) (r : Record) :
-    r ∈ headsInput cs follow xs ↔ r ∈ headsInput cs follow ys := by
-  unfold headsInput
-  split <;> simp [mem_filter, mem_map, h]
+theorem newestFirst_eq {xs ys : List Record} (hx : Addressed xs) (hy : Addressed ys)
+    (h : ∀ r, r ∈ xs ↔ r ∈ ys) : newestFirst xs = newestFirst ys := by
+  unfold newestFirst
+  rw [LatestBy.set_decides hx.unlinked hy.unlinked fun r => by simp only [mem_map, h]]
 
-theorem headsOf_set_decides (cs : List Cond) (follow : Bool) (limit : Option Nat)
-    {xs ys : List Record} (hx : Distinct xs) (hy : Distinct ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
-    headsOf cs follow limit xs = headsOf cs follow limit ys := by
-  have e : LatestBy.fold .empty (headsInput cs follow xs) =
-      LatestBy.fold .empty (headsInput cs follow ys) :=
-    LatestBy.set_decides (headsInput_addressed cs follow hx) (headsInput_addressed cs follow hy)
-      (mem_headsInput cs follow h)
-  simp only [headsOf, e]
+theorem latestOf_set_decides (sel : Record → Bool) (cs : List Cond) {xs ys : List Record}
+    (hx : Addressed xs) (hy : Addressed ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
+    latestOf sel cs xs = latestOf sel cs ys := by
+  unfold latestOf
+  rw [perThing_set_decides hx hy h]
+
+theorem collectOf_set_decides (sel : Record → Bool) (cs : List Cond) (follow : Bool)
+    (limit : Option Nat) {xs ys : List Record} (hx : Addressed xs) (hy : Addressed ys)
+    (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
+    collectOf sel cs follow limit xs = collectOf sel cs follow limit ys := by
+  have hp : newestFirst ((if follow then (perThing xs).flatMap (·.2.heads) else xs).filter
+        (chosen sel cs)) =
+      newestFirst ((if follow then (perThing ys).flatMap (·.2.heads) else ys).filter
+        (chosen sel cs)) := by
+    cases follow
+    · simp only [Bool.false_eq_true, ↓reduceIte]
+      exact newestFirst_eq (hx.filter _) (hy.filter _) fun r => by simp [mem_filter, h]
+    · simp only [↓reduceIte]
+      rw [perThing_set_decides hx hy h]
+  unfold collectOf
+  simp only [hp]
 
 /-- Every slot gives the same value for the same set of records. -/
-theorem Slot.set_decides (s : Slot) {xs ys : List Record} (hx : Distinct xs) (hy : Distinct ys)
-    (h : ∀ r, r ∈ xs ↔ r ∈ ys) : s.run xs = s.run ys := by
+theorem Slot.set_decides (s : Slot) (sel : Record → Bool) {xs ys : List Record}
+    (hx : Distinct xs) (hy : Distinct ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
+    s.run sel xs = s.run sel ys := by
   unfold Slot.run
   split
+  all_goals dsimp only
   · rw [Acc.select_set_decides _ _ hx hy h]
   · rw [Acc.select_set_decides _ _ hx hy h]
   · rw [Acc.select_set_decides _ _ hx hy h]
   · rw [Acc.select_set_decides _ _ hx hy h]
-  · exact headsOf_set_decides _ _ _ hx hy h
-  · exact headsOf_set_decides _ _ _ hx hy h
+  · exact latestOf_set_decides _ _ hx.addressed hy.addressed h
+  · exact collectOf_set_decides _ _ _ _ hx.addressed hy.addressed h
 
-/-- The set decides, for every spec. -/
-theorem Spec.set_decides (sp : Spec) {xs ys : List Record} (hx : Distinct xs) (hy : Distinct ys)
-    (h : ∀ r, r ∈ xs ↔ r ∈ ys) : sp.run xs = sp.run ys := by
-  have hs : ∀ r, r ∈ sp.select xs ↔ r ∈ sp.select ys := fun r => by simp [Spec.select, h]
+/-- The set decides, for every spec, under any rule for who may replace whom. -/
+theorem Spec.set_decides (sp : Spec) (may : Record → Record → Bool) {xs ys : List Record}
+    (hx : Distinct xs) (hy : Distinct ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
+    sp.run xs may = sp.run ys may := by
   unfold Spec.run
   exact map_congr_left fun s _ => by
-    rw [s.set_decides (xs := sp.select xs) (ys := sp.select ys) (hx.filter _) (hy.filter _) hs]
+    rw [s.set_decides sp.takes (admit_distinct may hx) (admit_distinct may hy) (admit_same may h)]
 
-/-! ## No false resurrection, in a slot -/
+/-! ## Selection after supersession -/
 
-theorem headsInput_view {f : Record → Record} (hf : View f) (cs : List Cond)
-    (xs : List Record) : headsInput cs true (xs.map f) = (headsInput cs true xs).map f := by
-  simp only [headsInput, ↓reduceIte, filter_map]
-  congr 1
-  apply filter_congr
-  intro r _
-  simp only [Function.comp]
-  rw [Cond.all_envelope_view hf (fun c hc => (mem_filter.1 hc).2)]
-
-/-- A latest-by slot under a view folds to the full reader's state, with
-payloads hidden: withholding never brings back what was superseded. -/
-theorem headsOf_view {f : Record → Record} (hf : View f) (cs : List Cond) {xs : List Record}
-    (hx : Distinct xs) :
-    LatestBy.fold .empty (headsInput cs true (xs.map f)) =
-      ⟨(LatestBy.fold .empty (headsInput cs true xs)).named,
-        (LatestBy.fold .empty (headsInput cs true xs)).heads.map f⟩ := by
-  rw [headsInput_view hf]
-  exact LatestBy.view hf (headsInput_addressed cs true hx)
+/-- What a spec's heads read under a view: every thing's state is the full
+reader's, with payloads hidden. Withholding never brings back what was
+superseded, and neither does selecting by kind, `about` or `from`, since
+selection only ever looks at heads. -/
+theorem Spec.view_state {f : Record → Record} (hf : View f) {may : Record → Record → Bool}
+    (hm : EnvOnly may) {xs : List Record} (hx : Distinct xs) :
+    perThing (admit may (xs.map f)) =
+      (perThing (admit may xs)).map fun p => (p.1, ⟨p.2.named, p.2.heads.map f⟩) := by
+  rw [admit_view hf hm]
+  unfold perThing
+  rw [thingsOf_view hf, map_map]
+  exact map_congr_left fun t _ => by
+    simp only [Function.comp]
+    rw [stateIn_view hf t (admit_distinct may hx).addressed]
 
 end Loops

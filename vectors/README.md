@@ -1,6 +1,6 @@
 # Vectors
 
-`fold/`, `lens/`, `record/`, `spec/` and `batch/` are written by `model/` (`lake exe gen
+`fold/`, `lens/`, `record/`, `spec/`, `batch/` and `realm/` are written by `model/` (`lake exe gen
 ../vectors`); never edit them by hand. CI regenerates them and fails on any
 difference. `standard/` holds test data from the standards themselves; see
 its README.
@@ -25,13 +25,15 @@ implementation folds each order separately; every one must produce
 `expect` (except `count.repeats`, which has one order).
 
 * Count: `expect` is the number.
-* LatestBy: `expect.heads` (newest first), `expect.named` (ascending), and
-  per key the `winner` and the `others` (a fork when non-empty).
+* LatestBy: per thing, its `heads` (newest first), its `winner` and its
+  `others` (a fork when non-empty). A record about several things counts in
+  each; a record about nothing counts in the thing `""`.
 * Latest: the `winner` and the `others`.
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
-Each record carries `n`, the integer the numeric folds read, and may carry
-`fields`, further payload fields by name. A record whose payload the reader
+Each record's `about` is a set of things. It carries `n`, the integer the
+numeric folds read, and may carry `observer`, `erases` (an erase record's
+targets) and `fields`, further payload fields by name. A record whose payload the reader
 doesn't hold has `shown` (`withheld` or `erased`) instead of `value`, `n` and
 `fields`.
 
@@ -66,19 +68,31 @@ order: an object, known keys, `vertex`, `from`, then each slot.
 
 `input.spec` and `input.orders`, as in the fold vectors. `expect` names each
 slot of `fold` and what it holds: `value` and `unread` for count, sum, min
-and max; for latest-by and collect, the `heads` newest first with what the
-reader holds of each, and how many heads a payload test couldn't answer
-(`unread`). Over heads, supersession runs on what `from` and the envelope
-tests select; payload tests then apply to the heads.
+and max; for latest-by, each thing's current records (`things`), and for
+collect the records newest first (`heads`), each with what the reader holds
+of it, and how many heads a payload test couldn't answer (`unread`). Over
+heads, supersession runs over everything held, per thing; `from` and the
+envelope tests then choose heads, and payload tests filter them.
 
 ## `batch`
 
 `input.drafts` is one changeset: each draft has an optional `label`
 (`@name`), an envelope whose `about` and `prev` may use labels, a `salt` and
-a payload. `expect.records` gives each record's `id` and canonical envelope
+a payload. `input.held` lists what the store already holds: each id and its
+`about`. `expect.records` gives each record's `id` and canonical envelope
 with labels replaced by ids, in the order given; or `expect.refused`:
-`label-duplicate`, `label-unknown` or `label-cycle`, checked in that order.
-Every order of the drafts gives the same records.
+`label-duplicate`, `label-unknown`, `label-cycle`, `prev-unknown` or
+`prev-unrelated`, checked in that order. Every order of the drafts gives the
+same records.
+
+## `realm`
+
+`input.forms` lists every form a reader's places hold, in one list. `expect`
+gives what the reader keeps, one record per id with what it holds of each
+(`settled`); the records refused for their `prev`, with the code
+(`refused`); each thing's state over the rest (`things`, as in
+`fold/latest-by`); and Sum over them (`sum`). Every rotation of the forms
+must give the same.
 
 ## `lens/section`
 

@@ -9,7 +9,7 @@
         {
           "id": "r:00000012",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v18",
           "prev": ["r:00000011"],
           "occurred": 200,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -30,13 +30,10 @@
     ]
   },
   "expect": {
-    "heads": ["r:00000012"],
-    "named": ["r:00000011"],
-    "keys": {
-      "topic:auth": {
-        "winner": "r:00000012",
-        "others": []
-      }
+    "topic:auth": {
+      "heads": ["r:00000012"],
+      "winner": "r:00000012",
+      "others": []
     }
   }
 }

@@ -69,9 +69,9 @@ def parseVector (name : String) (j : Json) : Except String J := do
 
 /-! ## Running -/
 
-def task (id : Nat) (key : String) (occurred : Nat) (fields : List (String × Val))
+def task (id : Nat) (thing : String) (occurred : Nat) (fields : List (String × Val))
     (prev : List Nat := []) : Record :=
-  { id, kind := "task", key, value := "", prev, occurred, emitted := occurred, fields }
+  { id, kind := "task", about := [thing], value := "", prev, occurred, emitted := occurred, fields }
 
 -- task:1 opens, then closes; task:2 is open; task:3 is open but its payload is withheld
 def t1 := task 0x41 "task:1" 100 [("status", .str "open"), ("est", .int 3)]
@@ -103,8 +103,15 @@ def runCases : List RunCase := [
   ⟨"01-tasks", ["spec.set", "spec.select"], taskSpec, [t1, t2, t3, n1]⟩,
   ⟨"02-withheld-payload", ["spec.set", "view.refines", "result.unread"], taskSpec, [t1, t2, t3, t4, n1]⟩,
   ⟨"03-withheld-successor", ["spec.set", "view.no-resurrection", "result.unread"], taskSpec,
-    [t1, t2.withhold, t3, n1]⟩
+    [t1, t2.withhold, t3, n1]⟩,
+  ⟨"04-kind-change", ["spec.set", "spec.after-supersession"], taskSpec,
+    [t1, { task 0x46 "task:1" 300 [] (prev := [0x41]) with kind := "task-done" }, t3]⟩,
+  ⟨"05-about-is-a-set", ["spec.set", "thing.local"], taskSpec,
+    [{ t3 with about := ["task:2", "task:9"] }, task 0x47 "task:2" 400 [("status", .str "closed")] (prev := [0x43])]⟩
 ]
+
+def jShownIds (hs : List (Nat × Shown)) : J :=
+  .arr (hs.map fun (i, sh) => .obj [("id", .str (idText i)), ("shown", jShown sh)])
 
 def jSlot : SlotValue → J
   | .nat r => .obj [("value", .num r.value), ("unread", .num r.unread)]
@@ -112,8 +119,9 @@ def jSlot : SlotValue → J
   | .opt r => .obj [("value", match r.value with
       | some v => .int v
       | none => .null), ("unread", .num r.unread)]
-  | .heads hs u => .obj [("heads", .arr (hs.map fun (i, sh) =>
-      .obj [("id", .str (idText i)), ("shown", jShown sh)])), ("unread", .num u)]
+  | .heads hs u => .obj [("heads", jShownIds hs), ("unread", .num u)]
+  | .things ts u => .obj [("things", .obj (ts.map fun (t, hs) => (t, jShownIds hs))),
+      ("unread", .num u)]
 
 def rotations (xs : List Record) : List (List Record) :=
   (List.range xs.length).map fun i => xs.drop i ++ xs.take i

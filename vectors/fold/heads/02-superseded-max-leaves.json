@@ -9,7 +9,7 @@
         {
           "id": "r:00000032",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v50",
           "prev": [],
           "occurred": 110,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000033",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v51",
           "prev": ["r:00000032"],
           "occurred": 120,
@@ -31,7 +31,7 @@
         {
           "id": "r:00000033",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v51",
           "prev": ["r:00000032"],
           "occurred": 120,
@@ -41,7 +41,7 @@
         {
           "id": "r:00000032",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v50",
           "prev": [],
           "occurred": 110,

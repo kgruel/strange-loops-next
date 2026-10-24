@@ -26,11 +26,16 @@ inductive Val where
 structure Record where
   id       : Nat
   kind     : String
-  key      : String
+  /-- Who says so. -/
+  observer : String := ""
+  /-- The things this record is about: a set. -/
+  about    : List String := []
   value    : String
   prev     : List Nat
   occurred : Nat
   emitted  : Nat
+  /-- For an erase record: the ids whose payloads it erases. -/
+  erases   : List Nat := []
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
   n        : Int := 0
   /-- Further payload fields, by name. -/
@@ -55,11 +60,16 @@ def Addressed (xs : List Record) : Prop :=
 /-- What a store hands a fold: each id once. -/
 def Distinct (xs : List Record) : Prop := (xs.map (·.id)).Nodup
 
-/-- The same envelope: everything the core reads without opening the payload.
-`key` stands for `about`. -/
-def SameEnvelope (a b : Record) : Prop :=
-  a.id = b.id ∧ a.kind = b.kind ∧ a.key = b.key ∧ a.prev = b.prev ∧
-    a.occurred = b.occurred ∧ a.emitted = b.emitted
+/-- The same envelope: everything the core reads without opening the payload. -/
+structure SameEnvelope (a b : Record) : Prop where
+  id : a.id = b.id
+  kind : a.kind = b.kind
+  observer : a.observer = b.observer
+  about : a.about = b.about
+  prev : a.prev = b.prev
+  occurred : a.occurred = b.occurred
+  emitted : a.emitted = b.emitted
+  erases : a.erases = b.erases
 
 /-- A view of records: it may hide a payload, and changes nothing else. A
 narrowed handle, a withheld form and an erasure are all views. -/

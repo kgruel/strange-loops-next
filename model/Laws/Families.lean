@@ -144,11 +144,11 @@ theorem OverHeads.late {σ} (answer : LatestBy → σ) {xs ys : List Record} (r 
 /-! ## Why there are two families -/
 
 def cx.a : Record :=
-  { id := 1, kind := "load", key := "k1", value := "", prev := [], occurred := 1, emitted := 1, n := 5 }
+  { id := 1, kind := "load", about := ["k1"], value := "", prev := [], occurred := 1, emitted := 1, n := 5 }
 def cx.b : Record :=
-  { id := 2, kind := "load", key := "k2", value := "", prev := [], occurred := 2, emitted := 2, n := 9 }
+  { id := 2, kind := "load", about := ["k2"], value := "", prev := [], occurred := 2, emitted := 2, n := 9 }
 def cx.c : Record :=
-  { id := 3, kind := "load", key := "k2", value := "", prev := [2], occurred := 3, emitted := 3, n := 1 }
+  { id := 3, kind := "load", about := ["k2"], value := "", prev := [2], occurred := 3, emitted := 3, n := 1 }
 
 /-- A bounded state can't follow `prev`. Max holds 9 after `[a, b]` and after
 `[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and
@@ -167,25 +167,46 @@ theorem Max.cannot_follow_prev :
 
 theorem View.newer {f : Record → Record} (hf : View f) {a b : Record} :
     Newer (f a) (f b) ↔ Newer a b := by
-  obtain ⟨a1, -, -, -, a5, a6⟩ := hf.envelope a
-  obtain ⟨b1, -, -, -, b5, b6⟩ := hf.envelope b
+  have ea := hf.envelope a
+  have eb := hf.envelope b
   unfold Newer
-  rw [a1, a5, a6, b1, b5, b6]
+  rw [ea.id, ea.occurred, ea.emitted, eb.id, eb.occurred, eb.emitted]
 
 theorem View.addressed {f : Record → Record} (hf : View f) {xs : List Record}
     (hx : Addressed xs) : Addressed (xs.map f) := by
   intro a' ha' b' hb' e
   obtain ⟨a, ha, rfl⟩ := mem_map.1 ha'
   obtain ⟨b, hb, rfl⟩ := mem_map.1 hb'
-  rw [(hf.envelope a).1, (hf.envelope b).1] at e
+  rw [(hf.envelope a).id, (hf.envelope b).id] at e
   rw [hx a ha b hb e]
 
+theorem SameEnvelope.refl (r : Record) : SameEnvelope r r := ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+theorem SameEnvelope.symm {a b : Record} (h : SameEnvelope a b) : SameEnvelope b a :=
+  ⟨h.id.symm, h.kind.symm, h.observer.symm, h.about.symm, h.prev.symm, h.occurred.symm,
+    h.emitted.symm, h.erases.symm⟩
+
+theorem SameEnvelope.trans {a b c : Record} (h : SameEnvelope a b) (h' : SameEnvelope b c) :
+    SameEnvelope a c :=
+  ⟨h.id.trans h'.id, h.kind.trans h'.kind, h.observer.trans h'.observer, h.about.trans h'.about,
+    h.prev.trans h'.prev, h.occurred.trans h'.occurred, h.emitted.trans h'.emitted,
+    h.erases.trans h'.erases⟩
+
+theorem withhold_envelope (r : Record) : SameEnvelope r.withhold r :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+theorem erase_envelope (r : Record) : SameEnvelope r.erase r :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
 theorem withholding_view (p : Record → Bool) : View (withholding p) where
-  envelope r := by unfold withholding; split <;> simp [SameEnvelope, Record.withhold]
+  envelope r := by
+    unfold withholding; split
+    · exact withhold_envelope r
+    · exact SameEnvelope.refl r
   hides r := by unfold withholding; split <;> simp [Record.withhold]
 
 theorem erase_view : View Record.erase where
-  envelope r := by simp [SameEnvelope, Record.erase]
+  envelope r := erase_envelope r
   hides r := by simp [Record.erase]
 
 theorem LatestBy.inv_of {xs : List Record} (hx : Addressed xs) :
@@ -200,8 +221,8 @@ theorem LatestBy.view {f : Record → Record} (hf : View f) {xs : List Record}
       ⟨(LatestBy.fold .empty xs).named, (LatestBy.fold .empty xs).heads.map f⟩ := by
   have hs := LatestBy.inv_of hx
   have ht := LatestBy.inv_of (hf.addressed hx)
-  have prev_eq : ∀ r, (f r).prev = r.prev := fun r => (hf.envelope r).2.2.2.1
-  have id_eq : ∀ r, (f r).id = r.id := fun r => (hf.envelope r).1
+  have prev_eq : ∀ r, (f r).prev = r.prev := fun r => (hf.envelope r).prev
+  have id_eq : ∀ r, (f r).id = r.id := fun r => (hf.envelope r).id
   refine LatestBy.inv_ext ht ⟨hs.named_sorted, ?_, ?_, ?_⟩ fun _ => Iff.rfl
   · intro n
     rw [hs.named_mem]
@@ -230,7 +251,7 @@ theorem LatestBy.view_head_ids {f : Record → Record} (hf : View f) {xs : List 
     (LatestBy.fold .empty (xs.map f)).heads.map (·.id) =
       (LatestBy.fold .empty xs).heads.map (·.id) := by
   rw [LatestBy.view hf hx, map_map]
-  exact map_congr_left fun r _ => (hf.envelope r).1
+  exact map_congr_left fun r _ => (hf.envelope r).id
 
 /-- No false resurrection: a record something supersedes is never a head, in
 any view. -/
@@ -241,7 +262,7 @@ theorem LatestBy.no_false_resurrection {f : Record → Record} (hf : View f)
   rw [LatestBy.view hf hx] at hh
   obtain ⟨g, hg, rfl⟩ := mem_map.1 hh
   obtain ⟨-, hn⟩ := ((LatestBy.inv_of hx).heads_mem g).1 hg
-  rw [(hf.envelope g).1] at e
+  rw [(hf.envelope g).id] at e
   exact hn ⟨q, hq, e ▸ hr⟩
 
 /-! ## Honest results -/

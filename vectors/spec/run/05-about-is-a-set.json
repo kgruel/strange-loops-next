@@ -1,0 +1,192 @@
+{
+  "vector": "05-about-is-a-set",
+  "layer": "spec/run",
+  "laws": ["spec.set", "thing.local"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "tasks",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "open": {
+          "latest-by": "about",
+          "follow": "prev",
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        },
+        "newest": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 1
+        },
+        "every": {
+          "collect": true
+        },
+        "observations": {
+          "count": true
+        },
+        "open-observations": {
+          "count": true,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "est": {
+          "sum": "est"
+        },
+        "blocked": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "present": true
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:00000043",
+          "kind": "task",
+          "about": ["task:2", "task:9"],
+          "value": "",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:00000047",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": ["r:00000043"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0,
+          "fields": {
+            "status": "closed"
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:00000047",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": ["r:00000043"],
+          "occurred": 400,
+          "emitted": 400,
+          "n": 0,
+          "fields": {
+            "status": "closed"
+          }
+        },
+        {
+          "id": "r:00000043",
+          "kind": "task",
+          "about": ["task:2", "task:9"],
+          "value": "",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "open": {
+      "things": {
+        "task:9": [
+          {
+            "id": "r:00000043",
+            "shown": "here"
+          }
+        ]
+      },
+      "unread": 0
+    },
+    "current": {
+      "things": {
+        "task:2": [
+          {
+            "id": "r:00000047",
+            "shown": "here"
+          }
+        ],
+        "task:9": [
+          {
+            "id": "r:00000043",
+            "shown": "here"
+          }
+        ]
+      },
+      "unread": 0
+    },
+    "newest": {
+      "heads": [
+        {
+          "id": "r:00000047",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "every": {
+      "heads": [
+        {
+          "id": "r:00000047",
+          "shown": "here"
+        },
+        {
+          "id": "r:00000043",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "observations": {
+      "value": 2,
+      "unread": 0
+    },
+    "open-observations": {
+      "value": 1,
+      "unread": 0
+    },
+    "est": {
+      "value": 5,
+      "unread": 1
+    },
+    "blocked": {
+      "value": 1,
+      "unread": 0
+    }
+  }
+}

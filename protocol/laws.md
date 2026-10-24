@@ -16,7 +16,7 @@ vectors; the model is what the vectors come from.
 | `latest-by.repeats` | `LatestBy.repeats` | re-delivering records changes nothing | `fold/latest-by/08` |
 | `latest-by.converge` | `LatestBy.converge` | two places syncing in either direction reach the same state | `fold/latest-by/09` |
 
-| `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is LatestBy with one key, so it inherits LatestBy's laws | `fold/latest/*` |
+| `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is LatestBy over one thing, so it inherits LatestBy's laws | `fold/latest/*` |
 | `sum.perm` | `Sum.perm` | arrival order doesn't change a sum | `fold/sum/01`, `02` |
 | `sum.repeats` | `Sum.repeats` | a repeated delivery is added again, so the store must hand each id over once | `fold/sum/03` |
 | `extrema.set` | `Max.set_decides`, `Min.set_decides` | Min and Max depend only on the set of records | `fold/extrema/*` |
@@ -30,6 +30,12 @@ The numeric folds read an **exact** field: an integer. Over floating point,
 addition isn't associative, so the order records arrive in would change a
 sum, and `sum.perm` would be false. Decimals, if they come, must be exact
 too.
+
+The model's integers are unbounded; an implementation's are not. Each
+payload number is within ±2^53 (RFC 8785), so implementations accumulate
+sums in 128 bits: overflowing that takes more than 2^74 records. An
+implementation that cannot hold a sum refuses with `sum-overflow`, never
+wraps.
 
 ## Two families, views and honest results (`model/Laws/Families.lean`)
 
@@ -64,16 +70,50 @@ system means and must be proved. Other laws may be listed here as
 conjectures, checked by vectors and fuzzing until proved; `lake build
 --wfail` keeps `sorry` out of the build.
 
+## Things and what a reader holds (`model/Laws/Things.lean`)
+
+`prev` is succession within a thing. Before any vertex asks its question, a
+reader settles the forms its places hold into one record per id, refuses
+records whose `prev` it can't accept, and works out each thing's state over
+everything left:
+
+* **Settle.** A payload any place holds is kept. An erase record in the set
+  naming an id erases every form of it. A form that arrives erased with no
+  erase record behind it counts as withheld.
+* **Admit.** A record whose `prev` names a held record it shares no thing
+  with is refused (`prev-unrelated`), as is one the store's rule says may
+  not replace it (`prev-not-permitted`). The rule reads only envelopes;
+  step 2 allows everything, and step 3 supplies standing.
+* **Per thing.** A record about several things lives in each; a record about
+  nothing lives in one thing of its own. Each thing's state is LatestBy over
+  the records about it.
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `settle.set` | `settle_eq`, `settle_distinct` | what a reader keeps depends only on which forms its places hold, one record per id | `realm/01`–`03` |
+| `settle.keeps` | `settle_keeps` | a payload any place holds is kept unless erased | `realm/01`, `02` |
+| `settle.erased` | `settle_erased` | once an erase record is held, every form of its target is erased | `realm/03` |
+| `admit.set` | `admit_same`, `refusalOf_none` | admission depends only on the set; a record is refused exactly when it isn't entitled to its `prev` | `realm/04` |
+| `admit.no-cross` | `admit_no_cross` | an admitted record's `prev` names only held records it shares a thing with and may replace | `realm/04` |
+| `thing.local` | `stateIn_local`, `perThing_set_decides` | a thing's state depends only on the records about it; the set decides per thing | `realm/04`–`07`, `fold/latest-by/*` |
+| `view.no-resurrection` (things) | `admit_view`, `stateIn_view`, `stateIn_no_false_resurrection` | a view admits the same records and folds each thing to the full reader's state; a record superseded in a thing is never current there | `fold/view/*`, `spec/run/03` |
+
+Writing checks `prev` too: you can only replace what you hold. `emit`
+refuses a `prev` naming a record neither in the batch nor in the store
+(`prev-unknown`) or one about other things (`prev-unrelated`).
+
 ## The spec (`model/Laws/Spec.lean`)
 
 A spec parses into a closed type: `from` selects by envelope, and `fold`
 names slots, each one fold with an optional `where`. `where` has six
 operators (`is`, `not`, `present`, `absent`, `at-least`, `below`) and three
-answers; a `where` map holds when every test does. Accumulating slots select,
-then fold. Slots over heads (latest-by, collect) let supersession run on what
-the envelope selects, then apply payload tests to the heads: filtering first
-would bring back a record whose successor no longer matches, or whose
-successor's payload is withheld.
+answers; a `where` map holds when every test does. `about` is a set, so a
+test on it asks whether a record is about a thing. Accumulating slots select,
+then fold. Slots over heads (latest-by, collect) read each thing's state,
+already settled over everything the reader holds; `from` and the envelope
+tests then choose heads, and payload tests filter them. Selecting first
+would bring back a record whose successor is of another kind, no longer
+matches, or is withheld.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
@@ -84,7 +124,7 @@ successor's payload is withheld.
 | `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
-| `view.no-resurrection` (slots) | `headsOf_view` | a latest-by slot under a view folds to the full reader's heads | `spec/run/03` |
+| `spec.after-supersession` | `Spec.view_state` | slots over heads read each thing's state, which under a view is the full reader's with payloads hidden; selection never brings back what was superseded | `spec/run/03`, `04` |
 | `spec.parse` | (checked by `gen`) | the parsed form parses back to itself; refusals name a closed code and a path | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
@@ -92,7 +132,7 @@ successor's payload is withheld.
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
 | `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`, `02` |
-| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused | `batch/10`–`12` |
+| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a `prev` naming a record not held, or one about other things | `batch/10`–`14` |
 
 `gen` checks every batch vector against `Meaning`, in every rotation of its
 drafts.
@@ -125,10 +165,31 @@ The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
 computed by reference code in `model/Gen/` that checks itself against
 FIPS 180-4 and RFC 8032 values before it writes anything.
 
-## Simplifications in step 0
+## What these laws don't promise
+
+Every law is about a given set of records. None says the set is complete,
+current, trusted or well dated:
+
+* **Absence isn't visible.** A reader that hasn't synced a successor sees
+  the record it replaces as current, and can't count what it doesn't know
+  exists. The laws promise convergence, not freshness.
+* **Torn reads.** A reader must not see half a changeset: segments close
+  per changeset with an atomic rename, and readers ignore a partial last
+  line.
+* **Time is the writer's word.** Content order breaks ties by claimed
+  times, so a skewed clock picks a fork's winner. Every head of a fork is
+  still shown.
+* **Trust is step 3.** Nothing here checks signatures or standing; the laws
+  hold for whatever a reader admits.
+* **A checkpoint is a set.** "Since" means segments not yet seen, not an
+  offset, or a late segment is missed.
+
+## Simplifications in the model
 
 * Ids are numbers standing for content hashes, written as fixed-width hex
-  (`r:00000011`) so byte order and numeric order agree.
+  (`r:00000011`) so byte order and numeric order agree. Nothing yet connects
+  these records to layer 0's real ones.
+* The payload is `value`, `n` and named `fields`.
 * `occurred` and `emitted` are plain numbers; EDTF and RFC 3339 arrive with
   layer 0's vectors.
 * Text is a list of lines; splitting a file into lines is outside the model.

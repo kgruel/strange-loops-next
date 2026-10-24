@@ -20,8 +20,8 @@ def Count.fold (n : Nat) (xs : List Record) : Nat := xs.foldl Count.step n
 /-! ## LatestBy
 
 LatestBy keeps the records nothing names in `prev` (the heads), newest first,
-and every id some `prev` names. A key's winner is its newest head; any other
-heads for the key are a fork, shown as a conflict.
+and every id some `prev` names. It runs over the records about one thing: the
+winner is the newest head, and any other heads are a fork, shown as a conflict.
 -/
 
 /-- Insert into a strictly ascending list, keeping it duplicate-free. -/
@@ -49,17 +49,16 @@ def LatestBy.empty : LatestBy := ⟨[], []⟩
 
 def LatestBy.fold (s : LatestBy) (xs : List Record) : LatestBy := xs.foldl LatestBy.step s
 
-/-- The winner for a key: its newest head. -/
-def LatestBy.winner (s : LatestBy) (k : String) : Option Record :=
-  s.heads.find? (·.key == k)
+/-- The winner: the newest head. LatestBy runs once per thing (`Loops.Things`),
+so this is the thing's current record. -/
+def LatestBy.winner (s : LatestBy) : Option Record := s.heads.head?
 
-/-- The other heads for a key: non-empty means the key is forked. -/
-def LatestBy.others (s : LatestBy) (k : String) : List Record :=
-  (s.heads.filter (·.key == k)).drop 1
+/-- The other heads: non-empty means the thing is forked. -/
+def LatestBy.others (s : LatestBy) : List Record := s.heads.drop 1
 
 /-! ## Latest
 
-Latest is LatestBy with a single key: the newest head, and any other heads as
+Latest is LatestBy over one thing: the newest head, and any other heads as
 a fork. It follows `prev` chains instead of trusting clocks.
 -/
 

@@ -4,6 +4,7 @@ import Gen.Records
 import Gen.Encode
 import Gen.Spec
 import Gen.Batch
+import Gen.Realm
 
 /-!
 # Gen: write the vectors
@@ -16,16 +17,6 @@ the model. Each case is also checked here against the laws it illustrates.
 open Loops Loops.Lens Gen
 
 /-! ## Encoding -/
-
-def jLatestBy (s : LatestBy) : J :=
-  let keys := s.heads.foldl (fun ks h => if ks.contains h.key then ks else ks ++ [h.key]) []
-  .obj [("heads", .arr (s.heads.map (.str ∘ idText ∘ (·.id)))),
-    ("named", .arr (s.named.map (.str ∘ idText))),
-    ("keys", .obj (keys.map fun k =>
-      (k, .obj [("winner", match s.winner k with
-          | some r => .str (idText r.id)
-          | none => .null),
-        ("others", .arr ((s.others k).map (.str ∘ idText ∘ (·.id))))])))]
 
 def jLine (l : Line) : J := .str (String.ofList l)
 def jLines (ls : List Line) : J := .arr (ls.map jLine)
@@ -40,9 +31,9 @@ def jOutcome : Outcome → J
 
 /-! ## Records used by the fold cases -/
 
-def rec (id : Nat) (key : String) (occurred : Nat) (emitted : Nat := occurred)
+def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
     (prev : List Nat := []) (value : String := s!"v{id}") : Record :=
-  { id, kind := "decision", key, value, prev, occurred, emitted }
+  { id, kind := "decision", about := [thing], value, prev, occurred, emitted }
 
 def r1 := rec 0x11 "topic:auth" 100
 def r2 := rec 0x12 "topic:auth" 200 (prev := [0x11])
@@ -113,7 +104,7 @@ def latestByCases : List FoldCase := [
   ⟨"07-merge", ["latest-by.set"], rotations [r1, r2, r3, r4]⟩,
   ⟨"08-repeats", ["latest-by.repeats"], [[r1, r3], [r1, r3, r1, r3], [r3, r1, r3]]⟩,
   ⟨"09-converge", ["latest-by.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
-  ⟨"10-two-keys", ["latest-by.set"], rotations [r1, r5, r3]⟩,
+  ⟨"10-two-things", ["latest-by.set"], rotations [r1, r5, r3]⟩,
   ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩
 ]
 
@@ -183,7 +174,7 @@ def selectCases : List SelectCase := [
   ⟨"02-envelope-test-on-withheld", ["result.unread", "select.set"],
     [n1, n2, n3.withhold],
     .obj [("kind", .obj [("is", .str "decision")])],
-    .envelope (·.kind == "decision") fun _ _ h => by rw [h.2.1]⟩,
+    .envelope (·.kind == "decision") fun _ _ h => by rw [h.kind]⟩,
   ⟨"03-all-here", ["result.full", "select.set"], [n1, n2, n3],
     .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩
 ]
@@ -271,7 +262,7 @@ def orFail : Except String J → IO J
 
 def main (args : List String) : IO UInt32 := do
   let dir : System.FilePath := args.headD "../vectors"
-  for sub in ["fold", "lens", "record", "spec", "batch"] do
+  for sub in ["fold", "lens", "record", "spec", "batch", "realm"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
@@ -288,7 +279,7 @@ def main (args : List String) : IO UInt32 := do
     pure (c.name, ← orFail (foldVector "fold/extrema" c fun o =>
       .obj [("min", jOptInt (Min.fold none o)), ("max", jOptInt (Max.fold none o))]))
   let latestBy ← latestByCases.mapM fun c => do
-    pure (c.name, ← orFail (foldVector "fold/latest-by" c fun o => jLatestBy (LatestBy.fold .empty o)))
+    pure (c.name, ← orFail (foldVector "fold/latest-by" c fun o => jPerThing (perThing o)))
   let heads ← headsCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (LatestBy.fold .empty o)))
   let views ← viewCases.mapM fun c => do pure (c.name, ← orFail (viewVector c))
@@ -315,5 +306,9 @@ def main (args : List String) : IO UInt32 := do
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
   writeAll dir "batch" batches
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length} vectors to {dir}"
+  let realms ← match Gen.RealmVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "realm" realms
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length} vectors to {dir}"
   return 0

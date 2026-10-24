@@ -9,7 +9,7 @@
         {
           "id": "r:00000031",
           "kind": "decision",
-          "key": "host:a",
+          "about": ["host:a"],
           "value": "v49",
           "prev": [],
           "occurred": 100,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000032",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v50",
           "prev": [],
           "occurred": 110,
@@ -29,7 +29,7 @@
         {
           "id": "r:00000033",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "prev": ["r:00000032"],
           "occurred": 120,
           "emitted": 120,
@@ -40,7 +40,7 @@
         {
           "id": "r:00000032",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v50",
           "prev": [],
           "occurred": 110,
@@ -50,7 +50,7 @@
         {
           "id": "r:00000033",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "prev": ["r:00000032"],
           "occurred": 120,
           "emitted": 120,
@@ -59,7 +59,7 @@
         {
           "id": "r:00000031",
           "kind": "decision",
-          "key": "host:a",
+          "about": ["host:a"],
           "value": "v49",
           "prev": [],
           "occurred": 100,
@@ -71,7 +71,7 @@
         {
           "id": "r:00000033",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "prev": ["r:00000032"],
           "occurred": 120,
           "emitted": 120,
@@ -80,7 +80,7 @@
         {
           "id": "r:00000031",
           "kind": "decision",
-          "key": "host:a",
+          "about": ["host:a"],
           "value": "v49",
           "prev": [],
           "occurred": 100,
@@ -90,7 +90,7 @@
         {
           "id": "r:00000032",
           "kind": "decision",
-          "key": "host:b",
+          "about": ["host:b"],
           "value": "v50",
           "prev": [],
           "occurred": 110,

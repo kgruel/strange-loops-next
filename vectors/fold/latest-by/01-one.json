@@ -9,7 +9,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -20,13 +20,10 @@
     ]
   },
   "expect": {
-    "heads": ["r:00000011"],
-    "named": [],
-    "keys": {
-      "topic:auth": {
-        "winner": "r:00000011",
-        "others": []
-      }
+    "topic:auth": {
+      "heads": ["r:00000011"],
+      "winner": "r:00000011",
+      "others": []
     }
   }
 }

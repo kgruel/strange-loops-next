@@ -9,7 +9,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000012",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v18",
           "prev": ["r:00000011"],
           "occurred": 200,
@@ -29,7 +29,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -39,7 +39,7 @@
         {
           "id": "r:00000014",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "prev": ["r:00000012", "r:00000013"],
           "occurred": 300,
           "emitted": 300,
@@ -50,7 +50,7 @@
         {
           "id": "r:00000012",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v18",
           "prev": ["r:00000011"],
           "occurred": 200,
@@ -60,7 +60,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -70,7 +70,7 @@
         {
           "id": "r:00000014",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "prev": ["r:00000012", "r:00000013"],
           "occurred": 300,
           "emitted": 300,
@@ -79,7 +79,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -91,7 +91,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -101,7 +101,7 @@
         {
           "id": "r:00000014",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "prev": ["r:00000012", "r:00000013"],
           "occurred": 300,
           "emitted": 300,
@@ -110,7 +110,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -120,7 +120,7 @@
         {
           "id": "r:00000012",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v18",
           "prev": ["r:00000011"],
           "occurred": 200,
@@ -132,7 +132,7 @@
         {
           "id": "r:00000014",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "prev": ["r:00000012", "r:00000013"],
           "occurred": 300,
           "emitted": 300,
@@ -141,7 +141,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -151,7 +151,7 @@
         {
           "id": "r:00000012",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v18",
           "prev": ["r:00000011"],
           "occurred": 200,
@@ -161,7 +161,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,

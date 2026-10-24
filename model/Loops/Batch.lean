@@ -8,6 +8,10 @@ the same batch by a label, `@name`, in `about` or `prev`, before either has an
 id. A record's id covers its envelope, so a label must be replaced by the id
 it stands for before the record that uses it can be named.
 
+Writing also checks each `prev`: you can only replace what you hold, so a
+target must be in the batch or the store (`prev-unknown`), and succession is
+within a thing, so it must share a thing with the record (`prev-unrelated`).
+
 A batch **means** an assignment of ids to labels in which every label's id is
 the id of its record with all its labels replaced: exactly what writing the
 records one at a time with real ids would give. An acyclic batch has at most
@@ -70,15 +74,34 @@ def resolveRounds (H : Hash) : Nat → List (String × String) → List Draft �
         | _, _ => none
       resolveRounds H fuel (σ ++ given) (pending.filter (!·.ready σ))
 
+/-- The things an envelope is about; about nothing is a thing of its own. -/
+def envThings (about : List String) : List String := if about.isEmpty then [""] else about
+
+/-- Each `prev` names a record the writer holds, in the batch or in the store
+(`held` gives a stored record's `about`), and shares a thing with it. -/
+def checkPrev (H : Hash) (held : String → Option (List String)) (rs : List Stored) :
+    Except String Unit := do
+  let inBatch := rs.map fun r => (r.id H, r.env.about)
+  for r in rs do
+    for p in r.env.prev do
+      match inBatch.lookup p <|> held p with
+      | none => throw "prev-unknown"
+      | some about =>
+        unless (envThings r.env.about).any (envThings about).contains do throw "prev-unrelated"
+
 /-- Resolve a batch to its records, in the order given. Checked in order: a
-label given twice, a label used but never given, a cycle. -/
-def resolveBatch (H : Hash) (ds : List Draft) : Except String (List Stored) := do
+label given twice, a label used but never given, a cycle, a `prev` naming a
+record the writer doesn't hold, and a `prev` naming one about other things. -/
+def resolveBatch (H : Hash) (held : String → Option (List String)) (ds : List Draft) :
+    Except String (List Stored) := do
   let labels := ds.filterMap (·.label)
   unless labels.Nodup do throw "label-duplicate"
   unless ds.all (·.refs.all labels.contains) do throw "label-unknown"
   let σ ← resolveRounds H ds.length [] ds
-  ds.mapM fun d => match substEnv (fun r => σ.lookup r) d.env with
+  let rs ← ds.mapM fun d => match substEnv (fun r => σ.lookup r) d.env with
     | some e => pure (make e d.salt d.payload)
     | none => throw "label-cycle"
+  checkPrev H held rs
+  pure rs
 
 end Loops

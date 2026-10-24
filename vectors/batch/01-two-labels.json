@@ -4,6 +4,16 @@
   "laws": ["batch.meaning"],
   "source": "model",
   "input": {
+    "held": [
+      {
+        "id": "r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua",
+        "about": ["topic:auth"]
+      },
+      {
+        "id": "r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a",
+        "about": []
+      }
+    ],
     "drafts": [
       {
         "label": "@d",

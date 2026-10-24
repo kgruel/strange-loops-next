@@ -9,7 +9,7 @@
         {
           "id": "r:00000015",
           "kind": "decision",
-          "key": "topic:cache",
+          "about": ["topic:cache"],
           "value": "v21",
           "prev": [],
           "occurred": 120,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000018",
           "kind": "decision",
-          "key": "topic:cache",
+          "about": ["topic:cache"],
           "value": "v24",
           "prev": ["r:00000099"],
           "occurred": 400,
@@ -31,7 +31,7 @@
         {
           "id": "r:00000018",
           "kind": "decision",
-          "key": "topic:cache",
+          "about": ["topic:cache"],
           "value": "v24",
           "prev": ["r:00000099"],
           "occurred": 400,
@@ -41,7 +41,7 @@
         {
           "id": "r:00000015",
           "kind": "decision",
-          "key": "topic:cache",
+          "about": ["topic:cache"],
           "value": "v21",
           "prev": [],
           "occurred": 120,
@@ -52,13 +52,10 @@
     ]
   },
   "expect": {
-    "heads": ["r:00000018", "r:00000015"],
-    "named": ["r:00000099"],
-    "keys": {
-      "topic:cache": {
-        "winner": "r:00000018",
-        "others": ["r:00000015"]
-      }
+    "topic:cache": {
+      "heads": ["r:00000018", "r:00000015"],
+      "winner": "r:00000018",
+      "others": ["r:00000015"]
     }
   }
 }
