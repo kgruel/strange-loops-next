@@ -6,4 +6,6 @@ import Loops.Stored
 import Loops.Record
 import Loops.Fold
 import Loops.Families
+import Loops.Spec
+import Loops.Batch
 import Loops.Lens

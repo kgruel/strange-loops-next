@@ -1,0 +1,21 @@
+{
+  "vector": "16-limit-on-count",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "fold": {
+        "c": {
+          "count": true,
+          "limit": 3
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "limit-invalid",
+    "path": "fold.c.limit"
+  }
+}

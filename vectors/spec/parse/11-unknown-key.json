@@ -1,0 +1,16 @@
+{
+  "vector": "11-unknown-key",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "query": "select *"
+    }
+  },
+  "expect": {
+    "refused": "unknown-key",
+    "path": "query"
+  }
+}

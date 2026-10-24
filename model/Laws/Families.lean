@@ -260,24 +260,29 @@ theorem Where.eval_here (w : Where) {r : Record} (h : r.shown = .here) :
     w.eval r ≠ .unknown := by
   cases w <;> simp [Where.eval, Tri.ofBool, h] <;> split <;> simp
 
-/-- With every payload here, nothing is unread, and the result is the plain fold
-of what `where` selects. -/
-theorem Acc.select_full {σ} (f : Acc σ) (w : Where) {xs : List Record}
-    (h : ∀ r ∈ xs, r.shown = .here) :
-    f.select w xs = ⟨f.fold (xs.filter (w.eval · == .yes)), 0⟩ := by
-  have hr : ∀ r ∈ xs.filter (w.eval · == .yes), f.readable r = true := fun r hr => by
-    simp [Acc.readable, h r (mem_filter.1 hr).1]
+/-- When the test answers for every record and the fold can read every
+record, nothing is unread and the result is the plain fold of what is
+selected. -/
+theorem Acc.select_full {σ} (f : Acc σ) (ev : Record → Tri) {xs : List Record}
+    (hev : ∀ r ∈ xs, ev r ≠ .unknown) (hr : ∀ r ∈ xs, f.readable r = true) :
+    f.select ev xs = ⟨f.fold (xs.filter (ev · == .yes)), 0⟩ := by
   simp only [Acc.select, Result.mk.injEq]
-  refine ⟨by rw [filter_eq_self.2 hr], ?_⟩
+  refine ⟨by rw [filter_eq_self.2 fun r h => hr r (mem_filter.1 h).1], ?_⟩
   rw [filter_eq_nil_iff.2, filter_eq_nil_iff.2]
   · rfl
-  · intro r hr'; simp [hr r hr']
-  · intro r hr'; simpa using w.eval_here (h r hr')
+  · intro r h; simp [hr r (mem_filter.1 h).1]
+  · intro r h; simpa using hev r h
+
+/-- With every payload here, a `where` test answers for every record. -/
+theorem Acc.select_here {σ} (f : Acc σ) (w : Where) {xs : List Record}
+    (h : ∀ r ∈ xs, r.shown = .here) (hr : ∀ r ∈ xs, f.readable r = true) :
+    f.select w.eval xs = ⟨f.fold (xs.filter (w.eval · == .yes)), 0⟩ :=
+  f.select_full w.eval (fun r hx => w.eval_here (h r hx)) hr
 
 /-- The set decides, for a selection too: what is read and what is unread. -/
-theorem Acc.select_set_decides {σ} (f : Acc σ) (w : Where) {xs ys : List Record}
+theorem Acc.select_set_decides {σ} (f : Acc σ) (ev : Record → Tri) {xs ys : List Record}
     (hx : Distinct xs) (hy : Distinct ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
-    f.select w xs = f.select w ys := by
+    f.select ev xs = f.select ev ys := by
   have p := perm_of_same hx hy h
   simp only [Acc.select]
   rw [f.perm (((p.filter _).filter _)), (p.filter _).length_eq,

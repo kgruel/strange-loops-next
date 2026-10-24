@@ -1,0 +1,35 @@
+{
+  "vector": "12-cycle",
+  "layer": "batch",
+  "laws": ["batch.refuse"],
+  "source": "model",
+  "input": {
+    "drafts": [
+      {
+        "label": "@a",
+        "env": {
+          "kind": "note",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "prev": ["@b"]
+        },
+        "salt": "ugdjcktryiskmai4kgwq46jzae",
+        "payload": {}
+      },
+      {
+        "label": "@b",
+        "env": {
+          "kind": "note",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "prev": ["@a"]
+        },
+        "salt": "3b6nmvqyx5rwbxndrclgj2n6t4",
+        "payload": {}
+      }
+    ]
+  },
+  "expect": {
+    "refused": "label-cycle"
+  }
+}

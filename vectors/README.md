@@ -1,6 +1,6 @@
 # Vectors
 
-`fold/`, `lens/` and `record/` are written by `model/` (`lake exe gen
+`fold/`, `lens/`, `record/`, `spec/` and `batch/` are written by `model/` (`lake exe gen
 ../vectors`); never edit them by hand. CI regenerates them and fails on any
 difference. `standard/` holds test data from the standards themselves; see
 its README.
@@ -30,9 +30,10 @@ implementation folds each order separately; every one must produce
 * Latest: the `winner` and the `others`.
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
-Each record carries `n`, the integer the numeric folds read. A record whose
-payload the reader doesn't hold has `shown` (`withheld` or `erased`) instead
-of `value` and `n`.
+Each record carries `n`, the integer the numeric folds read, and may carry
+`fields`, further payload fields by name. A record whose payload the reader
+doesn't hold has `shown` (`withheld` or `erased`) instead of `value`, `n` and
+`fields`.
 
 ## `fold/heads`
 
@@ -53,6 +54,31 @@ answers; a test on a payload the reader doesn't hold answers unknown.
 `expect.count` and `expect.sum` give the `value` over the selected, readable
 records and how many covered records were `unread`: unknown to the test, or
 selected but needed by the fold and not held. Count needs no payload.
+
+## `spec/parse`
+
+`input.spec` is a vertex's spec as JSON. `expect` is either `parsed`, the
+spec in its parsed form (which parses back to itself), or `refused` with the
+`path` of the offending key, per `protocol/laws.md`. Refusals are checked in
+order: an object, known keys, `vertex`, `from`, then each slot.
+
+## `spec/run`
+
+`input.spec` and `input.orders`, as in the fold vectors. `expect` names each
+slot of `fold` and what it holds: `value` and `unread` for count, sum, min
+and max; for latest-by and collect, the `heads` newest first with what the
+reader holds of each, and how many heads a payload test couldn't answer
+(`unread`). Over heads, supersession runs on what `from` and the envelope
+tests select; payload tests then apply to the heads.
+
+## `batch`
+
+`input.drafts` is one changeset: each draft has an optional `label`
+(`@name`), an envelope whose `about` and `prev` may use labels, a `salt` and
+a payload. `expect.records` gives each record's `id` and canonical envelope
+with labels replaced by ids, in the order given; or `expect.refused`:
+`label-duplicate`, `label-unknown` or `label-cycle`, checked in that order.
+Every order of the drafts gives the same records.
 
 ## `lens/section`
 

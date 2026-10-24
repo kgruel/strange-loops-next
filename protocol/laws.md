@@ -64,6 +64,39 @@ system means and must be proved. Other laws may be listed here as
 conjectures, checked by vectors and fuzzing until proved; `lake build
 --wfail` keeps `sorry` out of the build.
 
+## The spec (`model/Laws/Spec.lean`)
+
+A spec parses into a closed type: `from` selects by envelope, and `fold`
+names slots, each one fold with an optional `where`. `where` has six
+operators (`is`, `not`, `present`, `absent`, `at-least`, `below`) and three
+answers; a `where` map holds when every test does. Accumulating slots select,
+then fold. Slots over heads (latest-by, collect) let supersession run on what
+the envelope selects, then apply payload tests to the heads: filtering first
+would bring back a record whose successor no longer matches, or whose
+successor's payload is withheld.
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below` | `not` is the complement of `is`, `absent` of `present`; on a number exactly one of `at-least` and `below` holds | `spec/run/01` |
+| `where.typed` | `Op.ordered_numbers_only` | `at-least` and `below` hold only for numbers | `spec/run/01` |
+| `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record | every `spec/run` vector |
+| `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
+| `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
+| `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
+| `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
+| `view.no-resurrection` (slots) | `headsOf_view` | a latest-by slot under a view folds to the full reader's heads | `spec/run/03` |
+| `spec.parse` | (checked by `gen`) | the parsed form parses back to itself; refusals name a closed code and a path | `spec/parse/*` |
+
+## A batch with labels (`model/Laws/Batch.lean`)
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`, `02` |
+| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused | `batch/10`–`12` |
+
+`gen` checks every batch vector against `Meaning`, in every rotation of its
+drafts.
+
 ## Lens: keyed sections (`model/Laws/Lens.lean`)
 
 | Law | Theorem | Says | Vectors |

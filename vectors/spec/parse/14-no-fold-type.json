@@ -1,0 +1,20 @@
+{
+  "vector": "14-no-fold-type",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "fold": {
+        "none": {
+          "where": {}
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "fold-type",
+    "path": "fold.none"
+  }
+}

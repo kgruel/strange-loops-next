@@ -1,0 +1,13 @@
+{
+  "vector": "10-not-object",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": ["vertex"]
+  },
+  "expect": {
+    "refused": "spec-not-object",
+    "path": ""
+  }
+}

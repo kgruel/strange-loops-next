@@ -16,6 +16,13 @@ inductive Shown where
   | erased
   deriving Repr, DecidableEq, Inhabited
 
+/-- A payload value a `where` test or a fold can read. -/
+inductive Val where
+  | str (s : String)
+  | int (i : Int)
+  | bool (b : Bool)
+  deriving Repr, DecidableEq, Inhabited
+
 structure Record where
   id       : Nat
   kind     : String
@@ -26,7 +33,9 @@ structure Record where
   emitted  : Nat
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
   n        : Int := 0
-  /-- Whether the payload (`value` and `n`) is here for this reader. -/
+  /-- Further payload fields, by name. -/
+  fields   : List (String × Val) := []
+  /-- Whether the payload (`value`, `n`, `fields`) is here for this reader. -/
   shown    : Shown := .here
   deriving Repr, DecidableEq, Inhabited
 
@@ -58,9 +67,25 @@ structure View (f : Record → Record) : Prop where
   envelope : ∀ r, SameEnvelope (f r) r
   hides : ∀ r, f r = r ∨ (f r).shown ≠ .here
 
-def Record.withhold (r : Record) : Record := { r with value := "", n := 0, shown := .withheld }
+def Record.withhold (r : Record) : Record :=
+  { r with value := "", n := 0, fields := [], shown := .withheld }
 
-def Record.erase (r : Record) : Record := { r with value := "", n := 0, shown := .erased }
+def Record.erase (r : Record) : Record :=
+  { r with value := "", n := 0, fields := [], shown := .erased }
+
+/-- A payload field by name: `value` and `n` always exist; others may not. -/
+def Record.get (r : Record) (name : String) : Option Val :=
+  if name = "value" then some (.str r.value)
+  else if name = "n" then some (.int r.n)
+  else r.fields.lookup name
+
+/-- A payload field as an exact number, if the reader holds it and it is one. -/
+def Record.num (r : Record) (name : String) : Option Int :=
+  if r.shown = .here then
+    match r.get name with
+    | some (.int i) => some i
+    | _ => none
+  else none
 
 /-- Withhold the payloads of the records `p` picks, as a narrowed grant does. -/
 def withholding (p : Record → Bool) (r : Record) : Record := if p r then r.withhold else r

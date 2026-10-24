@@ -34,24 +34,51 @@ structure Acc (σ : Type) where
   init : σ
   step : σ → Record → σ
   comm : ∀ s a b, step (step s a) b = step (step s b) a
-  /-- Whether the step reads the payload (Sum, Min, Max) or only counts. -/
-  reads : Bool
+  /-- Whether the step can use this record: Count always can; a numeric
+  fold needs its field, in a payload the reader holds. -/
+  readable : Record → Bool
 
 def Acc.fold {σ} (f : Acc σ) (xs : List Record) : σ := xs.foldl f.step f.init
 
 def Count.acc : Acc Nat :=
-  ⟨0, Count.step, fun _ _ _ => rfl, false⟩
+  ⟨0, Count.step, fun _ _ _ => rfl, fun _ => true⟩
 
 def Sum.acc : Acc Int :=
-  ⟨0, Sum.step, fun s a b => by simp only [Sum.step]; omega, true⟩
+  ⟨0, Sum.step, fun s a b => by simp only [Sum.step]; omega, (·.shown == .here)⟩
 
 def Max.acc : Acc (Option Int) :=
   ⟨none, Max.step, fun s a b => by
-    cases s <;> simp only [Max.step, Option.some.injEq] <;> omega, true⟩
+    cases s <;> simp only [Max.step, Option.some.injEq] <;> omega, (·.shown == .here)⟩
 
 def Min.acc : Acc (Option Int) :=
   ⟨none, Min.step, fun s a b => by
-    cases s <;> simp only [Min.step, Option.some.injEq] <;> omega, true⟩
+    cases s <;> simp only [Min.step, Option.some.injEq] <;> omega, (·.shown == .here)⟩
+
+/-! The numeric folds a spec names, over a payload field. A record without
+that field as a number is not readable, so it is counted as unread. -/
+
+def Sum.on (field : String) : Acc Int :=
+  ⟨0, fun s r => s + (r.num field).getD 0, fun s a b => by omega, (·.num field |>.isSome)⟩
+
+def Max.on (field : String) : Acc (Option Int) :=
+  ⟨none, fun s r => match r.num field, s with
+      | some v, some m => some (max m v)
+      | some v, none => some v
+      | none, s => s,
+    fun s a b => by
+      cases ha : a.num field <;> cases hb : b.num field <;> cases s <;>
+        simp_all <;> omega,
+    (·.num field |>.isSome)⟩
+
+def Min.on (field : String) : Acc (Option Int) :=
+  ⟨none, fun s r => match r.num field, s with
+      | some v, some m => some (min m v)
+      | some v, none => some v
+      | none, s => s,
+    fun s a b => by
+      cases ha : a.num field <;> cases hb : b.num field <;> cases s <;>
+        simp_all <;> omega,
+    (·.num field |>.isSome)⟩
 
 /-! ## Folds over heads -/
 
@@ -92,16 +119,13 @@ structure Result (σ : Type) where
   unread : Nat
   deriving Repr, DecidableEq
 
-/-- Can this fold use this record? Count can always; the others need the payload. -/
-def Acc.readable {σ} (f : Acc σ) (r : Record) : Bool := !f.reads || r.shown == .here
-
-/-- Select with `where`, then fold. Records the test can't answer, and
-selected records whose payload the fold needs but can't read, are counted,
-never silently dropped. -/
-def Acc.select {σ} (f : Acc σ) (w : Where) (xs : List Record) : Result σ :=
-  let ys := xs.filter (w.eval · == .yes)
+/-- Select by a three-valued test, then fold. Records the test can't answer,
+and selected records the fold can't read, are counted, never silently
+dropped. -/
+def Acc.select {σ} (f : Acc σ) (ev : Record → Tri) (xs : List Record) : Result σ :=
+  let ys := xs.filter (ev · == .yes)
   ⟨f.fold (ys.filter f.readable),
-    (xs.filter (w.eval · == .unknown)).length + (ys.filter (!f.readable ·)).length⟩
+    (xs.filter (ev · == .unknown)).length + (ys.filter (!f.readable ·)).length⟩
 
 /-- Max over the current values: the largest readable head, and how many heads
 were unreadable. -/

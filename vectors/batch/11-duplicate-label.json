@@ -1,0 +1,39 @@
+{
+  "vector": "11-duplicate-label",
+  "layer": "batch",
+  "laws": ["batch.refuse"],
+  "source": "model",
+  "input": {
+    "drafts": [
+      {
+        "label": "@d",
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"]
+        },
+        "salt": "fuquyzncvucfe6gdlnubwfwjfe",
+        "payload": {
+          "choice": "passkeys"
+        }
+      },
+      {
+        "label": "@d",
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"]
+        },
+        "salt": "aq3f4dgnlsauuvnwqpuwdveypu",
+        "payload": {
+          "choice": "passkeys"
+        }
+      }
+    ]
+  },
+  "expect": {
+    "refused": "label-duplicate"
+  }
+}

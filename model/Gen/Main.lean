@@ -1,6 +1,9 @@
 import Loops
 import Gen.Json
 import Gen.Records
+import Gen.Encode
+import Gen.Spec
+import Gen.Batch
 
 /-!
 # Gen: write the vectors
@@ -13,25 +16,6 @@ the model. Each case is also checked here against the laws it illustrates.
 open Loops Loops.Lens Gen
 
 /-! ## Encoding -/
-
-def idText (n : Nat) : String :=
-  let d := Nat.toDigits 16 n
-  "r:" ++ String.ofList (List.replicate (8 - d.length) '0' ++ d)
-
-def jShown : Shown → J
-  | .here => .str "here"
-  | .withheld => .str "withheld"
-  | .erased => .str "erased"
-
-/-- A record as a reader holds it. A missing payload is written as `shown`,
-with no `value` or `n`. -/
-def jRecord (r : Record) : J :=
-  let env := [("id", .str (idText r.id)), ("kind", .str r.kind), ("key", .str r.key)]
-  let rest := [("prev", .arr (r.prev.map (.str ∘ idText))),
-    ("occurred", .num r.occurred), ("emitted", .num r.emitted)]
-  match r.shown with
-  | .here => .obj (env ++ [("value", .str r.value)] ++ rest ++ [("n", .int r.n)])
-  | s => .obj (env ++ rest ++ [("shown", jShown s)])
 
 def jLatestBy (s : LatestBy) : J :=
   let keys := s.heads.foldl (fun ks h => if ks.contains h.key then ks else ks ++ [h.key]) []
@@ -53,10 +37,6 @@ def jOutcome : Outcome → J
   | .accepted i b => .obj [("accepted", jLine i), ("body", jLines b)]
   | .unknown i => .obj [("unknown", jLine i)]
   | .absent i => .obj [("absent", jLine i)]
-
-def vector (name layer : String) (laws : List String) (input expect : J) : J :=
-  .obj [("vector", .str name), ("layer", .str layer), ("laws", .arr (laws.map .str)),
-    ("source", .str "model"), ("input", input), ("expect", expect)]
 
 /-! ## Records used by the fold cases -/
 
@@ -214,7 +194,7 @@ def jCount (r : Result Nat) : J := .obj [("value", .num r.value), ("unread", .nu
 def selectVector (c : SelectCase) : Except String J := do
   let orders := rotations c.records
   let results := orders.map fun o =>
-    J.obj [("count", jCount (Count.acc.select c.w o)), ("sum", jSum (Sum.acc.select c.w o))]
+    J.obj [("count", jCount (Count.acc.select c.w.eval o)), ("sum", jSum (Sum.acc.select c.w.eval o))]
   let first := results.headD .null
   if !(results.all (·.render 0 == first.render 0)) then
     throw s!"fold/select/{c.name}: arrival orders disagree"
@@ -291,7 +271,7 @@ def orFail : Except String J → IO J
 
 def main (args : List String) : IO UInt32 := do
   let dir : System.FilePath := args.headD "../vectors"
-  for sub in ["fold", "lens", "record"] do
+  for sub in ["fold", "lens", "record", "spec", "batch"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
@@ -327,5 +307,13 @@ def main (args : List String) : IO UInt32 := do
   writeAll dir "fold/select" selects
   writeAll dir "lens/section" lens
   writeAll dir "record" records
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length} vectors to {dir}"
+  let specs ← match Gen.SpecVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  for (sub, name, v) in specs do writeAll dir sub [(name, v)]
+  let batches ← match Gen.BatchVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "batch" batches
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length} vectors to {dir}"
   return 0

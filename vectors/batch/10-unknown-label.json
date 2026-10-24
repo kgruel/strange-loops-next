@@ -1,0 +1,23 @@
+{
+  "vector": "10-unknown-label",
+  "layer": "batch",
+  "laws": ["batch.refuse"],
+  "source": "model",
+  "input": {
+    "drafts": [
+      {
+        "env": {
+          "kind": "cites",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["@d", "@e"]
+        },
+        "salt": "bvt4mix5vu76am3frqlzyvdrre",
+        "payload": {}
+      }
+    ]
+  },
+  "expect": {
+    "refused": "label-unknown"
+  }
+}

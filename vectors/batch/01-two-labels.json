@@ -1,0 +1,62 @@
+{
+  "vector": "01-two-labels",
+  "layer": "batch",
+  "laws": ["batch.meaning"],
+  "source": "model",
+  "input": {
+    "drafts": [
+      {
+        "label": "@d",
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"]
+        },
+        "salt": "fuquyzncvucfe6gdlnubwfwjfe",
+        "payload": {
+          "choice": "passkeys"
+        }
+      },
+      {
+        "label": "@e",
+        "env": {
+          "kind": "evidence",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"]
+        },
+        "salt": "hvvdfeprimqep2q7xaojwm6av4",
+        "payload": {
+          "source": "url:https://example.com/passkeys"
+        }
+      },
+      {
+        "env": {
+          "kind": "cites",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["@d", "@e"]
+        },
+        "salt": "bvt4mix5vu76am3frqlzyvdrre",
+        "payload": {}
+      }
+    ]
+  },
+  "expect": {
+    "records": [
+      {
+        "id": "r:mcpvkyr6ihih5ni33so4xkmthwfrtmnc4bwexoqi4kxjsmnth5ta",
+        "env_canonical": "{\"about\":[\"topic:auth\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"decision\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}"
+      },
+      {
+        "id": "r:s6c4uq62sdtaamz6zhzmzdztcjarti6h5mgeqpua5tx5fmwhhkvq",
+        "env_canonical": "{\"about\":[\"topic:auth\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"evidence\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}"
+      },
+      {
+        "id": "r:vl3kne5az5yxxvepzchkmomoyjzhga6x7tdzbpbye6rrmni4m47q",
+        "env_canonical": "{\"about\":[\"r:mcpvkyr6ihih5ni33so4xkmthwfrtmnc4bwexoqi4kxjsmnth5ta\",\"r:s6c4uq62sdtaamz6zhzmzdztcjarti6h5mgeqpua5tx5fmwhhkvq\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"cites\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}"
+      }
+    ]
+  }
+}
