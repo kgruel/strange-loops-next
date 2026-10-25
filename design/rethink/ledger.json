@@ -45,6 +45,13 @@
     "kind": "decision",
     "group": "Layer 0 · the record",
     "status": "settled",
+    "claim": "Writing the same record twice is a no-op.",
+    "why": "A record's id covers its envelope, including <code>emitted</code>, plus its salt and payload. The same draft written twice is the same record, and set union absorbs it, in a batch or across batches. A new observation gets a fresh salt, so it gets a new id and is simply a new record. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
     "claim": "A field belongs on the envelope only if the core reads it.",
     "why": "<code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code> (a set of things), <code>prev</code> (a set), <code>under</code>. <code>derived-from</code>, <code>seen</code> and <code>refs</code> are payload. Unknown envelope fields are refused."
   },
@@ -89,6 +96,13 @@
     "status": "settled",
     "claim": "Naming, key binding and authority stay separate.",
     "why": "Authority is a grant record, pointed to by <code>under</code>. One stance shape covers affirm, adopt, dispute, retire and authorize. A delegate is a shared seat; an identity that emerges starts its own lineage and adopts what it wants to own."
+  },
+  {
+    "kind": "decision",
+    "group": "Observers and standing",
+    "status": "settled",
+    "claim": "A label may stand in <code>under</code>.",
+    "why": "A changeset can create a grant <code>@g</code> and act under it in the same batch. <code>under</code> takes labels as <code>about</code> and <code>prev</code> do, counts in cycle detection, and must name a record held in the batch or the store, like <code>prev</code>. It grants nothing extra: whether the grant holds is still decided at read time from its signer's standing, exactly as if it had been written first. Version 35."
   },
   {
     "kind": "decision",
@@ -145,6 +159,20 @@
     "status": "settled",
     "claim": "Predicates are a closed, typed set.",
     "why": "Six <code>where</code> operators over one record, or the vertex's own state for a boundary. No regex, arithmetic, user code or effects: classify by recording instead. Parse pipelines move into collectors, boundaries lose <code>run</code>, and there is no query language."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "<code>where</code> can test any envelope field, named explicitly.",
+    "why": "Envelope fields are tested as <code>env.kind</code>, <code>env.observer</code>, <code>env.emitted</code>, <code>env.occurred</code>, <code>env.about</code>, <code>env.prev</code> and <code>env.under</code>, and a bare name always means a payload field, so no payload name is shadowed. Envelope tests always answer and choose among heads after supersession. <code>at-least</code> and <code>below</code> on times wait for the time ordering, and <code>observer</code> compares lineage ids until name tables arrive. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "<code>unread</code> counts only what could change the answer.",
+    "why": "A record the reader can't read counts as unread only if its payload could change the result. With a <code>limit</code>, that is one newer than the last record kept, or any of them if fewer than the limit were kept; without a limit, every one counts. So <code>unread: 0</code> means the result is exactly what a reader holding everything would get, whatever the hidden payloads hold: a law to prove, not just a count. Version 35."
   },
   {
     "kind": "decision",
