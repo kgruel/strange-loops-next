@@ -327,7 +327,8 @@ def parseSource : Json → Parse Source
   | _ => refuse "from-invalid" "from"
 
 /-- Parse a spec. Checked in order: an object, known keys, `vertex`, `from`,
-then each slot of `fold`. -/
+then each slot of `fold`. A spec reads at least one source: one with no
+`from`, or an empty one, is refused (`from-missing`), never run empty. -/
 def Spec.ofJson : Json → Parse Spec
   | .obj kvs => do
     checkKeys specKeys "" kvs
@@ -335,7 +336,7 @@ def Spec.ofJson : Json → Parse Spec
       | some (.str v) => pure v
       | _ => refuse "vertex-missing" "vertex"
     let sources ← match kvs.lookup "from" with
-      | none => pure []
+      | none | some (.arr []) => refuse "from-missing" "from"
       | some (.arr xs) => xs.mapM parseSource
       | some _ => refuse "from-invalid" "from"
     let slots ← match kvs.lookup "fold" with

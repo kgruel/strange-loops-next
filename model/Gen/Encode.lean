@@ -7,10 +7,6 @@ import Gen.Json
 
 open Loops Gen
 
-def idText (n : Nat) : String :=
-  let d := Nat.toDigits 16 n
-  "r:" ++ String.ofList (List.replicate (8 - d.length) '0' ++ d)
-
 def jVal : Val → J
   | .str s => .str s
   | .int i => .int i

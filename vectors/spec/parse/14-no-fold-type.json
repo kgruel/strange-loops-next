@@ -6,6 +6,11 @@
   "input": {
     "spec": {
       "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
       "fold": {
         "none": {
           "where": {}

@@ -84,9 +84,10 @@ everything left:
   with is refused (`prev-unrelated`), as is one the store's rule says may
   not replace it (`prev-not-permitted`). The rule reads only envelopes;
   step 2 allows everything, and step 3 supplies standing.
-* **Per thing.** A record about several things lives in each; a record about
-  nothing lives in one thing of its own. Each thing's state is LatestBy over
-  the records about it.
+* **Per thing.** A record about several things lives in each. A record about
+  nothing anchors a thing of its own, named by its id, so unrelated records
+  about nothing never fork each other; a revision of one is about its id.
+  Each thing's state is LatestBy over the records about it.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
@@ -94,8 +95,8 @@ everything left:
 | `settle.keeps` | `settle_keeps` | a payload any place holds is kept unless erased | `realm/01`, `02` |
 | `settle.erased` | `settle_erased` | once an erase record is held, every form of its target is erased | `realm/03` |
 | `admit.set` | `admit_same`, `refusalOf_none` | admission depends only on the set; a record is refused exactly when it isn't entitled to its `prev` | `realm/04` |
-| `admit.no-cross` | `admit_no_cross` | an admitted record's `prev` names only held records it shares a thing with and may replace | `realm/04` |
-| `thing.local` | `stateIn_local`, `perThing_set_decides` | a thing's state depends only on the records about it; the set decides per thing | `realm/04`–`07`, `fold/latest-by/*` |
+| `admit.no-cross` | `admit_no_cross` | an admitted record's `prev` names only held records it shares a thing with and may replace | `realm/04`, `08` |
+| `thing.local` | `stateIn_local`, `perThing_set_decides` | a thing's state depends only on the records about it; the set decides per thing | `realm/04`–`08`, `fold/latest-by/*` |
 | `view.no-resurrection` (things) | `admit_view`, `stateIn_view`, `stateIn_no_false_resurrection` | a view admits the same records and folds each thing to the full reader's state; a record superseded in a thing is never current there | `fold/view/*`, `spec/run/03` |
 
 Writing checks `prev` too: you can only replace what you hold. `emit`
@@ -125,7 +126,7 @@ matches, or is withheld.
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
 | `spec.after-supersession` | `Spec.view_state` | slots over heads read each thing's state, which under a view is the full reader's with payloads hidden; selection never brings back what was superseded | `spec/run/03`, `04` |
-| `spec.parse` | (checked by `gen`) | the parsed form parses back to itself; refusals name a closed code and a path | `spec/parse/*` |
+| `spec.parse` | (checked by `gen`) | the parsed form parses back to itself; refusals name a closed code and a path; a spec with no source is refused (`from-missing`), never run empty | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
 

@@ -74,8 +74,10 @@ def resolveRounds (H : Hash) : Nat → List (String × String) → List Draft �
         | _, _ => none
       resolveRounds H fuel (σ ++ given) (pending.filter (!·.ready σ))
 
-/-- The things an envelope is about; about nothing is a thing of its own. -/
-def envThings (about : List String) : List String := if about.isEmpty then [""] else about
+/-- The things a record is about, as `Record.things` reads them: a record
+about nothing anchors a thing of its own, named by its id. -/
+def envThings (id : String) (about : List String) : List String :=
+  if about.isEmpty then [id] else about
 
 /-- Each `prev` names a record the writer holds, in the batch or in the store
 (`held` gives a stored record's `about`), and shares a thing with it. -/
@@ -87,7 +89,8 @@ def checkPrev (H : Hash) (held : String → Option (List String)) (rs : List Sto
       match inBatch.lookup p <|> held p with
       | none => throw "prev-unknown"
       | some about =>
-        unless (envThings r.env.about).any (envThings about).contains do throw "prev-unrelated"
+        unless (envThings (r.id H) r.env.about).any (envThings p about).contains do
+          throw "prev-unrelated"
 
 /-- Resolve a batch to its records, in the order given. Checked in order: a
 label given twice, a label used but never given, a cycle, a `prev` naming a

@@ -242,7 +242,7 @@ theorem perThing_set_decides {xs ys : List Record} (hx : Addressed xs) (hy : Add
 /-! ## Views, per thing -/
 
 theorem things_view {f : Record → Record} (hf : View f) (r : Record) : (f r).things = r.things := by
-  simp [Record.things, (hf.envelope r).about]
+  simp [Record.things, (hf.envelope r).about, (hf.envelope r).id]
 
 theorem isAbout_view {f : Record → Record} (hf : View f) (r : Record) (t : String) :
     (f r).isAbout t = r.isAbout t := by

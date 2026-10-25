@@ -32,9 +32,13 @@ def b1 := r 0x62 "facet" ["thing:B"] 2 [0x61]
 def d1 := r 0x71 "status" ["svc:auth", "svc:billing"] 1
 def d2 := r 0x72 "status" ["svc:auth"] 2 [0x71]
 
--- notes about nothing, revised
+-- a note about nothing anchors its own thing; its revision is about it, and an
+-- unrelated note about nothing is no fork of either
 def m1 := r 0x81 "note" [] 1
-def m2 := r 0x82 "note" [] 2 [0x81]
+def m2 := r 0x82 "note" [idText 0x81] 2 [0x81]
+def m3 := r 0x83 "config" [] 3
+-- a revision about nothing names a record in another thing
+def m4 := r 0x84 "note" [] 4 [0x81]
 
 -- a task finished by a record of another kind
 def t1 := r 0x91 "task" ["task:1"] 1
@@ -51,8 +55,9 @@ def cases : List Case := [
   ⟨"03-erase-record-sticks", ["settle.set", "settle.erased"], [full, full.erase, eraseRec, full]⟩,
   ⟨"04-cross-thing-prev-refused", ["admit.no-cross", "thing.local"], [a1, b1]⟩,
   ⟨"05-about-is-a-set", ["thing.local"], [d1, d2]⟩,
-  ⟨"06-about-nothing", ["thing.local"], [m1, m2]⟩,
-  ⟨"07-kind-change-supersedes", ["thing.local"], [t1, t2]⟩
+  ⟨"06-about-nothing", ["thing.local"], [m1, m2, m3]⟩,
+  ⟨"07-kind-change-supersedes", ["thing.local"], [t1, t2]⟩,
+  ⟨"08-about-nothing-revised-unrelated", ["admit.no-cross", "thing.local"], [m1, m4]⟩
 ]
 
 def allow : Record → Record → Bool := fun _ _ => true

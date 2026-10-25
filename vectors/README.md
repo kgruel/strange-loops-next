@@ -27,7 +27,7 @@ implementation folds each order separately; every one must produce
 * Count: `expect` is the number.
 * LatestBy: per thing, its `heads` (newest first), its `winner` and its
   `others` (a fork when non-empty). A record about several things counts in
-  each; a record about nothing counts in the thing `""`.
+  each; a record about nothing anchors a thing of its own, named by its id.
 * Latest: the `winner` and the `others`.
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
@@ -62,7 +62,8 @@ selected but needed by the fold and not held. Count needs no payload.
 `input.spec` is a vertex's spec as JSON. `expect` is either `parsed`, the
 spec in its parsed form (which parses back to itself), or `refused` with the
 `path` of the offending key, per `protocol/laws.md`. Refusals are checked in
-order: an object, known keys, `vertex`, `from`, then each slot.
+order: an object, known keys, `vertex`, `from` (present and non-empty), then
+each slot.
 
 ## `spec/run`
 

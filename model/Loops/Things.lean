@@ -19,17 +19,19 @@ hold into one set:
   a parameter that reads only envelopes; step 2 allows everything.
 * **Per thing.** Each thing's state is LatestBy over the records about it,
   over everything the reader holds, before any vertex selects. A record about
-  several things lives in each; a record about nothing lives in one thing of
-  its own. Supersession is a fact about the store, not about the question.
+  several things lives in each. A record about nothing anchors a thing of its
+  own, named by its id; a revision of it is about that id. Supersession is a
+  fact about the store, not about the question.
 -/
 
 namespace Loops
 
 /-! ## Things -/
 
-/-- The things a record is about. A record about nothing lives in the thing
-`""`; real things are typed references, which are never empty. -/
-def Record.things (r : Record) : List String := if r.about.isEmpty then [""] else r.about
+/-- The things a record is about. A record about nothing anchors a thing of
+its own, named by its id, so two unrelated records about nothing never share
+a thing. -/
+def Record.things (r : Record) : List String := if r.about.isEmpty then [idText r.id] else r.about
 
 def Record.isAbout (r : Record) (t : String) : Bool := r.things.contains t
 

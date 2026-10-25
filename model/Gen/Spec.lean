@@ -41,17 +41,21 @@ def parseCases : List (String × Json) := [
   ("10-not-object", a [s "vertex"]),
   ("11-unknown-key", o [("vertex", s "x"), ("query", s "select *")]),
   ("12-vertex-missing", o [("fold", o [])]),
-  ("13-two-fold-types", o [("vertex", s "x"),
+  ("13-two-fold-types", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
     ("fold", o [("both", o [("count", .bool true), ("sum", s "n")])])]),
-  ("14-no-fold-type", o [("vertex", s "x"), ("fold", o [("none", o [("where", o [])])])]),
-  ("15-regex-refused", o [("vertex", s "x"),
+  ("14-no-fold-type", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
+    ("fold", o [("none", o [("where", o [])])])]),
+  ("15-regex-refused", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
     ("fold", o [("m", o [("count", .bool true), ("where", o [("title", o [("matches", s "^auth")])])])])]),
-  ("16-limit-on-count", o [("vertex", s "x"),
+  ("16-limit-on-count", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
     ("fold", o [("c", o [("count", .bool true), ("limit", .int 3)])])]),
-  ("17-follow-on-sum", o [("vertex", s "x"),
+  ("17-follow-on-sum", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
     ("fold", o [("t", o [("sum", s "est"), ("follow", s "prev")])])]),
   ("18-from-not-array", o [("vertex", s "x"), ("from", o [("store", s ".")])]),
-  ("19-sum-of-nothing", o [("vertex", s "x"), ("fold", o [("t", o [("sum", .bool true)])])])
+  ("19-sum-of-nothing", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
+    ("fold", o [("t", o [("sum", .bool true)])])]),
+  ("20-from-missing", o [("vertex", s "x"), ("fold", o [("c", o [("count", .bool true)])])]),
+  ("21-from-empty", o [("vertex", s "x"), ("from", a []), ("fold", o [("c", o [("count", .bool true)])])])
 ]
 
 def jRefusal (r : Refusal) : J := .obj [("refused", .str r.code), ("path", .str r.path)]

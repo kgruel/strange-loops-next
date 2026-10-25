@@ -44,6 +44,12 @@ structure Record where
   shown    : Shown := .here
   deriving Repr, DecidableEq, Inhabited
 
+/-- An id as text: the model's ids are numbers standing for content hashes,
+written as fixed-width hex so byte order and numeric order agree. -/
+def idText (n : Nat) : String :=
+  let d := Nat.toDigits 16 n
+  "r:" ++ String.ofList (List.replicate (8 - d.length) '0' ++ d)
+
 /-- Content order, newest first: `occurred`, then `emitted`, then id. -/
 def Newer (a b : Record) : Prop :=
   a.occurred > b.occurred ∨
