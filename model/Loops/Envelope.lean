@@ -6,7 +6,8 @@ import Loops.Time
 
 What the core reads about a record. `about` and `prev` are sets: their
 canonical form is sorted by UTF-16 code units with repeats removed, and an
-empty set is left out, so the same set always gives the same bytes.
+empty set is left out, so the same set always gives the same bytes. `erases`
+is a set too: the records whose payloads this one erases, whatever its kind.
 -/
 
 namespace Loops
@@ -19,6 +20,7 @@ structure Env where
   about    : List String := []
   prev     : List String := []
   under    : Option String := none
+  erases   : List String := []
   deriving Repr, Inhabited
 
 def Env.toJson (e : Env) : Json :=
@@ -30,7 +32,8 @@ def Env.toJson (e : Env) : Json :=
     | [] => []
     | ys => [(k, .arr (ys.map .str))]
   .obj ([("kind", .str e.kind), ("observer", .str e.observer), ("emitted", .str e.emitted)] ++
-    opt "occurred" e.occurred ++ set "about" e.about ++ set "prev" e.prev ++ opt "under" e.under)
+    opt "occurred" e.occurred ++ set "about" e.about ++ set "prev" e.prev ++ opt "under" e.under ++
+    set "erases" e.erases)
 
 /-! ## Validation -/
 
@@ -56,6 +59,7 @@ def Env.problem (e : Env) : Option String :=
   else if !e.about.all typedRef then some "about-not-typed"
   else if !e.prev.all recordId then some "prev-not-record-id"
   else if !(e.under.map recordId).getD true then some "under-not-record-id"
+  else if !e.erases.all recordId then some "erases-not-record-id"
   else none
 
 end Loops

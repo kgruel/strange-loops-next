@@ -9,7 +9,7 @@ import Laws.Record
   places are read in, and however often a form repeats, a reader keeps the
   same records, one per id (`settle_eq`, `settle_distinct`).
 * **More information wins; erasure sticks.** A payload any place holds is
-  kept, unless an erase record in the set names it; then every form is
+  kept, unless a record in the set names it in `erases`; then every form is
   erased (`settle_keeps`, `settle_erased`).
 * **Admission is a function of the set,** and an admitted record's `prev`
   names only held records it shares a thing with and may replace
@@ -140,7 +140,7 @@ theorem settle_distinct (xs : List Record) : Distinct (settle xs) := by
       rw [pick_id (Option.mem_def.1 hb), pick_id (Option.mem_def.1 hb')]; exact h
   exact (pairwise_map.2 hp).imp Nat.ne_of_lt
 
-/-- Erasure sticks: once an erase record naming `i` is held, the record kept
+/-- Erasure sticks: once a record whose `erases` names `i` is held, the record kept
 for `i` is erased, whichever forms the places hold. -/
 theorem settle_erased {xs : List Record} {i : Nat} (he : erasedIn xs i = true) {r : Record}
     (hr : r ∈ settle xs) (hi : r.id = i) : r.shown = .erased := by

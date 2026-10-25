@@ -68,6 +68,16 @@ def bothPrev := draft none "batch-p"
     prev := [heldAuthId, grantId] }
   (.obj [])
 
+-- a revision that erases the record it replaces, and one naming a label in
+-- `erases`, which only `about` and `prev` may use
+def eraseHeld := draft none "batch-x"
+  { kind := "decision", observer := kyle, emitted := at0, about := ["topic:auth"],
+    prev := [heldAuthId], erases := [heldAuthId] }
+  (.obj [("choice", .str "passkeys")])
+def eraseLabel := draft none "batch-xl"
+  { kind := "note", observer := kyle, emitted := at0, about := ["topic:auth"], erases := ["@d"] }
+  (.obj [])
+
 def cycleA := draft (some "@a") "batch-a"
   { kind := "note", observer := kyle, emitted := at0, prev := ["@b"] } (.obj [])
 def cycleB := draft (some "@b") "batch-b"
@@ -81,13 +91,15 @@ structure Case where
 def cases : List Case := [
   ⟨"01-two-labels", ["batch.meaning"], [decide1, evidence, cites]⟩,
   ⟨"02-chain-and-real-ids", ["batch.meaning"], [decide1, revise, outside]⟩,
+  ⟨"03-revise-and-erase", ["batch.meaning"], [eraseHeld]⟩,
   ⟨"10-unknown-label", ["batch.refuse"], [cites]⟩,
   ⟨"11-duplicate-label", ["batch.refuse"], [decide1, { decide1 with salt := saltFor "batch-d-again" }]⟩,
   ⟨"12-cycle", ["batch.refuse"], [cycleA, cycleB]⟩,
   ⟨"13-prev-unknown", ["batch.refuse"], [unknownPrev]⟩,
   ⟨"14-prev-unrelated", ["batch.refuse"], [decide1, unrelated]⟩,
   ⟨"15-write-refused", ["batch.refuse", "write.checked"], [decide1, badKind, bigNumber]⟩,
-  ⟨"16-refusal-order", ["batch.refuse"], [decide1, unrelated, unknownPrev, bothPrev]⟩
+  ⟨"16-refusal-order", ["batch.refuse"], [decide1, unrelated, unknownPrev, bothPrev]⟩,
+  ⟨"17-label-in-erases", ["batch.refuse", "write.checked"], [decide1, eraseLabel]⟩
 ]
 
 def jDraft (d : Draft) : J :=

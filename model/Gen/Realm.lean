@@ -40,6 +40,10 @@ def m3 := r 0x83 "config" [] 3
 -- a revision about nothing names a record in another thing
 def m4 := r 0x84 "note" [] 4 [0x81]
 
+-- a revision that erases what it replaces: any kind may erase
+def x1 := { r 0xa1 "note" ["person:alice"] 1 with n := 7 }
+def x2 := { r 0xa2 "note" ["person:alice"] 2 [0xa1] with erases := [0xa1] }
+
 -- a task finished by a record of another kind
 def t1 := r 0x91 "task" ["task:1"] 1
 def t2 := r 0x92 "task-done" ["task:1"] 2 [0x91]
@@ -57,7 +61,8 @@ def cases : List Case := [
   ⟨"05-about-is-a-set", ["thing.local"], [d1, d2]⟩,
   ⟨"06-about-nothing", ["thing.local"], [m1, m2, m3]⟩,
   ⟨"07-kind-change-supersedes", ["thing.local"], [t1, t2]⟩,
-  ⟨"08-about-nothing-revised-unrelated", ["admit.no-cross", "thing.local"], [m1, m4]⟩
+  ⟨"08-about-nothing-revised-unrelated", ["admit.no-cross", "thing.local"], [m1, m4]⟩,
+  ⟨"09-revision-erases", ["settle.set", "settle.erased"], [x1, x2]⟩
 ]
 
 def allow : Record → Record → Bool := fun _ _ => true

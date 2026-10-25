@@ -32,10 +32,10 @@ implementation folds each order separately; every one must produce
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
 Each record's `about` is a set of things. It carries `n`, the integer the
-numeric folds read, and may carry `observer`, `erases` (an erase record's
-targets) and `fields`, further payload fields by name. A record whose payload the reader
-doesn't hold has `shown` (`withheld` or `erased`) instead of `value`, `n` and
-`fields`.
+numeric folds read, and may carry `observer`, `erases` (the ids whose
+payloads it erases, whatever its kind) and `fields`, further payload fields
+by name. A record whose payload the reader doesn't hold has `shown`
+(`withheld` or `erased`) instead of `value`, `n` and `fields`.
 
 ## `fold/heads`
 
@@ -78,8 +78,8 @@ envelope tests then choose heads, and payload tests filter them.
 ## `batch`
 
 `input.drafts` is one changeset: each draft has an optional `label`
-(`@name`), an envelope whose `about` and `prev` may use labels, a `salt` and
-a payload. `input.held` lists what the store already holds: each id and its
+(`@name`), an envelope whose `about` and `prev` may use labels (`erases` may
+not), a `salt` and a payload. `input.held` lists what the store already holds: each id and its
 `about`. `expect.records` gives each record's `id` and canonical envelope
 with labels replaced by ids, in the order given; or `expect.refused`:
 `label-duplicate`, `label-unknown`, `label-cycle`, a code `write` gives

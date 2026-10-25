@@ -32,7 +32,8 @@ def envInput (e : Env) : J :=
   let set (k : String) (xs : List String) : List (String × J) :=
     if xs.isEmpty then [] else [(k, .arr (xs.map .str))]
   .obj ([("kind", .str e.kind), ("observer", .str e.observer), ("emitted", .str e.emitted)] ++
-    opt "occurred" e.occurred ++ set "about" e.about ++ set "prev" e.prev ++ opt "under" e.under)
+    opt "occurred" e.occurred ++ set "about" e.about ++ set "prev" e.prev ++ opt "under" e.under ++
+    set "erases" e.erases)
 
 def textBytes (s : String) : List UInt8 := s.toUTF8.toList
 
@@ -175,7 +176,12 @@ def storedCases : List Case := [
   -- assigned one sets its prototype instead
   { name := "10-proto-member", laws := ["record.canonical"],
     envs := [note],
-    payloads := [.obj [("__proto__", .obj [("a", .int 1)]), ("b", .int 2)]] }
+    payloads := [.obj [("__proto__", .obj [("a", .int 1)]), ("b", .int 2)]] },
+  { name := "11-erases", laws := ["record.id", "record.sets"],
+    envs := [
+      { note with prev := [r1Id], erases := [r1Id, grantId] },
+      { note with prev := [r1Id], erases := [grantId, r1Id, grantId] }],
+    payloads := [.obj [("body", .str "hello, without the number")]] }
 ]
 
 def refusedCases : List (String × Env) := [
@@ -187,7 +193,8 @@ def refusedCases : List (String × Env) := [
   ("25-emitted-bad-offset", note "2026-10-21T05:30:00+24:00"),
   ("26-about-untyped", { note with about := ["auth"] }),
   ("27-prev-not-record", { note with prev := ["topic:auth"] }),
-  ("28-under-not-record", { note with under := some "r:short" })
+  ("28-under-not-record", { note with under := some "r:short" }),
+  ("33-erases-not-record", { note with erases := ["topic:auth"] })
 ]
 
 /-- Payloads refused under a good envelope. The largest exact integer is

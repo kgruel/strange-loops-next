@@ -34,7 +34,7 @@ structure Record where
   prev     : List Nat
   occurred : Nat
   emitted  : Nat
-  /-- For an erase record: the ids whose payloads it erases. -/
+  /-- The ids whose payloads this record erases, whatever its kind. -/
   erases   : List Nat := []
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
   n        : Int := 0
