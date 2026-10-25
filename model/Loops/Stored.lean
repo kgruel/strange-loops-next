@@ -111,8 +111,8 @@ def Written.stored (w : Written) : Stored := make w.env w.salt w.payload
 /-- Every code `writeProblem` can give, in the order it checks them. -/
 def writeCodes : List String :=
   ["kind-empty", "observer-not-typed", "emitted-not-rfc3339", "about-not-typed",
-    "prev-not-record-id", "under-not-record-id", "salt-not-16-bytes", "member-duplicate",
-    "number-out-of-range"]
+    "prev-not-record-id", "under-not-record-id", "erases-not-record-id", "salt-not-16-bytes",
+    "member-duplicate", "number-out-of-range"]
 
 /-- Of several write refusals, the one reported: the first in `writeCodes`.
 A code outside the list still refuses (`writeProblem_codes` says there is none). -/

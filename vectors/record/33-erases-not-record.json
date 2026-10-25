@@ -1,0 +1,21 @@
+{
+  "vector": "33-erases-not-record",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00",
+        "erases": ["topic:auth"]
+      }
+    ],
+    "salt": "26rg3lrase77szrsvk24pk3kdy",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "erases-not-record-id"
+  }
+}

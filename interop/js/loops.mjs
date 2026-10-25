@@ -56,7 +56,7 @@ const canonSet = (xs) => [...new Set(xs)].sort();
 export function envJson(env) {
   const out = { kind: env.kind, observer: env.observer, emitted: env.emitted };
   if (env.occurred !== undefined) out.occurred = env.occurred;
-  for (const k of ["about", "prev"]) {
+  for (const k of ["about", "prev", "erases"]) {
     if (env[k] && env[k].length) out[k] = canonSet(env[k]);
   }
   if (env.under !== undefined) out.under = env.under;
@@ -87,6 +87,7 @@ export function problem(env) {
   if (!(env.about ?? []).every(typedRef)) return "about-not-typed";
   if (!(env.prev ?? []).every(recordId)) return "prev-not-record-id";
   if (env.under !== undefined && !recordId(env.under)) return "under-not-record-id";
+  if (!(env.erases ?? []).every(recordId)) return "erases-not-record-id";
   return null;
 }
 
