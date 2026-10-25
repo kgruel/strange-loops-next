@@ -135,7 +135,7 @@ def storedCases : List Case := [
   { name := "02-full-envelope", laws := ["record.id", "record.sets"],
     envs := [{
       kind := "decision", observer := wren, emitted := "2026-10-21T09:15:02.250+01:00",
-      occurred := some "2026-10-17T09:14/PT4M", about := ["topic:auth", "url:https://example.com/x"],
+      occurred := some "2026-10-17T09:14:03Z/2026-10-17T09:18:13Z", about := ["topic:auth", "url:https://example.com/x"],
       prev := [r1Id], under := some grantId }],
     payloads := [.obj [("choice", .str "device flow"), ("why", .arr [.str "no browser on the box"])]],
     key := "wren" },
@@ -194,7 +194,8 @@ def refusedCases : List (String × Env) := [
   ("26-about-untyped", { note with about := ["auth"] }),
   ("27-prev-not-record", { note with prev := ["topic:auth"] }),
   ("28-under-not-record", { note with under := some "r:short" }),
-  ("33-erases-not-record", { note with erases := ["topic:auth"] })
+  ("33-erases-not-record", { note with erases := ["topic:auth"] }),
+  ("34-occurred-duration", { note with occurred := some "2026-10-17T09:14/PT4M" })
 ]
 
 /-- Payloads refused under a good envelope. The largest exact integer is

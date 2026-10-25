@@ -45,6 +45,32 @@ for (const f of readdirSync(join(dir, "record")).sort()) {
   expect(`${n} from text`, L.writeText(envs[0], salt, JSON.stringify(v.input.payloads[0]), seed).id, v.expect.id);
 }
 
+// Model-written occurred vectors: each text's span in UTC, and the order.
+const pad = (n, w = 2) => String(n).padStart(w, "0");
+const utc = ([secs, frac]) => {
+  const t = new Date(secs * 1000);
+  return `${pad(t.getUTCFullYear(), 4)}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T` +
+    `${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}:${pad(t.getUTCSeconds())}${frac ? "." + frac : ""}Z`;
+};
+for (const f of readdirSync(join(dir, "occurred")).sort()) {
+  const v = JSON.parse(readFileSync(join(dir, "occurred", f), "utf8"));
+  const n = `occurred/${v.vector}`;
+  const texts = v.input.occurred;
+  if (v.expect["oldest-first"]) {
+    const sorted = [...texts].sort((a, b) => {
+      const [x, y] = [L.occurredSpan(a), L.occurredSpan(b)];
+      return L.spanBefore(x, y) ? -1 : L.spanBefore(y, x) ? 1 : 0;
+    });
+    expect(`${n} order`, JSON.stringify(sorted), JSON.stringify(v.expect["oldest-first"]));
+    continue;
+  }
+  for (const [i, t] of texts.entries()) {
+    const sp = L.occurredSpan(t);
+    const got = sp ? { start: utc(sp.start), end: sp.end && utc(sp.end) } : { refused: "occurred-not-span" };
+    expect(`${n} ${JSON.stringify(t)}`, JSON.stringify(got), JSON.stringify(v.expect.spans[i]));
+  }
+}
+
 // RFC 8785: the reference test data, and ECMAScript number formatting.
 const jcs = join(dir, "standard", "jcs");
 for (const f of readdirSync(join(jcs, "input")).sort()) {

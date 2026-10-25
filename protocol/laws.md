@@ -166,9 +166,19 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about`, `prev` or `erases` never changes the id | `record/02`, `03`, `11` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
-| `record.refuse` | (by construction) | a bad envelope, a salt that isn't 16 bytes, a repeated member name or a payload number outside ±(2^53 − 1) is refused with a stated reason | `record/20`–`33` |
+| `record.refuse` | (by construction) | a bad envelope, a salt that isn't 16 bytes, a repeated member name or a payload number outside ±(2^53 − 1) is refused with a stated reason | `record/20`–`34` |
 | `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15`, `17` |
 | `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
+
+## Occurred (`model/Laws/Time.lean`)
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `occurred.span` | (by construction: `Span.ok`) | each form names one span, and its end is never before its start | `occurred/01`–`06` |
+| `occurred.qualifier` | `qualifier_ignored`, `point_qualified` | a qualifier never changes a date's span | `occurred/03`, `05` |
+| `occurred.instant` | `instant_stripped` | an instant has one moment however its fraction is written | `occurred/04` |
+| `occurred.order` | `Span.before_irrefl`, `Span.before_trans`, `Span.before_total` | spans order by start then end, an open end last: a strict total order, so every store orders them the same | `occurred/08` |
+| `occurred.refuse` | (by construction) | every other text is refused with `occurred-not-span` | `occurred/07`, `record/34` |
 
 The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
 computed by reference code in `model/Gen/` that checks itself against
@@ -199,6 +209,7 @@ current, trusted or well dated:
   (`r:00000011`) so byte order and numeric order agree. Nothing yet connects
   these records to layer 0's real ones.
 * The payload is `value`, `n` and named `fields`.
-* `occurred` and `emitted` are plain numbers; EDTF and RFC 3339 arrive with
-  layer 0's vectors.
+* In the fold model, `occurred` and `emitted` are still plain numbers. Layer 0
+  reads both as moments (`Loops/Time.lean`, `Loops/Occurred.lean`); moving
+  content order and windows onto spans is next.
 * Text is a list of lines; splitting a file into lines is outside the model.

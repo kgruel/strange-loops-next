@@ -81,7 +81,7 @@
         <rect x="24" y="64" width="150" height="22" rx="4" fill="url(#hatch)" class="ln-amb dash"/>
         <text x="186" y="73" class="s b">coarse</text><text x="186" y="89" class="mono tb">occurred: 2009~</text>
         <rect class="box-amb" x="218" y="118" width="64" height="22" rx="4"/>
-        <text x="206" y="126" text-anchor="end" class="s b">span (lasted)</text><text x="206" y="142" text-anchor="end" class="mono tb">…T09:14/PT4M</text>
+        <text x="206" y="126" text-anchor="end" class="s b">span (lasted)</text><text x="206" y="142" text-anchor="end" class="mono tb">…T09:14:03Z/…T09:18:13Z</text>
         <circle class="fill-amb" cx="300" cy="178" r="6"/>
         <text x="288" y="174" text-anchor="end" class="s b">instant</text><text x="288" y="190" text-anchor="end" class="mono tb">2026-10-17T09:14:03Z</text>
         <text x="16" y="240" class="xs m">not to scale</text>
@@ -141,10 +141,13 @@
     <div class="tbl"><table><tbody>
       <tr><td><code>2026-10-17T09:14:03Z</code></td><td>instant (a degenerate span)</td></tr>
       <tr><td><code>2009</code></td><td>coarse: sometime in 2009</td></tr>
-      <tr><td><code>2026-10-17T09:14/PT4M</code></td><td>a four-minute visit</td></tr>
+      <tr><td><code>2026-10-17T09:14:03Z/2026-10-17T09:18:13Z</code></td><td>a four-minute visit: two instants, never a duration</td></tr>
       <tr><td><code>2009-07/2011-03</code></td><td>a migration that ran about two years</td></tr>
-      <tr><td><code>2009~</code> · <code>2009?</code> · <code>2009/..</code></td><td>approximate · uncertain · open-ended (EDTF Level 1)</td></tr>
+      <tr><td><code>2009~</code> · <code>2009?</code> · <code>2009%</code></td><td>approximate · uncertain · both: the claim says so, the span is still 2009</td></tr>
+      <tr><td><code>201X</code> · <code>2004-XX</code></td><td>unspecified digits: sometime in the 2010s, in 2004</td></tr>
+      <tr><td><code>2019/..</code></td><td>began in 2019, still going</td></tr>
     </tbody></table></div>
+    <p><span class="pill p-ok">settled</span> That is the whole grammar, in <code>protocol/record.md</code>, with the laws in <code>model/Laws/Time.lean</code> and the vectors in <code>vectors/occurred/</code>. The forms come from ISO 8601 and EDTF Level 1, kept to those that name exactly one span. Calendar dates are UTC days, so every store orders them alike. A span of no length comes before a longer one with the same start, and an open end comes last. Durations are refused because an end instant says the same thing; seasons, open or unknown starts, unknown ends and years past 9999 are refused because they don't name one span. Accepting more later is free; accepting less would invalidate stored records.</p>
     <h4>Still to muse on</h4>
     <ul>
       <li><b>Duration vs imprecision.</b> "Visited for 4 minutes" lasted the whole span. "Decided in 2009" happened at some point inside it. Both order the same, but folds may care (summing attention time vs placing a decision on a timeline). Lean: the core stays out of it and the kind decides at read. This is the most likely place a second field becomes necessary.</li>

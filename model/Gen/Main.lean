@@ -5,6 +5,7 @@ import Gen.Encode
 import Gen.Spec
 import Gen.Batch
 import Gen.Realm
+import Gen.Occurred
 
 /-!
 # Gen: write the vectors
@@ -262,7 +263,7 @@ def orFail : Except String J → IO J
 
 def main (args : List String) : IO UInt32 := do
   let dir : System.FilePath := args.headD "../vectors"
-  for sub in ["fold", "lens", "record", "spec", "batch", "realm"] do
+  for sub in ["fold", "lens", "record", "spec", "batch", "realm", "occurred"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
@@ -310,5 +311,9 @@ def main (args : List String) : IO UInt32 := do
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
   writeAll dir "realm" realms
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length} vectors to {dir}"
+  let occurred ← match Gen.OccurredVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "occurred" occurred
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length} vectors to {dir}"
   return 0

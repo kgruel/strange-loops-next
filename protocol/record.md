@@ -12,7 +12,7 @@ vectors in `vectors/record/`.
 | `kind` | yes | a label, non-empty |
 | `observer` | yes | a typed reference (`prefix:value`), usually a lineage id `sl:…` |
 | `emitted` | yes | the observer's now: RFC 3339 with an offset |
-| `occurred` | no | the claimed past: EDTF Level 1 (not yet validated) |
+| `occurred` | no | the claimed past: a span, below |
 | `about` | no | a set of typed references |
 | `prev` | no | a set of record ids this one replaces |
 | `under` | no | the record id of the grant it acts on |
@@ -25,6 +25,7 @@ vectors in `vectors/record/`.
 * **`emitted`** is `YYYY-MM-DDTHH:MM:SS`, an optional fraction, then `Z` or
   `±HH:MM`. Only upper-case `T` and `Z`, a real calendar day, hours to 23,
   minutes to 59, seconds to 60 (a leap second), offsets to `23:59`.
+* **`occurred`** is a span of time. Its grammar is below.
 * **Sets** (`about`, `prev`, `erases`) have one canonical form: sorted by UTF-16 code
   units, repeats removed, and left out when empty.
 
@@ -33,9 +34,9 @@ core doesn't read belongs in the payload, and would otherwise be silently
 left out of the id.
 
 An envelope that breaks a rule is refused with one of: `kind-empty`,
-`observer-not-typed`, `emitted-not-rfc3339`, `about-not-typed`,
-`prev-not-record-id`, `under-not-record-id`, `erases-not-record-id`,
-checked in that order.
+`observer-not-typed`, `emitted-not-rfc3339`, `occurred-not-span`,
+`about-not-typed`, `prev-not-record-id`, `under-not-record-id`,
+`erases-not-record-id`, checked in that order.
 
 Any record may erase, whatever its kind: no kind is reserved for it, so the
 field alone carries the meaning, and every reader applies it from the
@@ -48,6 +49,42 @@ a salt that isn't 16 bytes (`salt-not-16-bytes`), a repeated member name
 anywhere in the payload (`member-duplicate`), and a payload number outside
 ±(2^53 − 1) (`number-out-of-range`). A batch writes each of its records the
 same way.
+
+## Occurred
+
+`occurred` is the observer's claim about when something happened: a span,
+possibly coarse. It is one of:
+
+| Form | Example | Span |
+|---|---|---|
+| a calendar date | `2009`, `2009-07`, `2009-07-14` | the whole year, month or day |
+| a date with its last digits unspecified | `201X`, `20XX`, `2004-XX`, `1985-04-XX`, `1985-XX-XX` | the decade, century, year or month |
+| either, then one qualifier | `2009?` (uncertain), `2009~` (approximate), `2009%` (both) | the date's own span |
+| an instant, as `emitted` writes one | `2026-10-17T09:14:03Z` | a span of no length |
+| `a/b`, two of those | `2009-07/2011-03`, `2026-10-17T09:14:03Z/2026-10-17T09:18:13Z` | from the start of `a` to the end of `b` |
+| `a/..` | `2019/..` | from the start of `a`, with no end yet |
+
+* Calendar dates are UTC days of the proleptic Gregorian calendar, years
+  0000 to 9999. Unspecified digits follow EDTF Level 1: only the last one or
+  two digits of a year, and a month or day only when everything after it is
+  unspecified too.
+* A qualifier is part of the claim and stays in the text; it never changes
+  the span. Instants take no qualifier.
+* In `a/b`, `b` may not start before `a` does.
+* The text is kept as written, as `emitted` keeps the writer's offset. Two
+  spellings of one span are two different envelopes with two different ids.
+* **Order.** Spans order by start, then end. A span of no length comes
+  before a longer one with the same start, and a span with no end comes
+  after any that has one. An instant's moment is its whole seconds in UTC,
+  then its fraction (`.5` and `.500` are the same moment); a leap second is
+  the first second of the next minute.
+
+The forms come from ISO 8601 and EDTF Level 1 (ISO 8601-2), but this is the
+whole grammar: no durations (write the end instant: `start/end`), seasons,
+open or unknown starts, unknown ends, or years past 9999. Anything else is
+refused with `occurred-not-span`. Accepting more later is free, since
+every record valid now stays valid with the same id; accepting less would
+invalidate records already stored.
 
 ## Canonical bytes
 
@@ -99,8 +136,8 @@ After erasure the opening is replaced by the commitment:
 
 ## Not yet
 
-* `occurred` is carried but not validated; EDTF parsing arrives with content
-  order.
+* `occurred` is checked and has an order, but content order and windows
+  still read the model's plain numbers; they move to spans next.
 * Key bindings, presence keys and admission arrive with standing (step 3).
 * Lone UTF-16 surrogates in strings are invalid JSON for RFC 8785, and
   decoders disagree on them: some replace them, JavaScript keeps them.

@@ -32,7 +32,14 @@
     "group": "Layer 0 · the record",
     "status": "settled",
     "claim": "Every record has an observer, and two times.",
-    "why": "Ingestion is a dumb observer reporting what a source holds: hearsay. <code>emitted</code> is the writer's word (RFC 3339); <code>occurred</code> is an optional claimed span (EDTF Level 1) that can be coarse."
+    "why": "Ingestion is a dumb observer reporting what a source holds: hearsay. <code>emitted</code> is the writer's word (RFC 3339); <code>occurred</code> is an optional claimed span that can be coarse."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "<code>occurred</code> is a span with a closed grammar: dates, instants and intervals, never a duration.",
+    "why": "The core reads <code>occurred</code> only to order records and to place them in windows, so each value must name one span, and every store must read it the same way. Calendar dates are UTC days. EDTF Level 1's qualifiers (<code>2009~</code>) and trailing unspecified digits (<code>201X</code>) stay, since each still names one span; a qualifier never changes it. An interval runs between two of those, and its end may be open (<code>2019/..</code>). Spans order by start, then end, an open end last. Durations are refused because an end instant says the same; seasons, open or unknown starts, unknown ends and years past 9999 are refused with <code>occurred-not-span</code>. Accepting more later is free; accepting less would invalidate stored records. Version 35."
   },
   {
     "kind": "decision",
@@ -312,7 +319,7 @@
     "group": "Building",
     "status": "settled",
     "claim": "Steps 0 and 1 are built; step 2 is modelled and reviewed.",
-    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch. Our review, Codex's and Gemini's found the holes at the boundaries, not in the laws: PR 7 closes the write path and PR 9 gives the envelope <code>erases</code>; 109 vectors in all. Next: formalize the data model in Lean, one record from JSON text to what a reader holds, before step 3 or any Rust."
+    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch. Our review, Codex's and Gemini's found the holes at the boundaries, not in the laws: PR 7 closes the write path, PR 9 gives the envelope <code>erases</code>, and PR 11 gives <code>occurred</code> a closed grammar and an order; 118 vectors in all. Next: formalize the data model in Lean, one record from JSON text to what a reader holds, before step 3 or any Rust."
   },
   {
     "kind": "decision",

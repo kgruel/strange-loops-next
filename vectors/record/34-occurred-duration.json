@@ -1,0 +1,21 @@
+{
+  "vector": "34-occurred-duration",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00",
+        "occurred": "2026-10-17T09:14/PT4M"
+      }
+    ],
+    "salt": "ngixoaja7hlfgcrxjvg5por2ie",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "occurred-not-span"
+  }
+}

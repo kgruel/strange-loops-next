@@ -1,0 +1,91 @@
+{
+  "vector": "07-refused",
+  "layer": "occurred",
+  "laws": ["occurred.refuse"],
+  "source": "model",
+  "input": {
+    "occurred": ["2026-10-17T09:14/PT4M", "2026-10-17T09:14:03Z/PT4M10S", "2026-10-17T09:14Z", "2026-10-17T09:14:03", "2026-10-17t09:14:03z", "2001-21", "../1985", "/1985", "1985/", "..", "../..", "Y170000002", "-1985", "20000", "201X-05", "1XXX", "1985-XX-12", "2009-13", "2009-00", "2009-02-29", "2009-7", "2010/2009", "2026-10-17T09:14:04Z/2026-10-17T09:14:03Z", "2026-10-17T09:14:03Z~", "2009~?", ""]
+  },
+  "expect": {
+    "spans": [
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      }
+    ]
+  }
+}
