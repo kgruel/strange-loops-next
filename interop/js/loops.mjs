@@ -138,7 +138,10 @@ export function parse(text) {
       for (;;) {
         ws(); const k = JSON.parse(token(STR));
         if (seen.has(k)) throw new Error("member-duplicate");
-        seen.add(k); ws(); token(/:/y); o[k] = value(); ws();
+        // Defined, not assigned: assigning "__proto__" would set the prototype.
+        seen.add(k); ws(); token(/:/y);
+        Object.defineProperty(o, k, { value: value(), enumerable: true, writable: true, configurable: true });
+        ws();
         if (text[i] === ",") { i++; continue; }
         token(/\}/y); return o;
       }

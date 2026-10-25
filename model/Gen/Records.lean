@@ -170,7 +170,12 @@ def storedCases : List Case := [
       about := [r1Id] }],
     payloads := [.obj [("body", .str "Called the customer back at 555-0100")]], key := "dev2" },
   { name := "09-leap-second", laws := ["record.emitted"],
-    envs := [note "2016-12-31T23:59:60Z"], payloads := [.obj []] }
+    envs := [note "2016-12-31T23:59:60Z"], payloads := [.obj []] },
+  -- `__proto__` is a member name like any other, though a JavaScript object
+  -- assigned one sets its prototype instead
+  { name := "10-proto-member", laws := ["record.canonical"],
+    envs := [note],
+    payloads := [.obj [("__proto__", .obj [("a", .int 1)]), ("b", .int 2)]] }
 ]
 
 def refusedCases : List (String × Env) := [
@@ -192,7 +197,8 @@ def refusedPayloads : List (String × Json) := [
   ("29-number-out-of-range", .obj [("largest", .int 9007199254740991),
     ("deep", .arr [.obj [("n", .int (-9007199254740992))]])]),
   ("31-member-duplicate", .obj [("body", .str "hello"),
-    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])])
+    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])]),
+  ("32-proto-out-of-range", .obj [("__proto__", .int 9007199254740992)])
 ]
 
 /-- A salt that isn't 16 bytes. An empty salt would let anyone confirm a guess
