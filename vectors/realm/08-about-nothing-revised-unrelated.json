@@ -1,0 +1,59 @@
+{
+  "vector": "08-about-nothing-revised-unrelated",
+  "layer": "realm",
+  "laws": ["admit.no-cross", "thing.local"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000081",
+        "kind": "note",
+        "about": [],
+        "value": "",
+        "prev": [],
+        "occurred": 1,
+        "emitted": 1,
+        "n": 0
+      },
+      {
+        "id": "r:00000084",
+        "kind": "note",
+        "about": [],
+        "value": "",
+        "prev": ["r:00000081"],
+        "occurred": 4,
+        "emitted": 4,
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000081",
+        "shown": "here"
+      },
+      {
+        "id": "r:00000084",
+        "shown": "here"
+      }
+    ],
+    "refused": [
+      {
+        "id": "r:00000084",
+        "code": "prev-unrelated"
+      }
+    ],
+    "things": {
+      "r:00000081": {
+        "heads": ["r:00000081"],
+        "winner": "r:00000081",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

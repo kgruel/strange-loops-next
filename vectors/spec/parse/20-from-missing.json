@@ -1,0 +1,20 @@
+{
+  "vector": "20-from-missing",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "from-missing",
+    "path": "from"
+  }
+}

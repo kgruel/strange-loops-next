@@ -1,0 +1,59 @@
+{
+  "vector": "04-cross-thing-prev-refused",
+  "layer": "realm",
+  "laws": ["admit.no-cross", "thing.local"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000061",
+        "kind": "facet",
+        "about": ["thing:A"],
+        "value": "",
+        "prev": [],
+        "occurred": 1,
+        "emitted": 1,
+        "n": 0
+      },
+      {
+        "id": "r:00000062",
+        "kind": "facet",
+        "about": ["thing:B"],
+        "value": "",
+        "prev": ["r:00000061"],
+        "occurred": 2,
+        "emitted": 2,
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000061",
+        "shown": "here"
+      },
+      {
+        "id": "r:00000062",
+        "shown": "here"
+      }
+    ],
+    "refused": [
+      {
+        "id": "r:00000062",
+        "code": "prev-unrelated"
+      }
+    ],
+    "things": {
+      "thing:A": {
+        "heads": ["r:00000061"],
+        "winner": "r:00000061",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

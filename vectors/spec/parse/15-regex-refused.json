@@ -1,0 +1,30 @@
+{
+  "vector": "15-regex-refused",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "m": {
+          "count": true,
+          "where": {
+            "title": {
+              "matches": "^auth"
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "where-invalid",
+    "path": "fold.m.where.title"
+  }
+}

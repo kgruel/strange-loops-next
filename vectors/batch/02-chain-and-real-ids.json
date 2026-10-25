@@ -1,0 +1,76 @@
+{
+  "vector": "02-chain-and-real-ids",
+  "layer": "batch",
+  "laws": ["batch.meaning"],
+  "source": "model",
+  "input": {
+    "held": [
+      {
+        "id": "r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua",
+        "about": ["topic:auth"]
+      },
+      {
+        "id": "r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a",
+        "about": []
+      }
+    ],
+    "drafts": [
+      {
+        "label": "@d",
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"]
+        },
+        "salt": "fuquyzncvucfe6gdlnubwfwjfe",
+        "payload": {
+          "choice": "passkeys"
+        }
+      },
+      {
+        "label": "@d2",
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"],
+          "prev": ["@d"]
+        },
+        "salt": "r4jmld4li7xnwq5af4xrplyr2y",
+        "payload": {
+          "choice": "passkeys, with a recovery code"
+        }
+      },
+      {
+        "env": {
+          "kind": "decision",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["@d2", "topic:auth"],
+          "prev": ["r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua"]
+        },
+        "salt": "dn6fgfxa7ne2in7k2bem7umou4",
+        "payload": {
+          "choice": "passkeys"
+        }
+      }
+    ]
+  },
+  "expect": {
+    "records": [
+      {
+        "id": "r:mcpvkyr6ihih5ni33so4xkmthwfrtmnc4bwexoqi4kxjsmnth5ta",
+        "env_canonical": "{\"about\":[\"topic:auth\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"decision\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}"
+      },
+      {
+        "id": "r:svryab2eeolkfok3alxx5rqrjoawwdm4xwtmwga43ochbrvv2sza",
+        "env_canonical": "{\"about\":[\"topic:auth\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"decision\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\",\"prev\":[\"r:mcpvkyr6ihih5ni33so4xkmthwfrtmnc4bwexoqi4kxjsmnth5ta\"]}"
+      },
+      {
+        "id": "r:usz5lbvwh7alox5symf4jovdvp3gqp73m5j5aep64rxpcvooztlq",
+        "env_canonical": "{\"about\":[\"r:svryab2eeolkfok3alxx5rqrjoawwdm4xwtmwga43ochbrvv2sza\",\"topic:auth\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"decision\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\",\"prev\":[\"r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua\"]}"
+      }
+    ]
+  }
+}

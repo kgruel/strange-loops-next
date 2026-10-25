@@ -1,0 +1,73 @@
+{
+  "vector": "06-about-nothing",
+  "layer": "realm",
+  "laws": ["thing.local"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000081",
+        "kind": "note",
+        "about": [],
+        "value": "",
+        "prev": [],
+        "occurred": 1,
+        "emitted": 1,
+        "n": 0
+      },
+      {
+        "id": "r:00000082",
+        "kind": "note",
+        "about": ["r:00000081"],
+        "value": "",
+        "prev": ["r:00000081"],
+        "occurred": 2,
+        "emitted": 2,
+        "n": 0
+      },
+      {
+        "id": "r:00000083",
+        "kind": "config",
+        "about": [],
+        "value": "",
+        "prev": [],
+        "occurred": 3,
+        "emitted": 3,
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000081",
+        "shown": "here"
+      },
+      {
+        "id": "r:00000082",
+        "shown": "here"
+      },
+      {
+        "id": "r:00000083",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "r:00000081": {
+        "heads": ["r:00000082"],
+        "winner": "r:00000082",
+        "others": []
+      },
+      "r:00000083": {
+        "heads": ["r:00000083"],
+        "winner": "r:00000083",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

@@ -2,7 +2,11 @@ import Loops.Json
 import Loops.Base32
 import Loops.Time
 import Loops.Envelope
-import Loops.Seal
+import Loops.Stored
 import Loops.Record
 import Loops.Fold
+import Loops.Families
+import Loops.Things
+import Loops.Spec
+import Loops.Batch
 import Loops.Lens

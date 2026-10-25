@@ -1,0 +1,45 @@
+{
+  "vector": "12-cycle",
+  "layer": "batch",
+  "laws": ["batch.refuse"],
+  "source": "model",
+  "input": {
+    "held": [
+      {
+        "id": "r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua",
+        "about": ["topic:auth"]
+      },
+      {
+        "id": "r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a",
+        "about": []
+      }
+    ],
+    "drafts": [
+      {
+        "label": "@a",
+        "env": {
+          "kind": "note",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "prev": ["@b"]
+        },
+        "salt": "ugdjcktryiskmai4kgwq46jzae",
+        "payload": {}
+      },
+      {
+        "label": "@b",
+        "env": {
+          "kind": "note",
+          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "emitted": "2026-10-24T09:00:00Z",
+          "prev": ["@a"]
+        },
+        "salt": "3b6nmvqyx5rwbxndrclgj2n6t4",
+        "payload": {}
+      }
+    ]
+  },
+  "expect": {
+    "refused": "label-cycle"
+  }
+}
