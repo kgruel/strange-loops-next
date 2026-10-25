@@ -85,6 +85,6 @@ After erasure the opening is replaced by the commitment:
 * `occurred` is carried but not validated; EDTF parsing arrives with content
   order.
 * Key bindings, presence keys and admission arrive with standing (step 3).
-* Lone UTF-16 surrogates in strings are invalid JSON for RFC 8785; Go's
-  decoder replaces them and JavaScript keeps them, so the two disagree on
-  invalid input. Refusing them explicitly is a small follow-up.
+* Lone UTF-16 surrogates in strings are invalid JSON for RFC 8785, and
+  decoders disagree on them: some replace them, JavaScript keeps them.
+  Refusing them explicitly is a small follow-up.
