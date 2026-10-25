@@ -15,9 +15,9 @@ writer that must agree with it byte for byte.
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS writer for layer 0 |
 
-Planned, filled step by step: the Rust implementation, with `xtask` checking
-its token and surface budgets; `scenarios/` (end-to-end walks), `.loops/`
-(this repo's own decision store).
+Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
+`xtask` checking token and surface budgets); `scenarios/` (end-to-end walks),
+`.loops/` (this repo's own decision store).
 
 ## Checking
 
