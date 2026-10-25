@@ -11,16 +11,8 @@
         "emitted": "2026-10-21T05:30:00-04:00"
       }
     ],
-    "payloads": [
-      {
-        "largest": 9007199254740991,
-        "deep": [
-          {
-            "n": -9007199254740992
-          }
-        ]
-      }
-    ]
+    "salt": "cjajiu4hbzcn24nys74faxtske",
+    "payload_text": "{\"largest\":9007199254740991,\"deep\":[{\"n\":-9007199254740992}]}"
   },
   "expect": {
     "refused": "number-out-of-range"

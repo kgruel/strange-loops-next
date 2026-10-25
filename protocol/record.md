@@ -35,19 +35,28 @@ An envelope that breaks a rule is refused with one of: `kind-empty`,
 `observer-not-typed`, `emitted-not-rfc3339`, `about-not-typed`,
 `prev-not-record-id`, `under-not-record-id`, checked in that order.
 
+Writing a record then checks the rest, in this order, after the envelope:
+a salt that isn't 16 bytes (`salt-not-16-bytes`), a repeated member name
+anywhere in the payload (`member-duplicate`), and a payload number outside
+±(2^53 − 1) (`number-out-of-range`). A batch writes each of its records the
+same way.
+
 ## Canonical bytes
 
 RFC 8785 (JCS): members sorted by UTF-16 code units, minimal string escapes,
 ECMAScript number formatting, no whitespace. Object member names must be
-distinct.
+distinct at every depth: JSON text with a repeated name is refused
+(`member-duplicate`), not resolved to the first or the last, which parsers
+disagree on.
 
 JCS reads every number as an IEEE-754 double, which holds an integer exactly
 only within ±(2^53 − 1). Past that, two different numbers share one canonical
 form (9007199254740993 becomes 9007199254740992), and an implementation that
 kept the number exactly would compute a different id. So a writer refuses a
-payload holding a number outside ±(2^53 − 1) with `number-out-of-range`,
-after the envelope checks, never rounding it. A number too large for that
-belongs in a string.
+payload holding a number outside ±(2^53 − 1) with `number-out-of-range`.
+The range applies to the number as JCS reads it, a double: text such as
+`9007199254740991.1` reads as 9007199254740991 and is accepted as that. A
+number that must stay exact past the range belongs in a string.
 
 ## Commitment, id, signature
 

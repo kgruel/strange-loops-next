@@ -93,11 +93,11 @@ def Json.canonMembers : List (String × Json) → List (String × String)
 end
 
 mutual
-/-- Object members must be distinct as UTF-16 sequences, i.e. distinct strings. -/
+/-- Object members must be distinct, at every depth. Distinct strings are
+distinct UTF-16 sequences (`utf16_inj`), so this is also JCS's rule. -/
 def Json.keysDistinct : Json → Bool
   | .arr xs => Json.allDistinct xs
-  | .obj kvs =>
-    (kvs.map fun kv => utf16 kv.1).eraseDups.length == kvs.length && Json.membersDistinct kvs
+  | .obj kvs => decide (kvs.map (·.1)).Nodup && Json.membersDistinct kvs
   | _ => true
 
 def Json.allDistinct : List Json → Bool

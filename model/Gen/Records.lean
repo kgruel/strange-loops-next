@@ -72,10 +72,11 @@ structure Case where
 def storedVector (c : Case) : Except String J := do
   let env := c.envs.headD default
   let payload := c.payloads.headD .null
-  if let some why := writeProblem env payload then throw s!"record/{c.name}: unexpectedly refused: {why}"
   let salt := saltFor c.name
   let seed := seedFor c.key
-  let r := make env salt payload
+  let r ← match write env salt payload with
+    | .ok w => pure w.stored
+    | .error why => throw s!"record/{c.name}: unexpectedly refused: {why}"
   let ids := c.envs.map fun e => idOf H e (r.commit H)
   let commits := c.payloads.map fun p => commitOf H salt p
   if !ids.all (· == r.id H) then throw s!"record/{c.name}: envelope variants disagree"
@@ -98,13 +99,21 @@ def storedVector (c : Case) : Except String J := do
       ("line", .str (storedJson env salt payload seed).canon),
       ("erased_line", .str (erasedJson env salt payload seed).canon)])]
 
-def refusedVector (name : String) (env : Env) (payload : Json := .obj []) : Except String J := do
-  match writeProblem env payload with
-  | none => throw s!"record/{name}: expected a refusal"
-  | some why =>
+/-- A payload as written, members in the order given and repeats kept: the
+only way a vector can carry a payload with a repeated member name. -/
+partial def rawText : Json → String
+  | .obj kvs => "{" ++ ",".intercalate (kvs.map fun (k, v) => quote k ++ ":" ++ rawText v) ++ "}"
+  | .arr xs => "[" ++ ",".intercalate (xs.map rawText) ++ "]"
+  | j => j.canon
+
+def refusedVector (name : String) (env : Env) (payload : Json := .obj [])
+    (salt : List UInt8 := saltFor name) : Except String J := do
+  match write env salt payload with
+  | .ok _ => throw s!"record/{name}: expected a refusal"
+  | .error why =>
     return .obj [("vector", .str name), ("layer", .str "record"), ("laws", .arr [.str "record.refuse"]),
       ("source", .str "model"), ("input", .obj [("envs", .arr [envInput env]),
-        ("payloads", .arr [ofJson payload])]),
+        ("salt", .str (base32 salt)), ("payload_text", .str (rawText payload))]),
       ("expect", .obj [("refused", .str why)])]
 
 /-! ## Cases -/
@@ -177,11 +186,18 @@ def refusedCases : List (String × Env) := [
 ]
 
 /-- Payloads refused under a good envelope. The largest exact integer is
-kept; one past the smallest, nested, is refused. -/
+kept; one past the smallest, nested, is refused. A repeated member name is
+refused at any depth. -/
 def refusedPayloads : List (String × Json) := [
   ("29-number-out-of-range", .obj [("largest", .int 9007199254740991),
-    ("deep", .arr [.obj [("n", .int (-9007199254740992))]])])
+    ("deep", .arr [.obj [("n", .int (-9007199254740992))]])]),
+  ("31-member-duplicate", .obj [("body", .str "hello"),
+    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])])
 ]
+
+/-- A salt that isn't 16 bytes. An empty salt would let anyone confirm a guess
+about a payload from its commitment. -/
+def shortSalt : List UInt8 := (saltFor "30-salt-short").take 15
 
 /-! ## Standards the reference code must meet before it writes anything -/
 
@@ -218,6 +234,7 @@ def vectors : Except String (List (String × J)) := do
   let stored ← storedCases.mapM fun c => do pure (c.name, ← storedVector c)
   let refused ← refusedCases.mapM fun (n, e) => do pure (n, ← refusedVector n e)
   let payloads ← refusedPayloads.mapM fun (n, p) => do pure (n, ← refusedVector n note p)
-  return stored ++ refused ++ payloads
+  let salt ← refusedVector "30-salt-short" note (salt := shortSalt)
+  return stored ++ refused ++ payloads ++ [("30-salt-short", salt)]
 
 end Gen.Records

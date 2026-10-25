@@ -1,0 +1,20 @@
+{
+  "vector": "31-member-duplicate",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "salt": "tt25jjnaatp37ufxru5felpls4",
+    "payload_text": "{\"body\":\"hello\",\"meta\":{\"tag\":\"a\",\"tag\":\"b\"}}"
+  },
+  "expect": {
+    "refused": "member-duplicate"
+  }
+}

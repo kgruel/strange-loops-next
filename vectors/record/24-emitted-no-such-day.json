@@ -11,9 +11,8 @@
         "emitted": "2026-02-29T00:00:00Z"
       }
     ],
-    "payloads": [
-      {}
-    ]
+    "salt": "hycv5vhuxqnqqu7dgvn66ohsnu",
+    "payload_text": "{}"
   },
   "expect": {
     "refused": "emitted-not-rfc3339"

@@ -21,7 +21,7 @@ for (const f of readdirSync(join(dir, "record")).sort()) {
   const envs = v.input.envs;
   if (v.expect.refused) {
     let got = null;
-    try { L.seal(envs[0], new Uint8Array(16), v.input.payloads[0], new Uint8Array(32)); }
+    try { L.writeText(envs[0], L.base32Decode(v.input.salt), v.input.payload_text, new Uint8Array(32)); }
     catch (e) { got = e.message; }
     expect(`${n} refused`, got, v.expect.refused);
     continue;

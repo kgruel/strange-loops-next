@@ -12,9 +12,8 @@
         "prev": ["topic:auth"]
       }
     ],
-    "payloads": [
-      {}
-    ]
+    "salt": "x2qe7idada575vctx7pvqerlfq",
+    "payload_text": "{}"
   },
   "expect": {
     "refused": "prev-not-record-id"

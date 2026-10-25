@@ -8,9 +8,13 @@ the same batch by a label, `@name`, in `about` or `prev`, before either has an
 id. A record's id covers its envelope, so a label must be replaced by the id
 it stands for before the record that uses it can be named.
 
-Writing also checks each `prev`: you can only replace what you hold, so a
-target must be in the batch or the store (`prev-unknown`), and succession is
-within a thing, so it must share a thing with the record (`prev-unrelated`).
+Each record is written through `write`, as a single record would be, so a
+batch can't store what writing one record would refuse. Writing also checks
+each `prev`: you can only replace what you hold, so a target must be in the
+batch or the store (`prev-unknown`), and succession is within a thing, so it
+must share a thing with the record (`prev-unrelated`). Every check runs
+across the whole batch, so which refusal is reported never depends on the
+order of drafts or of a `prev` set.
 
 A batch **means** an assignment of ids to labels in which every label's id is
 the id of its record with all its labels replaced: exactly what writing the
@@ -80,31 +84,36 @@ def envThings (id : String) (about : List String) : List String :=
   if about.isEmpty then [id] else about
 
 /-- Each `prev` names a record the writer holds, in the batch or in the store
-(`held` gives a stored record's `about`), and shares a thing with it. -/
+(`held` gives a stored record's `about`), and shares a thing with it. Checked
+across the whole batch, so the refusal never depends on the order of drafts
+or of a `prev` set: any `prev-unknown` first, then any `prev-unrelated`. -/
 def checkPrev (H : Hash) (held : String → Option (List String)) (rs : List Stored) :
     Except String Unit := do
   let inBatch := rs.map fun r => (r.id H, r.env.about)
-  for r in rs do
-    for p in r.env.prev do
-      match inBatch.lookup p <|> held p with
-      | none => throw "prev-unknown"
-      | some about =>
-        unless (envThings (r.id H) r.env.about).any (envThings p about).contains do
-          throw "prev-unrelated"
+  let target := fun p => inBatch.lookup p <|> held p
+  if rs.any fun r => r.env.prev.any fun p => (target p).isNone then throw "prev-unknown"
+  if rs.any fun r => r.env.prev.any fun p => (target p).any fun about =>
+      !(envThings (r.id H) r.env.about).any (envThings p about).contains then
+    throw "prev-unrelated"
 
-/-- Resolve a batch to its records, in the order given. Checked in order: a
-label given twice, a label used but never given, a cycle, a `prev` naming a
-record the writer doesn't hold, and a `prev` naming one about other things. -/
+/-- Resolve a batch to its records, in the order given, each written through
+`write`. Checked in order: a label given twice, a label used but never given,
+a cycle, any draft `write` refuses (reporting the code first in `writeCodes`
+among them), a `prev` naming a record the writer doesn't hold, and a `prev`
+naming one about other things. -/
 def resolveBatch (H : Hash) (held : String → Option (List String)) (ds : List Draft) :
-    Except String (List Stored) := do
+    Except String (List Written) := do
   let labels := ds.filterMap (·.label)
   unless labels.Nodup do throw "label-duplicate"
   unless ds.all (·.refs.all labels.contains) do throw "label-unknown"
   let σ ← resolveRounds H ds.length [] ds
-  let rs ← ds.mapM fun d => match substEnv (fun r => σ.lookup r) d.env with
-    | some e => pure (make e d.salt d.payload)
+  let es ← ds.mapM fun d => match substEnv (fun r => σ.lookup r) d.env with
+    | some e => pure (e, d)
     | none => throw "label-cycle"
-  checkPrev H held rs
-  pure rs
+  if let some why := firstRefusal (es.filterMap fun (e, d) => writeProblem e d.salt d.payload) then
+    throw why
+  let ws ← es.mapM fun (e, d) => write e d.salt d.payload
+  checkPrev H held (ws.map Written.stored)
+  pure ws
 
 end Loops
