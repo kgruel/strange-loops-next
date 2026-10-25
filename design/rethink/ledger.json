@@ -312,7 +312,7 @@
     "group": "Building",
     "status": "settled",
     "claim": "Steps 0 and 1 are built; step 2 is modelled and reviewed.",
-    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch. Our review and Codex's found the holes at the boundaries, not in the laws, and PR 7 closes the write path; 102 vectors in all. Next: formalize the data model in Lean, one record from JSON text to what a reader holds, before step 3 or any Rust."
+    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch. Our review, Codex's and Gemini's found the holes at the boundaries, not in the laws: PR 7 closes the write path and PR 9 gives the envelope <code>erases</code>; 109 vectors in all. Next: formalize the data model in Lean, one record from JSON text to what a reader holds, before step 3 or any Rust."
   },
   {
     "kind": "decision",
