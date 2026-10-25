@@ -116,9 +116,16 @@ export function verifyId(sig, id) {
   return verify(null, utf8(signingInput(id)), key, Buffer.from(base32Decode(sig.ed25519)));
 }
 
-// Seal a record: the stored line, and the line after erasure.
+// Every number within ±(2^53 - 1): past that, two numbers share one canonical form.
+const inRange = (v) =>
+  typeof v === "number" ? Math.abs(v) <= Number.MAX_SAFE_INTEGER
+  : v !== null && typeof v === "object" ? Object.values(v).every(inRange)
+  : true;
+
+// Seal a record: the stored line, and the line after erasure. Refuses a bad
+// envelope, then a payload number it can't carry exactly (never rounded).
 export function seal(env, salt, payload, seed) {
-  const why = problem(env);
+  const why = problem(env) ?? (inRange(payload) ? null : "number-out-of-range");
   if (why) throw new Error(why);
   const commit = commitOf(salt, payload);
   const id = idOf(env, commit);

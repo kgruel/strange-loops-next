@@ -9,7 +9,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -19,7 +19,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -31,7 +31,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -41,7 +41,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,
@@ -51,7 +51,7 @@
         {
           "id": "r:00000013",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
           "occurred": 150,
@@ -61,7 +61,7 @@
         {
           "id": "r:00000011",
           "kind": "decision",
-          "key": "topic:auth",
+          "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
           "occurred": 100,

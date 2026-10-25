@@ -1,0 +1,54 @@
+{
+  "vector": "07-kind-change-supersedes",
+  "layer": "realm",
+  "laws": ["thing.local"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000091",
+        "kind": "task",
+        "about": ["task:1"],
+        "value": "",
+        "prev": [],
+        "occurred": 1,
+        "emitted": 1,
+        "n": 0
+      },
+      {
+        "id": "r:00000092",
+        "kind": "task-done",
+        "about": ["task:1"],
+        "value": "",
+        "prev": ["r:00000091"],
+        "occurred": 2,
+        "emitted": 2,
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000091",
+        "shown": "here"
+      },
+      {
+        "id": "r:00000092",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "task:1": {
+        "heads": ["r:00000092"],
+        "winner": "r:00000092",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "vector": "05-about-is-a-set",
+  "layer": "realm",
+  "laws": ["thing.local"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000071",
+        "kind": "status",
+        "about": ["svc:auth", "svc:billing"],
+        "value": "",
+        "prev": [],
+        "occurred": 1,
+        "emitted": 1,
+        "n": 0
+      },
+      {
+        "id": "r:00000072",
+        "kind": "status",
+        "about": ["svc:auth"],
+        "value": "",
+        "prev": ["r:00000071"],
+        "occurred": 2,
+        "emitted": 2,
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000071",
+        "shown": "here"
+      },
+      {
+        "id": "r:00000072",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "svc:auth": {
+        "heads": ["r:00000072"],
+        "winner": "r:00000072",
+        "others": []
+      },
+      "svc:billing": {
+        "heads": ["r:00000071"],
+        "winner": "r:00000071",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

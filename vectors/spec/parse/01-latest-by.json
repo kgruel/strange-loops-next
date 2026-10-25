@@ -1,0 +1,54 @@
+{
+  "vector": "01-latest-by",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "decisions",
+      "note": "Decisions from notes; the latest per topic.",
+      "from": [
+        {
+          "store": "notes",
+          "kind": ["decision"]
+        },
+        {
+          "store": "rfc@home",
+          "kind": ["decision"]
+        }
+      ],
+      "fold": {
+        "by-topic": {
+          "latest-by": "about",
+          "follow": "prev"
+        }
+      },
+      "boundary": [
+        {
+          "when": "release"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "parsed": {
+      "vertex": "decisions",
+      "from": [
+        {
+          "store": "notes",
+          "kind": ["decision"]
+        },
+        {
+          "store": "rfc@home",
+          "kind": ["decision"]
+        }
+      ],
+      "fold": {
+        "by-topic": {
+          "latest-by": "about",
+          "follow": "prev"
+        }
+      }
+    }
+  }
+}

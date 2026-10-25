@@ -1,10 +1,10 @@
-import Loops.Seal
+import Loops.Stored
 
 /-!
 # Laws of the record
 
 * **Erasure keeps the id.** Forgetting the opening changes storage, not the
-  record: every reference, seal and signature still resolves.
+  record: every reference, tick and signature still resolves.
 * **An opening checks.** A record's own salt and payload open its commitment.
 * **Sets are sets.** Reordering or repeating `about` or `prev` gives the
   same envelope bytes, so the same id.

@@ -69,10 +69,10 @@ structure Case where
   payloads : List Json
   key : String := "kyle"
 
-def sealedVector (c : Case) : Except String J := do
+def storedVector (c : Case) : Except String J := do
   let env := c.envs.headD default
   let payload := c.payloads.headD .null
-  if let some why := env.problem then throw s!"record/{c.name}: unexpectedly refused: {why}"
+  if let some why := writeProblem env payload then throw s!"record/{c.name}: unexpectedly refused: {why}"
   let salt := saltFor c.name
   let seed := seedFor c.key
   let r := make env salt payload
@@ -98,13 +98,13 @@ def sealedVector (c : Case) : Except String J := do
       ("line", .str (storedJson env salt payload seed).canon),
       ("erased_line", .str (erasedJson env salt payload seed).canon)])]
 
-def refusedVector (name : String) (env : Env) : Except String J := do
-  match env.problem with
+def refusedVector (name : String) (env : Env) (payload : Json := .obj []) : Except String J := do
+  match writeProblem env payload with
   | none => throw s!"record/{name}: expected a refusal"
   | some why =>
     return .obj [("vector", .str name), ("layer", .str "record"), ("laws", .arr [.str "record.refuse"]),
       ("source", .str "model"), ("input", .obj [("envs", .arr [envInput env]),
-        ("payloads", .arr [.obj []])]),
+        ("payloads", .arr [ofJson payload])]),
       ("expect", .obj [("refused", .str why)])]
 
 /-! ## Cases -/
@@ -119,7 +119,7 @@ def grantId : String :=
   (make { kind := "grant", observer := kyle, emitted := "2026-10-20T12:00:00Z" }
     (saltFor "grant") (.obj [("to", .str wren)])).id H
 
-def sealedCases : List Case := [
+def storedCases : List Case := [
   { name := "01-minimal", laws := ["record.id", "record.commit", "record.sign"],
     envs := [note], payloads := [.obj [("body", .str "hello")]] },
   { name := "02-full-envelope", laws := ["record.id", "record.sets"],
@@ -176,6 +176,13 @@ def refusedCases : List (String × Env) := [
   ("28-under-not-record", { note with under := some "r:short" })
 ]
 
+/-- Payloads refused under a good envelope. The largest exact integer is
+kept; one past the smallest, nested, is refused. -/
+def refusedPayloads : List (String × Json) := [
+  ("29-number-out-of-range", .obj [("largest", .int 9007199254740991),
+    ("deep", .arr [.obj [("n", .int (-9007199254740992))]])])
+]
+
 /-! ## Standards the reference code must meet before it writes anything -/
 
 def selfCheck : Except String Unit := do
@@ -208,8 +215,9 @@ def selfCheck : Except String Unit := do
 
 def vectors : Except String (List (String × J)) := do
   selfCheck
-  let sealed ← sealedCases.mapM fun c => do pure (c.name, ← sealedVector c)
+  let stored ← storedCases.mapM fun c => do pure (c.name, ← storedVector c)
   let refused ← refusedCases.mapM fun (n, e) => do pure (n, ← refusedVector n e)
-  return sealed ++ refused
+  let payloads ← refusedPayloads.mapM fun (n, p) => do pure (n, ← refusedVector n note p)
+  return stored ++ refused ++ payloads
 
 end Gen.Records

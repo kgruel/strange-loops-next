@@ -1,0 +1,58 @@
+{
+  "vector": "02-where-and-limit",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "open-tasks",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "recent": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 5,
+          "where": {
+            "status": {
+              "is": "open"
+            },
+            "kind": {
+              "not": "draft"
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "parsed": {
+      "vertex": "open-tasks",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "recent": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 5,
+          "where": {
+            "status": {
+              "is": "open"
+            },
+            "kind": {
+              "not": "draft"
+            }
+          }
+        }
+      }
+    }
+  }
+}

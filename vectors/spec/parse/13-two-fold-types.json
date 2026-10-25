@@ -1,0 +1,26 @@
+{
+  "vector": "13-two-fold-types",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "both": {
+          "count": true,
+          "sum": "n"
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "fold-type",
+    "path": "fold.both"
+  }
+}

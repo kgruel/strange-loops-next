@@ -4,7 +4,7 @@ import Laws.Fold
 /-!
 # Laws of Latest, Sum, Min and Max
 
-* **Latest** inherits Upsert's laws: it is Upsert with a single key.
+* **Latest** inherits LatestBy's laws: it is LatestBy with a single key.
 * **Sum** is order-free and counts repeats, so the store hands each id over
   once. It is exact: over floating point, addition isn't associative and
   the order of arrival would change the total.
@@ -18,10 +18,10 @@ open List
 /-! ## Latest -/
 
 theorem Latest.perm {xs ys : List Record} (hx : Addressed xs) (h : xs ~ ys) :
-    Latest.fold xs = Latest.fold ys := Upsert.perm hx h
+    Latest.fold xs = Latest.fold ys := LatestBy.perm hx h
 
 theorem Latest.repeats {xs : List Record} (hx : Addressed xs) :
-    Latest.fold (xs ++ xs) = Latest.fold xs := Upsert.repeats hx
+    Latest.fold (xs ++ xs) = Latest.fold xs := LatestBy.repeats hx
 
 /-! ## Sum -/
 

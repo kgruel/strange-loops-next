@@ -1,0 +1,26 @@
+{
+  "vector": "17-follow-on-sum",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "t": {
+          "sum": "est",
+          "follow": "prev"
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "follow-invalid",
+    "path": "fold.t.follow"
+  }
+}

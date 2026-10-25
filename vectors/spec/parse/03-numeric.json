@@ -1,0 +1,80 @@
+{
+  "vector": "03-numeric",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "estimates",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"],
+          "about": "proj:loops"
+        }
+      ],
+      "fold": {
+        "tasks": {
+          "count": true
+        },
+        "total": {
+          "sum": "est"
+        },
+        "largest": {
+          "max": "est",
+          "where": {
+            "est": {
+              "at-least": 1,
+              "below": 100
+            }
+          }
+        },
+        "flagged": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "present": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "parsed": {
+      "vertex": "estimates",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"],
+          "about": "proj:loops"
+        }
+      ],
+      "fold": {
+        "tasks": {
+          "count": true
+        },
+        "total": {
+          "sum": "est"
+        },
+        "largest": {
+          "max": "est",
+          "where": {
+            "est": {
+              "at-least": 1,
+              "below": 100
+            }
+          }
+        },
+        "flagged": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "present": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

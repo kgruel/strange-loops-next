@@ -1,6 +1,10 @@
 import Loops
 import Gen.Json
 import Gen.Records
+import Gen.Encode
+import Gen.Spec
+import Gen.Batch
+import Gen.Realm
 
 /-!
 # Gen: write the vectors
@@ -14,25 +18,6 @@ open Loops Loops.Lens Gen
 
 /-! ## Encoding -/
 
-def idText (n : Nat) : String :=
-  let d := Nat.toDigits 16 n
-  "r:" ++ String.ofList (List.replicate (8 - d.length) '0' ++ d)
-
-def jRecord (r : Record) : J :=
-  .obj [("id", .str (idText r.id)), ("kind", .str r.kind), ("key", .str r.key),
-    ("value", .str r.value), ("prev", .arr (r.prev.map (.str ∘ idText))),
-    ("occurred", .num r.occurred), ("emitted", .num r.emitted), ("n", .int r.n)]
-
-def jUpsert (s : Upsert) : J :=
-  let keys := s.heads.foldl (fun ks h => if ks.contains h.key then ks else ks ++ [h.key]) []
-  .obj [("heads", .arr (s.heads.map (.str ∘ idText ∘ (·.id)))),
-    ("named", .arr (s.named.map (.str ∘ idText))),
-    ("keys", .obj (keys.map fun k =>
-      (k, .obj [("winner", match s.winner k with
-          | some r => .str (idText r.id)
-          | none => .null),
-        ("others", .arr ((s.others k).map (.str ∘ idText ∘ (·.id))))])))]
-
 def jLine (l : Line) : J := .str (String.ofList l)
 def jLines (ls : List Line) : J := .arr (ls.map jLine)
 
@@ -44,15 +29,11 @@ def jOutcome : Outcome → J
   | .unknown i => .obj [("unknown", jLine i)]
   | .absent i => .obj [("absent", jLine i)]
 
-def vector (name layer : String) (laws : List String) (input expect : J) : J :=
-  .obj [("vector", .str name), ("layer", .str layer), ("laws", .arr (laws.map .str)),
-    ("source", .str "model"), ("input", input), ("expect", expect)]
-
 /-! ## Records used by the fold cases -/
 
-def rec (id : Nat) (key : String) (occurred : Nat) (emitted : Nat := occurred)
+def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
     (prev : List Nat := []) (value : String := s!"v{id}") : Record :=
-  { id, kind := "decision", key, value, prev, occurred, emitted }
+  { id, kind := "decision", about := [thing], value, prev, occurred, emitted }
 
 def r1 := rec 0x11 "topic:auth" 100
 def r2 := rec 0x12 "topic:auth" 200 (prev := [0x11])
@@ -67,6 +48,11 @@ def n1 := { rec 0x21 "load" 100 with n := 5 }
 def n2 := { rec 0x22 "load" 110 with n := -3 }
 def n3 := { rec 0x23 "load" 120 with n := 40 }
 def n4 := { rec 0x24 "load" 130 with n := 40 }
+
+-- the current load per host: `h3` supersedes `h2`
+def h1 := { rec 0x31 "host:a" 100 with n := 5 }
+def h2 := { rec 0x32 "host:b" 110 with n := 9 }
+def h3 := { rec 0x33 "host:b" 120 (prev := [0x32]) with n := 1 }
 
 /-! ## Fold cases -/
 
@@ -108,19 +94,103 @@ def jOptInt : Option Int → J
   | some i => .int i
   | none => .null
 
-def upsertCases : List FoldCase := [
-  ⟨"01-one", ["upsert.set"], [[r1]]⟩,
-  ⟨"02-fork", ["upsert.set", "upsert.order"], rotations [r1, r3]⟩,
-  ⟨"03-chain", ["upsert.set"], [[r1, r2]]⟩,
-  ⟨"04-chain-late", ["upsert.set"], [[r2, r1]]⟩,
-  ⟨"05-emitted-breaks-tie", ["upsert.order"], rotations [r3, r6]⟩,
-  ⟨"06-id-breaks-tie", ["upsert.order"], rotations [r6, r7]⟩,
-  ⟨"07-merge", ["upsert.set"], rotations [r1, r2, r3, r4]⟩,
-  ⟨"08-repeats", ["upsert.repeats"], [[r1, r3], [r1, r3, r1, r3], [r3, r1, r3]]⟩,
-  ⟨"09-converge", ["upsert.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
-  ⟨"10-two-keys", ["upsert.set"], rotations [r1, r5, r3]⟩,
-  ⟨"11-dangling-prev", ["upsert.set"], rotations [r5, r8]⟩
+def latestByCases : List FoldCase := [
+  ⟨"01-one", ["latest-by.set"], [[r1]]⟩,
+  ⟨"02-fork", ["latest-by.set", "latest-by.order"], rotations [r1, r3]⟩,
+  ⟨"03-chain", ["latest-by.set"], [[r1, r2]]⟩,
+  ⟨"04-chain-late", ["latest-by.set"], [[r2, r1]]⟩,
+  ⟨"05-emitted-breaks-tie", ["latest-by.order"], rotations [r3, r6]⟩,
+  ⟨"06-id-breaks-tie", ["latest-by.order"], rotations [r6, r7]⟩,
+  ⟨"07-merge", ["latest-by.set"], rotations [r1, r2, r3, r4]⟩,
+  ⟨"08-repeats", ["latest-by.repeats"], [[r1, r3], [r1, r3, r1, r3], [r3, r1, r3]]⟩,
+  ⟨"09-converge", ["latest-by.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
+  ⟨"10-two-things", ["latest-by.set"], rotations [r1, r5, r3]⟩,
+  ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩
 ]
+
+def headsCases : List FoldCase := [
+  ⟨"01-max-follows-prev", ["heads.set"], rotations [h1, h2, h3]⟩,
+  ⟨"02-superseded-max-leaves", ["heads.set"], rotations [h2, h3]⟩,
+  ⟨"03-limit-newest-first", ["heads.set"], rotations [r1, r2, r3, r5, r8]⟩
+]
+
+def jResult (r : Result (Option Int)) : J :=
+  .obj [("value", jOptInt r.value), ("unread", .num r.unread)]
+
+def jHeads (s : LatestBy) : J :=
+  .obj [("max", jResult s.maxHeads),
+    ("limit-2", .arr ((s.limit 2).map (.str ∘ idText ∘ (·.id))))]
+
+/-! ## View cases: what a reader without some payloads gets -/
+
+structure ViewCase where
+  name : String
+  laws : List String
+  records : List Record
+  /-- How the reader sees each record. -/
+  view : Record → Record
+
+def hideIds (ids : List Nat) : Record → Record := withholding (ids.contains ·.id)
+def eraseIds (ids : List Nat) (r : Record) : Record := if ids.contains r.id then r.erase else r
+
+def viewCases : List ViewCase := [
+  ⟨"01-withheld-head-still-supersedes", ["view.no-resurrection"], [r1, r2], hideIds [0x12]⟩,
+  ⟨"02-erased-head-still-supersedes", ["view.no-resurrection"], [r1, r2, r3, r4], eraseIds [0x14]⟩,
+  ⟨"03-withheld-ancestor", ["view.no-resurrection"], [r1, r2, r3, r4], hideIds [0x11, 0x12]⟩,
+  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [0x33]⟩
+]
+
+def jViewState (s : LatestBy) : J :=
+  .obj [("heads", .arr (s.heads.map fun h => .obj [("id", .str (idText h.id)), ("shown", jShown h.shown)])),
+    ("max", jResult s.maxHeads)]
+
+def viewVector (c : ViewCase) : Except String J := do
+  let orders := rotations (c.records.map c.view)
+  let results := orders.map fun o => jViewState (LatestBy.fold .empty o)
+  let first := results.headD .null
+  if !(results.all (·.render 0 == first.render 0)) then
+    throw s!"fold/view/{c.name}: arrival orders disagree"
+  -- a view sees the same heads as a reader holding everything
+  let full := (LatestBy.fold .empty c.records).heads.map (·.id)
+  if (LatestBy.fold .empty (c.records.map c.view)).heads.map (·.id) != full then
+    throw s!"fold/view/{c.name}: a view changed the heads"
+  return vector c.name "fold/view" c.laws
+    (.obj [("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
+
+/-! ## Select cases: `where` with three answers -/
+
+structure SelectCase where
+  name : String
+  laws : List String
+  records : List Record
+  /-- The test as a spec writes it, and as the model runs it. -/
+  test : J
+  w : Where
+
+def selectCases : List SelectCase := [
+  ⟨"01-payload-test-on-withheld", ["result.unread", "select.set"],
+    [n1, n2, n3.withhold],
+    .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩,
+  ⟨"02-envelope-test-on-withheld", ["result.unread", "select.set"],
+    [n1, n2, n3.withhold],
+    .obj [("kind", .obj [("is", .str "decision")])],
+    .envelope (·.kind == "decision") fun _ _ h => by rw [h.kind]⟩,
+  ⟨"03-all-here", ["result.full", "select.set"], [n1, n2, n3],
+    .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩
+]
+
+def jSum (r : Result Int) : J := .obj [("value", .int r.value), ("unread", .num r.unread)]
+def jCount (r : Result Nat) : J := .obj [("value", .num r.value), ("unread", .num r.unread)]
+
+def selectVector (c : SelectCase) : Except String J := do
+  let orders := rotations c.records
+  let results := orders.map fun o =>
+    J.obj [("count", jCount (Count.acc.select c.w.eval o)), ("sum", jSum (Sum.acc.select c.w.eval o))]
+  let first := results.headD .null
+  if !(results.all (·.render 0 == first.render 0)) then
+    throw s!"fold/select/{c.name}: arrival orders disagree"
+  return vector c.name "fold/select" c.laws
+    (.obj [("where", c.test), ("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
 
 def foldVector (layer : String) (c : FoldCase) (result : List Record → J) : Except String J := do
   let results := c.orders.map result
@@ -192,7 +262,7 @@ def orFail : Except String J → IO J
 
 def main (args : List String) : IO UInt32 := do
   let dir : System.FilePath := args.headD "../vectors"
-  for sub in ["fold", "lens", "record"] do
+  for sub in ["fold", "lens", "record", "spec", "batch", "realm"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
@@ -208,18 +278,37 @@ def main (args : List String) : IO UInt32 := do
   let extrema ← extremaCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/extrema" c fun o =>
       .obj [("min", jOptInt (Min.fold none o)), ("max", jOptInt (Max.fold none o))]))
-  let upsert ← upsertCases.mapM fun c => do
-    pure (c.name, ← orFail (foldVector "fold/upsert" c fun o => jUpsert (Upsert.fold .empty o)))
+  let latestBy ← latestByCases.mapM fun c => do
+    pure (c.name, ← orFail (foldVector "fold/latest-by" c fun o => jPerThing (perThing o)))
+  let heads ← headsCases.mapM fun c => do
+    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (LatestBy.fold .empty o)))
+  let views ← viewCases.mapM fun c => do pure (c.name, ← orFail (viewVector c))
+  let selects ← selectCases.mapM fun c => do pure (c.name, ← orFail (selectVector c))
   let lens ← lensCases.mapM fun c => do pure (c.name, ← orFail (lensVector c))
   let records ← match Gen.Records.vectors with
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
   writeAll dir "fold/count" count
-  writeAll dir "fold/upsert" upsert
+  writeAll dir "fold/latest-by" latestBy
   writeAll dir "fold/latest" latest
   writeAll dir "fold/sum" sum
   writeAll dir "fold/extrema" extrema
+  writeAll dir "fold/heads" heads
+  writeAll dir "fold/view" views
+  writeAll dir "fold/select" selects
   writeAll dir "lens/section" lens
   writeAll dir "record" records
-  IO.println s!"wrote {count.length + upsert.length + latest.length + sum.length + extrema.length + lens.length + records.length} vectors to {dir}"
+  let specs ← match Gen.SpecVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  for (sub, name, v) in specs do writeAll dir sub [(name, v)]
+  let batches ← match Gen.BatchVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "batch" batches
+  let realms ← match Gen.RealmVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "realm" realms
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length} vectors to {dir}"
   return 0

@@ -1,0 +1,15 @@
+{
+  "vector": "12-vertex-missing",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "fold": {}
+    }
+  },
+  "expect": {
+    "refused": "vertex-missing",
+    "path": "vertex"
+  }
+}

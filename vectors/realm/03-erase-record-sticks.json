@@ -1,0 +1,79 @@
+{
+  "vector": "03-erase-record-sticks",
+  "layer": "realm",
+  "laws": ["settle.set", "settle.erased"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:00000051",
+        "kind": "load",
+        "about": ["host:a"],
+        "value": "",
+        "prev": [],
+        "occurred": 100,
+        "emitted": 100,
+        "n": 40
+      },
+      {
+        "id": "r:00000051",
+        "kind": "load",
+        "about": ["host:a"],
+        "prev": [],
+        "occurred": 100,
+        "emitted": 100,
+        "shown": "erased"
+      },
+      {
+        "id": "r:00000052",
+        "kind": "erase",
+        "about": [],
+        "value": "",
+        "prev": [],
+        "occurred": 110,
+        "emitted": 110,
+        "erases": ["r:00000051"],
+        "n": 0
+      },
+      {
+        "id": "r:00000051",
+        "kind": "load",
+        "about": ["host:a"],
+        "value": "",
+        "prev": [],
+        "occurred": 100,
+        "emitted": 100,
+        "n": 40
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:00000051",
+        "shown": "erased"
+      },
+      {
+        "id": "r:00000052",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "host:a": {
+        "heads": ["r:00000051"],
+        "winner": "r:00000051",
+        "others": []
+      },
+      "r:00000052": {
+        "heads": ["r:00000052"],
+        "winner": "r:00000052",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 1
+    }
+  }
+}

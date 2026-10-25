@@ -1,0 +1,336 @@
+{
+  "vector": "03-withheld-successor",
+  "layer": "spec/run",
+  "laws": ["spec.set", "view.no-resurrection", "result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "tasks",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "open": {
+          "latest-by": "about",
+          "follow": "prev",
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        },
+        "newest": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 1
+        },
+        "every": {
+          "collect": true
+        },
+        "observations": {
+          "count": true
+        },
+        "open-observations": {
+          "count": true,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "est": {
+          "sum": "est"
+        },
+        "blocked": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "present": true
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:00000041",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:00000042",
+          "kind": "task",
+          "about": ["task:1"],
+          "prev": ["r:00000041"],
+          "occurred": 200,
+          "emitted": 200,
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000043",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:00000045",
+          "kind": "note",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 170,
+          "emitted": 170,
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:00000042",
+          "kind": "task",
+          "about": ["task:1"],
+          "prev": ["r:00000041"],
+          "occurred": 200,
+          "emitted": 200,
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000043",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:00000045",
+          "kind": "note",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 170,
+          "emitted": 170,
+          "n": 0
+        },
+        {
+          "id": "r:00000041",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:00000043",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:00000045",
+          "kind": "note",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 170,
+          "emitted": 170,
+          "n": 0
+        },
+        {
+          "id": "r:00000041",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:00000042",
+          "kind": "task",
+          "about": ["task:1"],
+          "prev": ["r:00000041"],
+          "occurred": 200,
+          "emitted": 200,
+          "shown": "withheld"
+        }
+      ],
+      [
+        {
+          "id": "r:00000045",
+          "kind": "note",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 170,
+          "emitted": 170,
+          "n": 0
+        },
+        {
+          "id": "r:00000041",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "occurred": 100,
+          "emitted": 100,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:00000042",
+          "kind": "task",
+          "about": ["task:1"],
+          "prev": ["r:00000041"],
+          "occurred": 200,
+          "emitted": 200,
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000043",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "occurred": 150,
+          "emitted": 150,
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "open": {
+      "things": {
+        "task:2": [
+          {
+            "id": "r:00000043",
+            "shown": "here"
+          }
+        ]
+      },
+      "unread": 1
+    },
+    "current": {
+      "things": {
+        "task:1": [
+          {
+            "id": "r:00000042",
+            "shown": "withheld"
+          }
+        ],
+        "task:2": [
+          {
+            "id": "r:00000043",
+            "shown": "here"
+          }
+        ]
+      },
+      "unread": 0
+    },
+    "newest": {
+      "heads": [
+        {
+          "id": "r:00000042",
+          "shown": "withheld"
+        }
+      ],
+      "unread": 0
+    },
+    "every": {
+      "heads": [
+        {
+          "id": "r:00000042",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:00000043",
+          "shown": "here"
+        },
+        {
+          "id": "r:00000041",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "observations": {
+      "value": 3,
+      "unread": 0
+    },
+    "open-observations": {
+      "value": 2,
+      "unread": 1
+    },
+    "est": {
+      "value": 8,
+      "unread": 1
+    },
+    "blocked": {
+      "value": 1,
+      "unread": 1
+    }
+  }
+}
