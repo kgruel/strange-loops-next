@@ -148,10 +148,10 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `lens.escaping` | `escaping` | any body survives rendering and parsing | `lens/section/02` |
+| `lens.escaping` | `escaping`, `unescape_keeps` | any body survives rendering and parsing; reading drops a backslash only where rendering would have written one | `lens/section/02`, `10` |
 | `lens.round-trip` | `parse_render` | `parse (render d) = some d` | `lens/section/01` |
 | `lens.no-op` | `no_op` | the unedited render gives no outcomes | `lens/section/03` |
-| `lens.put-get` | `put_get`, `put_get_text` | an edit that keeps the sections in order applies exactly, up to normal form | `lens/section/04` |
+| `lens.put-get` | `put_get`, `put_get_text` | an edit that keeps the sections in order applies exactly, up to normal form | `lens/section/04`, `10` |
 | `lens.nothing-dropped` | `nothing_dropped`, `absence_reported` | every section is unchanged, accepted or reported; every dropped one is reported | `lens/section/05`, `06` |
 | `lens.absence-not-edit` | `absence_not_edit` | a dropped section changes nothing | `lens/section/06` |
 | normal form | `normalize_idem` | normalizing twice is normalizing once | every lens vector |

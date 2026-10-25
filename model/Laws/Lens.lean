@@ -4,7 +4,9 @@ import Loops.Lens
 # Laws of the keyed-section lens
 
 * **Escaping.** Any body survives rendering and parsing, whatever it holds:
-  fences, headers, backslashes.
+  fences, headers, backslashes. Reading drops a backslash only where
+  rendering would have written one, so `\\hello` typed into a body stays
+  `\\hello` (`unescape_keeps`).
 * **Round trip.** `parse (render d) = some d`, for every document.
 * **No-op.** Rendering the base and reading it back gives no outcomes.
 * **Put-get.** When an edit keeps the base's sections in order, applying its
@@ -24,7 +26,7 @@ open List
 theorem unescape_escape (l : Line) : unescape (escape l) = l := by
   unfold escape
   split
-  · rfl
+  · rename_i h; simp [unescape, h]
   · rename_i h
     match l, h with
     | [], _ => rfl
@@ -32,6 +34,19 @@ theorem unescape_escape (l : Line) : unescape (escape l) = l := by
       have : c ≠ '\\' := by
         intro e; subst e; simp [reserved] at h
       simp [unescape, this]
+
+/-- Reading a line changes it only by removing the backslash that escapes a
+line needing one. -/
+theorem unescape_keeps (l : Line) : unescape l = l ∨ (l = '\\' :: unescape l ∧ reserved (unescape l)) := by
+  match l with
+  | [] => simp [unescape]
+  | c :: cs =>
+    by_cases hc : c = '\\'
+    · subst hc
+      by_cases hr : reserved cs
+      · right; simp [unescape, hr]
+      · left; simp [unescape, hr]
+    · left; simp [unescape, hc]
 
 theorem escape_take (l : Line) : (escape l).take 3 ≠ fence := by
   unfold escape
