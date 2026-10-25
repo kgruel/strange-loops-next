@@ -1,0 +1,296 @@
+<section class="panel" id="meaning" role="tabpanel" aria-labelledby="t-meaning">
+  <div class="panel-head"><h2>Layer 1: vertex and store</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist"><b>A store is a thing you write into; a vertex is a question you ask.</b> A store is a lineage defined by records about itself; a vertex is named by the hash of its spec. Neither owns the other.</p>
+  <p>Today's <code>.vertex</code> file mixes four jobs: where records live, who produces them, which records to select, and what they mean. Split apart, a vertex keeps only meaning (inputs, a time axis, folds, a boundary) and writes ticks that cover exact records. A store becomes its own thing: an anchor id, declarations as records inside it, and places kept per machine. Names resolve through the same tables as observers. Declarations are dated and nothing is rewritten, so a store gets a schema without migrations and can mature from open to strict.</p>
+  <div class="callout"><p><b>The contract:</b> <code>state = fold(spec, select(records))</code>. Same set, same spec, same state, wherever it runs and in whatever order the records are read. Every choice on this tab exists to keep that true.</p></div>
+  <p><span class="pill p-ok">layer closed</span> Tick questions move to layer 2 and thing identity to composition. See <a href="#cases" data-tab="cases">Cases</a> for the novel, orchestration and team stores.</p>
+
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 420" role="img" aria-label="Observers write into a store, st:91…, which holds its anchor and declarations plus a set of records; its places are local per machine. A vertex reads from the store by name and applies select, order, fold and boundary. Its state goes through a lens to an observer; its ticks go into a store or another vertex.">
+        <rect class="box-acc" x="140" y="4" width="120" height="30" rx="8"/><text x="200" y="24" text-anchor="middle" class="s b">observers</text>
+        <line class="ln" x1="200" y1="36" x2="200" y2="57" marker-end="url(#ah)"/><text x="208" y="51" class="xs m">write</text>
+        <rect class="panel" x="0" y="60" width="400" height="104" rx="10"/>
+        <text x="14" y="82" class="b">store</text><text x="56" y="82" class="mono m">st:91…</text>
+        <rect class="box" x="14" y="92" width="180" height="30" rx="7"/><text x="104" y="112" text-anchor="middle" class="s">anchor · declarations</text>
+        <rect class="box" x="206" y="92" width="180" height="30" rx="7"/><text x="296" y="112" text-anchor="middle" class="s">records (a set)</text>
+        <text x="14" y="150" class="xs m">places, per machine: file · git · S3 · bundle</text>
+        <line class="ln" x1="200" y1="166" x2="200" y2="193" marker-end="url(#ah)"/><text x="208" y="184" class="mono m">from "notes"</text>
+        <rect class="box-acc" x="0" y="196" width="400" height="124" rx="10"/>
+        <text x="14" y="218" class="b">vertex</text><text x="64" y="218" class="mono ta">vx:…</text>
+        <text x="14" y="242" class="s b">select</text><text x="86" y="242" class="mono">kind · observer · about · ticks</text>
+        <text x="14" y="264" class="s b">order</text><text x="86" y="264" class="mono">occurred → emitted → id</text>
+        <text x="14" y="286" class="s b">fold</text><text x="86" y="286" class="mono">closed vocabulary</text>
+        <text x="14" y="308" class="s b">boundary</text><text x="86" y="308" class="mono">content or operational</text>
+        <line class="ln" x1="109" y1="322" x2="109" y2="351" marker-end="url(#ah)"/><text x="117" y="341" class="xs m">state</text>
+        <rect class="box" x="14" y="354" width="190" height="34" rx="8"/><text x="109" y="376" text-anchor="middle" class="s">lens → observer</text>
+        <line class="ln-amb" x1="298" y1="322" x2="298" y2="351" marker-end="url(#ah-amb)"/><text x="306" y="341" class="xs tb">tick</text>
+        <rect class="box-amb" x="210" y="354" width="176" height="34" rx="8"/><text x="298" y="376" text-anchor="middle" class="s">into a store or a vertex</text>
+        <text x="14" y="408" class="xs m">acting on it is a new record</text>
+        <text x="210" y="408" class="xs m">covers exact ids; can be re-folded</text>
+      </svg>
+    </div>
+    <figcaption>Writing and reading meet only at the store's records. The vertex never learns where they live; the store never learns what they mean.</figcaption>
+  </figure>
+
+  <h3>The vertex: a question</h3>
+  <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--line);padding:12px;border-radius:10px;overflow-x:auto">{
+  "vertex": "decisions",
+  "note": "Decisions from notes and from the RFC store at home; review ticks arrive directly.",
+  "from": [
+    { "store": "notes",    "kind": ["decision"] },
+    { "store": "rfc@home", "kind": ["decision"] }
+  ],
+  "ticks": ["review"],
+  "into": "notes",
+  "order": "occurred",
+  "fold": { "by-topic": { "latest-by": "topic" } },
+  "boundary": [{ "when": "release" }]
+}</pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Selects by</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>kind</td><td><code>"kind": ["decision"]</code></td></tr>
+      <tr><td>observer</td><td><code>"observer": ["sl:7f"]</code> (resolved from a name when written)</td></tr>
+      <tr><td>thing</td><td><code>"about": "url:example.com/x"</code></td></tr>
+      <tr><td>ticks from a vertex</td><td><code>"ticks": ["review"]</code></td></tr>
+      <tr><td>another vertex's state</td><td><code>"admitted-by": "auth"</code>: admission without special machinery</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Rule:</b> selection looks only at what a record carries, never at which store it came from or when it arrived.</p>
+
+  <details class="unfold"><summary>Folds: two families, and neither needs records in order</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Accumulating</th><th>Over heads</th></tr></thead>
+      <tbody>
+        <tr><td>Count, Sum, Min, Max, and Collect without <code>follow</code></td><td>LatestBy, and any fold with <code>"follow": "prev"</code></td></tr>
+        <tr><td>Compact state; the step is commutative</td><td>The state is the heads (records nothing names in <code>prev</code>) and every id named; the answer is worked out from them</td></tr>
+      </tbody>
+    </table></div>
+    <p>Both are proved to depend only on the set of records, so a record landing late folds onto the cached state. Content order still decides which record wins, newest head first; it is never a rule about arrival. Supersession is why the second family exists: a new record can push an old one out of a top five, or retire the current maximum, and only the heads know what comes back. <code>limit</code> and <code>order</code> apply when the answer is read. A coarse <code>occurred</code> like <code>2009~</code> normalizes to a range and sorts by its start.</p>
+  </div></details>
+  <details class="unfold"><summary>Boundaries: content vs operational</summary><div class="body">
+    <p>Today a boundary fires "when a record of kind X <i>arrives</i>": receipt order in disguise.</p>
+    <ul>
+      <li><b>Content boundaries</b> are defined by what records say: "at the record of kind <code>release</code>", "each calendar day of <code>occurred</code>". Deterministic: anyone folding the same set gets the same cycles.</li>
+      <li><b>Operational boundaries</b>, like "every N prompts", "on demand" or "after 20 records", are honestly events in time.</li>
+    </ul>
+    <p>Either way the tick lists exactly what it covered. A late record simply wasn't in that tick. A tick is the vertex's own observation: "when I ticked, I had these, and they folded to this."</p>
+    <details class="source"><summary>Today's boundary</summary><div class="body"><p><code>libs/atoms/src/atoms/boundary.py</code>: modes <code>when</code> (on kind arrival), <code>after</code> and <code>every</code> (counts), with <code>reset</code>, payload <code>match</code>, fold-state <code>conditions</code> and a <code>run</code> hook.</p></div></details>
+  </div></details>
+  <details class="unfold"><summary>Verifiable ticks</summary><div class="body">
+    <p>If a tick carries the spec's hash, the ids it covers and the folded result, anyone holding those records can fold them again and check the result, much like a reproducible build. Its payload then splits in two: the <b>fold result</b>, which can be checked, and <b>attachments</b> (like the orchestrator's message to you), which are signed claims.</p>
+    <p>This only works with a closed, deterministic fold vocabulary, which is a strong reason to keep it closed and versioned. Who signs: nobody, for a content tick, which is a value anyone can recompute. When it's stored, whoever stores it signs the tick record, and the target store's writer policy admits that observer. The vertex holds no key (settled in version 32).</p>
+  </div></details>
+  <details class="unfold"><summary>Fold or lens?</summary><div class="body">
+    <p><b>Fold:</b> anything another vertex depends on, or that must be reproducible. Salience weights qualify, since the stale-review boundary uses them. <b>Lens:</b> anything that exists only for display or is compiled for one reader, like rendering the system prompt. A lens never writes; acting on what it shows is a new observation.</p>
+  </div></details>
+
+  <h3>The store: a thing you write into</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 182" role="img" aria-label="A store has three parts. Identity, in the store as its first record: st:91… equals the hash of its anchor. Declarations, in the store as records: kinds, shapes and writers. Places, per machine and never shared: file, git, S3 or bundle.">
+        <rect class="box-acc" x="0" y="0" width="400" height="52" rx="9"/>
+        <text x="14" y="22" class="b">identity</text><text x="14" y="40" class="xs m">in the store · first record</text>
+        <text x="170" y="31" class="mono ta">st:91… = hash(anchor)</text>
+        <rect class="box-acc" x="0" y="64" width="400" height="52" rx="9"/>
+        <text x="14" y="86" class="b">declarations</text><text x="14" y="104" class="xs m">in the store · records</text>
+        <text x="170" y="95" class="mono ta">kinds · shapes · writers</text>
+        <rect class="box dash" x="0" y="128" width="400" height="52" rx="9"/>
+        <text x="14" y="150" class="b">places</text><text x="14" y="168" class="xs m">per machine · never shared</text>
+        <text x="170" y="159" class="mono">file · git · S3 · bundle</text>
+      </svg>
+    </div>
+    <figcaption>Replication means one id with several places. Copying a store to git or a colleague's laptop never changes what it is.</figcaption>
+  </figure>
+  <details class="unfold"><summary>The three parts, as files</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># .loops/anchor: the store's first record, whose id is st:91…
+{"kind":"store-anchor", "observer":"sl:a1", "name":"notes", "stewards":["sl:a1"]}
+
+# .loops/store.json: a render of the declarations, which are dated records in the store
+{
+  "store": "notes",
+  "kinds": { "decision": { "fields": { "topic": "string", "status": "string" } } },
+  "writers": [{ "allow": "sl:a1" }, { "allow": "sl:7f", "require-under": true }]
+}
+
+# ~/.config/loops/places.json: this machine only
+{ "stores": { "st:91…": [
+    { "place": "laptop", "path": "/Users/kyle/work/platform/.loops" },
+    { "place": "origin", "url": "git+ssh://git.acme/platform.git#.loops" } ] } }</pre>
+    <p>A name resolves in three hops, as for observers: <code>"rfc@home"</code> → name table → <code>st:4c…</code> → this machine's places → a path. Store and observer names share the same tables.</p>
+  </div></details>
+
+  <h3>Schema without migration</h3>
+  <p>A declaration applies from the time it's written. A record written before a shape existed isn't invalid; it's from before that shape. Changing a shape is a new declaration: nothing is migrated, and the shape's history stays in the store. The default rule is <b>accretion</b>: add fields and kinds, never break them. A breaking change becomes a new kind, or an explicit <code>retire</code>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Maturity</th><th>Policy records say</th><th>Undeclared kind or writer</th></tr></thead>
+    <tbody>
+      <tr><td><b>open</b></td><td>none</td><td>accepted (solo repo, scratch work)</td></tr>
+      <tr><td><b>declared</b></td><td>kinds and shapes</td><td>accepted, flagged as undeclared</td></tr>
+      <tr><td><b>strict</b></td><td><code>policy strict</code></td><td>not admitted; kept as a visible rejection</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><p><b>"Strict" can't mean writes are impossible.</b> In a replicated set, anyone can append to their own segment. Enforcement at write is a courtesy; admission at read is the real thing. A strict store stops a bad record from counting, not from existing, and keeps what was attempted visible.</p></div>
+  <details class="unfold"><summary>Why this ends project-vertex drift</summary><div class="body">
+    <p>Project vertex files used to scatter across repos and drift silently, because each copy was its own file. Declarations that live <i>in</i> the store travel with every replica, and replication is union, so copies can't silently differ. Concurrent conflicting declarations become a visible conflict in the data, settled by the stewards named in the anchor.</p>
+    <p>A kind stays a label, not a type. Declarations are records <i>about</i> kinds, so an undeclared observation is still a valid observation, and a store is usable before anyone designs anything.</p>
+    <details class="source"><summary>Prior art</summary><div class="body"><ul>
+      <li>Datomic: schema is data in the database itself, and grows by adding.</li>
+      <li>Rich Hickey, "Spec-ulation" (Clojure/conj 2016): grow by accretion, never break.</li>
+      <li>Schema registries with compatibility rules (Avro, Protobuf) and event-sourcing "upcasting".</li>
+    </ul></div></details>
+  </div></details>
+
+  <h3>One life cycle, several things</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Thing</th><th>Anchor gives</th><th>Later records describe</th></tr></thead>
+    <tbody>
+      <tr><td><b>Observer</b></td><td><code>sl:…</code></td><td>names, keys, runs-on, stances</td></tr>
+      <tr><td><b>Store</b></td><td><code>st:…</code></td><td>declared kinds, writer policy, stewards</td></tr>
+      <tr><td>Vertex</td><td>—</td><td>not a lineage: <code>vx:…</code> is the hash of its spec and parameters, and a name points at the current one</td></tr>
+      <tr><td>Tick</td><td>—</td><td>a value; stored as an ordinary signed record when cited</td></tr>
+    </tbody>
+  </table></div>
+  <p>Not a generic entity type: just "records about a thing, folded", applied consistently.</p>
+
+  <h3>Composing: the salience feed</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Three stores, safari, likes and feeds, each with its own kinds. The salience vertex maps visit to attention, like to marked and item to available, collates by thing, folds, and on a daily boundary writes a tick into a digest store. The tick covers by hash, so browsing history stays private.">
+        <rect class="box" x="8" y="8" width="120" height="32" rx="8"/><text x="68" y="29" text-anchor="middle" class="s b">safari</text>
+        <rect class="box" x="140" y="8" width="120" height="32" rx="8"/><text x="200" y="29" text-anchor="middle" class="s b">likes</text>
+        <rect class="box" x="272" y="8" width="120" height="32" rx="8"/><text x="332" y="29" text-anchor="middle" class="s b">feeds</text>
+        <text x="68" y="60" text-anchor="middle" class="mono ta" style="font-size:10px">visit → attention</text>
+        <text x="200" y="60" text-anchor="middle" class="mono ta" style="font-size:10px">like → marked</text>
+        <text x="332" y="60" text-anchor="middle" class="mono ta" style="font-size:10px">item → available</text>
+        <line class="ln" x1="68" y1="68" x2="150" y2="95" marker-end="url(#ah)"/>
+        <line class="ln" x1="200" y1="68" x2="200" y2="95" marker-end="url(#ah)"/>
+        <line class="ln" x1="332" y1="68" x2="250" y2="95" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="80" y="98" width="240" height="60" rx="9"/>
+        <text x="200" y="122" text-anchor="middle" class="b">salience vertex</text>
+        <text x="200" y="142" text-anchor="middle" class="xs">collate by thing · fold · daily boundary</text>
+        <line class="ln-amb" x1="200" y1="160" x2="200" y2="191" marker-end="url(#ah-amb)"/><text x="208" y="180" class="xs tb">tick</text>
+        <rect class="box" x="110" y="194" width="180" height="34" rx="8"/><text x="200" y="216" text-anchor="middle" class="s b">store: digest</text>
+        <text x="200" y="252" text-anchor="middle" class="xs m">covers by hash: the browsing history stays private</text>
+      </svg>
+    </div>
+    <figcaption>Each store keeps its own kinds. Each <code>from</code> maps them into the vertex's own vocabulary, so stores built for different purposes feed one question.</figcaption>
+  </figure>
+  <details class="unfold"><summary>The salience vertex, and what it depends on</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{
+  "vertex": "salience",
+  "from": [
+    { "store": "safari", "kind": ["visit"], "as": "attention" },
+    { "store": "likes",  "kind": ["like"],  "as": "marked" },
+    { "store": "feeds",  "kind": ["item"],  "as": "available" }
+  ],
+  "order": "occurred",
+  "fold": {
+    "attention": { "sum": "dwell", "by": "about", "where": { "kind": { "is": "attention" } } },
+    "marked":    { "count": true,  "by": "about", "where": { "kind": { "is": "marked" } } },
+    "available": { "collect": true, "set": true, "by": "about", "where": { "kind": { "is": "available" } } }
+  },
+  "boundary": [{ "every": "day", "axis": "occurred" }],
+  "into": "digest"
+}</pre>
+    <ul>
+      <li><b>Kinds are scoped to their store.</b> Two stores may both declare <code>visit</code> with different shapes. <code>as</code> maps each input into the vertex's own vocabulary.</li>
+      <li><b>Collating needs thing identity.</b> The same essay must be recognized across Safari, likes and RSS. This open question just became central. Lean: a normalization rule (such as URL canonicalization) declared per kind in the store, plus <code>same-as</code> observations for the hard cases.</li>
+      <li><b>Writing <code>into</code> another store makes whoever runs the vertex a writer there.</b> The tick record is theirs, signed with their key and admitted by that store's policy; the vertex itself holds no key.</li>
+      <li><b>Across realms, <code>into</code> is a bridge</b> and must say so explicitly. Within a realm it's ordinary.</li>
+    </ul>
+  </div></details>
+
+  <h3>Verbs and nouns</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Verb</th><th>Who</th><th>Produces</th></tr></thead>
+    <tbody>
+      <tr><td><b>observe</b></td><td>an observer, in the world</td><td>nothing yet: perception, outside the system</td></tr>
+      <tr><td><b>emit</b></td><td>an observer</td><td>a record (the write primitive)</td></tr>
+      <tr><td><b>tick</b></td><td>a vertex</td><td>a tick</td></tr>
+      <tr><td><b>fold</b></td><td>a vertex</td><td>state</td></tr>
+      <tr><td><b>render</b></td><td>a lens</td><td>a view for someone</td></tr>
+    </tbody>
+  </table></div>
+  <p>"Observation" is a noun: the most common kind of record, not the only one. A <code>visit</code> claims something about the world and can be true or false. A <code>declare</code>, <code>grant</code>, <code>name</code> or <code>adopt</code> describes nothing: saying it, in a store that recognizes it, makes it so, but only if the author has standing.</p>
+  <details class="unfold"><summary>Reserved kinds, and speech acts</summary><div class="body">
+    <p>The core reads a short, closed list of reserved kinds: <code>*-anchor</code>, <code>name</code>, <code>declare</code>, <code>policy</code>, <code>grant</code>, <code>vouch</code>, the stances (<code>affirm</code>, <code>adopt</code>, <code>dispute</code>, <code>retire</code>, <code>promote</code>) and <code>spec</code>. This list is to the core what the fold list is to vertices. Every other kind is yours, and the core never interprets it.</p>
+    <p>Speech act theory names the split: <i>constatives</i> state something; <i>performatives</i> do something by being said. A performative only works if its "felicity conditions" hold, such as the speaker having standing. A policy record from a non-steward is emitted, kept and visible, but has no effect: admission is the felicity check.</p>
+    <details class="source"><summary>Prior art</summary><div class="body"><ul>
+      <li>J. L. Austin, <i>How to Do Things with Words</i> (1962)</li>
+      <li>John Searle, <i>Speech Acts</i> (1969)</li>
+    </ul></div></details>
+  </div></details>
+
+  <h3>Pressure-testing the fold vocabulary</h3>
+  <p>The cases asked a lot of the closed vocabulary. It holds, with two parameters instead of new folds.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Need</th><th>Handled by</th></tr></thead>
+    <tbody>
+      <tr><td>order by chapter or story time</td><td><code>order field=…</code>, a parameter</td></tr>
+      <tr><td>"all children ticked"</td><td>a boundary condition on folded state (exists today)</td></tr>
+      <tr><td>a set, not a list</td><td>an explicit set mode on <code>Collect</code></td></tr>
+      <tr><td>weighting by observer</td><td><b>new:</b> <code>weight-by=&lt;vertex&gt;</code> on Collect's ranking (and so TopN), reading another vertex's state like <code>admitted-by</code>. Never on Sum, where it would change the number rather than the order, and never on Latest: Latest is succession, and weighting it would bury new observations under old seniority.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Without <code>weight-by</code>, weighted questions would need joins, and joins would open the vocabulary.</p>
+
+  <h3>Cycles: the strange loop, made safe</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 170" role="img" aria-label="Left: state references form a DAG. The knowledge vertex is admitted-by auth and weighted-by tenure; no cycles, because there is no time step. Right: ticks may loop. A vertex reads a store and ticks back into it; each turn is a new dated record.">
+        <rect class="panel" x="0" y="0" width="192" height="166" rx="10"/>
+        <text x="12" y="22" class="s b">state references: a DAG</text>
+        <rect class="box" x="12" y="40" width="76" height="28" rx="6"/><text x="50" y="58" text-anchor="middle" class="xs">auth</text>
+        <rect class="box" x="104" y="40" width="76" height="28" rx="6"/><text x="142" y="58" text-anchor="middle" class="xs">tenure</text>
+        <rect class="box-acc" x="50" y="112" width="92" height="30" rx="6"/><text x="96" y="131" text-anchor="middle" class="xs b">knowledge</text>
+        <line class="ln" x1="54" y1="70" x2="82" y2="109" marker-end="url(#ah)"/>
+        <line class="ln" x1="138" y1="70" x2="110" y2="109" marker-end="url(#ah)"/>
+        <text x="12" y="96" class="xs m">admitted-by</text>
+        <text x="180" y="96" text-anchor="end" class="xs m">weight-by</text>
+        <text x="12" y="160" class="xs m">no cycles: there's no time step</text>
+        <rect class="panel" x="208" y="0" width="192" height="166" rx="10"/>
+        <text x="220" y="22" class="s b">ticks: may loop</text>
+        <rect class="box" x="232" y="40" width="140" height="28" rx="6"/><text x="302" y="58" text-anchor="middle" class="xs">store</text>
+        <rect class="box-acc" x="232" y="108" width="140" height="28" rx="6"/><text x="302" y="126" text-anchor="middle" class="xs b">vertex</text>
+        <line class="ln" x1="256" y1="70" x2="256" y2="105" marker-end="url(#ah)"/><text x="262" y="92" class="xs m">read</text>
+        <line class="ln-amb" x1="348" y1="106" x2="348" y2="71" marker-end="url(#ah-amb)"/><text x="342" y="92" text-anchor="end" class="xs tb">tick</text>
+        <text x="220" y="160" class="xs m">each turn: a new dated record</text>
+      </svg>
+    </div>
+    <figcaption>Feedback through ticks is the strange loop itself, and it's sound because ticking is a discrete step. Its danger is self-reinforcing salience: referenced, so surfaced, so referenced more. The stale review that inverts salience is the built-in counterweight.</figcaption>
+  </figure>
+
+  <h3>Decisions and open threads</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Item</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>state = fold(spec, select(records))</code> holds wherever it runs</td><td><span class="pill p-ok">settled</span></td></tr>
+      <tr><td>A kind stays a label; declarations are records about kinds</td><td><span class="pill p-ok">settled</span></td></tr>
+      <tr><td>A vertex owns neither storage nor sources</td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>Store = anchor id + declarations as records + local places</td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>Store and observer names share the name tables</td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>Schema by accretion; a breaking change is a new kind</td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>Maturity open → declared → strict, enforced at admission</td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>A vertex reads many stores and maps their kinds with <code>as</code></td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>Stewards named in the anchor govern policy</td><td><span class="pill p-sk">proposed</span></td></tr>
+      <tr><td><code>emit</code> and <code>tick</code> are the write verbs; a closed list of reserved kinds</td><td><span class="pill p-lean">leaning</span></td></tr>
+      <tr><td>Specs are templates; a vertex is a spec plus parameters, named by their hash</td><td><span class="pill p-ok">settled</span></td></tr>
+      <tr><td>Fold vocabulary holds: <code>order field=</code>, <code>Collect</code> set mode, <code>weight-by</code></td><td><span class="pill p-ok">settled</span></td></tr>
+      <tr><td>State references form a DAG; ticks may loop</td><td><span class="pill p-ok">settled</span></td></tr>
+      <tr><td>Weights are records, applied by a vertex; rank, never hide</td><td><span class="pill p-ok">settled</span></td></tr>
+      <tr><td>Should a store carry its standard vertices as records? (Orchestration says templates can live in a store.)</td><td><span class="pill p-lean">leaning yes</span></td></tr>
+      <tr><td>Verifiable ticks; who signs a tick (whoever stores it); <code>into</code> vs a store per vertex</td><td><span class="pill p-next">→ layer 2</span></td></tr>
+      <tr><td>Thing identity across stores</td><td><span class="pill p-next">→ composition</span></td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>What layer 1 needs from a store, and zero-config</summary><div class="body">
+    <p>Only three things: list the records, get one by id, and give what's new since a checkpoint. Segments, git, SQLite and S3 all sit below that line, in layer 4. It's the narrow contract Arrival was reaching for, but read-only and with no head.</p>
+    <p>For the solo case, <code>loops emit</code> walks up from the current directory to find <code>.loops/</code>, the way git finds <code>.git</code>. The first emit writes the anchor. Vertices in <code>.loops/vertices/</code> default to <code>from "."</code> and <code>into "."</code>, which keeps the "agents emit during work" experience that worked.</p>
+    <details class="source"><summary>Today's vertex files</summary><div class="body"><ul>
+      <li><code>apps/loops/session.vertex</code>: <code>name</code>, <code>store</code> path, <code>loops</code> with folds</li>
+      <li><code>libs/lang/tests/fixtures/system.vertex</code>: adds <code>discover "./**/*.loop"</code>, <code>routes</code>, <code>boundary when=</code>, <code>emit</code></li>
+    </ul></div></details>
+  </div></details>
+</section>

@@ -1,0 +1,131 @@
+<section class="panel" id="glossary" role="tabpanel" aria-labelledby="t-glossary">
+  <div class="panel-head"><h2>Glossary</h2></div>
+  <p class="gist">One word per concept, one concept per word. Every public name in the <code>loops</code> crate appears here, and every word here means one thing across the page and the code. Plain words win; <b>vertex</b> is the one word kept from the strange-loop vocabulary, on purpose.</p>
+
+  <h3>Records</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>record</b></td><td>The unit of everything: an envelope, a payload and a signature, named by a content hash. An observation, never a statement of truth.</td></tr>
+        <tr><td><b>emit</b></td><td>To write a record. One of the two write verbs; the other is <i>tick</i>.</td></tr>
+        <tr><td><b>envelope</b></td><td>The fields the core reads: <code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code>, <code>prev</code>, <code>under</code>. A field belongs here only if the core reads it.</td></tr>
+        <tr><td><b>payload</b></td><td>Everything else. The core never interprets it; folds read typed fields from it.</td></tr>
+        <tr><td><b>kind</b></td><td>A record's label. It stays a label, not a type; declarations describe it.</td></tr>
+        <tr><td><b>observer</b></td><td>Whoever says "I saw": a lineage id on every record. A collector is an observer reporting hearsay.</td></tr>
+        <tr><td><b>emitted · occurred</b></td><td>Two times. <code>emitted</code> is when the observer wrote it; <code>occurred</code> is the claimed span, and may be coarse.</td></tr>
+        <tr><td><b>about</b></td><td>The things a record is about: a set, usually one.</td></tr>
+        <tr><td><b>prev</b></td><td>The records this one replaces, within the things both are about: a set. Empty starts a chain; two or more merge. It may name only records the writer holds about a shared thing.</td></tr>
+        <tr><td><b>under</b></td><td>The grant a record relies on.</td></tr>
+        <tr><td><b>commitment · salt</b></td><td>The payload's hash, salted so a withheld payload can't be guessed. Opening it means showing the payload and the salt.</td></tr>
+        <tr><td><b>erasure</b></td><td>Removing a payload but keeping its commitment, so the id and every tick that cites it still hold.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>Things and identity</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>thing</b></td><td>Whatever records are about: a chapter, a service, a URL, a person. Each thing has its own state; a record about nothing lives in one thing of its own.</td></tr>
+        <tr><td><b>anchor</b></td><td>The record a thing or a lineage starts with; its id is the identity. Primitives start with the reserved <code>*-anchor</code> kinds.</td></tr>
+        <tr><td><b>natural key</b></td><td>A typed key that needs no anchor, such as <code>url:</code>, <code>isbn:</code> or <code>svc:</code>. Anyone computes the same one.</td></tr>
+        <tr><td><b>birth key</b></td><td>The natural key for code: the symbol as it was in the commit that created it.</td></tr>
+        <tr><td><b>lineage</b></td><td>A stable identity under changing names and keys: the hash of its anchor. Observers and stores are lineages; a vertex is named by its spec's hash instead.</td></tr>
+        <tr><td><b>name · name table · <code>@home</code></b></td><td>Names resolve at read through name tables and never take part in matching. <code>@home</code> is the table your realm starts from.</td></tr>
+        <tr><td><b>same-as · dispute</b></td><td>The two identity kinds: these are one thing, or they are not.</td></tr>
+        <tr><td><b>resolve-by</b></td><td>How a vertex joins identities: it folds same-as and dispute records into classes.</td></tr>
+        <tr><td><b>facet</b></td><td>One kind about one thing, emitted whole; the current state is the latest per kind.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>Meaning</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>store</b></td><td>A set of records with its own anchor and declarations. It holds records; it owns no meaning.</td></tr>
+        <tr><td><b>declaration · maturity</b></td><td>Records in a store describing its kinds, writers and policy. A store matures from open to declared to strict.</td></tr>
+        <tr><td><b>vertex</b></td><td>A standing question over stores: it selects, folds and ticks, and its ticks feed higher vertices. Where loops meet, which nothing else names, so it keeps its word from the original vocabulary.</td></tr>
+        <tr><td><b>spec</b></td><td>A vertex's definition: inputs, folds, a boundary. One spec can be instantiated as several vertices, each named by the hash of the spec and its parameters. Written as JSON, stored as a record of kind <code>vertex</code>; its <code>note</code> explains it and stays out of the input key.</td></tr>
+        <tr><td><b>fold</b></td><td>Turning a set of records into state, with one of six: Count, Sum, Min, Max, LatestBy, Collect. Accumulating folds are commutative; folds over heads follow <code>prev</code>. Latest, TopN and Window are modifiers of these, and Avg is left to the lens.</td></tr>
+        <tr><td><b>head</b></td><td>A record nothing about the same thing names in <code>prev</code>: a thing's current record. A thing with several heads is forked, shown as a conflict. Heads are worked out from envelopes alone, over everything the reader holds.</td></tr>
+        <tr><td><b>content order</b></td><td>How a fold decides which record wins: taken from what records carry, never from arrival. No fold needs records read in this order.</td></tr>
+        <tr><td><b>predicate</b></td><td>Wherever a spec says which records, or when to tick. A closed, typed set.</td></tr>
+        <tr><td><b>boundary · marker</b></td><td>When a vertex ticks. A marker is a record whose arrival is that moment.</td></tr>
+        <tr><td><b>tick</b></td><td>A vertex's result at a moment, covering exactly the records it folded. Also the verb: a vertex ticks at each boundary. A <b>content tick</b> is a value anyone can recompute, with an id over its vertex, covers and result; it is stored, when cited or sent, as a record of kind <code>tick</code> signed by its writer. A <b>witness tick</b> is such a record saying what the runner had.</td></tr>
+        <tr><td><b>covers</b></td><td>The records a tick folded, listed exactly; also its field, <code>covers=(…)</code>.</td></tr>
+        <tr><td><b>as of</b></td><td>The cut a fold is taken at, for either time. Always an input, never the clock.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>Standing</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>standing</b></td><td>Whether a record takes effect, given who signed it.</td></tr>
+        <tr><td><b>admission</b></td><td>The standing check, made at read: a record without standing stays visible but has no effect.</td></tr>
+        <tr><td><b>stance</b></td><td>A record that affirms, adopts, disputes, retires or authorizes another.</td></tr>
+        <tr><td><b>steward</b></td><td>An observer with standing over a store's declarations and policy.</td></tr>
+        <tr><td><b>grant</b></td><td>Standing given ahead of time, with a scope. Agents act within it.</td></tr>
+        <tr><td><b>presence</b></td><td>A person present, signing with a key behind Touch ID or similar, for acts that can't be undone. A grant is presence given ahead of time.</td></tr>
+        <tr><td><b>seat</b></td><td>An identity shared by delegates who don't have their own yet.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>Places and sharing</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>place</b></td><td>Where a store's records live on a machine: a location, a format and a role.</td></tr>
+        <tr><td><b>segment</b></td><td>One writer's file of records in a place. Closed once committed; named by hash.</td></tr>
+        <tr><td><b>realm</b></td><td>The stores reachable from one root name table. Realms nest by linking, never by rewriting.</td></tr>
+        <tr><td><b>promotion</b></td><td>Copying a record, verbatim, into another store in your realm.</td></tr>
+        <tr><td><b>bridge</b></td><td>Crossing into another realm: always explicit, always a signed tick.</td></tr>
+        <tr><td><b>bundle</b></td><td>A tick sent together with everything it covers.</td></tr>
+        <tr><td><b>changeset</b></td><td>Records emitted together as one transaction, as a lens apply does.</td></tr>
+        <tr><td><b>collector</b></td><td>An external process that turns a source into records, over stdin.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>Reading out</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>lens</b></td><td>A two-way transform between state and a file: render for an audience, parse edits back, diff by ids, apply as records. Absence is never an edit.</td></tr>
+        <tr><td><b>base</b></td><td>What a render came from: tick, lens hash and audience. Edits are diffed against it.</td></tr>
+        <tr><td><b>audience</b></td><td>Who a render is for; it decides what is withheld.</td></tr>
+        <tr><td><b>input key · result hash</b></td><td>A result's two names: what went in, and what came out.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>API words</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Term</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><b>Realm</b></td><td>Package <code>loops</code>'s handle on the stores you can read. Reads span all of them; writes name one store. <code>Narrow</code> restricts it to a grant.</td></tr>
+        <tr><td><b>Draft</b></td><td>A record before it is signed.</td></tr>
+        <tr><td><b>State</b></td><td>What a fold returns.</td></tr>
+        <tr><td><b>AsOf</b></td><td>The cut, for both times.</td></tr>
+        <tr><td><b>Checkpoint</b></td><td>A place's segment list as last seen. What's new since it is how watching works. Not "cursor": the editor already owns that word.</td></tr>
+        <tr><td><b>Signer</b></td><td>The trait for anything that signs: a device key, the keychain, a file.</td></tr>
+        <tr><td><b>Place</b></td><td>The trait for storage: list, get by id, what's new since a checkpoint, a blob by hash. <code>loops-dir</code> is the one built in.</td></tr>
+        <tr><td><b>Lens</b></td><td>The trait for render and parse; the core does the diff.</td></tr>
+        <tr><td><b>Refusal</b></td><td>An error with a code from a closed set, and the field it concerns.</td></tr>
+      </tbody>
+    </table></div>
+
+  <h3>Retired words</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Was</th><th>Now</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><b>fact</b></td><td>record</td><td>"Fact" implies truth; the model holds observations.</td></tr>
+        <tr><td><b>genesis</b></td><td>anchor</td><td>One concept: the record an identity starts with.</td></tr>
+        <tr><td><b>subject</b></td><td>thing</td><td><code>about</code> holds things.</td></tr>
+        <tr><td><b>residence</b></td><td>place</td><td>A residence was just a store's places on one machine.</td></tr>
+        <tr><td><b>topology</b></td><td>realm</td><td>A topology was a realm whose name table links others.</td></tr>
+        <tr><td><b>boundary list</b></td><td>the limits</td><td><i>Boundary</i> means when a vertex ticks.</td></tr>
+        <tr><td><b>seal</b></td><td>tick, covers</td><td>"Seal" suggests hiding or signing, and a tick does neither. A vertex ticks; a tick covers records. In code at step 2, <code>record.Seal</code> becomes <code>NewRecord</code> and <code>Sealed</code> becomes <code>Stored</code>.</td></tr>
+        <tr><td><b>spec, for the documents</b></td><td>protocol</td><td><i>Spec</i> stays for a vertex's definition; the normative prose in <code>protocol/</code> is the protocol.</td></tr>
+        <tr><td><b>Upsert</b></td><td>LatestBy</td><td>A database write verb used for a read: the latest record per key.</td></tr>
+      </tbody>
+    </table></div>
+  <p>The conversation turns in <a href="#sources" data-tab="sources">Sources</a> keep the words used at the time.</p>
+</section>

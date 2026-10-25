@@ -1,0 +1,81 @@
+<section class="panel" id="open" role="tabpanel" aria-labelledby="t-open">
+  <div class="panel-head"><h2>Open questions</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Only what is still open, grouped by layer; each unfolds into what's known and where it leans. Settled answers moved to the decision ledger on the <a href="#map" data-tab="map">Map</a> in version 31.</p>
+
+  <h3>Layer 0 · record</h3>
+  <div class="q">
+    <details class="unfold"><summary>Does <code>occurred</code> need a duration-vs-imprecision marker?</summary><div class="body"><p>Both normalize to <code>[start, end)</code> and order the same. Lean: the kind decides at read. Watch for folds that need it, such as summing attention time.</p></div></details>
+  </div>
+  <h3>Observers and lineage</h3>
+  <div class="q">
+    <details class="unfold"><summary>Should <code>under</code> be required when a write needs authority?</summary><div class="body"><p>Optional keeps the envelope small; required makes admission a lookup instead of a search. Possibly a per-store policy.</p></div></details>
+    <details class="unfold"><summary>Who signs a cross-realm <code>same-as</code>?</summary><div class="body"><p>Both lineages, or you as the parent of both. It lives only in the home realm either way.</p></div></details>
+    <details class="unfold"><summary>Is a model swap the same observer? <span class="pill p-lean">leaning</span></summary><div class="body"><p>Yes: <code>runs-on</code> is a statement on the lineage. A new lineage is for leaving a shared seat, not for every swap.</p></div></details>
+    <details class="unfold"><summary>Can a lineage fork, and how are stances reconciled?</summary><div class="body"><p>Concurrent sessions taking opposite stances. A DAG like git, with divergence held as data until resolved.</p></div></details>
+    <details class="unfold"><summary>Does your endorsement design already separate naming from authority?</summary><div class="body"><p>If so, it's the most battle-tested input for the observer envelope.</p></div></details>
+  </div>
+  <h3>Realms and places</h3>
+  <div class="q">
+    <details class="unfold"><summary>One store per repo, or a personal store spanning repos?</summary><div class="body"><p>The second brings custody questions back in a milder form.</p></div></details>
+    <details class="unfold"><summary>What does verifying a deep tick tree cost?</summary><div class="body"><p>Recursive recomputation down an orchestration tree. Verify lazily, by sampling, or trust per hop: an operational choice, not a model one.</p></div></details>
+  </div>
+  <h3>Horizons</h3>
+  <div class="q">
+    <details class="unfold"><summary>Where does a rendered file keep its base? <span class="pill p-lean">leaning</span></summary><div class="body"><p>Front matter, holding the tick, the lens hash and the audience. It changes on every render and adds git noise; rendering only when the file's own result changes keeps that small.</p></div></details>
+    <details class="unfold"><summary>The conflict block's syntax</summary><div class="body"><p>A fork renders as a block naming each head and its author. It must stay unambiguous inside code fences and survive editors; git's markers don't. Lean: a fenced directive the parser owns.</p></div></details>
+    <details class="unfold"><summary>Hooks, merge drivers, and edits made without a key</summary><div class="body"><p>Committed lens files rely on a pre-commit hook and a merge driver that re-renders. How a repo installs them, and whether a CI collector records key-less edits as hearsay for the author to endorse, is per team.</p></div></details>
+    <details class="unfold"><summary>Do team aggregates ever need more than the signer's word?</summary><div class="body"><p>Folds over withheld payloads rest on the signer. Zero-knowledge proofs could close the gap; nothing needs them yet.</p></div></details>
+    <details class="unfold"><summary>Which selector spec? <span class="pill p-lean">leaning</span></summary><div class="body"><p>Both walks need one: line ranges inside a function and passages on a page. Lean: a W3C subset, with quote, prefix and suffix as the anchor and position only as a hint. PDFs and video need page and time selectors.</p></div></details>
+    <details class="unfold"><summary>Code beyond symbols: files, packages, the repo</summary><div class="body"><p>Git follows file renames natively; directories barely. Lean: name a repo by its root commit, which survives renames; forks then share keys for the history before they split.</p></div></details>
+    <details class="unfold"><summary>A reading group: one shared store, or federation?</summary><div class="body"><p>A private group could be a small realm with one store, like the team, synced by git or Syncthing. Federation keeps custody with each person. Both work; probably both get used.</p></div></details>
+    <details class="unfold"><summary>Who runs aggregators, and in what format?</summary><div class="body"><p>A vertex over many public stores, publishing witness ticks. Open: whether it also publishes a <code>by-key/</code> index, how a reader finds one, and whether several are composed.</p></div></details>
+    <details class="unfold"><summary>Pings: Webmention as is? <span class="pill p-lean">leaning yes</span></summary><div class="body"><p>A ping carries only where to look: the source store and record. Webmention already defines that shape; adopting it means existing endpoints work.</p></div></details>
+    <details class="unfold"><summary>Admission across federation: one hop of vouches by default?</summary><div class="body"><p>Follows alone is quiet and safe; one hop of vouches finds more but widens trust. Lean: follows only, with one hop as a toggle.</p></div></details>
+    <details class="unfold"><summary>Snapshots of what was read?</summary><div class="body"><p><code>seen</code> answers "changed since?" without one. A personal blob (erasable, never shared) or a Wayback link answers "what did it say?". Lean: off by default, per site on.</p></div></details>
+    <details class="unfold"><summary>Parallel subagents with conflicting findings</summary><div class="body"><p>Two sessions on the same task reach different answers. Lean: findings are ordinary records; conflicts are disputes or forks, surfaced by the review lens.</p></div></details>
+    <details class="unfold"><summary>Budgeting an agent's context window</summary><div class="body"><p>A lens decides what to show in full and what to leave as ids to unfold. Lean: rank by the vertex's weight and recency, show envelopes for the rest; never drop silently.</p></div></details>
+    <details class="unfold"><summary>Handing a thing over <span class="pill p-sk">tabled</span></summary><div class="body"><p>A house, a car, a machine given to a friend, a service changing teams. Framing so far: <b>custody</b> (a steward changeset and retire-through, with presence), <b>history</b> (a restricted tick, or the thing's whole store), <b>continuity</b> (the giver keeps their copy to the cut). Personal data never enters a thing's store; envelope-level disclosure makes a seller's omissions visible; third parties' signed records are the strongest evidence; a service handover inside one realm moves no data. Tabled: worth walking, unlikely to change the model.</p></div></details>
+    <details class="unfold"><summary>Transcript collector: built into the harness, or external?</summary><div class="body"><p>The return needs every turn and tool call as records. A harness that emits records natively is simplest; an external collector reading transcripts works with any harness, as siftd did.</p></div></details>
+    <details class="unfold"><summary>Where does a cache place live? <span class="pill p-lean">leaning</span></summary><div class="body"><p>Results and renders need a home static readers can reach, served under the grant of their inputs. Lean: beside the store's own place, same layout style (<code>keys/</code>, <code>results/</code>, <code>renders/</code>, all named by hash), published only where the store is.</p></div></details>
+    <details class="unfold"><summary>Retention for run transcripts</summary><div class="body"><p>Runs are the highest-volume store. How long they stay local, when they move to the archive place, and whether old turns are ever dropped (blob-only) is a per-store choice; it needs a default. The build walk gives eviction a shape: pinned ticks are roots (a release, a brief's tick), and results and renders outside them can go.</p></div></details>
+  </div>
+  <h3>Build</h3>
+  <div class="q">
+    <details class="unfold"><summary>Step 1's choices, carried into the Rust port <span class="pill p-next">please check</span></summary><div class="body">
+      <p>Step 1 needed decisions the page only leaned on. The port keeps them unless you change them; each is cheap to change until records exist.</p>
+      <ul>
+        <li><b>One text encoding for bytes:</b> lower-case base32 without padding, for ids, commitments, salts, keys and signatures. Salts are 16 bytes; a key is <code>k:</code> plus base32 of the public key.</li>
+        <li><b>The id's preimage</b> is the canonical object <code>{"commit", "env"}</code>, not a byte concatenation.</li>
+        <li><b>Signed bytes:</b> <code>"loops/record/v1:" + id</code>; the version in that prefix is how a reader refuses only what is newer than it knows.</li>
+        <li><b><code>emitted</code> is strict RFC 3339:</b> upper-case <code>T</code> and <code>Z</code>, a real calendar day, a leap second allowed. <code>occurred</code> is carried but not yet validated.</li>
+        <li><b>Typed references</b> are <code>prefix:value</code> with a lower-case prefix; sets sort by UTF-16 code units.</li>
+        <li><b>Unknown envelope fields are refused</b> when reading, rather than silently left out of the id.</li>
+      </ul>
+    </div></details>
+    <details class="unfold"><summary>The crate's name</summary><div class="body"><p><code>loops</code> may already be taken on crates.io. Decide when the workspace is created; the name in code can differ from the published one.</p></div></details>
+    <details class="unfold"><summary>Schema field names</summary><div class="body"><p>The JSON shapes on this page are drafts: <code>from</code>, <code>ticks</code>, <code>fold</code> with the fold type as its key, <code>where</code> with word operators, <code>boundary</code>, <code>param</code>, <code>note</code>. The schemas in <code>protocol/</code> fix them when step 2 is modelled.</p></div></details>
+    <details class="unfold"><summary>What "decimal" means <span class="pill p-lean">leaning</span></summary><div class="body"><p>Over floating point, addition isn't associative, so arrival order would change a sum and "the set decides" fails. The model folds integers. Lean: a decimal is a string in a fixed grammar, parsed to an integer at a scale the spec declares per field; mixed scales are refused, and a fractional <code>:=</code> on a declared numeric field is refused. Avg is gone from the core, so no fold divides or rounds.</p></div></details>
+    <details class="unfold"><summary>The review's other findings</summary><div class="body"><p>Two outside reviews of version 31 are compiled in <a href="https://claude.ai/artifact/TVxL5UBVhc2cTGWMi4B8KE">Strange Loops Rethink: Review</a>. Version 32 took its fold, withholding, tick and vertex findings. Still to weigh there: id prefixes, the window time zone and the <code>occurred</code> grammar, standing's bootstrap order and two key tiers, <code>resolve-by</code> transitivity, closing segments per changeset, salt as an input to the core, and the sequence (ticks before standing).</p></div></details>
+    <details class="unfold"><summary>Canonical encoding for results <span class="pill p-lean">leaning</span></summary><div class="body"><p>A result hash needs one encoding per state. Lean: RFC 8785 (JCS) for results, as for records; a Merkle encoding only if hashing large results gets slow.</p></div></details>
+    <details class="unfold"><summary>Where does the LSP's history index live?</summary><div class="body"><p>Mapping a cursor to a birth key needs a cache of each symbol's history. Lean: the editor tooling's own disposable cache, not loops' index; the core never reads git.</p></div></details>
+    <details class="unfold"><summary>Calibrating the budgets</summary><div class="body"><p>About 60k tokens for the core and 15k per module are guesses. Step 1 in Go measured <code>record</code> at 3.2k against ~8k; the Rust port measures again, and step 2 calibrates. The surface is pinned at its current 34 names until the local API walk. Measure the step 2 slice and set the numbers from it.</p></div></details>
+    <details class="unfold"><summary>Minting in a declared store with several thing kinds</summary><div class="body"><p>When a name misses and the store declares more than one thing kind, the emitter has to say which. A flag, a prompt, or a per-store default; a CLI detail, not a model one.</p></div></details>
+  </div>
+  <h3>Layer 5 · sharing (closed)</h3>
+  <div class="q">
+    <details class="unfold"><summary>Should presence be provable to other replicas?</summary><div class="body"><p>Today a presence key's binding claims "used only with you present". FIDO hardware keys could prove it (a user-presence flag inside the signed bytes) at the cost of a second signature format. Lean: wait until someone needs proof.</p></div></details>
+    <details class="unfold"><summary>A local signer behind a socket?</summary><div class="body"><p>Like ssh-agent: sits outside an agent's sandbox, signs only as that agent and only within its grant. Defence in depth; not needed for the model to hold.</p></div></details>
+  </div>
+  <h3>Composition (closed)</h3>
+  <div class="q">
+    <details class="unfold"><summary>How exactly does <code>resolve-by</code> turn pairs into classes?</summary><div class="body"><p>Connected components over the pairs the identity vertex accepts. It must be specified as precisely as a fold, since verifiable ticks will depend on it. The display id of a class (lean: the earliest anchor in content order) may change when classes merge.</p></div></details>
+    <details class="unfold"><summary>Who proposes merges? <span class="pill p-lean">leaning</span></summary><div class="body"><p>A hygiene vertex for things (name similarity, or an agent proposing matches) feeding the stale review. One hygiene vertex per discipline surface: kinds, things, names, natural keys.</p></div></details>
+    <details class="unfold"><summary>Anchors a store can't read <span class="pill p-lean">leaning</span></summary><div class="body"><p>A team record about an anchor that lives in a personal store groups fine (the hash is enough) but can't be named. Lean: promotion carries the anchor along verbatim when the target lacks it. Across realms, a natural key is content, not a reference: <code>svc:auth@corp-prod</code> says something, so it crosses only by bridge. A public store is a standing bridge, which is how <code>url:</code> keys meet across realms.</p></div></details>
+    <details class="unfold"><summary>Which name table resolves input? <span class="pill p-lean">leaning</span></summary><div class="body"><p>Lean: the target store's names first, then home; a miss is handled in the target store. Otherwise personal petnames leak into team anchors.</p></div></details>
+    <details class="unfold"><summary>References: recognized by prefix, or declared?</summary><div class="body"><p>Open stores guess from id prefixes; strict stores declare their reference fields. A string that only looks like an id is the failure case.</p></div></details>
+  </div>
+  <h3>Layer 2 · resolution (closed)</h3>
+  <div class="q">
+    <details class="unfold"><summary><code>into</code>, or a store per vertex? <span class="pill p-lean">leaning</span></summary><div class="body"><p>Content ticks are values, stored only when cited or sent, as a tick record signed by its writer. <code>into</code> names where that record lands; admission is by recomputing or by the writer's grant.</p></div></details>
+  </div>
+</section>

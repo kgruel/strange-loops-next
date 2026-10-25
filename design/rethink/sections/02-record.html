@@ -1,0 +1,165 @@
+<section class="panel" id="record" role="tabpanel" aria-labelledby="t-record">
+  <div class="panel-head"><h2>Layer 0: the record</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">A record is an observation, not a statement about the world. Records are immutable, the only write is append, and the record never learns what anything means. A store is a <b>set</b> of records. Order is derived from what records carry, never from where they landed.</p>
+
+  <div class="cards">
+    <div class="card acc">
+      <h5>Record · observation</h5>
+      <dl class="env">
+        <dt>id</dt><dd>content hash of canonical bytes</dd>
+        <dt>observer</dt><dd>who saw it (a lineage id)</dd>
+        <dt>kind</dt><dd>a label, not a type</dd>
+        <dt>emitted</dt><dd>stamped instant, never set by hand</dd>
+        <dt>occurred?</dt><dd>claimed span; can be coarse</dd>
+        <dt>about?</dt><dd>the things it is about: a set, usually one</dd>
+        <dt>prev?</dt><dd>the records this one replaces: a set, usually one</dd>
+        <dt>under?</dt><dd>the grant it acts on</dd>
+        <dt>payload</dt><dd>anything, including references</dd>
+        <dt>sig?</dt><dd>signature over the id, kept beside the record (outside the id); see <a href="#sharing" data-tab="sharing">Sharing</a></dd>
+      </dl>
+    </div>
+    <div class="card amb">
+      <h5>Record · resolution (tick)</h5>
+      <dl class="env">
+        <dt>id</dt><dd>content hash</dd>
+        <dt>vertex</dt><dd>the question it answers</dd>
+        <dt>kind</dt><dd>the boundary that fired</dd>
+        <dt>spec</dt><dd>hash of spec + fold-vocabulary version</dd>
+        <dt>covers</dt><dd>ids of the records it folded</dd>
+        <dt>occurred?</dt><dd>the concrete window it covers</dd>
+        <dt>payload</dt><dd>the folded result</dd>
+        <dt>observer · emitted · sig</dt><dd>witness ticks only; a content tick derives its time from what it covers</dd>
+      </dl>
+    </div>
+  </div>
+  <p>One envelope, two variants. Everything done to records (storing, signing, merging, sending, observing) works the same on both. Only the variant tells a conclusion from an observation.</p>
+
+  <h3>The envelope convention</h3>
+  <p>A field belongs on the envelope only if the core reads it. Everything else is a payload convention. It's a test applied when a field is proposed, not a law.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Field</th><th>What in the core reads it</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>identity, merging, ticks</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>observer</code></td><td>admission, signatures</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>kind</code></td><td>selection</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>emitted</code></td><td>content order</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>occurred?</code></td><td>content order</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>about?</code></td><td>selection</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>prev?</code></td><td>Latest and LatestBy follow chains to their heads instead of trusting clocks; a set, so one record can merge a fork</td><td><span class="pill p-lean">keep</span></td></tr>
+      <tr><td><code>under?</code></td><td>admission (the grant check)</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>covers</code> (ticks)</td><td>verification</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>as</code></td><td>nothing: names are never matched</td><td><span class="pill p-sk">drops</span></td></tr>
+      <tr><td><code>derived-from</code></td><td>nothing: only hygiene vertices</td><td><span class="pill p-sk">payload</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><code>as</code> existed to keep history honest ("written when it still called itself claude"). Name records are dated, so "what was this observer called at <code>emitted</code>" is a fold, and <code>as</code> drops out. On ticks, <code>observer</code>, <code>emitted</code> and the signature appear only on witness ticks; see <a href="#resolution" data-tab="resolution">Resolution</a>.</p>
+  <details class="unfold"><summary>Time in the id, or a field?</summary><div class="body">
+    <p>A time-ordered id (UUIDv7, or AT Protocol's TID) carries emit time inside the identifier. A UUIDv7 is out: it's random, and ticks, verbatim promotion, lineage ids and merge dedup all need the id to be a content hash. The real choice was a <b>time prefix plus a content hash</b> against a plain hash with <code>emitted</code> as a field. In both, the hash covers the time, so they hold the same information; the difference is where it shows.</p>
+    <div class="tbl"><table>
+      <thead><tr><th></th><th>Field + plain hash ✓</th><th>Time prefix + hash</th></tr></thead>
+      <tbody>
+        <tr><td>Ids</td><td>standard; any tool verifies</td><td>a custom format to split</td></tr>
+        <tr><td>References</td><td>opaque</td><td>every reference says when its target was written</td></tr>
+        <tr><td>Across realms</td><td>"references cross, content doesn't" holds exactly</td><td>a shared id leaks when you wrote it</td></tr>
+        <tr><td>Time</td><td>RFC 3339, any precision, with the writer's offset</td><td>fixed precision, UTC</td></tr>
+        <tr><td>Sorting</td><td>ids don't sort by time</td><td>chronological files, index locality</td></tr>
+      </tbody>
+    </table></div>
+    <p>Everything the prefix buys is about where records live (sorting, locality), which the disposable index already provides. Everything the field buys belongs to the model. <code>emitted</code> passes the envelope convention honestly: the core orders by it.</p>
+  </div></details>
+
+  <h3>Two times</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 250" role="img" aria-label="A past-to-now axis. Occurred values are claims about the past: a coarse hatched span labeled 2009 approximately, a solid four-minute span, and an instant. Emitted is a single stamped instant at the observer's present.">
+        <line class="ln" x1="16" y1="34" x2="384" y2="34" marker-end="url(#ah)"/>
+        <text x="16" y="22" class="xs m">past</text><text x="384" y="22" text-anchor="end" class="xs m">now</text>
+        <line class="ln-acc dash" x1="352" y1="34" x2="352" y2="206"/>
+        <circle class="fill-acc" cx="352" cy="34" r="5"/>
+        <text x="352" y="224" text-anchor="end" class="s ta b">emitted</text>
+        <text x="352" y="240" text-anchor="end" class="xs ta">the observer's present · RFC 3339</text>
+        <rect x="24" y="64" width="150" height="22" rx="4" fill="url(#hatch)" class="ln-amb dash"/>
+        <text x="186" y="73" class="s b">coarse</text><text x="186" y="89" class="mono tb">occurred: 2009~</text>
+        <rect class="box-amb" x="218" y="118" width="64" height="22" rx="4"/>
+        <text x="206" y="126" text-anchor="end" class="s b">span (lasted)</text><text x="206" y="142" text-anchor="end" class="mono tb">…T09:14/PT4M</text>
+        <circle class="fill-amb" cx="300" cy="178" r="6"/>
+        <text x="288" y="174" text-anchor="end" class="s b">instant</text><text x="288" y="190" text-anchor="end" class="mono tb">2026-10-17T09:14:03Z</text>
+        <text x="16" y="240" class="xs m">not to scale</text>
+      </svg>
+    </div>
+    <figcaption>You only witness in a precise present, but you know the past at varying resolution. <code>emitted</code> is the observer's "now". <code>occurred</code> is optional and holds the claimed past.</figcaption>
+  </figure>
+
+  <h3>Things, and who observed them</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 250" role="img" aria-label="One thing, an essay, observed by four observers: kyle/rss saw it appear in a feed, kyle/safari saw a visit, kyle/likes saw a like, and kyle read it and judged it mattered.">
+        <rect class="box-amb" x="8" y="8" width="384" height="40" rx="8"/>
+        <text x="200" y="33" text-anchor="middle" class="b">thing: essay at example.com/x</text>
+        <line class="ln" x1="24" y1="48" x2="24" y2="224"/>
+        <line class="ln" x1="24" y1="80" x2="36" y2="80"/><rect class="box" x="38" y="63" width="136" height="34" rx="7"/><text x="106" y="84" text-anchor="middle" class="mono">kyle/rss</text>
+        <text x="186" y="77" class="s">appeared in a feed</text><text x="186" y="93" class="xs m mono">occurred: published</text>
+        <line class="ln" x1="24" y1="128" x2="36" y2="128"/><rect class="box" x="38" y="111" width="136" height="34" rx="7"/><text x="106" y="132" text-anchor="middle" class="mono">kyle/safari</text>
+        <text x="186" y="125" class="s">visited, 4m 10s</text><text x="186" y="141" class="xs m mono">occurred: the visit</text>
+        <line class="ln" x1="24" y1="176" x2="36" y2="176"/><rect class="box" x="38" y="159" width="136" height="34" rx="7"/><text x="106" y="180" text-anchor="middle" class="mono">kyle/likes</text>
+        <text x="186" y="173" class="s">liked</text><text x="186" y="189" class="xs m mono">occurred: the like</text>
+        <line class="ln" x1="24" y1="224" x2="36" y2="224"/><rect class="box-acc" x="38" y="207" width="136" height="34" rx="7"/><text x="106" y="228" text-anchor="middle" class="mono">kyle</text>
+        <text x="186" y="221" class="s">read it; this mattered</text><text x="186" y="237" class="xs m mono">emitted: now</text>
+      </svg>
+    </div>
+    <figcaption>The essay isn't a record. It's a thing in the world, and records are observations about it. Salience is a fold over the set of observers that touched each thing.</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Salience tier</th><th>Observer set for the thing</th></tr></thead>
+    <tbody>
+      <tr><td>The mass below</td><td>only an ingest collector</td></tr>
+      <tr><td>Current attention</td><td>Safari, weighted by time spent</td></tr>
+      <tr><td>What you marked</td><td>the platform's like, or you directly</td></tr>
+      <tr><td>What to surface</td><td>close to recent attention, but untouched by you</td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="unfold"><summary>Set, not sequence</summary><div class="body">
+    <p>Under "set," the store has no order of its own. Order comes from what records carry. Under "sequence," the store carries receipt order as part of its identity. That was Arrival's choice, and it's the root reason a store needed a single authority to hold its head.</p>
+    <p>Your original conception: the past happened, so <code>occurred</code>/<code>emitted</code> are primary. Receipt order is where things started going off the rails.</p>
+    <p>"Ordered twice: as claimed, and as witnessed" now sits entirely inside the record. <code>occurred</code> is as claimed. <code>emitted</code> is as witnessed, by the observer rather than the store. Witness time travels with the record, so every store agrees on it.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Why ingestion isn't "unobserved"</summary><div class="body">
+    <p>Your proposal was that raw ingestion isn't observed, and becomes observed when attention acts on it. The intuition is right: an RSS item arriving and you reading an essay are different. Two problems with the conclusion:</p>
+    <ul>
+      <li><b>It hollows out the observer.</b> Ingestion is most of the volume. If those records have no observer, every fold has to handle that as a special case.</li>
+      <li><b>It puts observation in the lens.</b> If running a lens makes records observed, reading writes to the record, and the record depends on which lenses happened to run. That breaks "meaning binds at read."</li>
+    </ul>
+    <p>The resolution: every record is observed, but observers see different things. A collector sees a <b>row</b> ("Safari's database says you visited u at t"). That's hearsay, and the record claims no more than the collector saw. The collector is still an observer, just a dumb one.</p>
+    <p>Acting on a digest item (reading, marking, dismissing) is your observation. Running the salience lens is mechanism.</p>
+    <details class="source"><summary>README.md, "The pattern"</summary><div class="body"><p>"An observer sees the state through a lens … and acts by emitting new facts. The loop closes through the observer, not through the mechanism."</p></div></details>
+  </div></details>
+
+  <details class="unfold"><summary>Occurred: one field that can be a span</summary><div class="body">
+    <p>A coarse date is already a span: <code>2009</code> means somewhere in <code>[2009-01-01, 2010-01-01)</code>. If every value normalizes to <code>[start, end)</code>, one field covers instants, coarse dates and spans. Ordering is by start, then end, then emitted, then id.</p>
+    <div class="tbl"><table><tbody>
+      <tr><td><code>2026-10-17T09:14:03Z</code></td><td>instant (a degenerate span)</td></tr>
+      <tr><td><code>2009</code></td><td>coarse: sometime in 2009</td></tr>
+      <tr><td><code>2026-10-17T09:14/PT4M</code></td><td>a four-minute visit</td></tr>
+      <tr><td><code>2009-07/2011-03</code></td><td>a migration that ran about two years</td></tr>
+      <tr><td><code>2009~</code> · <code>2009?</code> · <code>2009/..</code></td><td>approximate · uncertain · open-ended (EDTF Level 1)</td></tr>
+    </tbody></table></div>
+    <h4>Still to muse on</h4>
+    <ul>
+      <li><b>Duration vs imprecision.</b> "Visited for 4 minutes" lasted the whole span. "Decided in 2009" happened at some point inside it. Both order the same, but folds may care (summing attention time vs placing a decision on a timeline). Lean: the core stays out of it and the kind decides at read. This is the most likely place a second field becomes necessary.</li>
+      <li><b>Claim at write vs derive at read.</b> Lean: <code>occurred</code> on the envelope is the observer's own claim. A declaration may derive or reinterpret time at read, as a lens, without overwriting the claim. For dumb collectors either works.</li>
+      <li><b>Revised claims.</b> "Actually it was 2011" is a new record about a record. A fold applies it at read.</li>
+      <li><b>Intervals</b> (overlap, containment) are out of scope for layer 0.</li>
+    </ul>
+    <details class="source"><summary>EDTF, ISO 8601-2, RFC 3339</summary><div class="body">
+      <p>EDTF (Extended Date/Time Format) came out of Library of Congress archival work and was folded into ISO 8601-2:2019. It isn't an RFC. Level 0 is ISO 8601 basics. Level 1 adds approximate, uncertain, unspecified digits (<code>200X</code>), seasons and open interval ends. Level 2 is more elaborate. <a href="https://www.loc.gov/standards/datetime/" rel="noopener">loc.gov/standards/datetime</a></p>
+      <p>RFC 3339 profiles ISO 8601 for internet timestamps. <a href="https://www.rfc-editor.org/rfc/rfc3339" rel="noopener">rfc-editor.org/rfc/rfc3339</a></p>
+    </div></details>
+  </div></details>
+
+  <details class="unfold"><summary>The <code>about</code> field and thing identity</summary><div class="body">
+    <p><code>about</code> is promoted from a payload <code>ref</code> to an envelope field because composition depends on it: salience groups by thing across three stores.</p>
+    <p>The hard part is thing identity across stores. The same essay shows up as a feed GUID in RSS, a URL with tracking parameters in Safari, and a post id in likes. The answer is both: a typed natural key normalized per prefix where the world supplies one, and <code>same-as</code> records folded at read where it takes judgment. Worked through in <a href="#things" data-tab="things">Things</a>.</p>
+  </div></details>
+</section>

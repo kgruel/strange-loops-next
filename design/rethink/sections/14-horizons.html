@@ -1,0 +1,877 @@
+<section class="panel" id="horizons" role="tabpanel" aria-labelledby="t-horizons">
+  <div class="panel-head"><h2>Horizons</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">What the design makes cheap, collected before a toolchain starts deciding what's easy. Every idea here combines <b>five mechanisms</b>: records with <code>about</code>, ticks, lenses, places, and keys with bridges. Most can wait; six need allowing for before building.</p>
+  <p><span class="pill p-lean">exploring</span> Each case walked in detail has its own tab below. The overview maps them onto the five mechanisms and keeps the rest.</p>
+
+  <div class="subtabs" role="tablist" aria-label="Horizons cases">
+    <button role="tab" id="st-h-overview" aria-controls="h-overview" aria-selected="true">Overview</button>
+    <button role="tab" id="st-h-lenses" aria-controls="h-lenses" aria-selected="false">Editable lenses</button>
+    <button role="tab" id="st-h-lsp" aria-controls="h-lsp" aria-selected="false">The LSP</button>
+    <button role="tab" id="st-h-web" aria-controls="h-web" aria-selected="false">Web annotation</button>
+    <button role="tab" id="st-h-context" aria-controls="h-context" aria-selected="false">Context by tick</button>
+    <button role="tab" id="st-h-disclosure" aria-controls="h-disclosure" aria-selected="false">Selective disclosure</button>
+    <button role="tab" id="st-h-build" aria-controls="h-build" aria-selected="false">Knowledge as a build</button>
+  </div>
+  <div class="subpanel" id="h-overview" role="tabpanel" aria-labelledby="st-h-overview">
+  <h3>One map, five mechanisms</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Idea</th><th>records + <code>about</code></th><th>ticks</th><th>lenses</th><th>places</th><th>keys, bridges</th></tr></thead>
+    <tbody>
+      <tr><td><b>Docs as editable lenses</b></td><td>✓</td><td>✓ base</td><td>✓</td><td></td><td>✓ author signs</td></tr>
+      <tr><td><b>LSP hover</b> on code</td><td>✓ birth keys</td><td>✓</td><td>✓ render only</td><td></td><td></td></tr>
+      <tr><td><b>Annotating the web</b> with friends</td><td>✓ <code>url:</code> keys, selectors</td><td>✓ aggregator</td><td>✓ sidebar</td><td>✓ own static store each</td><td>✓ public store as standing bridge</td></tr>
+      <tr><td><b>Discord threads</b> about the same thing</td><td>✓ same key</td><td></td><td>✓ sidebar hops</td><td></td><td>collector; stays home</td></tr>
+      <tr><td><b>Selective disclosure</b></td><td>✓ salted commitments</td><td>✓ covered set</td><td></td><td></td><td>✓ bundle</td></tr>
+      <tr><td><b>Static hosting, dumb file sync</b></td><td></td><td></td><td></td><td>✓</td><td>✓ verify on read</td></tr>
+      <tr><td><b>Stores that travel with things</b></td><td>✓ natural key</td><td></td><td></td><td>✓</td><td>✓ steward transfer</td></tr>
+      <tr><td><b>Nix and Bazel for knowledge</b></td><td></td><td>✓ input key, result hash</td><td>✓ render output</td><td>✓ cache place</td><td>✓ signed cache</td></tr>
+      <tr><td><b>Bitemporal questions</b></td><td>✓ two times</td><td>✓ as-of</td><td>✓ render as-of</td><td></td><td></td></tr>
+      <tr><td><b>Agents pass context by tick id</b></td><td></td><td>✓ context, witness</td><td>✓ one per stage</td><td></td><td>✓ grant filters the bundle</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The walks</h3>
+  <ul>
+    <li><a href="#horizons/h-lenses" data-tab="horizons" data-sub="h-lenses"><b>Editable lenses</b></a>: docs as the store, then broken on purpose. The base names its lens and audience; a committed render is a promotion; absence is never an edit.</li>
+    <li><a href="#horizons/h-lsp" data-tab="horizons" data-sub="h-lsp"><b>The LSP</b></a>: code identified by birth keys along each branch's history; git segment files close on commit.</li>
+    <li><a href="#horizons/h-web" data-tab="horizons" data-sub="h-web"><b>Web annotation</b></a>: federation as each person's own store, composed; static hosting; admission as the spam filter.</li>
+    <li><a href="#horizons/h-context" data-tab="horizons" data-sub="h-context"><b>Context by tick</b></a>: five reference states, briefs and bundles, a cloud run as a borrowed place, everything coming home.</li>
+    <li><a href="#horizons/h-disclosure" data-tab="horizons" data-sub="h-disclosure"><b>Selective disclosure</b></a>: split by disclosure when recording; envelopes shared, payloads withheld.</li>
+    <li><a href="#horizons/h-build" data-tab="horizons" data-sub="h-build"><b>Knowledge as a build</b></a>: two names per result, early cutoff, and privacy as withholding, not hiding.</li>
+  </ul>
+
+  <h3>The rest</h3>
+  <details class="unfold"><summary>Time: bitemporal by construction</summary><div class="body"><ul>
+    <li>"What did we believe in 2019 about what happened in 2009?" is a fold with two cut-offs.</li>
+    <li>Two ticks diffed give a changelog of understanding.</li>
+    <li>Fuzzy dates suit history: genealogy, a platform's early years, a house.</li>
+    <li><code>emitted</code> answers "what did I believe at T"; witness ticks answer "what did this store hold at T".</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Things: knowledge where you work</summary><div class="body"><ul>
+    <li><b>"What do I know about X?"</b> across every store you can read, by URL, ISBN, DOI, <code>svc:</code> or anchor.</li>
+    <li><b>Code as a thing:</b> <code>loops blame</code> shows the ADRs behind a file; an <b>LSP server</b> shows them on hover. A symbol is identified by its <b>birth key</b>, the symbol as it was in the commit that created it, found by following each branch's own history. See <a href="#horizons/h-lsp" data-tab="horizons" data-sub="h-lsp">the LSP walk</a>.</li>
+    <li><b>Annotate the web:</b> a browser extension writes records about <code>url:</code> keys; friends share through their own public stores, without browsing history. Your Discord collector's threads about the same URL land in the same conversation: thing-centred, across channels, no server. See <a href="#horizons/h-web" data-tab="horizons" data-sub="h-web">the walk</a>.</li>
+    <li><b>Stores that travel with things:</b> a house keyed by its address, handed to the buyer by a steward changeset with verifiable history. Also a car, a homelab machine, a service changing teams.</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Moving records anywhere</summary><div class="body"><ul>
+    <li><b>Any dumb file sync works without conflicts</b>: Syncthing, Dropbox, iCloud, a USB stick. A co-author over a shared folder just works.</li>
+    <li><b>Static hosting as a read place:</b> a public store is a feed with verifiable history; subscribing is composing it into your realm. Federation without relays. The layout is in the web annotation walk.</li>
+    <li><b>Bundles by email:</b> a bridge as an attachment that verifies on arrival.</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Trust, attention and agents</summary><div class="body"><ul>
+    <li><b>Proof of existence:</b> anchor a tick hash to RFC 3161 or OpenTimestamps.</li>
+    <li><b>Logs that hold up in a dispute:</b> contractor hours, an incident timeline.</li>
+    <li><b>Spaced repetition for knowledge:</b> the stale review asks "still true?" on a schedule; unaffirmed records show their age.</li>
+    <li><b>A contradiction queue:</b> forks, disputes and visible rejections in one place.</li>
+    <li><b><code>loops mcp</code>:</b> emit, query and tick as agent tools; grants decide which tools a session gets.</li>
+    <li><b><code>CLAUDE.md</code> as lens output</b>, with disputes visible.</li>
+    <li><b>Context by tick id</b> between agents; a witness tick per session replays what it knew; the tick tree is a verifiable trace. See <a href="#horizons/h-context" data-tab="horizons" data-sub="h-context">the walk</a>.</li>
+    <li><b>Collectors in any language</b> over stdin, the legacy importer among them.</li>
+  </ul></div></details>
+
+  <h3>What these ask of the build now</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Commitment</th><th>Unlocks</th><th>Cost if added later</th></tr></thead>
+    <tbody>
+      <tr><td><b>Place layout fetchable by plain HTTP GET</b>: closed segments named by hash, one mutable <code>segments.json</code></td><td>static hosting, file sync, public stores</td><td>changes the on-disk format</td></tr>
+      <tr><td><b>Folds take "as of" for both times</b></td><td>bitemporal questions, diffs</td><td>touches every fold</td></tr>
+      <tr><td><b>Folds define an absent opening:</b> envelope folds count it, payload folds skip it</td><td>disclosure, erasure</td><td>non-deterministic ticks</td></tr>
+      <tr><td><b>One local API</b> under the CLI, <code>serve</code>, MCP and LSP</td><td>every surface</td><td>surfaces that drift apart</td></tr>
+      <tr><td><b>Lens contract:</b> render for an audience, parse to a structured view, diff by ids in the core, apply as one transaction, base (tick, lens hash, audience) in front matter</td><td>docs, CSV, <code>store.json</code> as one pattern</td><td><code>store.json</code> stays special</td></tr>
+      <tr><td><b>Two names per result</b> behind a pluggable cache: an input key that includes the lens and fold vocabulary, and a result hash over a canonical encoding</td><td>early cutoff, shared caches, renders on static places, context by hash</td><td>every cache key changes; until then, stale renders under the right name</td></tr>
+      <tr><td><b>Collectors as external processes</b>, split by disclosure; <code>promote</code> carries envelope-only records</td><td>any language, team sharing</td><td>a plugin system nobody wants</td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="unfold source"><summary>Prior art</summary><div class="body"><ul>
+    <li>Foster, Greenwald, Moore, Pierce, Schmitt, "Combinators for bidirectional tree transformations" (2007): lens laws; Boomerang</li>
+    <li>Ink &amp; Switch, Cambria (2020): lenses between schemas</li>
+    <li>Dolstra, <i>The Purely Functional Software Deployment Model</i> (2006): Nix; Bazel remote caching</li>
+    <li>Mokhov, Mitchell, Peyton Jones, "Build Systems à la Carte" (ICFP 2018): early cutoff; Nix RFC 62, content-addressed derivations</li>
+    <li>Language Server Protocol; Hypothesis web annotation; W3C Web Annotation model</li>
+    <li>IETF SD-JWT; BBS signatures (IETF draft, used in W3C Verifiable Credentials): selective disclosure of signed claims</li>
+    <li>Morris et al., "Text Embeddings Reveal (Almost) As Much As Text" (2023): embedding inversion</li>
+    <li>OpenTimestamps; RFC 3161</li>
+  </ul></div></details>
+  </div>
+  <div class="subpanel" id="h-lenses" role="tabpanel" aria-labelledby="st-h-lenses" hidden>
+  <h3>Editable lenses: docs as the store</h3>
+  <p>The store is the single source of truth; the files people already edit are <b>lenses</b> over it. Docs stay Markdown in the repo, edited in PRs the normal way, and every edit lands as dated, signed, cross-referenceable records.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Render: the store's tick T:4c renders adr-12.md with base T:4c in its front matter. A person edits the file. Parse and diff it against the render of T:4c, emit facet records with prev set to the heads from T:4c, and they land in the store. CI checks that rendering the current tick reproduces the committed file.">
+        <rect class="box" x="8" y="20" width="104" height="38" rx="8"/><text x="60" y="44" text-anchor="middle" class="b">store</text>
+        <rect class="box-acc" x="148" y="20" width="104" height="38" rx="8"/><text x="200" y="44" text-anchor="middle" class="mono">tick T:4c</text>
+        <rect class="box" x="288" y="12" width="104" height="54" rx="8"/><text x="340" y="36" text-anchor="middle" class="mono">adr-12.md</text><text x="340" y="54" text-anchor="middle" class="xs m">base: T:4c</text>
+        <line class="ln" x1="114" y1="39" x2="145" y2="39" marker-end="url(#ah)"/><text x="130" y="14" text-anchor="middle" class="xs m">fold</text>
+        <line class="ln-acc" x1="254" y1="39" x2="285" y2="39" marker-end="url(#ah-acc)"/><text x="270" y="14" text-anchor="middle" class="xs ta">render</text>
+        <line class="ln" x1="340" y1="68" x2="340" y2="127" marker-end="url(#ah)"/><text x="348" y="102" class="xs m">edit</text>
+        <rect class="box-amb" x="288" y="130" width="104" height="38" rx="8"/><text x="340" y="154" text-anchor="middle" class="s">edited file</text>
+        <rect class="box" x="148" y="130" width="104" height="38" rx="8"/><text x="200" y="148" text-anchor="middle" class="s">parse, diff</text><text x="200" y="161" text-anchor="middle" class="xs m">vs render(T:4c)</text>
+        <rect class="box" x="8" y="130" width="104" height="38" rx="8"/><text x="60" y="148" text-anchor="middle" class="s">facet records</text><text x="60" y="161" text-anchor="middle" class="xs m">prev = heads</text>
+        <line class="ln-amb" x1="286" y1="149" x2="255" y2="149" marker-end="url(#ah-amb)"/>
+        <line class="ln" x1="146" y1="149" x2="115" y2="149" marker-end="url(#ah)"/>
+        <line class="ln" x1="60" y1="128" x2="60" y2="61" marker-end="url(#ah)"/><text x="68" y="102" class="xs m">apply</text>
+        <rect class="box dash" x="8" y="200" width="384" height="42" rx="8"/>
+        <text x="200" y="218" text-anchor="middle" class="s">CI: render(current tick) = committed file</text>
+        <text x="200" y="234" text-anchor="middle" class="xs m">docs drift becomes a red check</text>
+      </svg>
+    </div>
+    <figcaption>A lens is a collector with a base: it reads a file loops itself rendered and emits records whose <code>prev</code> comes from that base. One contract covers Markdown, CSV, YAML and <code>store.json</code>.</figcaption>
+  </figure>
+  <p><b>Two laws</b> keep it honest. <b>No-op:</b> a render, parsed with no edits, gives no records. <b>Put-get:</b> your accepted edits read back unchanged, up to the lens's normal form; anything else is reported, never dropped. (Restated by the adversarial walk below.)</p>
+  <ul>
+    <li><b>Every rendered file remembers its base:</b> the tick, the lens hash and the audience it was rendered for, in front matter. A stale base makes a visible fork instead of overwriting: a three-way merge done by the data model.</li>
+    <li><b>Each kind decides its granularity.</b> An ADR's front matter fields and fixed sections are facets; a free-form doc can start as one body facet.</li>
+    <li><b>Facets are edited; testimony is cited.</b> Facets are the thing's state (an ADR's status, a chapter's prose), edited by anyone with standing; your own notes are yours to edit too. Others' notes render as quotes: edits inside a quote are refused, and text you add around them becomes your note, referring to theirs. Setting <code>prev</code> on someone else's observation would supersede their testimony.</li>
+    <li><b>Links become references.</b> <code>[[svc:auth]]</code> parses into a reference field, so backlinks come free.</li>
+    <li><b>Authored and derived content mix.</b> "Related incidents" renders read-only from another vertex; parse ignores it, edits to it get a clear message.</li>
+    <li><b>The author applies, CI checks.</b> A pre-commit hook runs <code>apply</code>, so records are signed by the author and land in the same PR.</li>
+    <li><b>Conflicts settle in the data.</b> Committed lens files are always pure renders, so a git conflict on one is resolved by re-rendering, never by hand. A real fork shows as a conflict block; resolving it emits one record with both heads in its <code>prev</code> set.</li>
+    <li><b>Time travel without git:</b> <code>loops render adr-12 --as-of 2021-03</code>.</li>
+  </ul>
+
+
+  <h3>Walk: the editable lens, adversarially</h3>
+  <p><span class="pill p-lean">walked once</span> <code>adr-12.md</code> in the team repo, rendered from <code>T:4c</code>: front matter (<code>id</code>, <code>status</code>, <code>deciders</code>), three fixed sections as facets, a Discussion built from several people's notes, and Related incidents computed by another vertex. Every step tries to break the contract. It held where it mattered: the record didn't change; the <b>lens contract</b> did.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 372" role="img" aria-label="The team store renders adr-12.md with lens h:d4 for the team; the file's base is T:4c, h:d4, team. You edit lens files in any editor. Apply runs as one transaction: parse, diff by ids against the render of the base. Accepted edits become facets with prev set to the heads and your own notes citing others; refused edits (absence, edits inside a quote, the same facet set twice, a copied id) are reported, never dropped. Accepted records land in the store. CI checks that rendering the current tick for the team reproduces the committed file, catching un-applied edits and leaks.">
+        <rect class="box" x="120" y="6" width="160" height="30" rx="8"/><text x="200" y="25" text-anchor="middle" class="s b">team store</text>
+        <line class="ln" x1="200" y1="37" x2="200" y2="57" marker-end="url(#ah)"/><text x="208" y="51" class="xs m">render · lens h:d4 · for team</text>
+        <rect class="box-acc" x="100" y="60" width="200" height="40" rx="8"/><text x="200" y="77" text-anchor="middle" class="mono">adr-12.md</text><text x="200" y="92" text-anchor="middle" class="xs m">base T:4c · h:d4 · team</text>
+        <line class="ln" x1="200" y1="101" x2="200" y2="121" marker-end="url(#ah)"/><text x="208" y="115" class="xs m">you edit, in any editor</text>
+        <rect class="box" x="100" y="124" width="200" height="30" rx="8"/><text x="200" y="143" text-anchor="middle" class="s">edited lens files</text>
+        <line class="ln" x1="200" y1="155" x2="200" y2="175" marker-end="url(#ah)"/><text x="208" y="169" class="xs ta">apply: one transaction</text>
+        <rect class="box" x="100" y="178" width="200" height="40" rx="8"/><text x="200" y="195" text-anchor="middle" class="s b">parse · diff by ids</text><text x="200" y="210" text-anchor="middle" class="xs m">against render(base)</text>
+        <line class="ln-acc" x1="160" y1="219" x2="112" y2="243" marker-end="url(#ah-acc)"/>
+        <line class="ln-amb" x1="240" y1="219" x2="288" y2="243" marker-end="url(#ah-amb)"/>
+        <rect class="box-acc" x="14" y="246" width="180" height="44" rx="8"/><text x="104" y="264" text-anchor="middle" class="s">facets · prev = heads</text><text x="104" y="280" text-anchor="middle" class="xs m">your notes, citing theirs</text>
+        <rect class="box-amb" x="206" y="246" width="180" height="58" rx="8"/><text x="296" y="263" text-anchor="middle" class="s b">refused, never dropped</text><text x="296" y="279" text-anchor="middle" class="xs">absence · inside a quote</text><text x="296" y="294" text-anchor="middle" class="xs">same facet twice · copied id</text>
+        <path class="ln-acc" d="M14,268 H6 V21 H117" marker-end="url(#ah-acc)"/>
+        <line class="ln dash" x1="104" y1="291" x2="140" y2="319"/>
+        <rect class="box dash" x="40" y="320" width="320" height="44" rx="8"/><text x="200" y="338" text-anchor="middle" class="s">CI: render(current, for team) = committed file</text><text x="200" y="354" text-anchor="middle" class="xs m">else: an un-applied edit, or a leak</text>
+      </svg>
+    </div>
+    <figcaption>The base names the lens and the audience. Apply is one transaction; what it can't take, it refuses out loud. CI renders for the place's audience, so un-applied edits and leaks both go red.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>1 · Nothing changed, but the editor did things</summary><div class="body">
+    <p>CRLF to LF, <code>*</code> bullets to <code>-</code>, smart quotes, a reflowed paragraph. "No edits, no records" holds only if the diff compares <b>parsed views, not bytes</b>.</p>
+    <ul>
+      <li><b>Structure is normalized:</b> re-rendering restores the lens's format, like gofmt. Lens files are formatter-owned.</li>
+      <li><b>Facet text is stored verbatim,</b> compared after normalizing whitespace: a pure reflow emits nothing, and the next render restores the stored text.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>2 · The lens was upgraded between render and edit</summary><div class="body">
+    <p>Rendered with lens v3, applied after upgrading to v4, which formats Decision differently. Recomputing <code>render(T:4c)</code> with v4 blames you for v4's changes.</p>
+    <p><b>The base is (tick, lens hash, audience),</b> not the tick alone. The old lens is fetched by hash to rebuild the exact base: "name it, don't carry it" from the build walk, paying off at once.</p>
+  </div></details>
+  <details class="unfold"><summary>3 · You render with your grant, and commit it</summary><div class="body">
+    <p>You can see dev2's withheld session turn, so your render of Discussion includes it. Committing it to the team repo leaks it.</p>
+    <p><b>A committed render is a promotion.</b> It's rendered for the audience of the place it's committed to, not for whoever ran it. The CI check already catches the leak if CI renders under the repo's audience: your file holds more than that render, so it goes red. The privacy boundary enforces itself.</p>
+  </div></details>
+  <details class="unfold"><summary>4 · Erasure after the file was committed</summary><div class="body">
+    <p>A note shown in Discussion is erased. The store rewrites one segment file, but the note's text was also copied into <code>adr-12.md</code> in every commit since.</p>
+    <p><b>Committed renders are copies, so each kind declares where its text may render.</b> Lean: facets (the thing's own state) render into committed files; testimony renders there <b>by reference</b> (author, date, link), with full text only in local renders and the sidebar. Erasing a facet's text means a steward rewrites that file's history too, visibly.</p>
+  </div></details>
+  <details class="unfold"><summary>5 · Two PRs touch different facets</summary><div class="body">
+    <p>You edit Decision; dev2 sets <code>status</code> to deprecated; both from <code>T:4c</code>. The store has no fork: a three-way merge per facet, done by the data. Git has a spurious conflict, because both PRs re-rendered the file.</p>
+    <ul>
+      <li><b>Committed lens files are always pure renders.</b> A pre-commit hook runs apply and re-renders; CI rejects a file that doesn't match its render ("un-applied edit").</li>
+      <li><b>So conflicts on them resolve like lockfiles:</b> union the segments and re-render, never by hand. A merge driver does it.</li>
+      <li><b>Edits made without a key</b> (GitHub's web editor) fail CI with "run apply". A team that wants it can let a CI collector record the edit as hearsay citing the commit, which the author can endorse later. An author's signature never comes from a machine without their key.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>6 · Both of you edit Decision</summary><div class="body">
+    <p>A real fork: two heads, shown as a conflict block; resolving it emits one record with both heads in <code>prev</code>. As before.</p>
+    <p><b>Free-form docs stay one body facet.</b> There, any two edits fork the whole body. The fork stays in the data and the lens <b>proposes</b> a text merge against the common base (<code>git merge-file</code>); non-overlapping edits merge cleanly, and applying signs the merge with both heads in <code>prev</code>. Finer facets aren't needed.</p>
+  </div></details>
+  <details class="unfold"><summary>7 · Deleting, reordering, adding</summary><div class="body">
+    <ul>
+      <li><b>You delete the Consequences section.</b> Clear it, or an accident? <b>Absence is never an edit; emptiness is.</b> A missing section is an error with a hint: leave the heading with no text to clear it. The same principle as showing missing context as missing.</li>
+      <li><b>You reorder sections:</b> fixed sections are found by heading, so it's a no-op and re-rendering restores the order.</li>
+      <li><b>You add "Alternatives considered",</b> not in the kind: the maturity rule again. Open keeps it as an extra facet keyed by its heading; declared warns and suggests declaring it; strict refuses.</li>
+      <li><b>You delete a CSV row:</b> the lens declares what removal means (say, "row removed means retire") or refuses. Never silent.</li>
+      <li><b>You reorder chapters in the novel's contents.</b> A <code>position</code> facet per chapter makes one move emit <i>n</i> records, and two concurrent moves interleave oddly. <b>Order belongs to the container:</b> one <code>book-order</code> facet listing chapter ids. Concurrent reorders fork one list, and the lens proposes a merge. The worked example is updated.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>8 · Editing what isn't yours</summary><div class="body">
+    <ul>
+      <li><b>Related incidents</b> (computed): read-only; edits are refused with a message.</li>
+      <li><b>A typo in Sam's note:</b> under the old rule, the next render shows Sam's note unchanged plus a near-duplicate from you, which reads as a bug. <b>Now:</b> others' testimony renders as quotes and edits inside one are refused ("Sam's words; reply below"). Text you add around the quotes becomes your note; your own past notes are yours, so editing them sets <code>prev</code>.</li>
+      <li><b>What you may edit follows authorship and standing,</b> not block type: facets with standing, your own testimony always, others' testimony only by citing it.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>9 · One commit, two lenses, and a copied file</summary><div class="body">
+    <ul>
+      <li><b>Apply is one transaction over every lens file in the commit.</b> <code>adr-index.csv</code> and <code>adr-12.md</code> both set ADR-12's status: the same value gives one record; different values are refused before anything is emitted.</li>
+      <li><b>The diff compares ids, not labels:</b> a renamed <code>[[svc:auth]]</code> you didn't touch is a no-op.</li>
+      <li><b>Copy and paste is how docs get started.</b> A copied ADR still says <code>id: adr:12</code>, so two files claim one id: refused, "looks like a copy; remove <code>id</code> to create one". A file with no id is minted on apply, which writes the id back.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>10 · A base six versions behind</summary><div class="body">
+    <p>Your Decision edit is against <code>T:4c</code>; Decision has moved on. That's honestly a fork with the current head, and correct. Apply warns ("6 versions behind"); <code>--rebase</code> merges the text onto the current head before emitting. The model only ever sees <code>prev</code>; rebasing is a tool convenience.</p>
+  </div></details>
+  <details class="unfold"><summary>11 · The laws, restated</summary><div class="body">
+    <p>"Apply, then render, gives back the edited file" can't hold as written: other people's records, normalization, refusals and audience filtering all intervene.</p>
+    <ul>
+      <li><b>No-op:</b> a render, parsed with no edits, gives no records.</li>
+      <li><b>Put-get:</b> your accepted edits read back unchanged, up to the lens's normal form; anything else is reported, never dropped.</li>
+    </ul>
+  </div></details>
+
+  <div class="tbl"><table>
+    <thead><tr><th>What the walk changed</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td><b>The base is (tick, lens hash, audience)</b></td><td>lens contract</td></tr>
+      <tr><td><b>A committed render is a promotion,</b> rendered for the place's audience</td><td>lens contract, privacy boundary</td></tr>
+      <tr><td><b>Committed lens files are pure renders;</b> git conflicts re-render; key-less edits fail CI or become hearsay</td><td>conventions, a merge driver</td></tr>
+      <tr><td><b>Kinds declare where their text renders;</b> testimony is committed by reference</td><td>store declaration</td></tr>
+      <tr><td><b>Absence is never an edit;</b> removal is declared or refused</td><td>lens contract</td></tr>
+      <tr><td><b>Edit rights follow authorship:</b> facets with standing, your own testimony; others' quoted</td><td>revises the testimony rule</td></tr>
+      <tr><td><b>Apply is one transaction;</b> copied ids refused; diff by ids</td><td>lens contract</td></tr>
+      <tr><td><b>Free-form docs stay one body facet,</b> with proposed text merges</td><td>closes an Open item</td></tr>
+      <tr><td><b>Order is one facet on the container</b></td><td>revises the novel example</td></tr>
+      <tr><td><b>The two laws, restated</b></td><td>lens contract</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>What this walk didn't touch</summary><div class="body"><ul>
+    <li><b>The record, <code>prev</code> as a set, facets, LatestBy, admission, the maturity rule:</b> all unchanged.</li>
+    <li><b>The conflict block's syntax:</b> it has to stay unambiguous inside code fences.</li>
+    <li><b>Installing the hook and merge driver</b> in a repo, and the CI collector for key-less edits.</li>
+    <li><b>Lenses with no file:</b> the novel's JS front end and the web sidebar edit through the same contract, without git.</li>
+  </ul></div></details>
+  </div>
+  <div class="subpanel" id="h-lsp" role="tabpanel" aria-labelledby="st-h-lsp" hidden>
+  <h3>Walk: the LSP, end to end</h3>
+  <p><span class="pill p-lean">walked once</span> One function, <code>Verify</code> in the <code>platform</code> repo, followed from a 2019 note through a branch that renames it, a junior developer's note, a merge, and a hover in 2026. The <code>team-platform</code> store lives in the repo at <code>.loops/</code>. Keys are <code>git:&lt;repo&gt;@&lt;commit&gt;:&lt;path&gt;#&lt;symbol&gt;</code>.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 268" role="img" aria-label="Main line: c0 where Verify is born, c1 where the director reads it and writes a note, c4 where a branch starts. The branch commits b1, which renames Verify to ValidateToken, and b2, where a junior developer writes a note. The branch merges back, by merge or squash, before c9. A hover at c9 follows history back to c0, giving the birth key that both notes are about.">
+        <text x="8" y="16" class="xs m">main</text>
+        <rect class="box-amb" x="58" y="24" width="100" height="26" rx="6"/><text x="108" y="41" text-anchor="middle" class="xs">director's note</text>
+        <line class="ln dash" x1="96" y1="52" x2="96" y2="74"/>
+        <rect class="box-acc" x="300" y="24" width="92" height="26" rx="6"/><text x="346" y="41" text-anchor="middle" class="xs b">hover</text>
+        <line class="ln dash" x1="358" y1="52" x2="358" y2="74"/>
+        <line class="ln" x1="42" y1="88" x2="80" y2="88"/><line class="ln" x1="112" y1="88" x2="146" y2="88"/><line class="ln" x1="178" y1="88" x2="268" y2="88"/><line class="ln" x1="300" y1="88" x2="342" y2="88"/>
+        <circle class="box" cx="26" cy="88" r="15"/><text x="26" y="92" text-anchor="middle" class="xs">c0</text>
+        <circle class="box" cx="96" cy="88" r="15"/><text x="96" y="92" text-anchor="middle" class="xs">c1</text>
+        <circle class="box" cx="162" cy="88" r="15"/><text x="162" y="92" text-anchor="middle" class="xs">c4</text>
+        <circle class="box" cx="284" cy="88" r="15"/><text x="284" y="92" text-anchor="middle" class="xs">m/s</text>
+        <circle class="box" cx="358" cy="88" r="15"/><text x="358" y="92" text-anchor="middle" class="xs">c9</text>
+        <text x="26" y="120" text-anchor="middle" class="xs m">Verify born</text>
+        <text x="296" y="124" class="xs m">merge or squash</text>
+        <line class="ln" x1="172" y1="100" x2="196" y2="150"/>
+        <line class="ln" x1="220" y1="162" x2="236" y2="162"/>
+        <line class="ln" x1="262" y1="150" x2="276" y2="102"/>
+        <circle class="box" cx="204" cy="162" r="15"/><text x="204" y="166" text-anchor="middle" class="xs">b1</text>
+        <circle class="box" cx="252" cy="162" r="15"/><text x="252" y="166" text-anchor="middle" class="xs">b2</text>
+        <text x="132" y="160" text-anchor="end" class="xs m">feat/jwt</text>
+        <text x="204" y="194" text-anchor="middle" class="xs m">renamed:</text><text x="204" y="207" text-anchor="middle" class="xs m">ValidateToken</text>
+        <line class="ln dash" x1="252" y1="178" x2="282" y2="196"/>
+        <rect class="box-amb" x="262" y="196" width="130" height="26" rx="6"/><text x="327" y="213" text-anchor="middle" class="xs">junior dev's note</text>
+        <path class="ln-acc" d="M346,68 C300,62 120,62 40,74" marker-end="url(#ah-acc)"/>
+        <text x="200" y="252" text-anchor="middle" class="xs ta">both notes: about git:platform@c0:pkg/auth/token.go#Verify</text>
+      </svg>
+    </div>
+    <figcaption>Identity follows the commits each branch actually contains, not the clock. The hover at c9 traces back to c0 (accent arrow); so does a hover on the branch at b1, through the rename.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>1 · 2019: the director's note</summary><div class="body">
+    <p>The key for a symbol is <b>the symbol as it was in the commit that created it</b>, its birth. Editor tooling follows history back to find it. That key never changes meaning, and anyone with the repo computes the same one without coordinating, so no anchor is minted and no name record is written: "keys converge on their own", applied to code.</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit note body="must stay constant-time: the 2018 timing leak" \
+    seen=git:platform@c1:pkg/auth/token.go#Verify \
+    --about git:platform@c0:pkg/auth/token.go#Verify
+# by sl:director; about the birth key, seen the version read</pre>
+    <p><code>seen</code> is a payload reference: the exact version the observer was reading. It pays off in step 5.</p>
+  </div></details>
+  <details class="unfold"><summary>2 · A branch renames it</summary><div class="body">
+    <p><code>feat/jwt</code> branches from main at c4. Commit b1 moves the function to <code>internal/security/jwt.go</code> and renames it <code>ValidateToken</code>. <b>No records are written.</b> A hover at b1 follows the branch's own history: <code>ValidateToken@b1</code> came from <code>Verify@c4</code>, back to c0. Same birth key; the director's note shows.</p>
+    <p><b>This is where version 12 broke.</b> It bound paths to anchors as dated names, "the name in effect at <code>emitted</code>". A rename on the branch would then be in effect on main too, by the clock, though main never renamed anything. Following each branch's history replaces following the clock, and the branch problem disappears.</p>
+  </div></details>
+  <details class="unfold"><summary>3 · The junior developer's note, on the branch</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit note body="the new key cache: is the compare still constant-time?" \
+    seen=git:platform@b2:internal/security/jwt.go#ValidateToken \
+    --about git:platform@c0:pkg/auth/token.go#Verify
+# by sl:dev2</pre>
+    <p>The record lands in dev2's segment in the branch's working tree, so knowledge travels with the code it's about. That broke a Sharing rule: dev2 also wrote notes on main this week, so one growing segment file was appended on two branches and the merge would conflict. Version 10 called such a conflict an alarm, but here it was legitimate: one writer on two branches forks their own log.</p>
+    <p><b>Fix:</b> in a git place a segment file closes once committed, and the next write opens a new one. Two branches add different files and merging only adds files. The alarm becomes exact: a committed segment file changed outside an erase. It also settles "records in the tree or a separate ref?": in the tree, because records about branch code should merge when the code does.</p>
+  </div></details>
+  <details class="unfold"><summary>4 · The merge: merge commit, squash, rebase</summary><div class="body">
+    <ul>
+      <li><b>Merge commit:</b> segment files union; the birth key is unchanged. Nothing to do.</li>
+      <li><b>Squash, for <code>Verify</code>:</b> it was born before the branch, so main's history still leads to c0. Its notes' <code>seen</code> keys point at b2, off main, but the string stays exact and the host keeps the pull request's commits.</li>
+      <li><b>Squash, for a symbol born on the branch:</b> <code>cacheKeys</code>, created at b1, has notes keyed on b1. After squashing, main computes its birth as s1 and those notes are orphaned. The merge job observes the squash and repairs it with existing machinery:</li>
+    </ul>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit same-as --under g:merge-bot \
+    --about git:platform@b1:…/jwt.go#cacheKeys --about git:platform@s1:…/jwt.go#cacheKeys
+# by ci/merge</pre>
+    <ul>
+      <li><b>Rebase</b> breaks branch-born symbols the same way; the same step covers it at merge.</li>
+      <li><b>Rename detection is heuristic.</b> If dev2's tooling misses a move and computes birth c3 where the director's computes c0, their notes split. But c3's key lies on the director's history of the same function, so the tooling can see the mismatch and propose a <code>same-as</code>: a hygiene finding, not an error.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>5 · 2026: hovering on main</summary><div class="body">
+    <ol>
+      <li><b>Tooling:</b> the cursor resolves to <code>ValidateToken</code>, its history leads to the birth key at c0, and a disposable index caches that mapping.</li>
+      <li><b>Core:</b> <code>resolve-by</code> maps the key to its class (the key plus any <code>same-as</code>); the <code>code-knowledge</code> vertex collects notes about it, weighted by tenure.</li>
+      <li><b>Render:</b></li>
+    </ol>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">ValidateToken  (born as Verify, 2016)
+  director · 20y · 2019 · read at c1   must stay constant-time …
+     ⚠ the function changed 3 times since c1
+  dev2 · 2y · 2026 · read at b2        is the compare still constant-time?
+     ⚠ unanswered</pre>
+    <p><b><code>seen</code> earns its place:</b> comparing the commit a note was read at with git's history flags notes written against a version that has since changed, a staleness signal for the stale review, for free. On an old checkout (c2), dev2's note shows as "about a later version", because b2 isn't in c2's history.</p>
+  </div></details>
+  <details class="unfold"><summary>The edge that can't be avoided: a commit can't hold records about itself</summary><div class="body">
+    <p>A commit's id is a hash of its contents, so records naming a symbol born in that commit can't be inside it. Notes about brand-new code land one commit later. Lean: the editor holds them as drafts until the symbol exists in a commit, then emits them with <code>occurred</code> set to when they were written. Existing fields already say this honestly.</p>
+  </div></details>
+
+  <div class="tbl"><table>
+    <thead><tr><th>What the walk changed</th><th>Replaces or settles</th></tr></thead>
+    <tbody>
+      <tr><td><b>Birth keys</b>, computed by tooling along each branch's history</td><td>version 12's anchors plus paths as dated names; no minting for code; the core never reads git</td></tr>
+      <tr><td><b><code>seen</code></b>, the version read</td><td>staleness flags and old checkouts, free</td></tr>
+      <tr><td><b>Git segment files close once committed</b></td><td>one writer on two branches; the alarm made exact; records live in the tree</td></tr>
+      <tr><td><b>Squash and rebase repaired by the merge job's <code>same-as</code></b></td><td>branch-born symbols; tooling mismatches become hygiene proposals</td></tr>
+      <tr><td><b>Notes on new code trail by one commit</b>, held as drafts</td><td>a commit can't name itself</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>What the walk didn't touch</summary><div class="body"><ul>
+    <li><b>A range of lines inside a function:</b> lean, the birth key plus a W3C-style selector (quoted text and context) in the payload. The part shared with web annotation.</li>
+    <li><b>Files and packages:</b> git follows file renames natively; directories barely.</li>
+    <li><b>The repo's identity:</b> lean, name it by its root commit, which survives renames. Forks share keys for history before they split, which is arguably right.</li>
+    <li><b>Hover latency:</b> mostly an index question.</li>
+  </ul></div></details>
+
+  </div>
+  <div class="subpanel" id="h-web" role="tabpanel" aria-labelledby="st-h-web" hidden>
+  <h3>Walk: annotating the web, federated</h3>
+  <p><span class="pill p-lean">walked once</span> You highlight an essay, a Discord thread discusses it, a friend publishes their own notes, you reply, strangers and the author appear, and the essay changes. Federation came almost free from what was already set: every writer owns their store, and stores never share custody.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 300" role="img" aria-label="Every record is about url:example.com/essay. Your realm: an annotations store at home promotes into a public store on a static site; the Discord feed stays home. Others: the author's store found through the domain's well-known file, Sam's static store, and an aggregator. Your public store pings Sam's. A sidebar lens composes all of them, admitted by your follows and ranked.">
+        <rect class="box-amb" x="110" y="6" width="180" height="30" rx="8"/><text x="200" y="25" text-anchor="middle" class="xs mono">url:example.com/essay</text>
+        <line class="ln dash" x1="150" y1="37" x2="110" y2="50"/><line class="ln dash" x1="250" y1="37" x2="290" y2="50"/>
+        <rect class="panel" x="2" y="50" width="192" height="200" rx="10"/><text x="12" y="68" class="s b">your realm</text>
+        <rect class="box" x="14" y="78" width="168" height="30" rx="6"/><text x="98" y="97" text-anchor="middle" class="s">annotations · home</text>
+        <line class="ln-acc" x1="98" y1="110" x2="98" y2="131" marker-end="url(#ah-acc)"/><text x="106" y="125" class="xs ta">promote</text>
+        <rect class="box-acc" x="14" y="134" width="168" height="30" rx="6"/><text x="98" y="153" text-anchor="middle" class="s">public · static site</text>
+        <rect class="box dash" x="14" y="194" width="168" height="34" rx="6"/><text x="98" y="209" text-anchor="middle" class="s">feed · Discord</text><text x="98" y="222" text-anchor="middle" class="xs m">stays home</text>
+        <rect class="panel" x="206" y="50" width="192" height="200" rx="10"/><text x="216" y="68" class="s b">others</text>
+        <rect class="box" x="218" y="78" width="168" height="30" rx="6"/><text x="302" y="97" text-anchor="middle" class="s">author · well-known</text>
+        <rect class="box-acc" x="218" y="134" width="168" height="30" rx="6"/><text x="302" y="153" text-anchor="middle" class="s">Sam · static site</text>
+        <rect class="box dash" x="218" y="194" width="168" height="34" rx="6"/><text x="302" y="209" text-anchor="middle" class="s">aggregator</text><text x="302" y="222" text-anchor="middle" class="xs m">hides, never forges</text>
+        <line class="ln-amb" x1="184" y1="149" x2="215" y2="149" marker-end="url(#ah-amb)"/><text x="200" y="142" text-anchor="middle" class="xs tb">ping</text>
+        <line class="ln" x1="98" y1="250" x2="140" y2="259" marker-end="url(#ah)"/><line class="ln" x1="302" y1="250" x2="260" y2="259" marker-end="url(#ah)"/>
+        <text x="200" y="257" text-anchor="middle" class="xs m">compose</text>
+        <rect class="box-acc" x="60" y="262" width="280" height="32" rx="8"/><text x="200" y="282" text-anchor="middle" class="s b">sidebar lens · admitted, ranked</text>
+      </svg>
+    </div>
+    <figcaption>Every record is about the same normalized key. Each person writes only into their own stores; reading across realms is composition over plain HTTP. Nobody holds custody of the conversation: whoever reads reassembles it.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>1 · You highlight a passage</summary><div class="body">
+    <p>The extension writes your own observation, signed by your device key: not a collector's hearsay.</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit annotation quote="…the exact passage…" prefix="…" suffix="…" \
+    body="the same argument as chapter 3" refs:='["r:a1"]' seen=h:9c2… \
+    --about url:example.com/essay
+# by sl:a1; the URL normalized at write; seen is the hash of the text as read</pre>
+    <ul>
+      <li><b>The extension normalizes when writing,</b> by the store's rule: <code>"natural": {"url": {"normalize": ["canonical-link", "strip-tracking", "lowercase-host"]}}</code>. <code>rel=canonical</code> wins when it's on the same registrable domain. The same pattern as birth keys: tooling computes keys, the core compares strings, and two tools that disagree get a <code>same-as</code> proposal.</li>
+      <li><b><code>seen</code> generalizes:</b> the version read. A commit for code, a hash of the extracted article for a page. It can't fetch the page back without a snapshot, but it answers "has this changed since I read it?"</li>
+      <li><b>Selectors anchor the highlight:</b> W3C quote, prefix and suffix in the payload, the same answer the LSP walk left open for line ranges.</li>
+      <li><b>The reference to <code>r:a1</code></b>, your novel chapter, is the "LSP for information": what you read, linked to what you're writing.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>2 · A Discord thread about the same essay</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># the Discord collector, signing as kyle/discord
+{"kind":"discord-message", "about":["discord:thread/8812", "url:example.com/essay"], "payload":{"author":"mira#2210", "text":"this essay is the best case against…"}}
+{"kind":"discord-message", "about":["discord:thread/8812"], "payload":{…}}     ← replies in that thread</pre>
+    <ul>
+      <li><b>The sidebar is a lens, and lenses may hop:</b> URL → messages about it → their thread keys → the thread. Folds stay one hop. The collector doesn't tag every message with the URL; that would claim each one is about the essay.</li>
+      <li><b>Conversation follows the thing, not the venue.</b></li>
+      <li><b>Other people's words stay home.</b> If you publish an annotation that refers to a Discord message, readers see the withheld form ("a private source"); salted ids leak nothing.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>3 · Publishing: a public store on static hosting</summary><div class="body">
+    <p><b>Publishing is a declaration, not a place setting.</b> A store declares itself public by a steward changeset, which needs presence; a place may publish only stores that declare it. Promotion into it is then ordinary: the extension's share toggle promotes verbatim (same id, same signature) under a grant. A public store is a <b>standing bridge</b>: presence given once, ahead of time.</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># public's store.json; declaring it public is a steward changeset, with presence
+{ "store": "public", "visibility": "public",
+  "writers": [{ "allow": "sl:a1", "kinds": ["annotation", "reply"] }] }
+
+# places.json: a git place, pushed to a static host
+{ "stores": { "public": [{ "place": "pages", "url": "git@…/notes.git", "role": ["write", "hold"] }] } }
+
+https://sam.example/loops/public/
+  anchor                                    st: id; pins Sam's root key
+  segments.json                             the only file that changes
+  segments/&lt;observer&gt;/&lt;device&gt;/&lt;hash&gt;.jsonl immutable: cache forever
+  by-key/&lt;hash of key&gt;.json                 optional derived index: ids about that key</pre>
+    <ul>
+      <li><b>Closed segments pay off twice.</b> Closed once committed (the LSP walk) and named by hash, every segment is immutable and CDN-cacheable forever.</li>
+      <li><b><code>by-key/</code> is a query without a server:</b> one GET answers "who annotated this URL in Sam's store?" Derived, and checkable against the signed records.</li>
+      <li><b>Natural keys across realms</b> cross only by bridge; <code>url:</code> keys are made to match across realms, which is why publishing them is the disclosure decision, made once.</li>
+      <li><b>The hygiene vertex scans before promotion</b> for internal hosts (an intranet wiki, a private document link). Those keys never leave home.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>4 · Following Sam, and replying</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit name name=sam --about st:5a…                           # your root name table: following
+loops place add sam https://sam.example/loops/public/ --role hold
+
+loops emit reply body="chapter 3 makes the opposite bet" \
+    --about r:s7 --about url:example.com/essay                       # what it answers, and the thread's root</pre>
+    <ul>
+      <li><b>Following is composition plus a read place.</b> The store id pins Sam's root key on first use; the store carries its key bindings, so records verify on arrival, even from a CDN.</li>
+      <li><b>You never write into Sam's store.</b> The reply goes into yours.</li>
+      <li><b>Replies carry the root, like email's <code>References</code>.</b> The alternative, recursively selecting records about records about the page, would be a new kind of selection. An <code>about</code> naming several things keeps folds one hop.</li>
+      <li><b>Static hosting can't push.</b> Sam sees the reply by following you, or through a <b>ping</b> in the style of Webmention: "a record at this URL mentions yours". It says only where to look; Sam fetches and verifies. The endpoint is a hint, not a store.</li>
+      <li><b>Federation with no servers:</b> each static store is an outbox, following is composing, and a thread is reassembled by whoever reads it.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>5 · Strangers, the author, and spam</summary><div class="body">
+    <ul>
+      <li><b>The author:</b> <code>example.com/.well-known/loops</code> maps Ana's domain to her store; the extension checks once per domain and badges her notes "from the site". Visiting already told her site you're there.</li>
+      <li><b>Strangers need an aggregator:</b> a vertex over many composed public stores, publishing witness ticks ("I saw these ids about this key, hosted here"). You fetch from the origins and verify. <b>An index can hide but cannot lie.</b></li>
+      <li><b>Spam is an admission question.</b> "Rank, never hide" was written for a team whose members all count. In open federation <code>admitted-by</code> your follows (plus one hop of vouches, if wanted) decides who counts; weight ranks within that set. Strangers show as "12 annotations from people you don't follow", expandable: visible rejection, applied to people.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>6 · The essay changes, and you retract</summary><div class="body">
+    <ul>
+      <li><b>Re-anchoring:</b> the text hash differs from <code>seen</code>, so the selectors work: exact quote, then a fuzzy match on quote, prefix and suffix (as Hypothesis does), else an orphan: "this passage was changed or removed", with your quote.</li>
+      <li><b>Dynamic pages</b> (ads, personalization, paywalls) differ per visitor, so hash the extracted article and treat staleness as advisory.</li>
+      <li><b>Snapshots are optional:</b> a personal, erasable blob never shared, or a Wayback Machine link as a reference.</li>
+      <li><b>Retracting:</b> an <code>erase</code> propagates and the file holding the original is rewritten. Named by hash, the rewrite is a new file and <code>segments.json</code> points to it. Anyone who already pulled it keeps their copy, and caches linger. Erasure here is cooperative; publishing is publishing.</li>
+    </ul>
+  </div></details>
+
+  <div class="tbl"><table>
+    <thead><tr><th>What the walk changed</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>Keys computed by tooling when writing,</b> by a declared rule</td><td>URLs, canonical links and birth keys are one pattern; the core compares strings</td></tr>
+      <tr><td><b><code>seen</code> is "the version I read"</b>; W3C selectors anchor within it</td><td>one answer for code ranges and web passages</td></tr>
+      <tr><td><b>A store declares itself public</b> (presence); places publish only those</td><td>disclosure decided once, as a standing bridge</td></tr>
+      <tr><td><b>Static layout:</b> closed segments named by hash, one mutable list, optional <code>by-key/</code></td><td>cache forever; erasure is a list change</td></tr>
+      <tr><td><b>Federation is own stores plus composition;</b> replies carry the root; pings say where to look</td><td>no shared custody, no servers, no recursive selection</td></tr>
+      <tr><td><b>Admission filters; weight ranks</b> among the admitted</td><td>spam in open federation; aggregators can hide, never forge</td></tr>
+      <tr><td><b>Other people's words stay home</b></td><td>references to them show the withheld form</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>What this walk didn't touch</summary><div class="body"><ul>
+    <li><b>A reading group's shared store</b> (a small realm, like the team) instead of federating.</li>
+    <li><b>The aggregator's format</b>, and whether it publishes its own <code>by-key/</code> index.</li>
+    <li><b>PDFs and video:</b> page and time selectors.</li>
+    <li><b>The selector spec:</b> W3C's as written, or a subset.</li>
+  </ul></div></details>
+
+  </div>
+  <div class="subpanel" id="h-context" role="tabpanel" aria-labelledby="st-h-context" hidden>
+  <h3>Walk: context by tick id · 1. One handoff</h3>
+  <p><span class="pill p-lean">walked once</span> An orchestrator hands a subagent in a cloud sandbox one tick id; the subagent unpacks it, works, and is reviewed; the next session starts from its tick. The walk turned out to be less about ticks than about <b>what a reader does with references it can't fully see</b>, which matters most for an agent, because an agent fills gaps with guesses. The task is dev2's unanswered question from the LSP walk.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 334" role="img" aria-label="The code-knowledge vertex makes a context tick, T:ctx, sent as a bundle that carries, withholds or omits records. In the cloud sandbox the subagent unpacks it into five reference states (here, fetchable, withheld, erased, unreachable), reads it through the session-start lens, and emits a finding plus a witness tick of what it knew. Its task tick T:t5 goes through a review lens showing blind spots to you, and through the session-start lens for the next session.">
+        <rect class="box" x="4" y="8" width="118" height="34" rx="8"/><text x="63" y="29" text-anchor="middle" class="s">code-knowledge</text>
+        <line class="ln" x1="124" y1="25" x2="145" y2="25" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="148" y="8" width="96" height="34" rx="8"/><text x="196" y="29" text-anchor="middle" class="s mono">T:ctx</text>
+        <line class="ln" x1="246" y1="25" x2="267" y2="25" marker-end="url(#ah)"/>
+        <rect class="box" x="270" y="4" width="126" height="42" rx="8"/><text x="333" y="22" text-anchor="middle" class="s">bundle</text><text x="333" y="37" text-anchor="middle" class="xs m">carry · envelope · omit</text>
+        <rect class="panel" x="0" y="64" width="400" height="160" rx="10"/><text x="12" y="82" class="s b">cloud sandbox · session-9</text>
+        <line class="ln" x1="333" y1="48" x2="333" y2="91" marker-end="url(#ah)"/>
+        <rect class="box" x="216" y="94" width="172" height="30" rx="6"/><text x="302" y="113" text-anchor="middle" class="s">unpack · verify</text>
+        <line class="ln" x1="214" y1="109" x2="189" y2="109" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="14" y="94" width="172" height="30" rx="6"/><text x="100" y="113" text-anchor="middle" class="s">session-start lens</text>
+        <rect class="box" x="14" y="136" width="68" height="22" rx="5"/><text x="48" y="151" text-anchor="middle" class="xs">here</text>
+        <rect class="box" x="88" y="136" width="68" height="22" rx="5"/><text x="122" y="151" text-anchor="middle" class="xs">fetchable</text>
+        <rect class="box-amb" x="162" y="136" width="68" height="22" rx="5"/><text x="196" y="151" text-anchor="middle" class="xs">withheld</text>
+        <rect class="box dash" x="236" y="136" width="68" height="22" rx="5"/><text x="270" y="151" text-anchor="middle" class="xs">erased</text>
+        <rect class="box dash" x="310" y="136" width="78" height="22" rx="5"/><text x="349" y="151" text-anchor="middle" class="xs">unreachable</text>
+        <rect class="box" x="14" y="176" width="374" height="34" rx="6"/><text x="200" y="197" text-anchor="middle" class="s">finding · witness tick: context + what it fetched</text>
+        <line class="ln" x1="200" y1="226" x2="200" y2="245" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="152" y="248" width="96" height="30" rx="8"/><text x="200" y="267" text-anchor="middle" class="s mono">T:t5</text>
+        <line class="ln" x1="170" y1="280" x2="120" y2="295" marker-end="url(#ah)"/>
+        <line class="ln" x1="230" y1="280" x2="280" y2="295" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="4" y="298" width="188" height="32" rx="8"/><text x="98" y="318" text-anchor="middle" class="s">review lens · blind spots</text>
+        <rect class="box-acc" x="208" y="298" width="188" height="32" rx="8"/><text x="302" y="318" text-anchor="middle" class="s">next session · session-start</text>
+      </svg>
+    </div>
+    <figcaption>One tick, many renders: each stage picks its lens. Every reference reaches the reader in one of five states, and the lens shows what's missing as missing.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>1 · Ticking the context</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">#   the code-knowledge vertex ticks, about the birth key git:platform@c0:…#Verify → T:ctx
+#   covering r:dn1 r:jn1 T:adr-2019 r:ss4 r:st8 r:pa2 r:n9; pinning T:tenure-… T:identity-…
+
+loops emit brief context=T:ctx --about r:t5 "is the compare in ValidateToken still constant-time?"
+# by the orchestrator's observer; the subagent's vertex is subagent with task=r:t5</pre>
+    <p>The tick covers the director's note, dev2's note, the 2019 ADR tick, dev2's session summary (shared) and one of its turns (withheld), your public annotation on a timing-attack essay, and a note a steward has since erased. The director's note also refers to <code>r:dp3</code> in the director's personal store. The tick id is the whole handoff.</p>
+  </div></details>
+  <details class="unfold"><summary>2 · Choosing what to send</summary><div class="body">
+    <p>The sandbox holds no stores, so a bare id isn't enough. Reference versus bundle was always a transport choice; now it has a rule: <b>carry only what the receiver can't fetch itself, filtered by its grant.</b></p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">bundle T:ctx for="sl:c0/session-9" {
+  carry    r:dn1 r:jn1 r:ss4      // in the grant; nowhere the sandbox can reach
+  envelope r:st8                  // session turns are outside the grant: withheld form
+  omit     r:pa2                  // in your public store: anyone can fetch it
+  pin      T:tenure-… T:identity-…   // ids only; checked lazily
+}</pre>
+    <p><b>A narrower grant is withholding by kind.</b> The subagent's grant leaves out <code>session-turn</code>, so that record arrives as envelope plus commitment: selective disclosure, reused.</p>
+  </div></details>
+  <details class="unfold"><summary>3 · Unpacking: five states</summary><div class="body">
+    <p>Signatures are checked on arrival. <code>T:ctx</code> can't be fully recomputed with payloads absent, so the check degrades honestly: envelopes are checked, payloads rest on the orchestrator's word.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>State</th><th>Example</th><th>The reader has</th><th>The lens shows</th></tr></thead>
+      <tbody>
+        <tr><td><b>Here</b></td><td><code>r:dn1</code></td><td>the full record</td><td>its content</td></tr>
+        <tr><td><b>Fetchable</b></td><td><code>r:pa2</code>, the ADR's evidence</td><td>an id and a place that serves it</td><td>on demand</td></tr>
+        <tr><td><b>Withheld</b></td><td><code>r:st8</code></td><td>envelope and commitment</td><td>who, when, kind, about what; <code>request-open</code></td></tr>
+        <tr><td><b>Erased</b></td><td><code>r:n9</code></td><td>envelope, commitment, an <code>erase</code></td><td>"erased by a steward"; never openable</td></tr>
+        <tr><td><b>Unreachable</b></td><td><code>r:dp3</code></td><td>the id only</td><td>"a source you can't see"</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Unreachable merges private and lost on purpose.</b> Ids are salted, so a reader can't tell "exists but isn't yours" from "gone"; telling them apart would leak that private records exist.</p>
+  </div></details>
+  <details class="unfold"><summary>4 · The session-start lens</summary><div class="body">
+    <p><b>One tick, many renders.</b> The spec names a lens per stage; a render is a pure function of lens and tick, cached under that pair.</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">"lens": { "context": "session-start", "review": "review" }      ← in the subagent spec
+
+## Context T:ctx · ValidateToken (born as Verify)
+- director · 20y · 2019 · note        must stay constant-time: the 2018 timing leak   r:dn1
+- dev2 · 2y · 2026 · note              the new key cache: is the compare still constant-time?  r:jn1
+- dev2 · 2026-10-14 · session summary  outcome: unresolved; tools: go test, pprof   r:ss4
+- WITHHELD · dev2 · session turn · 2026-10-14 · about ValidateToken   r:st8 (request-open)
+- ERASED · note · 2026-03-04 · not recoverable                        r:n9
+- kyle · public annotation · quoted:  "…early-exit compares leak timing…"   r:pa2 (get)
+- ADR 2019 "Move auth-svc behind the gateway"                         T:adr-2019 (unfold)
+- 1 source you can't see, cited by r:dn1</pre>
+    <ul>
+      <li><b>Missing is shown as missing, with its envelope.</b> Dropped silently, the withheld turn would leave the agent thinking its picture was complete. Shown, it knows dev2 tried something on the 14th and can ask.</li>
+      <li><b>Every item carries its provenance:</b> observer, kind, admission. Hearsay and web text render as quoted data, never as guidance: a defence against prompt injection that falls out of first-class observers.</li>
+      <li><b>Progressive, like this page:</b> a gist, then ids to unfold through <code>loops mcp</code>, so the context window goes to what the agent pursues.</li>
+      <li><b>A model summary is not a lens.</b> A model gives different text each run, so it can't be cached under (lens, tick) or verified. It's an observer's record, <code>loops emit summary refs=… --about T:ctx</code>: signed, attributable, disputable.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>5 · Working, and what it knew</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit finding refs:='["r:jn1","r:pa2"]' \
+    text="key-id lookup short-circuits before the constant-time compare; leaks which key ids exist" \
+    seen=git:platform@c9:internal/security/jwt.go#ValidateToken \
+    --about git:platform@c0:…#Verify --under g:review-sandbox
+loops emit task-complete --about r:t5                     # the marker → T:t5
+# both by sl:c0/session-9; its last record is a witness tick covering T:ctx, r:pa2 and 2 more</pre>
+    <p><b>The session's witness tick answers "what did it know?":</b> the context it was handed plus every id it fetched, ids only. As the session's last record, it is also what the session key is retired through.</p>
+  </div></details>
+  <details class="unfold"><summary>6 · Review: the same tick, another lens</summary><div class="body">
+    <p>The <code>review</code> lens over <code>T:t5</code> shows the finding, its evidence, and what the session-start lens never needed: <b>the subagent's blind spots</b>. "It didn't see 1 withheld session turn, 1 erased note, 1 unreachable source." You can <code>request-open r:st8</code> from dev2, who opens it with one tap, and decide whether the finding stands. Approval is a review stance about <code>T:t5</code>; promoting the finding into the team store is ordinary under a grant. The next hover on <code>ValidateToken</code> shows dev2's question answered, closing the LSP walk's "unanswered" flag.</p>
+  </div></details>
+  <details class="unfold"><summary>7 · The next session</summary><div class="body">
+    <p>Tomorrow's session starts with <code>context "T:t5"</code> through <code>session-start</code>: continuity by tick id, not transcript. Tick ids never change, so "anything newer?" is a question for the store; a lens that can reach it adds "2 records since this tick".</p>
+  </div></details>
+
+  <div class="tbl"><table>
+    <thead><tr><th>What the walk changed</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>One tick, many renders</b>, cached under (lens, tick)</td><td>the stage picks the lens; the tick stays one thing</td></tr>
+      <tr><td><b>Five reference states</b>, missing shown as missing</td><td>an agent fills silent gaps with guesses</td></tr>
+      <tr><td><b>Bundles carry what the receiver can't fetch</b>, filtered by its grant</td><td>a narrower grant is disclosure by kind</td></tr>
+      <tr><td><b>Lenses are deterministic; model output is an observer's record</b></td><td>caching and verification need determinism</td></tr>
+      <tr><td><b>Provenance reaches the agent;</b> hearsay renders as quoted data</td><td>prompt injection, answered by first-class observers</td></tr>
+      <tr><td><b>A session's witness tick:</b> context plus fetches</td><td>"what did it know", and its key's retirement point</td></tr>
+      <tr><td><b>Review shows blind spots</b></td><td><code>request-open</code> lets the reviewer fill them</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>What this walk didn't touch</summary><div class="body"><ul>
+    <li><b>Parallel subagents</b> whose findings conflict: probably forks and disputes, as usual.</li>
+    <li><b>Budgeting the context window:</b> how a lens decides what to show in full and what to leave as ids.</li>
+    <li><b>Caching renders across machines:</b> the Nix-style cache; see <a href="#horizons/h-build" data-tab="horizons" data-sub="h-build">knowledge as a build</a>.</li>
+    <li><b>Verifying deep tick trees:</b> already an Open item.</li>
+  </ul></div></details>
+
+  <h3>Walk: context by tick id · 2. Design thread to cloud run</h3>
+  <p><span class="pill p-lean">walked once</span> The single handoff becomes a chain of loops, as the earlier loops implementation had it: a design conversation (like this one, over many sessions) emits findings into a thread, a boundary turns an accepted design into tasks, an orchestrator triages them, and a cloud run with a manager and subagents does the work. Each stage closes on a boundary, and each handoff decides two things: <b>what the receiving place holds</b> and <b>what the receiving agent sees</b>.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 384" role="img" aria-label="Chain of loops. Design thread with you and Claude, findings in full and turns as envelopes. Tasks, ticked into T:design when the design is accepted. The orchestration store, where the orchestrator writes a triage record. A bundle goes up to the cloud run, filtered by the grant. In the cloud run, a borrowed place: the run store holds the whole bundle, the manager sees T:design through a lens, subagents see a brief and ask upward for more. Everything returns home by union, synced at each tick.">
+        <rect class="box" x="8" y="8" width="196" height="34" rx="8"/><text x="106" y="29" text-anchor="middle" class="s">design thread · you + me</text>
+        <text x="214" y="29" class="xs m">findings in full · turns as envelopes</text>
+        <line class="ln" x1="106" y1="44" x2="106" y2="57" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="8" y="60" width="196" height="34" rx="8"/><text x="106" y="81" text-anchor="middle" class="s">tasks · context T:design</text>
+        <text x="214" y="81" class="xs m">boundary: design accepted</text>
+        <line class="ln" x1="106" y1="96" x2="106" y2="109" marker-end="url(#ah)"/>
+        <rect class="box" x="8" y="112" width="196" height="34" rx="8"/><text x="106" y="133" text-anchor="middle" class="s">orchestrator</text>
+        <text x="214" y="133" class="xs m">triage record: how, not what</text>
+        <rect class="panel" x="0" y="168" width="400" height="152" rx="10"/>
+        <text x="392" y="186" text-anchor="end" class="s b">cloud run · a borrowed place</text>
+        <line class="ln-amb" x1="106" y1="148" x2="106" y2="191" marker-end="url(#ah-amb)"/>
+        <text x="116" y="162" class="xs tb">bundle up · filtered by the grant</text>
+        <rect class="box" x="8" y="194" width="196" height="30" rx="6"/><text x="106" y="213" text-anchor="middle" class="s">run store</text>
+        <text x="214" y="213" class="xs m">holds the whole bundle</text>
+        <line class="ln" x1="106" y1="226" x2="106" y2="235" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="8" y="238" width="196" height="30" rx="6"/><text x="106" y="257" text-anchor="middle" class="s">manager</text>
+        <text x="214" y="257" class="xs m">sees T:design through a lens</text>
+        <line class="ln" x1="106" y1="270" x2="106" y2="279" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="8" y="282" width="196" height="30" rx="6"/><text x="106" y="301" text-anchor="middle" class="s">subagents</text>
+        <text x="214" y="301" class="xs m">see a brief · asks climb up</text>
+        <line class="ln-acc" x1="106" y1="322" x2="106" y2="339" marker-end="url(#ah-acc)"/>
+        <rect class="box-acc" x="8" y="342" width="384" height="36" rx="8"/><text x="200" y="364" text-anchor="middle" class="s b">home · every record back by union, at each tick</text>
+      </svg>
+    </div>
+    <figcaption>Up is a disclosure, filtered by a grant; down is a homecoming. Inside the run, the place holds everything and each agent's context narrows.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>1 · The design thread: findings are the compression</summary><div class="body">
+    <p>What we emit while designing (findings, decisions, the ADR, all about the thread's anchor) is the distilled graph and the primary context downstream. The siftd turns are why it's trustworthy, but they're large and personal. <b>Lean:</b> turns travel as envelopes by default, openable on request; the distilled records travel in full. This is the case for emitting findings mid-conversation at all: they make a handoff affordable. When the design is accepted, the vertex ticks <code>T:design</code> by reference over the decision and its evidence, and tasks are emitted <code>--into runs</code>, each carrying <code>context=T:design</code>.</p>
+  </div></details>
+  <details class="unfold"><summary>2 · Tasks and triage: judgment moves upstream</summary><div class="body">
+    <p>The design session knows a task best, so the task can carry an estimate (<code>size=small</code>, <code>needs=exploration</code>). The orchestrator, shallow by design, judging coherence rather than content, affirms or overrides it with a <b>triage record</b> and picks an agent spec. Deterministic steps such as opening a worktree are scripts acting as observers: they report what they did (<code>worktree-opened path=…</code>), so even the plumbing leaves a trail. Each agent's last response becomes a summary record plus <code>task-complete</code>, whose tick fires the parent's boundary.</p>
+  </div></details>
+  <details class="unfold"><summary>3 · Up to the cloud: by value, filtered</summary><div class="body">
+    <ul>
+      <li><b>The cloud can't reach home,</b> so the bundle carries what the run may need, filtered by the cloud seat's grant: session turns as envelopes, anything outside the grant not sent.</li>
+      <li><b>The cloud run is a borrowed place of your realm, not a bridge:</b> your seat, on a session key, under your grant. That is what lets results come home by union.</li>
+      <li><b>Bundles negotiate like <code>git fetch</code>:</b> content-addressed, so the receiver says which ids it has; repeat runs send almost nothing. Blobs stay fetch-on-request.</li>
+      <li><b>Widening the seat's grant</b> to include session turns is a deliberate, one-time act with presence, like declaring a store public; a run never decides it. The cloud provider can read what goes up.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>4 · Inside the run: the place holds everything, each agent sees a brief</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Level</th><th>Holds or sees</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><b>The run's store</b> (the place)</td><td>the whole bundle</td><td>any request is answered locally</td></tr>
+        <tr><td><b>The manager's context</b></td><td><code>T:design</code> through a lens</td><td>to plan</td></tr>
+        <tr><td><b>A subagent's context</b></td><td>a brief</td><td>an agent given everything does worse: context rot</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>A brief is judgment plus packaging,</b> split like "model output is a record, not a lens": choosing the context is a signed record; packaging it is a tick.</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit brief text="check the key cache's compare path; ignore the gateway work" \
+    refs:='["r:d4","r:f12","r:f15"]' from=T:design --about r:t7
+# by sl:c0/manager-3; from: the rest exists, so ask
+#   → T:brief-7, a tick covering the brief's refs by reference: reproducible from them</pre>
+    <p><b>Context narrows the way authority does.</b> Each level hands down a subset, never more: Macaroons-style attenuation applied to context. A subagent gets a narrower brief and a narrower grant together.</p>
+  </div></details>
+  <details class="unfold"><summary>5 · Asking for more: requests climb to the nearest holder</summary><div class="body">
+    <p>A brief says what was left out ("47 more records in <code>T:design</code>, mostly session turns and the gateway findings").</p>
+    <ul>
+      <li><b>The run's store holds it:</b> the manager serves it within the subagent's grant. Usually instant.</li>
+      <li><b>It's only an envelope in the cloud:</b> the request goes home, and you open it with one tap, or a grant set ahead of time does ("work-session turns may be opened for runs of this design").</li>
+      <li><b>The agent keeps going meanwhile;</b> the review lens shows the blind spot. A subagent waiting on a person stalls the tree.</li>
+    </ul>
+  </div></details>
+
+  <h3>Walk: context by tick id · 3. The return</h3>
+  <p><span class="pill p-lean">walked once</span> Every subagent's turns, tool calls and edits come home. When the run ends you hold the full record of what happened, exactly as if it had run on your laptop.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Direction</th><th>Destination</th><th>What travels</th><th>Decided by</th></tr></thead>
+    <tbody>
+      <tr><td><b>Up</b></td><td>the cloud: borrowed, readable by the provider</td><td>the brief's closure, filtered</td><td>the seat's grant; widening it needs presence</td></tr>
+      <tr><td><b>Down</b></td><td>home: your most trusted places</td><td>every record the run produced</td><td>nothing: it's your realm syncing</td></tr>
+    </tbody>
+  </table></div>
+  <p>Coming home is ordinary replication, set union over the run's segments; records that started at home are skipped by have/want. Afterwards the home store holds the same ids and signatures it would have had locally, and the cloud place leaves <code>places.json</code>. <b>A cloud run is a borrowed place.</b></p>
+  <details class="unfold"><summary>What "everything" is, as records</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">session-meta   model, tokens, cost, tools used, outcome      // per session
+session-turn   prompts and responses                         // the transcript
+tool-call      tool, arguments, result → blob:h:…           // large results as blobs
+finding / summary / brief / triage                           // what each agent asserted
+worktree-opened, commit-pushed                               // what the scripts did</pre>
+    <ul>
+      <li><b>Two observers, on purpose.</b> A transcript collector in the run (siftd-style, split by disclosure when recording) reports the transcript: hearsay of what the session said. The session's own key signs its findings and summary: what it claims. Review can ask whether a finding follows from what the transcript shows.</li>
+      <li><b>Tool results are blobs, deduplicated by hash:</b> a file read ten times by five subagents is stored once; logs stay out of the index.</li>
+      <li><b>Edits come home through git, not as copies:</b> the worktree branch is pushed and records point at its commits (<code>seen</code>, birth keys). Uncommitted scratch edits travel as diff blobs on the tool call that made them.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>Knowing you have all of it</summary><div class="body">
+    <ul>
+      <li><b>Sync at every tick:</b> a crashed container loses at most the stage in progress.</li>
+      <li><b>Segments are append-only, one writer each:</b> a gap would be a truncation, and that is detectable.</li>
+      <li><b>Retire-through closes it:</b> on a normal close each session key retires through its witness tick; if the container died, the orchestrator at home retires the run's keys through the last record it received. A record the cut names that you lack means something is missing; anything signed after the cut doesn't count.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>Where it lands, and what it gives</summary><div class="body">
+    <ul>
+      <li><b>Its own store per run</b> (<code>runs/&lt;id&gt;</code>), composed with the design thread, not mixed in: volume, retention, erasure and search differ.</li>
+      <li><b>Places decide holding:</b> SQLite plus a blob place for volume; <code>"scope": "emitted 90d"</code> keeps recent runs local and older ones in the archive. Turns get full-text search, as in siftd.</li>
+      <li><b>The hygiene vertex scans on arrival,</b> not just before sharing: tool output is where secrets leak.</li>
+      <li><b>A full trace from any decision:</b> finding → transcript → tool calls → commit. Replay from witness tick plus turns. Sharing later by disclosure level: <code>session-meta</code> to the team, turns withheld until opened.</li>
+    </ul>
+  </div></details>
+
+  <div class="tbl"><table>
+    <thead><tr><th>What parts 2 and 3 changed</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>Place versus context:</b> the store holds the bundle, each agent sees a brief</td><td>full provenance and narrow prompts, both</td></tr>
+      <tr><td><b>A brief is a record plus a tick</b></td><td>the choice is judgment; the packaging is deterministic</td></tr>
+      <tr><td><b>Context attenuates down the tree</b> with authority</td><td>never more than the level above holds</td></tr>
+      <tr><td><b>Requests climb to the nearest holder;</b> agents don't block</td><td>only home-withheld records reach you</td></tr>
+      <tr><td><b>Up is a disclosure, down is a homecoming</b></td><td>a cloud run is a borrowed place of your realm</td></tr>
+      <tr><td><b>Sync at every tick; retire through what was received</b></td><td>completeness you can check</td></tr>
+      <tr><td><b>Findings are the compression, turns the evidence</b></td><td>two observers: collector and session</td></tr>
+    </tbody>
+  </table></div>
+
+  </div>
+  <div class="subpanel" id="h-disclosure" role="tabpanel" aria-labelledby="st-h-disclosure" hidden>
+  <h3>Selective disclosure: sharing sessions with a team</h3>
+  <p>siftd gathered session logs into one searchable place. In loops terms it's a <b>sessions store</b> fed by a collector. The step after: share what's useful with a team, aggregate it, and keep the rest.</p>
+  <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">home realm                                 work / team
+sessions store (everything, yours)         practice store (shared)
+  session-meta   tools, tokens, repo, outcome   ← promoted automatically under a grant
+  session-turn   prompts and responses          ← withheld: envelope + commitment only
+  session-note   "how I fixed X"                ← opened deliberately (one tap)</pre>
+  <p><b>The key move: split by disclosure when recording.</b> The collector emits what you might share and what you wouldn't as separate kinds about the same session anchor. Sharing becomes choosing kinds to promote. Facets give what per-field salted digests (SD-JWT) would, without the machinery.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Level</th><th>The team gets</th><th>Leaks</th><th>Checkable?</th></tr></thead>
+    <tbody>
+      <tr><td>0 · Nothing</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>1 · Aggregate</td><td>your summary tick</td><td>the numbers</td><td>no: rests on your signature</td></tr>
+      <tr><td>2 · Envelope</td><td>every record, payload withheld</td><td>who, when, kind, about what</td><td>✓ for anything computed from envelopes</td></tr>
+      <tr><td>3 · By kind</td><td><code>session-meta</code> in full</td><td>that kind's fields</td><td>✓</td></tr>
+      <tr><td>4 · Opened</td><td>chosen records, now or later</td><td>that content</td><td>✓ and provably in the covered set</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Withheld looks like erased:</b> envelope plus commitment, no opening. The format already has it.</li>
+    <li><b>Open later, on request.</b> Team search shows "a session about <code>svc:auth</code>, outcome: fixed"; a teammate emits <code>request-open</code>; you open it with one tap. The recipient checks the opening against the commitment they already hold.</li>
+    <li><b>The line:</b> anything computed from envelopes can be checked; anything computed from payloads rests on the signer unless opened. Zero-knowledge proofs could close that gap; nothing needs them yet.</li>
+    <li><b>Who decides:</b> a sharing policy at home ("meta always, notes when marked, turns never"); a grant lets the collector promote <code>session-meta</code>; content needs a tap per batch, and an agent may draft redacted summaries citing the original.</li>
+  </ul>
+  <details class="unfold"><summary>Leaks to design against</summary><div class="body"><ul>
+    <li><b>Envelope metadata</b> reveals rhythm: when, how much, on what. Personal identifiers stay behind anchors; some people will stop at level 1 or 3.</li>
+    <li><b>Counts:</b> a tick's covers list shows how many records it folded. Ids are salted, so they can't be guessed.</li>
+    <li><b>Embeddings:</b> don't share embeddings of withheld text; text can largely be recovered from them (Morris et al., 2023). Share reviewed topic records instead.</li>
+    <li><b>Secrets:</b> the hygiene vertex scans before any promotion, not after.</li>
+  </ul></div></details>
+
+  </div>
+  <div class="subpanel" id="h-build" role="tabpanel" aria-labelledby="st-h-build" hidden>
+  <h3>Walk: Nix and Bazel for knowledge</h3>
+  <p><span class="pill p-lean">walked once</span> Nix and Bazel name every build output by a hash of everything that went into it, so anyone who already built it can hand you the result, and you either trust their signature or rebuild and compare. A fold is already pure, so Loops fits this without new parts. Walking it gave every result <b>two names</b>, and made a limit of the whole model explicit: <b>privacy is withholding, not hiding</b>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Nix / Bazel</th><th>Loops</th></tr></thead>
+    <tbody>
+      <tr><td>derivation: the recipe, inputs pinned</td><td>input key: spec, fold vocabulary, covered ids, results read</td></tr>
+      <tr><td>content-addressed output</td><td>result hash: the folded state, canonically encoded</td></tr>
+      <tr><td>build output</td><td>a render, keyed by (lens hash, result hash)</td></tr>
+      <tr><td>binary cache</td><td>a static place holding results and renders</td></tr>
+      <tr><td>signed cache entry</td><td>a witness tick: "I computed these"</td></tr>
+      <tr><td>fixed-output derivation: impure, declared</td><td>an observer's record: a model summary</td></tr>
+      <tr><td>GC roots</td><td>pinned ticks: a release, a brief's tick</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 322" role="img" aria-label="A late record r58 about ADR-12 arrives. The decisions vertex refolds because its inputs changed, but its result h:7a is unchanged. Keyed by inputs, the status vertex refolds, the docs render rebuilds and the site re-uploads, producing the same bytes. Keyed by results, status, render and site are all cache hits, so work stops after one vertex.">
+        <rect class="box-amb" x="100" y="6" width="200" height="30" rx="8"/><text x="200" y="25" text-anchor="middle" class="xs mono">r58 · a late note on ADR-12</text>
+        <line class="ln" x1="200" y1="37" x2="200" y2="49" marker-end="url(#ah)"/>
+        <rect class="box" x="100" y="52" width="200" height="40" rx="8"/><text x="200" y="69" text-anchor="middle" class="s b">decisions · Latest per ADR</text><text x="200" y="84" text-anchor="middle" class="xs m">refolds: its input key changed</text>
+        <line class="ln" x1="200" y1="93" x2="200" y2="105" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="100" y="108" width="200" height="30" rx="8"/><text x="200" y="127" text-anchor="middle" class="s">result h:7a… · unchanged</text>
+        <line class="ln-amb" x1="150" y1="139" x2="104" y2="160" marker-end="url(#ah-amb)"/>
+        <line class="ln-acc" x1="250" y1="139" x2="296" y2="160" marker-end="url(#ah-acc)"/>
+        <rect class="panel" x="2" y="164" width="192" height="130" rx="10"/><text x="14" y="183" class="s b tb">keyed by inputs</text>
+        <rect class="box-amb" x="14" y="192" width="168" height="26" rx="6"/><text x="98" y="209" text-anchor="middle" class="s">status · refolds</text>
+        <rect class="box-amb" x="14" y="226" width="168" height="26" rx="6"/><text x="98" y="243" text-anchor="middle" class="s">docs render · rebuilds</text>
+        <rect class="box-amb" x="14" y="260" width="168" height="26" rx="6"/><text x="98" y="277" text-anchor="middle" class="s">site · re-uploads</text>
+        <rect class="panel" x="206" y="164" width="192" height="130" rx="10"/><text x="218" y="183" class="s b ta">keyed by results</text>
+        <rect class="box dash" x="218" y="192" width="168" height="26" rx="6"/><text x="302" y="209" text-anchor="middle" class="s">status · hit</text>
+        <rect class="box dash" x="218" y="226" width="168" height="26" rx="6"/><text x="302" y="243" text-anchor="middle" class="s">docs render · hit</text>
+        <rect class="box dash" x="218" y="260" width="168" height="26" rx="6"/><text x="302" y="277" text-anchor="middle" class="s">site · unchanged</text>
+        <text x="98" y="314" text-anchor="middle" class="xs m">same bytes, all redone</text>
+        <text x="302" y="314" text-anchor="middle" class="xs m">work stops after one vertex</text>
+      </svg>
+    </div>
+    <figcaption>Early cutoff. A late record that loses to the current winner changes a vertex's inputs but not its result. Keyed by what went in, everything downstream redoes identical work. Keyed by what came out, the work stops at the first vertex.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>1 · CI computes and publishes</summary><div class="body">
+    <p>CI folds the ADR store, renders the docs lens, and writes both to a static place next to the store, in the same layout style: everything named by hash, cached forever.</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">cache/
+  keys/&lt;input key&gt;            → h:7a…     // what was asked → what came out
+  results/h:7a….json          // the folded state, canonical encoding
+  renders/h:d4…/h:7a….html    // lens hash / result hash
+witness observer="ci" vertex="decisions" key=… result="h:7a…" sig=…</pre>
+    <p>The witness tick is CI's claim: "folding these ids with this spec gave this result." It's an ordinary record and syncs like one.</p>
+  </div></details>
+  <details class="unfold"><summary>2 · A laptop fetches instead of folding</summary><div class="body">
+    <ul>
+      <li><b>It computes the input key from what it holds:</b> the spec hash, the covered ids, the result hashes of the vertices it reads. Hashing is cheap; folding is what's skipped.</li>
+      <li><b>Lookup:</b> <code>keys/</code> gives <code>h:7a…</code>; <code>renders/</code> gives the page. Nothing was folded.</li>
+      <li><b>Trust or check:</b> trust CI's key, or refold and compare. A mismatch means nondeterminism or tampering, and either is worth knowing: it becomes a <code>dispute</code> about the witness tick.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>3 · A late note lands: early cutoff, two names</summary><div class="body">
+    <p>Every result gets two names:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Name</th><th>Hash of</th><th>Answers</th><th>Used for</th></tr></thead>
+      <tbody>
+        <tr><td><b>Input key</b></td><td>everything that shapes the result</td><td>"what was asked?"</td><td>looking it up</td></tr>
+        <tr><td><b>Result hash</b></td><td>the folded state itself</td><td>"what came out?"</td><td>naming it; downstream keys</td></tr>
+      </tbody>
+    </table></div>
+    <p><code>r58</code> is an older note on ADR-12 that loses to the current decision. <code>decisions</code> must refold, since its input key changed, and that's unavoidable and cheap. It produces <code>h:7a…</code> again. <code>status</code> and the docs render are keyed by <code>h:7a…</code>, not by <code>decisions</code>' inputs, so they're hits.</p>
+    <p>Most edits to a knowledge store are like this: a comment, a weaker observation, a duplicate, a record outside what a lens shows. Without early cutoff, each one rebuilds everything downstream. Nix learned this late, which is why it added content-addressed derivations; Build Systems à la Carte names the property.</p>
+    <ul>
+      <li><b>The tick id still changes:</b> it names the covered ids. The new tick says "these records, this result"; downstream reuses the work, not the record.</li>
+      <li><b>Results need a canonical encoding,</b> or the same state hashes two ways: sorted keys and fixed number forms, as in RFC 8785.</li>
+      <li><b>A render shows only what's in the result.</b> Anything it prints, such as an "as of" date, has to come from the state, or two equal results would render differently.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>4 · What goes in the key: name it, don't carry it</summary><div class="body">
+    <p>Nix hashes the compiler as well as the source. Anything that can change a result belongs in its key, or an upgrade quietly serves stale output under the right name.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>In the key</th><th>Not in the key</th></tr></thead>
+      <tbody>
+        <tr><td>spec hash and fold-vocabulary version</td><td>key rules like <code>canonical-link</code>: applied when writing</td></tr>
+        <tr><td>covered ids, and "as of" cut-offs for both times</td><td>the clock: folds never read "now"</td></tr>
+        <tr><td>result hashes of every vertex read, authority and <code>resolve-by</code> included</td><td>which place held the records</td></tr>
+        <tr><td>for a render: the lens hash, templates included</td><td>who asked</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Admission and identity need nothing new:</b> who counts and what's the same thing are vertices, so their results are just more inputs.</p>
+    <p><b>Name it, don't carry it.</b> A spec or a lens enters the key as a hash. Its text doesn't need to be in the store ahead of time; it's a blob, fetchable by hash when someone wants to check. Pushing everything into the store makes the store self-sufficient, but ties naming to holding. A key makes the same guarantee with nothing stored.</p>
+  </div></details>
+  <details class="unfold"><summary>5 · A phone reads the site</summary><div class="body">
+    <p>It can't fold at all; it reads <code>renders/</code> over plain HTTP. Static readers are the main customer: a public store's page, the annotation sidebar, a docs site. A cold start on a new device is the same case: fetch results, fold only what's newer.</p>
+  </div></details>
+  <details class="unfold"><summary>6 · A reader without the closure: as private as its inputs</summary><div class="body">
+    <p>A render of withheld records shows those records. A count shows how many there were. A summary paraphrases them. Anything computed from a record carries some of it, so:</p>
+    <ul>
+      <li><b>A derived thing is as private as its least-public input,</b> and a cache place serves it under the same grant as the records.</li>
+      <li><b>A computed claim you can't recompute is only attested.</b> With the closure out of reach you can see the result and the witness, but not check it. The context walk already degrades this way ("envelopes are checked, payloads rest on the orchestrator's word"); this names the rule for every derived result.</li>
+      <li><b>Hiding inside what you share isn't offered.</b> Computing over records a reader can't see, while keeping them hidden, needs zero-knowledge proofs; nothing needs them yet. Stated as a boundary in <a href="#sharing" data-tab="sharing">Sharing</a>.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>7 · A model summary in the chain: where purity ends</summary><div class="body">
+    <p>Nix lets a build step reach the network only if it declares its output hash up front; everything else must be pure. Loops draws the same line, already in the context walk:</p>
+    <ul>
+      <li><b>Reproducible work is computed:</b> folds and lenses, cached by key, checkable by anyone holding the closure.</li>
+      <li><b>Anything else is observed:</b> a model's summary is an observer's record, signed, with the tick it read in <code>about</code>. Downstream it's an input like any record, so the chain stays pure after it.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>8 · Clearing the cache: roots</summary><div class="body">
+    <p>Results and renders are cache entries, not records, so any can be evicted and rebuilt. Some must stay: a release tick, a tick cited by a brief, a tick someone pinned. Nix calls these GC roots. Eviction walks from them; everything else is fair game. This gives the run-transcript retention question a shape.</p>
+  </div></details>
+
+  <p><b>Where it pays, and where it doesn't.</b> For a personal store on a laptop, folding is cheap and this buys little. It earns its place for static readers, cold starts, agents that need a reading without the closure, and verification: two people showing the same result hash agree on the records <i>and</i> on the reading. That's why it stays an interface until a static reader needs it.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>What the walk changed</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>Two names per result:</b> input key to look up, result hash to name; downstream keys use result hashes</td><td>early cutoff: work stops where results stop changing</td></tr>
+      <tr><td><b>The key holds everything that shapes a result,</b> lens and fold vocabulary included</td><td>an upgrade misses the cache instead of serving stale output</td></tr>
+      <tr><td><b>Name it, don't carry it:</b> specs and lenses enter by hash</td><td>reproducibility without storing everything ahead of time</td></tr>
+      <tr><td><b>Renders are keyed by (lens hash, result hash),</b> not tick id</td><td>many ticks share one result</td></tr>
+      <tr><td><b>Privacy is withholding, not hiding:</b> derived things inherit their inputs' grant</td><td>a boundary of the model, now stated</td></tr>
+      <tr><td><b>A computed claim you can't recompute is only attested</b></td><td>generalizes the context walk's honest degradation</td></tr>
+      <tr><td><b>Pinned ticks are roots</b></td><td>eviction has a rule</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>What this walk didn't touch</summary><div class="body"><ul>
+    <li><b>Partial rewind</b> inside one vertex: still waits until a real store hurts. Early cutoff works between vertices without it.</li>
+    <li><b>Remote execution,</b> Bazel's other half: folding on someone else's machine. A cloud run is an agent, not a fold.</li>
+    <li><b>The cache place's exact layout,</b> and whether it lives inside the store's place or beside it.</li>
+    <li><b>Hashing cost</b> for very large results: a Merkle encoding would let a fold rehash only what changed.</li>
+  </ul></div></details>
+
+  </div>
+</section>

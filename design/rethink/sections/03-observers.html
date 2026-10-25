@@ -1,0 +1,203 @@
+<section class="panel" id="observers" role="tabpanel" aria-labelledby="t-observers">
+  <div class="panel-head"><h2>Observers</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">An observer is a first-class thing: something that can honestly say "I saw." On a record it's a stable lineage id. Names, keys, grants and reliability are all records about it, relative to whoever states them. Names never take part in matching.</p>
+
+  <h3>Three concerns that got mixed together</h3>
+  <div class="cards">
+    <div class="card"><h5>Naming</h5><p><b>Who is this?</b></p><p>The name on every record. Answered by naming systems: Kerberos, SDSI, petnames, DIDs.</p></div>
+    <div class="card"><h5>Key binding</h5><p><b>Which keys speak for this name?</b></p><p>Records about the observer. A parent vouches for a child's key.</p></div>
+    <div class="card"><h5>Authority</h5><p><b>What may it do, and for whom?</b></p><p>A store's admission policy over endorsement records. Your OBO and endorsements work lives here.</p></div>
+  </div>
+  <p>Today one <code>.vertex</code> <code>observers {}</code> block is the allow-list, the grant and the key registry at once. Most of the CLI and SDK drift comes from that.</p>
+
+  <h3>Name anatomy</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 130" role="img" aria-label="The name kyle/claude/reviewer@home split into three parts: kyle is the principal and root namespace; /claude/reviewer is named by each parent; @home is an optional anchor for where it lives.">
+        <rect class="box-acc" x="16" y="20" width="84" height="40" rx="8"/><text x="58" y="45" text-anchor="middle" class="mono" style="font-size:15px">kyle</text>
+        <rect class="box" x="104" y="20" width="176" height="40" rx="8"/><text x="192" y="45" text-anchor="middle" class="mono" style="font-size:15px">/claude/reviewer</text>
+        <rect class="box-amb dash" x="284" y="20" width="100" height="40" rx="8"/><text x="334" y="45" text-anchor="middle" class="mono" style="font-size:15px">@home</text>
+        <text x="58" y="88" text-anchor="middle" class="s b">principal</text><text x="58" y="106" text-anchor="middle" class="xs m">root namespace</text>
+        <text x="192" y="88" text-anchor="middle" class="s b">named by its parent</text><text x="192" y="106" text-anchor="middle" class="xs m">each parent names its child</text>
+        <text x="334" y="88" text-anchor="middle" class="s b">anchor</text><text x="334" y="106" text-anchor="middle" class="xs m">optional; where it lives</text>
+      </svg>
+    </div>
+    <figcaption>Read SDSI-style, <code>kyle/claude</code> means "the principal kyle calls claude." It is a naming claim, not a delegation of authority, which keeps naming and authority separate.</figcaption>
+  </figure>
+  <ul>
+    <li><code>kyle/safari</code>, <code>kyle/rss</code>: my instruments, observing on my behalf</li>
+    <li><code>kyle/claude</code>: an agent working with me; <code>kyle/claude/reviewer</code> is its sub-agent</li>
+    <li><code>alex@acme</code>: disambiguated once stores compose across people</li>
+  </ul>
+
+  <h3>Four forms of a name</h3>
+  <p>Zooko's triangle split across fields, each giving up a different corner. Only the first is ever compared.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Form</th><th>Example</th><th>Asserted by</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><b>Lineage id</b></td><td><code>sl:7f3a…</code></td><td>the hash of its anchor</td><td>the only thing folds and admission key on</td></tr>
+      <tr><td><b>Self-name</b> (<code>as</code>)</td><td><code>wren</code></td><td>the observer, about itself</td><td>a write-time hint so raw JSONL and git diffs read well</td></tr>
+      <tr><td><b>Petname path</b></td><td><code>kyle/claude</code></td><td>the namer, in a signed name record</td><td>how people and CLIs refer to observers</td></tr>
+      <tr><td><b>Home-qualified</b></td><td><code>kyle/claude@acme</code></td><td>a realm's root name table</td><td>sharing across stores, like a Kerberos realm or an AT Protocol handle</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>On the wire, and what each layer does with names</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{"kind":"obs", "observer":"sl:7f3a…", "emitted":"2026-10-17T14:02:11Z", …}
+{"kind":"name", "observer":"sl:a1c0…", "about":["sl:7f3a…"], "name":"claude"}    ← kyle's name for it</pre>
+    <ul>
+      <li><b>Folds and admission</b> compare ids. Equality replaces today's leaf-tolerant matching, and the CLI-warns vs SDK-raises split disappears.</li>
+      <li><b>Lenses</b> map ids back to names, using the reader's own name records first. Your view can say <code>kyle/claude</code> while Sam's says <code>team/reviewer-bot</code>; both are right.</li>
+      <li><b>Input</b> (CLI, queries, specs) resolves names to ids before anything is stored. Ambiguity is an error at typing time, never in storage.</li>
+      <li><b><code>/</code> is naming only.</b> <code>kyle/claude</code> grants nothing; that's a grant record. Naming a child and vouching for its key often happen together, but stay separate records.</li>
+      <li><b>Today's <code>ObserverDecl(name, identity, grant, key)</code></b> splits into four records: name, lineage id, grant, key binding. The unused <code>identity</code> field suggests that split was already wanted.</li>
+      <li><b>Zero-config start:</b> the first emit in an empty store makes a local lineage named from the environment (e.g. <code>$USER</code>).</li>
+    </ul>
+  </div></details>
+
+  <h3>Delegation, separated</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="Three things called delegation. Key binding: kyle vouches that sl:7f speaks with key k1. Authority: kyle's grant g7 says sl:7f may write decisions in auth-rfc. Attribution: an orchestrator's tick covers the subagent ticks it asked for. An observation with observer sl:7f and under g7 goes to an admission fold that checks the first two.">
+        <text x="0" y="14" class="xs m b">1 · KEY BINDING</text>
+        <rect class="box" x="0" y="22" width="100" height="32" rx="7"/><text x="50" y="43" text-anchor="middle" class="s b">kyle</text>
+        <line class="ln" x1="102" y1="38" x2="166" y2="38" marker-end="url(#ah)"/><text x="134" y="32" text-anchor="middle" class="xs m">vouch</text>
+        <rect class="box-acc" x="170" y="22" width="216" height="32" rx="7"/><text x="182" y="43" class="mono">sl:7f speaks with key k1</text>
+        <text x="0" y="80" class="xs m b">2 · AUTHORITY</text>
+        <rect class="box" x="0" y="88" width="100" height="32" rx="7"/><text x="50" y="109" text-anchor="middle" class="s b">kyle</text>
+        <line class="ln" x1="102" y1="104" x2="166" y2="104" marker-end="url(#ah)"/><text x="134" y="98" text-anchor="middle" class="xs m">grant g7</text>
+        <rect class="box-acc" x="170" y="88" width="216" height="32" rx="7"/><text x="182" y="109" class="mono">sl:7f may: decision@auth-rfc</text>
+        <text x="0" y="146" class="xs m b">3 · ATTRIBUTION</text>
+        <rect class="box" x="0" y="154" width="100" height="32" rx="7"/><text x="50" y="175" text-anchor="middle" class="s">orchestrator</text>
+        <line class="ln-amb" x1="102" y1="170" x2="166" y2="170" marker-end="url(#ah-amb)"/><text x="134" y="164" text-anchor="middle" class="xs tb">tick covers</text>
+        <rect class="box-amb" x="170" y="154" width="216" height="32" rx="7"/><text x="182" y="175" class="s">the subagent ticks it asked for</text>
+        <rect class="box" x="0" y="208" width="220" height="42" rx="7"/>
+        <text x="12" y="226" class="mono">obs observer=sl:7f</text>
+        <text x="12" y="242" class="mono ta">under=g7</text>
+        <line class="ln" x1="222" y1="229" x2="259" y2="229" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="262" y="208" width="124" height="42" rx="8"/>
+        <text x="324" y="226" text-anchor="middle" class="s b">admission fold</text>
+        <text x="324" y="242" text-anchor="middle" class="xs">checks 1 and 2</text>
+      </svg>
+    </div>
+    <figcaption>"Delegation" is really two things, maybe three. Key binding is rare and slow-moving. Authority is a grant record with a scope written in spec vocabulary. Attribution in orchestrated work may already be the tick tree.</figcaption>
+  </figure>
+  <p><b>Lean:</b> an observation carries one optional pointer, <code>under: &lt;grant hash&gt;</code>. It's a reference, not the delegation itself, so the admission fold checks it directly and readers who don't care ignore it. The grant, its scope and its revocation stay separate records. This sits between AT Protocol (no delegation in records at all) and Nostr NIP-26 (a signed delegation inside every event).</p>
+
+  <details class="unfold"><summary>Does AT Protocol do delegation?</summary><div class="body">
+    <p><b>Not in the sense needed here.</b> It delegates <i>access to an account</i>, not <i>one identity acting for another</i>. Records carry no actor-vs-principal distinction: a post written by an OAuth app looks exactly like one you wrote.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Mechanism</th><th>What it does</th><th>What to take</th></tr></thead>
+      <tbody>
+        <tr><td><b>did:plc rotation keys vs signing key</b></td><td>keys that control the identity are separate from the key that signs repo writes</td><td>lineage root vs per-agent write keys</td></tr>
+        <tr><td><b>OAuth granular scopes</b></td><td><code>repo:&lt;collection&gt;?action=create</code>, <code>blob:image/*</code>; permission sets are themselves Lexicon schemas</td><td>grant scopes written in the same spec language as everything else</td></tr>
+        <tr><td><b>Service auth JWTs</b></td><td>one call, bound to one service (<code>aud</code>) and method (<code>lxm</code>), short expiry, <code>jti</code> nonce</td><td>a short-lived capability; never recorded, so not provenance</td></tr>
+        <tr><td><b>Verification records, labelers</b></td><td>another account publishes a record about you; each reader chooses whom to trust</td><td>endorsements as records, admission as a fold (from memory, not re-checked)</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>The gap:</b> no chain from actor to principal. A third-party server, Tranquil PDS, has an open pull request adding controllers, role presets and an RFC 8693-style <code>act</code> claim: people reaching for exactly the missing piece, at the token layer rather than in records.</p>
+    <details class="source"><summary>AT Protocol references</summary><div class="body"><ul>
+      <li><a href="https://atproto.com/specs/did" rel="noopener">atproto DID spec</a>; <a href="https://datatracker.ietf.org/doc/html/draft-newbold-at-architecture-00" rel="noopener">AT Architecture Internet-Draft</a></li>
+      <li><a href="https://atproto.com/specs/permission" rel="noopener">Permission spec</a>; <a href="https://atproto.com/guides/scopes" rel="noopener">Implementing OAuth scopes</a>; <a href="https://atproto.com/guides/permission-requests" rel="noopener">Permission requests</a>; <a href="https://atproto.com/blog/oauth-atproto" rel="noopener">OAuth for atproto</a></li>
+      <li><a href="https://tangled.org/tranquil.farm/tranquil-pds/pulls/17" rel="noopener">Tranquil PDS delegation pull request</a></li>
+      <li>Service auth checks as implemented: <a href="https://hexdocs.pm/atex/Atex.ServiceAuth.html" rel="noopener">atex (Elixir)</a>, <a href="https://pub.dev/documentation/atproto_identity/latest/" rel="noopener">atproto_identity (Dart)</a></li>
+      <li><a href="https://mackuba.eu/2026/07/20/atproto-in-practice-identity/" rel="noopener">atproto in practice: identity</a></li>
+    </ul></div></details>
+  </div></details>
+
+  <details class="unfold"><summary>Where the missing piece lives</summary><div class="body">
+    <ul>
+      <li><b>KERI delegated identifiers:</b> closest structural match to lineage = hash(anchor). A delegate's creation (and, as I understand it, its rotations) takes effect only once the delegator anchors a seal of it in its own event log. Cooperative: the parent vouches but never holds the child's keys.</li>
+      <li><b>Matrix cross-signing:</b> master key signs a self-signing key, which signs each device. "Parent vouches for child" in production at scale.</li>
+      <li><b>RFC 8693 nested <code>act</code>:</b> the shape for "C acting for B acting for A" when more than one hop must be visible.</li>
+      <li><b>UCAN, Biscuit:</b> attenuation at each hop, checkable offline.</li>
+    </ul>
+  </div></details>
+
+  <h3>Authority as a vertex</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 225" role="img" aria-label="Authorize, attenuate and revoke records flow into an admission vertex that folds over endorsements. A record cites the endorsement it relied on, and the vertex answers whether the record was allowed when emitted.">
+        <rect class="box" x="8" y="14" width="176" height="34" rx="7"/><text x="20" y="35" class="s"><tspan class="b">authorize</tspan> · scope S</text>
+        <rect class="box" x="8" y="58" width="176" height="34" rx="7"/><text x="20" y="79" class="s"><tspan class="b">attenuate</tspan> · narrower S′</text>
+        <rect class="box" x="8" y="102" width="176" height="34" rx="7"/><text x="20" y="123" class="s"><tspan class="b">revoke</tspan> · at t</text>
+        <rect class="box-acc" x="226" y="40" width="166" height="58" rx="9"/>
+        <text x="309" y="64" text-anchor="middle" class="b">admission vertex</text><text x="309" y="83" text-anchor="middle" class="xs">fold over endorsements</text>
+        <line class="ln" x1="186" y1="31" x2="223" y2="55" marker-end="url(#ah)"/>
+        <line class="ln" x1="186" y1="75" x2="223" y2="70" marker-end="url(#ah)"/>
+        <line class="ln" x1="186" y1="119" x2="223" y2="86" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="226" y="150" width="166" height="58" rx="9"/>
+        <text x="309" y="174" text-anchor="middle" class="s">was record X allowed</text><text x="309" y="192" text-anchor="middle" class="s">when it was emitted?</text>
+        <line class="ln" x1="309" y1="100" x2="309" y2="147" marker-end="url(#ah)"/>
+        <rect class="box" x="8" y="162" width="176" height="34" rx="7"/><text x="20" y="183" class="s"><tspan class="b">record X</tspan> · cites E</text>
+        <line class="ln-acc dash" x1="186" y1="179" x2="223" y2="179" marker-end="url(#ah-acc)"/>
+      </svg>
+    </div>
+    <figcaption>If endorsements are records, authorization is just a fold. Your work authorization system becomes a domain built on the substrate, not machinery inside the core.</figcaption>
+  </figure>
+  <div class="callout"><p><b>Where receipt time still matters.</b> <code>emitted</code> is self-stamped, so a compromised key can backdate a record to before its revocation. The defense is evidence that the record existed by some time: a store's receipt, or a tick that covered it (as in Certificate Transparency or RFC 3161 timestamping). That's the one real job "witnessed by a store" does. It belongs as a narrow tool in the sharing layer, not in the foundation.</p></div>
+
+  <details class="unfold"><summary>How observers work in the code today</summary><div class="body">
+    <ul>
+      <li><b>A free-form string with no grammar.</b> The only structure is <code>/</code> namespacing (<code>principal/agent</code>). Default <code>kyle/loops-claude</code> via <code>LOOPS_OBSERVER</code>. No <code>@</code> convention exists.</li>
+      <li><b>Fact:</b> <code>observer: str</code> plus <code>origin</code>. Documented as required, but <code>__init__</code> defaults to <code>""</code>. Only arrival rejects an empty observer.</li>
+      <li><b>Tick:</b> no observer field (this fits). But re-entering ticks get the vertex name as observer, and arrival added a <b>custodian</b> (the vertex stem, also a privileged "self-observer") to fill the slot.</li>
+      <li><b>Declarations:</b> <code>ObserverDecl(name, identity, grant, key)</code>. The <code>identity</code> field is parsed but never read.</li>
+      <li><b>Keys:</b> registry keyed by observer name; private keys under <code>keys/&lt;observer&gt;/ed25519.key</code>. Arrival keeps its own in-log key registry.</li>
+      <li><b>Admission:</b> no block means unrestricted; undeclared means <code>UnknownObserver</code> in the SDK, but only a warning in the CLI.</li>
+    </ul>
+    <h4>Inconsistencies found</h4>
+    <ul>
+      <li>Two matching rules: the CLI is leaf-tolerant and the SDK is exact. <code>kyle/loops-claude</code> passes <code>sl emit</code> but raises <code>UnknownObserver</code> through the SDK.</li>
+      <li>The <code>focus.X</code> rule enforces meaning at write (<code>observer == X</code>). Under the model it's hearsay, and a fold can filter at read.</li>
+      <li>The custodian overlaps the self-observer. <code>TickWindow.observer</code> is really the boundary name.</li>
+    </ul>
+    <details class="source"><summary>File references</summary><div class="body"><ul>
+      <li><code>libs/atoms/src/atoms/fact.py:76-88,130,157</code>: Fact fields and constructors</li>
+      <li><code>libs/engine/src/engine/sqlite_store.py:293-317</code>: <code>observer TEXT NOT NULL</code>; ticks have no observer column</li>
+      <li><code>libs/engine/src/engine/arrival.py:116,492-493,2013-2058</code>: envelope fields, non-empty check, in-log key registry</li>
+      <li><code>libs/engine/src/engine/observer.py:3-5,32-48</code>: namespacing and <code>observer_matches</code></li>
+      <li><code>libs/lang/src/lang/ast.py:657-672,757-760</code>: <code>GrantDecl</code>, <code>ObserverDecl</code></li>
+      <li><code>libs/lang/src/lang/loader.py:697-729</code>: allowed observer fields</li>
+      <li><code>libs/custody/src/custody/signing.py:92-133,209-294</code>: key paths and verification</li>
+      <li><code>libs/engine/src/engine/admission.py:131-165</code>: <code>grant_for_observer</code></li>
+      <li><code>libs/engine/src/engine/arrival_store.py:27-32,424-461</code>: custodian on tick envelopes</li>
+      <li><code>libs/engine/src/engine/vertex.py:585-589,1160,1237</code>: <code>focus.X</code> gate; ticks re-entering as facts</li>
+      <li><code>apps/loops/src/loops/commands/identity.py:78-119,199-249</code>: who-am-I resolution; <code>check_emit</code></li>
+    </ul></div></details>
+  </div></details>
+
+  <details class="unfold"><summary>Prior art: the <code>name/instance@home</code> grammar</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>System</th><th>Syntax</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Kerberos</td><td><code>primary/instance@REALM</code></td><td>almost exactly our grammar. <code>kyle/admin</code> is a separate principal with its own key, related to <code>kyle</code> only by naming</td></tr>
+        <tr><td>Email · WebFinger</td><td><code>name@domain</code></td><td>RFC 7033 resolves <code>acct:</code> (RFC 7565) to a document</td></tr>
+        <tr><td>Nostr NIP-05</td><td><code>name@domain</code> → key</td><td>the domain vouches via <code>/.well-known/nostr.json</code></td></tr>
+        <tr><td>Matrix</td><td><code>@name:server</code></td><td>home server as namespace</td></tr>
+        <tr><td>SPIFFE</td><td><code>spiffe://domain/path</code></td><td>workload identity; trust domain plus path</td></tr>
+        <tr><td>AT Protocol</td><td>handle ↔ <code>did:plc:…</code></td><td>readable handle can change; stable DID underneath; each points at the other</td></tr>
+      </tbody>
+    </table></div>
+  </div></details>
+
+  <details class="unfold"><summary>Prior art: naming without a central registry</summary><div class="body">
+    <ul>
+      <li><b>Zooko's triangle</b> (about 2001): a name can be human-meaningful, secure and decentralized, but only two at once.</li>
+      <li><b>Petname systems</b> (Marc Stiegler, 2005): a key (global, secure, unreadable), a nickname (self-claimed, readable, not unique), a petname (my name for you). Your point that observations about observers are relative is a petname system.</li>
+      <li><b>SDSI</b> (Rivest and Lampson, 1996; merged into SPKI, RFC 2693): every principal has a local namespace and names link across them. There are no global names. Closest fit: <code>kyle/claude</code> is "the principal kyle calls claude", and kyle vouches for its key.</li>
+      <li><b>Secure Scuttlebutt:</b> an identity is an Ed25519 key with its own single-writer signed feed; names are <code>about</code> messages, including names for others. Very close to sl. Its lessons: identity = key meant a lost key was a lost identity, and one feed per key made multiple devices painful.</li>
+      <li><b>Keybase sigchains:</b> a signed, append-only chain of statements a user makes about themselves (keys, devices, proofs). A concrete model of an observer's self-description as its own small store.</li>
+      <li><b>W3C DIDs:</b> <code>did:method:id</code> resolving to a document of keys with rotation. <code>did:key</code> is self-certifying, <code>did:web</code> is anchored in DNS.</li>
+    </ul>
+  </div></details>
+
+  <details class="unfold"><summary>Prior art: delegation and authority</summary><div class="body">
+    <ul>
+      <li><b>OAuth Token Exchange, RFC 8693:</b> <code>sub</code> is the principal, <code>act</code> is the actor; nested <code>act</code> records a delegation chain per token. <b>RFC 9396</b> (Rich Authorization Requests) adds <code>authorization_details</code>.</li>
+      <li><b>Attenuating capabilities</b>, where you can only pass on less than you hold: SPKI authorization certificates, Macaroons (caveats chained with HMAC), Biscuit (public-key, Datalog, offline attenuation), UCAN (DID-based proof chains). Your endorsements belong to this family. Its useful checks are enforced attenuation, offline verification and revocation.</li>
+      <li><b>Nostr NIP-26</b> (delegated event signing) put delegation into the event envelope and has since been marked unrecommended. Every client had to understand it, for little gain. The lesson is to keep authority out of the record envelope.</li>
+    </ul>
+    <h4>Question this raised, now leaning</h4>
+    <p>Is delegation part of the name or part of each observation? A Kerberos- or SDSI-style name is static, so a bot acting for both you and Alex needs two names. An RFC 8693-style per-record reference is dynamic. Lean: the name says who named whom; a grant record says on whose behalf; an observation points at its grant with <code>under</code>.</p>
+  </div></details>
+</section>

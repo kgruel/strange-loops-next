@@ -1,0 +1,579 @@
+<section class="panel" id="sources" role="tabpanel" aria-labelledby="t-sources">
+  <div class="panel-head"><h2>Sources</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Everything this page draws on: the repository, outside standards and prior art, and the conversation itself.</p>
+
+  <details class="unfold"><summary>Repository files</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Path</th><th>What it showed</th></tr></thead>
+      <tbody>
+        <tr><td><code>README.md</code></td><td>the truths, three shapes, the pattern, boundaries of the model, lineage</td></tr>
+        <tr><td><code>docs/CONCEPTUAL_MODEL.md</code></td><td>three loops; state is an answer; the observer loop's danger</td></tr>
+        <tr><td><code>docs/RECEIPT_ORDER_FOLD.md</code></td><td>fold order became receipt order; merge directions differ</td></tr>
+        <tr><td><code>docs/architecture/arrival/*.html</code></td><td>protocol, wire format, backend contract, witness protocol</td></tr>
+        <tr><td><code>benchmarks/LEDGER.md</code></td><td>cost curves; quadratic ingest; cold-open replay</td></tr>
+        <tr><td><code>spec/conformance/</code></td><td>81 vectors: fold, merge, replay, replicate, witness, comparison, lens (only fold and lens carry over)</td></tr>
+        <tr><td><code>docs/RATCHETS.md</code></td><td>construction vs detection ratchets</td></tr>
+        <tr><td><code>libs/atoms/src/atoms/parse.py</code></td><td>parse pipelines: <code>Where</code>, and <code>Skip</code> with substrings, regex and lambdas; moved to collectors</td></tr>
+        <tr><td><code>libs/lang/src/lang/ast.py</code></td><td>boundary matches, fold-state conditions, and <code>run</code> shell commands on fire</td></tr>
+        <tr><td><code>libs/*</code>, <code>apps/*</code>, measured</td><td>non-test source: 76.7k lines, about 765k tokens; <code>libs/engine</code> alone about 318k</td></tr>
+        <tr><td><code>apps/loops/session.vertex</code></td><td>the one real vertex: selects by kind alone, folds by <code>by</code> and <code>collect</code></td></tr>
+        <tr><td><code>libs/atoms/src/atoms/fold.py</code></td><td>the closed fold vocabulary; <code>Upsert</code> keys on a payload field</td></tr>
+        <tr><td><code>libs/lang/src/lang/loader.py</code></td><td>a loop block holds fold, boundary, search (FTS5 fields), parse, preview, edge and lifecycle: four jobs in one file</td></tr>
+        <tr><td><code>libs/atoms/src/atoms/boundary.py</code></td><td><code>Boundary</code> modes when, after, every: only <code>every</code> is operational</td></tr>
+        <tr><td><code>libs/atoms/src/atoms/fact.py</code></td><td><code>Fact</code> is kind, ts, payload, observer, origin: no subject field</td></tr>
+        <tr><td><code>libs/store/src/store/merge.py</code></td><td>three merge arms; ordering claims</td></tr>
+        <tr><td><code>pyproject.toml</code></td><td>flat vendored wheel; dependency list</td></tr>
+        <tr><td><code>CHANGELOG.md</code>, <code>*-REPORT.md</code></td><td>0.11.0 "CLI honesty"; review rounds</td></tr>
+      </tbody>
+    </table></div>
+    <p>Observer code references are listed under <a href="#observers" data-tab="observers">Observers</a>.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Standards</summary><div class="body"><ul>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc3339" rel="noopener">RFC 3339</a>: date and time on the internet</li>
+    <li><a href="https://www.loc.gov/standards/datetime/" rel="noopener">EDTF</a>: Extended Date/Time Format (ISO 8601-2:2019)</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc8785" rel="noopener">RFC 8785</a>: JSON Canonicalization Scheme</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc8032" rel="noopener">RFC 8032</a>: Ed25519</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc9562" rel="noopener">RFC 9562</a>: UUIDs, including v7</li>
+    <li><a href="https://kdl.dev" rel="noopener">KDL</a> and <a href="https://github.com/kdl-org/kdl-rs" rel="noopener">kdl-rs</a></li>
+    <li><a href="https://git-scm.com/docs/gitattributes" rel="noopener">gitattributes</a>: the <code>union</code> merge driver</li>
+    <li><a href="https://www.w3.org/TR/skos-reference/" rel="noopener">SKOS Reference</a>: mapping properties (<code>exactMatch</code>, <code>closeMatch</code>, …), considered and dropped</li>
+    <li><a href="https://atproto.com/specs/record-key" rel="noopener">AT Protocol record keys</a>: TIDs, time-ordered keys alongside content hashes</li>
+    <li><a href="https://www.sqlite.org/fts5.html" rel="noopener">SQLite FTS5</a>: contentless and contentless-delete tables</li>
+    <li><a href="https://datatracker.ietf.org/doc/draft-ietf-oauth-selective-disclosure-jwt/" rel="noopener">SD-JWT</a>: salted per-claim digests for selective disclosure</li>
+    <li><a href="https://csrc.nist.gov/pubs/sp/800/88/r1/final" rel="noopener">NIST SP 800-88</a>: media sanitization, including cryptographic erase</li>
+  </ul></div></details>
+
+  <details class="unfold"><summary>Archival and provenance models</summary><div class="body"><ul>
+    <li><a href="https://www.loc.gov/standards/premis/" rel="noopener">PREMIS</a>: Objects, Events, Agents (person, organization, software), Rights</li>
+    <li><a href="https://www.w3.org/TR/prov-overview/" rel="noopener">W3C PROV</a>: Entity, Activity, Agent; <code>wasDerivedFrom</code>, <code>actedOnBehalfOf</code></li>
+    <li><a href="https://public.ccsds.org/Pubs/650x0m2.pdf" rel="noopener">OAIS (ISO 14721)</a>: submission, archival and dissemination packages</li>
+    <li>Records in Contexts (RiC), International Council on Archives: records, agents and relations as a graph</li>
+  </ul><p>You recalled an archival standard close to this model from an earlier discussion. One of these may be it.</p></div></details>
+
+  <details class="unfold"><summary>Naming and identity</summary><div class="body"><ul>
+    <li>Kerberos principal names: <code>primary/instance@REALM</code></li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc7033" rel="noopener">RFC 7033</a> WebFinger, <a href="https://www.rfc-editor.org/rfc/rfc7565" rel="noopener">RFC 7565</a> <code>acct:</code></li>
+    <li><a href="https://github.com/nostr-protocol/nips/blob/master/05.md" rel="noopener">Nostr NIP-05</a>; <a href="https://github.com/nostr-protocol/nips/blob/master/26.md" rel="noopener">NIP-26</a> (unrecommended)</li>
+    <li><a href="https://spec.matrix.org" rel="noopener">Matrix</a>, <a href="https://spiffe.io" rel="noopener">SPIFFE</a></li>
+    <li><a href="https://atproto.com/specs/did" rel="noopener">AT Protocol DIDs</a> and <a href="https://atproto.com/specs/handle" rel="noopener">handles</a></li>
+    <li><a href="https://www.w3.org/TR/did-core/" rel="noopener">W3C DID Core</a></li>
+    <li>Zooko's triangle; Marc Stiegler, "An Introduction to Petname Systems" (2005)</li>
+    <li>Rivest and Lampson, SDSI (1996); <a href="https://www.rfc-editor.org/rfc/rfc2693" rel="noopener">RFC 2693</a> SPKI certificate theory</li>
+    <li><a href="https://ssbc.github.io/scuttlebutt-protocol-guide/" rel="noopener">Secure Scuttlebutt protocol guide</a>; Keybase sigchains</li>
+    <li>KERI (Key Event Receipt Infrastructure) delegated identifiers; Matrix cross-signing (in the <a href="https://spec.matrix.org" rel="noopener">Matrix spec</a>)</li>
+    <li>Halpin et al., "When owl:sameAs isn't the same" (ISWC 2010)</li>
+    <li>Ateniese et al., "Redactable Blockchain" (IEEE EuroS&amp;P 2017): chameleon hashes</li>
+  </ul></div></details>
+
+  <details class="unfold"><summary>AT Protocol and delegation</summary><div class="body"><ul>
+    <li><a href="https://atproto.com/specs/permission" rel="noopener">Permission spec</a>, <a href="https://atproto.com/guides/scopes" rel="noopener">OAuth scopes guide</a>, <a href="https://atproto.com/guides/permission-requests" rel="noopener">permission requests</a>, <a href="https://atproto.com/blog/oauth-atproto" rel="noopener">OAuth for atproto</a></li>
+    <li><a href="https://datatracker.ietf.org/doc/html/draft-newbold-at-architecture-00" rel="noopener">AT Architecture Internet-Draft</a></li>
+    <li><a href="https://tangled.org/tranquil.farm/tranquil-pds/pulls/17" rel="noopener">Tranquil PDS delegation pull request</a> (third-party)</li>
+    <li><a href="https://hexdocs.pm/atex/Atex.ServiceAuth.html" rel="noopener">atex ServiceAuth</a>, <a href="https://pub.dev/documentation/atproto_identity/latest/" rel="noopener">atproto_identity</a>: service-auth checks as implemented</li>
+    <li><a href="https://mackuba.eu/2026/07/20/atproto-in-practice-identity/" rel="noopener">atproto in practice: identity</a></li>
+  </ul></div></details>
+
+  <details class="unfold"><summary>Authority, time evidence, memory</summary><div class="body"><ul>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc8693" rel="noopener">RFC 8693</a> OAuth Token Exchange (<code>act</code>); <a href="https://www.rfc-editor.org/rfc/rfc9396" rel="noopener">RFC 9396</a> Rich Authorization Requests</li>
+    <li>Macaroons (Birgisson et al., 2014); <a href="https://www.biscuitsec.org" rel="noopener">Biscuit</a>; <a href="https://ucan.xyz" rel="noopener">UCAN</a></li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc9162" rel="noopener">RFC 9162</a> Certificate Transparency; <a href="https://www.rfc-editor.org/rfc/rfc3161" rel="noopener">RFC 3161</a> timestamping</li>
+    <li>Spaced repetition: Leitner boxes, SM-2, <a href="https://github.com/open-spaced-repetition" rel="noopener">FSRS</a></li>
+    <li>Akidau et al., <a href="http://www.vldb.org/pvldb/vol8/p1792-Akidau.pdf" rel="noopener">"The Dataflow Model"</a> (PVLDB 2015): event time, triggers, late data</li>
+    <li>Locke, Parfit (<i>Reasons and Persons</i>), Ricoeur on narrative identity</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Horizons</summary><div class="body"><ul>
+    <li>Foster et al., "Combinators for bidirectional tree transformations" (2007): the lens laws (GetPut, PutGet); Ink &amp; Switch, Cambria (2020)</li>
+    <li>gitattributes custom merge drivers and <code>git merge-file</code>: regenerate rather than hand-merge, as with lockfiles</li>
+    <li>Dolstra, <i>The Purely Functional Software Deployment Model</i> (2006); Bazel remote caching</li>
+    <li>Language Server Protocol; Hypothesis; W3C Web Annotation (selectors: quote, context, position)</li>
+    <li>SCIP and LSIF monikers: symbols named by package and path, which a rename breaks; git rename detection (<code>-M</code>, <code>--follow</code>)</li>
+    <li><a href="https://www.w3.org/TR/webmention/" rel="noopener">Webmention</a> (W3C Recommendation, 2017): a ping that says where to look; ActivityPub, by contrast, pushes into inbox servers</li>
+    <li>Hypothesis fuzzy anchoring (quote, prefix, suffix); Mozilla Readability; the Wayback Machine</li>
+    <li>Greshake et al., "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection" (2023)</li>
+    <li>Anthropic, "How we built our multi-agent research system" (2025): an orchestrator writing briefs for subagents; Chroma, "Context Rot" (2025)</li>
+    <li>git's fetch negotiation (have/want); Macaroons: attenuation, here applied to context</li>
+    <li>Mokhov, Mitchell, Peyton Jones, "Build Systems à la Carte" (ICFP 2018): early cutoff, constructive traces; Nix RFC 62, content-addressed derivations; Nix fixed-output derivations and GC roots; the Reproducible Builds project</li>
+    <li>BBS signatures (IETF draft); Morris et al., "Text Embeddings Reveal (Almost) As Much As Text" (2023); OpenTimestamps</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Proof and budgets</summary><div class="body"><ul>
+    <li><a href="https://github.com/bendlang/bend" rel="noopener">Bend 2</a> (bendlang/bend): laws and proofs, dependent and affine types, C, Metal, CUDA and JS targets; <code>WONTFIX.txt</code>; <code>bend2/comp.ts</code>, the C and JS lanes</li>
+    <li>Lean 4; Plausible, Lean's property testing; Quint and TLA+ for protocol model checking</li>
+    <li>AWS, <a href="https://arxiv.org/abs/2407.01688" rel="noopener">"How We Built Cedar: A Verification-Guided Approach"</a> (FSE 2024): a Lean model, proofs, and differential random testing against Rust</li>
+    <li>Ko, Zan, Hu, "BiGUL: A Formally Verified Core Language for Putback-Based Bidirectional Programming" (PEPM 2016, verified in Agda); Foster, Pilkiewicz, Pierce, "Quotient Lenses" (ICFP 2008)</li>
+    <li>The new repo: <a href="https://github.com/kgruel/strange-loops-next" rel="noopener">kgruel/strange-loops-next</a>, with PRs <a href="https://github.com/kgruel/strange-loops-next/pull/1" rel="noopener">#1</a> (layer 0), <a href="https://github.com/kgruel/strange-loops-next/pull/2" rel="noopener">#2</a> (folds), <a href="https://github.com/kgruel/strange-loops-next/pull/3" rel="noopener">#3</a> (KDL)</li>
+    <li>RFC 8785's reference test data and number file (cyberphone/json-canonicalization); the SUPERCOP Ed25519 set via Go; the official KDL v2 test suite (kdl-org/kdl)</li>
+    <li>Lean 4.35 core library: <code>List.Perm.eq_of_pairwise</code>, <code>Perm.foldl_eq'</code>, <code>grind</code>; Lake's <code>--wfail</code></li>
+    <li>Go's <code>internal/</code> package rule and workspaces (<code>go.work</code>)</li>
+    <li>Go's native fuzzing; <code>testscript</code> and txtar (<code>github.com/rogpeppe/go-internal</code>), from the <code>go</code> command's own tests</li>
+    <li>Go's <code>apidiff</code> and <code>gorelease</code> (<code>golang.org/x/exp</code>): API-compatibility checks for the surface budget</li>
+  </ul></div></details>
+  <details class="unfold"><summary>The Rust build</summary><div class="body"><ul>
+    <li>Cedar (AWS): a Lean model with proofs, a Rust implementation and differential random testing between them</li>
+    <li>UniFFI (Mozilla): Swift and Kotlin bindings from one Rust core, as used for Firefox's application services</li>
+    <li><code>wasm-bindgen</code>: the core as WebAssembly for pages and browser extensions</li>
+    <li>RustCrypto <code>sha2</code> and <code>ed25519-dalek</code>: the core's two allowed dependencies</li>
+    <li><code>cargo public-api</code>: the surface budget's snapshot diff</li>
+    <li><code>trycmd</code>: CLI scenarios as scripts with expected output</li>
+    <li><code>cargo-fuzz</code>: libFuzzer targets for differential fuzzing against the model</li>
+    <li><code>cargo-zigbuild</code>: cross-compiling the CLI with bundled SQLite</li>
+    <li><code>security-framework</code>: the macOS keychain without C glue</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Second opinion</summary><div class="body"><ul>
+    <li>Gemini, a review of version 11 (20 Oct 2026): the store, display and transport triad; seams in caching across vertices, Upsert forks, minting on a miss, breadth in the build, weighted Latest, <code>prev</code> as a set, <code>git:</code> keys and splits; SKOS left in the example. Its account of turns 31–33 was off: "we don't need it" (turn 33) was about <code>derived-from</code>.</li>
+  </ul></div></details>
+  <details class="unfold"><summary>Sharing and keys</summary><div class="body"><ul>
+    <li>Secure Scuttlebutt; Hypercore: per-writer logs replicated by comparing positions</li>
+    <li>Keybase device provisioning; Signal linked devices; Matrix cross-signing; did:plc rotation keys</li>
+    <li>SSH certificates; <a href="https://www.sigstore.dev" rel="noopener">Sigstore</a> (Fulcio): short-lived keys bound to an identity</li>
+    <li>ssh-agent; 1Password SSH agent: signing through a socket with approval</li>
+    <li><a href="https://www.w3.org/TR/webauthn-3/" rel="noopener">WebAuthn</a> / FIDO2: user-presence flags in signed data</li>
+    <li><a href="https://www.rfc-editor.org/rfc/rfc8032" rel="noopener">RFC 8032</a> Ed25519</li>
+  </ul></div></details>
+
+  <h3>The conversation, turn by turn</h3>
+  <div class="turns">
+    <details class="unfold turn"><summary>1 · Rewrite in another language?</summary><div class="body">
+      <p class="who">kyle</p><p>Consider rewriting from scratch for a cleaner, faster implementation. Back-compat not needed; a clean, portable, easy-to-install core is.</p>
+      <p class="who">claude</p><ul><li>About 77k source and 115k test lines; the model is small and the folds are a closed vocabulary.</li><li>Conformance vectors already anticipate another implementation.</li><li>Ledger: costs are algorithmic; a language fixes cold start, not replay-on-open.</li><li>Lean Rust, Go credible. Expand vectors first, core library before CLI, guard against re-accretion.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>2 · Arrival got out of hand</summary><div class="body">
+      <p class="who">kyle</p><p>The early CLI was workable for agents emitting during work. Arrival began from sharing repo knowledge at work (process, history, decisions up to ADRs) via git or JSONL, and tried to be mergeable by default. The library is the product.</p>
+      <p class="who">claude</p><ul><li>Single-writer custody vs a multi-writer problem; receipt order breaks convergence.</li><li>Merge as set union; fold on content order with checkpoints.</li><li>Let git handle custody for the team case; per-observer JSONL; SQLite as a disposable index; facts reviewed in PRs.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>3 · The full topology</summary><div class="body">
+      <p class="who">kyle</p><p>Hand-built stores (a novel, an auth RFC), ingestion stores (newsletters, RSS, subreddits, likes, Safari history), composition into a salience feed, personal-life stores, and ticks in agent orchestration with lossless fidelity. Arrival tried to be git-storable without being git-only.</p>
+      <p class="who">claude</p><ul><li>Three relationships: compose, bridge, replicate. Most stores have one writer.</li><li>Immutable content-addressed facts and blobs; single-writer segments; derived index.</li><li>Composition makes content order mandatory. Ticks as content-addressed seals; references as a privacy boundary.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>4 · Keep it conceptual; build a diagram</summary><div class="body">
+      <p class="who">kyle</p><p>Ticks reference facts by nesting; each tick contains everything within. Start at the top and build a diagram progressively.</p>
+      <p class="who">claude</p><ul><li>Layers 0 to 5. Layer 0 commitments: observation not truth; immutable; append only; meaning unknown to the record.</li><li>Questions: set or sequence; who observes when a collector writes.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>5 · Set; are ingested facts observed?</summary><div class="body">
+      <p class="who">kyle</p><p>Set. Receipt order is where things went off the rails. Maybe ingested facts are unobserved until acted on through the salience lens.</p>
+      <p class="who">claude</p><ul><li>Pushback: that hollows out the observer and puts observation in the lens.</li><li>Collectors observe records (hearsay). Things vs facts. Salience as a fold over observer sets.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>6 · ts is overloaded</summary><div class="body">
+      <p class="who">kyle</p><p>ts should be emit time with an optional settable time. Collectors are dumb observers. Observations about observers depend on who makes them.</p>
+      <p class="who">claude</p><ul><li><code>emitted</code> and <code>occurred</code>; "ordered twice" now lives in the fact. Fold axis is declared by the spec.</li><li>Observers are things. Proposed a bridge-as-observer (later revised).</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>7 · Spans, observer envelope, vertex as bridge</summary><div class="body">
+      <p class="who">kyle</p><p>Optional span, possibly coarse. Observers are first-class things with defined aspects; a <code>name@</code> style was discussed before. Send an agent to ground it. Isn't a vertex the bridge?</p>
+      <p class="who">claude</p><ul><li>One EDTF-style span field; duration vs imprecision; claim at write.</li><li>Option A: ticks flow into vertices directly. The reviewer's judgment is an observer's fact.</li><li>Agent report on observers in code (see Observers tab).</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>8 · Ticks are facts; an archival standard</summary><div class="body">
+      <p class="who">kyle</p><p>A tick is conceptually a fact that references or contains the facts below it; it should carry data and be sendable to a remote store at full fidelity. An archival standard from earlier research was close to this model. Prefer adhering to specs.</p>
+      <p class="who">claude</p><ul><li>One envelope, two variants. Reference vs bundle is transport.</li><li>EDTF is ISO 8601-2, not an RFC. PREMIS, PROV, OAIS, RiC. Specs table.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>9 · Prior art for namespacing</summary><div class="body">
+      <p class="who">kyle</p><p>Delegation with key signing led to an OBO design with authorization details, and "endorsements": bounded authorization from others with a durable key store, being implemented at work.</p>
+      <p class="who">claude</p><ul><li>Three concerns: naming, key binding, authority.</li><li>Kerberos, WebFinger, NIP-05, Matrix, SPIFFE, AT Protocol; Zooko, petnames, SDSI, SSB, Keybase, DIDs; RFC 8693, RAR, capabilities, NIP-26.</li><li>Endorsements as records; authorization as a vertex; the revocation-time caveat.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>10 · Agent identities that change</summary><div class="body">
+      <p class="who">kyle</p><p>Agents started generic, chose names, emitted identity observations folded into a system prompt with salience and periodic stale reviews. Fable mistrusted the unprovenanced store, made its own key, and adopted prior observations it agreed with. Leaning toward stable ids under names.</p>
+      <p class="who">claude</p><ul><li>Identity as continuity; lineage ids from genesis hashes; <code>observer</code> plus <code>as</code>.</li><li>Adoption as honest retro-claiming; stances as one record shape.</li><li>Spaced repetition as a boundary; trust root at genesis; open questions on forks and model swaps.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>11 · Capture it as a page</summary><div class="body">
+      <p class="who">kyle</p><p>Make an artifact of the discussion: tabs for mobile, rich with diagrams, all source material, concise on top and unfolding into sources.</p>
+      <p class="who">claude</p><ul><li>This page, version 1: nine tabs, Unfold → Source layering.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>12 · Does AT Protocol allow delegation?</summary><div class="body">
+      <p class="who">kyle</p><p>Reviewing the observer options, delegation seems necessary. Does AT Protocol support it?</p>
+      <p class="who">claude</p><ul><li>No: it delegates account access, not one identity acting for another; records carry no actor.</li><li>Take rotation-vs-signing keys, scopes as schemas, service auth, verification records. Look to KERI, Matrix cross-signing, RFC 8693 <code>act</code>, UCAN/Biscuit for the chain.</li><li>Split delegation into key binding, authority, attribution; optional <code>under</code> pointer.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>13 · How to handle observer naming</summary><div class="body">
+      <p class="who">kyle</p><p>What's the best way to handle the naming effect?</p>
+      <p class="who">claude</p><ul><li>Names never take part in matching. Four forms: lineage id, self-name, petname path, home-qualified.</li><li>Lenses render names; input resolves them; <code>ObserverDecl</code> splits into four records; zero-config first emit.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>14 · Delegate to self; realms that grow</summary><div class="body">
+      <p class="who">kyle</p><p>A Claude delegate from the harness later grows its own identity and acts as itself. And realms: per-store at first, then a homelab of topologies, plus work.</p>
+      <p class="who">claude</p><ul><li>The delegate is a shared seat; Wren starts a new lineage that descends from it and adopts. Identity doesn't widen authority.</li><li><code>@home</code> names a name table; joining adds links, never rewrites. Work is an ownership boundary; separate lineages; compose across.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>15 · Compose across every realm</summary><div class="body">
+      <p class="who">kyle</p><p>Compose makes sense for any cross-realm store or transfer, employer or not. Update the page, with progressive scenario diagrams.</p>
+      <p class="who">claude</p><ul><li>Boundary rule: compose by default, bridge as explicit signed tick, never replicate. References cross; content doesn't.</li><li>This version: a Scenarios tab built up in seven steps.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>16 · Layer 1 from the top</summary><div class="body">
+      <p class="who">kyle</p><p>Walk layer 1 from the top.</p>
+      <p class="who">claude</p><ul><li>The contract: same set and spec give the same state anywhere.</li><li>A vertex is a question; selection only on what records carry; declared time axis; content vs operational boundaries; verifiable ticks; fold vs lens.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>17 · Then how is a store defined?</summary><div class="body">
+      <p class="who">kyle</p><p>Focus on the vertex definition. How would <code>store</code> be defined?</p>
+      <p class="who">claude</p><ul><li>Identity (genesis), declarations (records in the store), residence (per machine). Names resolve like observers. Discovery like <code>.git</code>.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>18 · Declarations as a store's type</summary><div class="body">
+      <p class="who">kyle</p><p>Observers and stores both establish lineages. Declarations could define a mature or locked-down store, a schema without migrations, and end the drift of scattered project vertex files.</p>
+      <p class="who">claude</p><ul><li>One life cycle: genesis, then records that fold into the current self. Accretion (Datomic, "Spec-ulation"). Maturity ladder; strict means not admitted, not impossible.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>19 · Progressive summary</summary><div class="body">
+      <p class="who">kyle</p><p>Summarize vertices and stores progressively.</p>
+      <p class="who">claude</p><ul><li>One sentence, one paragraph, the model, decisions and open threads.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>20 · Multi-store vertices</summary><div class="body">
+      <p class="who">kyle</p><p>Add it to the page. This resolves the salience feed: a vertex declares the stores and kinds it reads, collates, folds, and can send the result to another store.</p>
+      <p class="who">claude</p><ul><li>Yes, with <code>as</code> mapping store-scoped kinds; thing identity becomes central; writing <code>into</code> makes the vertex a writer there; across realms, <code>into</code> is a bridge.</li><li>This version: the Vertex &amp; store tab.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>21 · Novel, orchestration, team store</summary><div class="body">
+      <p class="who">kyle</p><p>Consider the novel, task orchestration, and the git-shared multi-repo team store: personal observations from developers, or a central store weighted by experience (20, 14 and about 3 years).</p>
+      <p class="who">claude</p><ul><li>Novel: order by a declared field. Orchestration: specs as templates, vertices as instances. Team: shared store in git plus personal stores, promotion between them; no central ingest.</li><li>Weights as records applied in a vertex. Pushbacks: tenure varies by domain; rank, never hide.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>22 · Emit vs observe; promotion</summary><div class="body">
+      <p class="who">kyle</p><p>Loose language on purpose. Is "observe" a verb and "emit" the primitive? The personal observation should travel with a promotion, depending on how it happens.</p>
+      <p class="who">claude</p><ul><li>Emit and seal are the write verbs; observation is a noun. Constatives vs performatives; reserved kinds.</li><li>Promotion modes: verbatim (the same record, by hash), restated, summarized, agent-proposed.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>23 · Recurse before composition</summary><div class="body">
+      <p class="who">kyle</p><p>Was that a real question? Is anything left in this section before composition?</p>
+      <p class="who">claude</p><ul><li>Partly; "restated" reflected our narrowing, not evidence.</li><li>Close with two points: the fold vocabulary holds with two parameters; state references form a DAG while ticks may loop.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>24 · Close layer 1</summary><div class="body">
+      <p class="who">kyle</p><p>Agreed. Update the page before moving on. Are we leaving open questions that will cause problems later?</p>
+      <p class="who">claude</p><ul><li>This version: the Cases tab, layer 1 closed, parked questions moved to their layers, and an erasure risk raised.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>25 · Ticks or identity first?</summary><div class="body">
+      <p class="who">kyle</p><p>Verifiable ticks keep coming up. What pulls most?</p>
+      <p class="who">claude</p><ul><li>Identity: it's where Arrival's pain lives now, it presses on the selection rule, and its answer changes what a tick seals.</li><li>Ticks need only a reserved spec-hash field now. Found a crack: floats make Sum and Avg order-sensitive.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>26 · What are things?</summary><div class="body">
+      <p class="who">kyle</p><p>We're clumping too broadly: ingested items (log snippets, RSS, novel entries) vs system primitives that have lineages. A chapter has a lineage inside the store, which is itself a lineage.</p>
+      <p class="who">claude</p><ul><li>Three categories: record, thing, primitive. Lineage alone doesn't separate them; who reads it does (the core vs vertices). Primitives have standing.</li><li>Minted vs natural identity. Names for things reuse the observer naming system; mint on a name miss.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>27 · A chapter as emitted records</summary><div class="body">
+      <p class="who">kyle</p><p>Start a chapter by emitting it with metadata and references; edits append to the chapter.</p>
+      <p class="who">claude</p><ul><li>The first record is the anchor; edits append to the thing, not the record. Renumbering, retitling and splitting survive. Reserve <code>*-genesis</code> for primitives.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>28 · Draft granularity</summary><div class="body">
+      <p class="who">kyle</p><p>Prose is re-emitted whole; other kinds change on their own without copying the prose. Diffs inside prose are a later question.</p>
+      <p class="who">claude</p><ul><li>Facets: one kind about one thing, emitted whole; Upsert keyed by kind. Git packs compress similar snapshots. <code>prev</code> makes concurrent saves a visible fork.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>29 · A departure from loops facts</summary><div class="body">
+      <p class="who">kyle</p><p>Loops facts carried arbitrary kinds and were folded on specified fields. Is this a new primitive?</p>
+      <p class="who">claude</p><ul><li>Identity moved from the fold to the record; <code>about</code> is the primitive, facets aren't. The old model survives as the no-<code>about</code> case. Claim vs question.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>30 · Test it with diagrams</summary><div class="body">
+      <p class="who">kyle</p><p>Show examples as diagrams to see whether it holds across the use cases.</p>
+      <p class="who">claude</p><ul><li>This version: the Things tab. Six refinements; later links need no state; <code>resolve-by</code> is the third state reference.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>31 · Discipline in a semantic store</summary><div class="body">
+      <p class="who">kyle</p><p>The suggestion vertex and the stale review fit. In an open model, disciplined convention is what makes a properly aligned semantic store.</p>
+      <p class="who">claude</p><ul><li>The <code>owl:sameAs</code> lesson; SKOS mapping relations, only <code>exactMatch</code> resolves.</li><li>Four discipline surfaces, a hygiene vertex for each. Read-time admission lets discipline tighten later.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>32 · How many identity concepts?</summary><div class="body">
+      <p class="who">kyle</p><p>Count the identity concepts before deciding link vs provenance. Wary of bringing in too much; SKOS makes sense for search across combined records.</p>
+      <p class="who">claude</p><ul><li>Two id forms, one naming mechanism, four pointers, three state references; the rest rides on <code>about</code>. Three families: equivalence, provenance, succession.</li><li>SKOS as an opt-in vocabulary, not core. Watch the envelope, the on-ramp, and read-side sprawl.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>33 · We don't need <code>derived-from</code></summary><div class="body">
+      <p class="who">kyle</p><p>It answers the question: we don't need it.</p>
+      <p class="who">claude</p><ul><li>Not folded into <code>resolve-by</code> (a different family); identity rides on <code>about</code>, so it's a payload convention.</li><li>A field is on the envelope only if the core reads it. <code>prev</code> earns its place if Latest follows chains.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>34 · Drop <code>emitted</code> for a time-ordered id?</summary><div class="body">
+      <p class="who">kyle</p><p>A convention, not a rule. UUIDv7 carries time; could <code>emitted</code> go, leaving <code>occurred</code>?</p>
+      <p class="who">claude</p><ul><li>Not UUIDv7: the id must stay a content hash. Proposed a time prefix plus hash (AT Protocol's TID and CID). Corrected the RSS dedup claim.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>35 · What before an update?</summary><div class="body">
+      <p class="who">kyle</p><p>A nice set of updates. What else before updating the page?</p>
+      <p class="who">claude</p><ul><li>Recap and the current envelope. Remaining: anchors a store can't read, which name table resolves input, and the envelope review of <code>as</code> and <code>occurred</code>.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>36 · Field or id, again</summary><div class="body">
+      <p class="who">kyle</p><p>Flip-flopping between <code>emitted</code> and time in the id. Pros and cons?</p>
+      <p class="who">claude</p><ul><li>Same information, different visibility. Time in ids leaks through every reference across realms; sorting is an index concern. Keep the field and a plain hash.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>37 · Update</summary><div class="body">
+      <p class="who">kyle</p><p>Agreed on keeping it. Update, then see what's next.</p>
+      <p class="who">claude</p><ul><li>This version: the envelope convention on Record; identity counted and discipline on Things; ledger, Open and Sources updated.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>38 · Close composition; open layer 2</summary><div class="body">
+      <p class="who">kyle</p><p>Close out composition and start layer 2, likely one of the harder ones.</p>
+      <p class="who">claude</p><ul><li>Composition closed on three leans; <code>as</code> drops.</li><li>Why ticks exist; what a tick claims (computed, witnessed, asserted); content vs witness ticks; late records and the Dataflow model.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>39 · Arbitrary ticks were something else</summary><div class="body">
+      <p class="who">kyle</p><p>The split holds. Arbitrary ticks were either a selection of records or a fold; an incident is a fold over what the investigation turned up, with witness ticks along the way.</p>
+      <p class="who">claude</p><ul><li>A selection is an emit; state is a fold; handoffs are witness ticks; resolution is a content tick. Today's <code>Boundary</code> modes already hold the split.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>40 · Ticks end to end</summary><div class="body">
+      <p class="who">kyle</p><p>Walk ticks across the novel, orchestration, the team store, an incident, and a personal feed: a recap of last month's HOA records before a board meeting.</p>
+      <p class="who">claude</p><ul><li>The life of a tick; fourteen cases; the HOA walk. Marker records make content boundaries; verifiability depends on what the reader holds; not every vertex ticks.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>41 · Re-seal or a new linked tick?</summary><div class="body">
+      <p class="who">kyle</p><p>An ADR from 2019 revisited in 2026 is revisited from other work.</p>
+      <p class="who">claude</p><ul><li><code>occurred</code> decides: a revisit is a new tick citing the old. Sets are chosen by window, reference or witness; an ADR seals by reference. Parents seal ids, so cascades become flags.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>42 · Edge cases</summary><div class="body">
+      <p class="who">kyle</p><p>Anything left?</p>
+      <p class="who">claude</p><ul><li>Tick envelopes per kind; window membership by span start; determinism across implementations; empty windows. Erasure reaches into tick results.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>43 · Update, then residence</summary><div class="body">
+      <p class="who">kyle</p><p>Agreed. Update, then move into layer 4.</p>
+      <p class="who">claude</p><ul><li>This version: the Resolution tab; composition and resolution closed; Topology renamed; Open and Sources updated.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>44 · Erasure: what is it for?</summary><div class="body">
+      <p class="who">kyle</p><p>No erasure concept today, and Arrival went a little nuts here. Retraction is a status; the real concern is private data showing up in a store where it shouldn't be.</p>
+      <p class="who">claude</p><ul><li>Erasure per store. The minimal set: salted payload hash, one <code>erase</code> kind, references in tick results, a permanent envelope. Git honestly; prevention; rejection isn't erasure.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>45 · What would true erasure look like?</summary><div class="body">
+      <p class="who">kyle</p><p>Musing: keep the references, wipe the data.</p>
+      <p class="who">claude</p><ul><li>Records commit to payloads; erasure forgets the opening. Three levels. References make derived data traceable. Limits: SSDs, other parties. SD-JWT and chameleon hashes at the exotic end. Salt per payload.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>46 · The whole game</summary><div class="body">
+      <p class="who">kyle</p><p>Per payload is fine: rewrite the records with the hash, throw away the key, done.</p>
+      <p class="who">claude</p><ul><li>Records don't change; storage replaces the opening. It's a salt, not a key. The remaining work is finding. Erasure closed.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>47 · Residence agenda</summary><div class="body">
+      <p class="who">kyle</p><p>Update now, or one sweep after places?</p>
+      <p class="who">claude</p><ul><li>One sweep. Leans on segment layout, the index, discovery and <code>places.kdl</code>.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>48 · Storage duplication</summary><div class="body">
+      <p class="who">kyle</p><p>An SQLite index used for its feature set duplicates storage.</p>
+      <p class="who">claude</p><ul><li>Index envelopes and offsets, not payloads; contentless FTS5, opt-in per kind; SQLite as the segment format for ingestion stores.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>49 · Remixing places</summary><div class="body">
+      <p class="who">kyle</p><p>This opens up what a place can be.</p>
+      <p class="who">claude</p><ul><li>Location, format, scope; roles write, hold, blobs. Git as interchange, tiering, blob places, backups as places. Scope by <code>emitted</code>.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>50 · Defining stores</summary><div class="body">
+      <p class="who">kyle</p><p>The vertex file used to define storage and search fields. How are stores defined now?</p>
+      <p class="who">claude</p><ul><li>Four homes for what <code>.vertex</code> held. <code>store.kdl</code> as an editable lens over declarations; <code>apply</code> emits the diff.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>51 · Updating a store is an emit</summary><div class="body">
+      <p class="who">kyle</p><p>Arrival tried to keep everything inside the record itself. Updating store information is just an emit?</p>
+      <p class="who">claude</p><ul><li>Yes, a performative one: standing decides; proposals for free; one changeset per apply; records judged by declarations in effect at <code>emitted</code>.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>52 · A worked example</summary><div class="body">
+      <p class="who">kyle</p><p>The layout matches. Build a pseudo-example across the use cases to see it in a more mature form.</p>
+      <p class="who">claude</p><ul><li>This version: the Residence and Example tabs, residence closed, sharing up next.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>53 · One store or a realm?</summary><div class="body">
+      <p class="who">kyle</p><p>In the example, is home one store holding everything, or a realm of related stores?</p>
+      <p class="who">claude</p><ul><li>A realm: a small <code>root</code> store holds the name table and cross-store vertices; each other store keeps its own genesis, definition and places.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>54 · Root, and how it composes</summary><div class="body">
+      <p class="who">kyle</p><p>Root works; add a slight explanation of the composition.</p>
+      <p class="who">claude</p><ul><li>Example renamed to <code>root</code>; "How the realm composes": membership is a link, names at two levels, cross-store work in root, why not one big store.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>55 · Layer 5: sharing</summary><div class="body">
+      <p class="who">kyle</p><p>Ready for layer 5. Each layer is taking less effort, which feels right.</p>
+      <p class="who">claude</p><ul><li>Union compared by segment lists; git without <code>merge=union</code>; delivery isn't trust; signing by default; retire through. Nothing new needed.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>56 · Signing and keys</summary><div class="body">
+      <p class="who">kyle</p><p>Those hold up. How do automatic signing and key storage actually work?</p>
+      <p class="who">claude</p><ul><li>Lineage id pins the root key; device keys per segment; sign the id, outside it; keychain or file; pairing; stores carry their writers' bindings.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>57 · The agent situation</summary><div class="body">
+      <p class="who">kyle</p><p>Is there any way to approach the agent problem?</p>
+      <p class="who">claude</p><ul><li>Three threats. Session keys retired at close; presence for standing changes; where the agent runs decides the rest.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>58 · Presence for durable acts</summary><div class="body">
+      <p class="who">kyle</p><p>I like a Touch ID or elevated request for anything that changes something durable, versus just an emit.</p>
+      <p class="who">claude</p><ul><li>The test: takes effect because of who signed it, or can't be undone. Grants are presence ahead of time; a presence key per device. This version: the Sharing tab, layer 5 closed.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>59 · The build questions</summary><div class="body">
+      <p class="who">kyle</p><p>Let's start on the build questions.</p>
+      <p class="who">claude</p><ul><li>The Build tab predated most layers: old vectors test the old model, time-ordered ids are gone, signing moves to the start. Rust held while bindings mattered.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>60 · Go, and what else exists</summary><div class="body">
+      <p class="who">kyle</p><p>No Python compatibility, a new repo from scratch. Go compiles to one binary and it's done. What other options fit?</p>
+      <p class="who">claude</p><ul><li>Go, Rust and TypeScript compared. Go fits once embedding stops mattering: the format lets any language write records. Migration is a collector.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>61 · The novel front end, and WASM</summary><div class="body">
+      <p class="who">kyle</p><p>The novel used the Python SDK over JSON. Can Go do the same, or is Rust better because of WASM?</p>
+      <p class="who">claude</p><ul><li>Yes: <code>loops serve</code> over JSON. WASM runs library code inside a page and matters only with no local process. Go settled.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>62 · Get creative</summary><div class="body">
+      <p class="who">kyle</p><p>Stretch before the toolchain constrains us.</p>
+      <p class="who">claude</p><ul><li>Ideas grouped by mechanism, and six commitments that need allowing for before building.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>63 · All of them pull</summary><div class="body">
+      <p class="who">kyle</p><p>The lens aspect most: materialized docs, with edits applied back. Also the LSP, static hosting, annotation with friends, stores with things, Nix for knowledge.</p>
+      <p class="who">claude</p><ul><li>The lens walk: render, parse, apply; base in front matter; CI checks the law. Every idea uses five mechanisms.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>64 · Selective disclosure and siftd</summary><div class="body">
+      <p class="who">kyle</p><p>siftd gathered session logs; I wanted to push prompting history to a team store without sharing everything.</p>
+      <p class="who">claude</p><ul><li>Split by disclosure when recording; five levels; withheld looks like erased; open on request; what can and can't be proven; embeddings leak.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>65 · Horizons on the page</summary><div class="body">
+      <p class="who">kyle</p><p>Horizons needs more cases, but update now since it covers disclosure.</p>
+      <p class="who">claude</p><ul><li>This version: the Horizons tab, the Build tab rewritten for Go, ledger and Open updated.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>66 · A second opinion: progressive identity</summary><div class="body">
+      <p class="who">kyle</p><p>Shared Gemini's review of the page. Its last turn: the maturity curve inverts the database lifecycle; <code>resolve-by</code> is pure connected components; associative links are multi-subject <code>about</code>; things mature from payload strings to keys to anchors.</p>
+      <p class="who">claude</p><ul><li>Mostly a clean restatement. Real: the page mixed <code>same-as</code> (Things) and a SKOS <code>match</code> (Example); drop <code>match</code>.</li><li>The director's record did two jobs: a dispute and a note about both.</li><li>An open store's miss should write a key, not mint. Pushback: payload-only topics don't roll up through <code>resolve-by</code>.</li><li>The triad fits; our opinion lives in standing, not transport.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>67 · The rest of the review</summary><div class="body">
+      <p class="who">kyle</p><p>The earlier turns: seams in checkpoints, Upsert forks, minting, build breadth; weighted Latest, <code>prev</code> as a set, <code>git:</code> keys, splits. Thought we'd decided against SKOS.</p>
+      <p class="who">claude</p><ul><li>The record: you liked SKOS for search; "we don't need it" was <code>derived-from</code>. The example did present opt-in as default. Drop it either way.</li><li>Six of eight seams real, two of them contradictions on the page: weighted Latest, and <code>prev</code> as one pointer beside "both heads as <code>prev</code>".</li><li>Pushback: a synthesis must not set <code>prev</code> on others' testimony; a path is a name, not a natural key, so neither <code>same-as</code> nor matches fit renames.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>68 · Make the changes</summary><div class="body">
+      <p class="who">kyle</p><p>A good set of changes; do it.</p>
+      <p class="who">claude</p><ul><li>This version: SKOS out, a mid-flow referencing section and a matching table in Things, <code>prev</code> as a set with heads, <code>weight-by</code> off Latest, the lens rule for testimony, paths as names, whole-vertex caching.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>69 · Which case next?</summary><div class="body">
+      <p class="who">kyle</p><p>Working the LSP end to end will turn up the most difficulties and edge cases.</p>
+      <p class="who">claude</p><ul><li>Agreed: the only case where the thing changes underneath the record. The others reuse built parts; web annotation shares the LSP's anchoring problem.</li><li>Model edges: names assume one timeline but code branches; anchor granularity; ranges; uncommitted code; records in the same PR. Tooling edges: latency, rename heuristics, composing stores. Start with branches.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>70 · One detailed walk</summary><div class="body">
+      <p class="who">kyle</p><p>Let's try one detailed walk.</p>
+      <p class="who">claude</p><ul><li>Birth keys along each branch's history replace paths as dated names; <code>seen</code> gives staleness.</li><li>One writer on two branches broke the segment rule: files close once committed. Squash and rebase repaired by the merge job's <code>same-as</code>. A commit can't hold records about itself.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>71 · Capture the walk</summary><div class="body">
+      <p class="who">kyle</p><p>Fold it in, and capture the walk itself so it isn't lost.</p>
+      <p class="who">claude</p><ul><li>This version: the walk in Horizons, step by step with a diagram; ledger, Residence, Sharing, Topology and Open updated.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>72 · Walk web annotation</summary><div class="body">
+      <p class="who">kyle</p><p>Walk web annotation, with static hosting and sharing with others: a federated commentary.</p>
+      <p class="who">claude</p><ul><li>Mostly assembly. Keys computed by tooling when writing; <code>seen</code> as the version read; selectors shared with code ranges.</li><li>Publishing is a declaration (presence), a public store a standing bridge; closed segments named by hash make static stores cacheable forever.</li><li>Federation is own stores plus composition; replies carry the root; pings say where to look. Admission filters spam; aggregators can hide, never forge. Others' words stay home.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>73 · Fold it in; update the open items</summary><div class="body">
+      <p class="who">kyle</p><p>Please do, and update the open items from what the walks are finding.</p>
+      <p class="who">claude</p><ul><li>This version: the web annotation walk in Horizons; four ledger entries; presence covers declaring a store public; the Horizons open items rebuilt from both walks, plus publishing and the LSP's history index.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>74 · Context by tick, in orchestration</summary><div class="body">
+      <p class="who">kyle</p><p>The interesting case is orchestration: a tick goes through a lens per stage (session start, review). Walk getting a tick, unpacking it, and hitting references or facts that aren't accessible.</p>
+      <p class="who">claude</p><ul><li>One tick, many renders; bundles carry what the receiver can't fetch, filtered by its grant.</li><li>Five reference states, missing shown as missing; unreachable merges private and lost. Provenance into the agent's context; model summaries are records, not lenses.</li><li>A session witness tick of what it knew; review shows blind spots. Closed dev2's question from the LSP walk.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>75 · Fold it in; handing things over</summary><div class="body">
+      <p class="who">kyle</p><p>Fold it in. The house case might widen to any physical item, or a service handed to another team: perhaps the same concept, and a restricted tick in many ways.</p>
+      <p class="who">claude</p><ul><li>This version: the context walk in Horizons, four ledger entries, Open updated.</li><li>Handing over: custody, history, continuity. "A restricted tick" fits history; custody is standing, not a tick.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>76 · Table the handover; the whole pipeline</summary><div class="body">
+      <p class="who">kyle</p><p>Table the handover. Widen the walk: a design thread like this one emits findings, a boundary creates tasks, a shallow orchestrator routes them, a manager in the cloud gets the full bundle with provenance and briefs subagents, who can ask for more.</p>
+      <p class="who">claude</p><ul><li>Findings are the compression, turns the evidence; judgment moves upstream; triage is a record.</li><li>Up by value, filtered; a cloud run is a borrowed place; have/want. The place holds everything, each agent sees a brief (record plus tick); context attenuates with authority; requests climb and don't block.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>77 · Everything comes home</summary><div class="body">
+      <p class="who">kyle</p><p>All the subagents' turns, tool calls and edits should come back too: a full record of what happened, in my own stores.</p>
+      <p class="who">claude</p><ul><li>Up is a disclosure; down is a homecoming, plain union. Two observers: collector for transcripts, session for claims. Blobs for tool results, git for edits.</li><li>Completeness: sync at every seal, append-only segments, retire through what was received.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>78 · All three as one update</summary><div class="body">
+      <p class="who">kyle</p><p>Do all three as one update.</p>
+      <p class="who">claude</p><ul><li>This version: the context walk in three parts (one handoff, design thread to cloud run, the return), four ledger entries, the handover tabled with its framing, two new Open items.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>79 · Nix and Bazel for knowledge, unpacked</summary><div class="body">
+      <p class="who">kyle</p><p>Unpack Nix and Bazel for knowledge; I hadn't considered it at all.</p>
+      <p class="who">claude</p><ul><li>Hash everything that goes in; fetch instead of compute; trust the signer or recompute. A fold is already pure, so Loops fits.</li><li>It turned up early cutoff, the key including the fold and the lens, renders as private as their inputs, the purity line, GC roots. Worth it for static readers, cold starts, agents and verification.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>80 · Early cutoff, and privacy as a boundary</summary><div class="body">
+      <p class="who">kyle</p><p>The key holding the code is what I tried in Arrival by pushing everything into the store ahead of time. Unpack early cutoff. You can't have true hidden privacy here; that's fundamental, so state it. Add it all to the page.</p>
+      <p class="who">claude</p><ul><li>Two names per result: an input key to look it up, a result hash to name it; downstream keys on results, so work stops where results stop changing.</li><li>Name it, don't carry it. Withholding, not hiding, stated in Sharing as settled. This version: the build walk.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>81 · Where are we, and what's pulling?</summary><div class="body">
+      <p class="who">kyle</p><p>Where are we overall, and what's pulling for you?</p>
+      <p class="who">claude</p><ul><li>Layers closed; the last four walks added nothing to the core, so more walks yield less, and the risk shifts to the page outgrowing anything that tests it.</li><li>Pulls: break the editable lens on purpose; then the "won't do" list and the budget; then the local API. Then start building.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>82 · The editable lens, adversarially</summary><div class="body">
+      <p class="who">kyle</p><p>Agreed: the lens walk, then the boundary list, budget and structure, then build with this as the grounding.</p>
+      <p class="who">claude</p><ul><li>Eleven attempts to break <code>adr-12.md</code>. The base is (tick, lens hash, audience); a committed render is a promotion; committed lens files are pure renders; absence is never an edit; edit rights follow authorship; apply is one transaction.</li><li>Free-form docs stay one body facet; order moves to the container. The record didn't change.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>83 · Fold it in; tabs for Horizons</summary><div class="body">
+      <p class="who">kyle</p><p>Add it, and give Horizons its own tabs, one per example, instead of scrolling so deep.</p>
+      <p class="who">claude</p><ul><li>This version: Horizons in seven tabs (overview and six walks, with next and previous at the bottom of each), the lens walk, the revised lens contract, <code>book-order</code> in the novel example.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>84 · Draw the boundary list</summary><div class="body">
+      <p class="who">kyle</p><p>Let's draw the boundary list next.</p>
+      <p class="who">claude</p><ul><li>Four tiers: not the model, not in the core, not yet with triggers, outside by design; a rule for entering the core.</li><li>Three to settle: a query language, encryption at rest, spec predicates.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>85 · No query language, no encryption; predicates?</summary><div class="body">
+      <p class="who">kyle</p><p>No query language: use a SQLite store and query that. Encryption at rest would add enormous complexity. Unpack spec predicates.</p>
+      <p class="who">claude</p><ul><li>Predicates live in parse pipelines, boundaries and selection, and had reached regex, lambdas and shell commands; the one real vertex uses kind alone.</li><li>A closed typed set; RE2 and JavaScript disagree on regex; classify by recording, not by predicate. Parse to collectors, <code>run</code> dropped, logic-less templates.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>86 · Agreed; the parse pipelines go</summary><div class="body">
+      <p class="who">kyle</p><p>Agreed, and getting rid of the parse pipelines too: early craft that stayed long past its usefulness.</p>
+      <p class="who">claude</p><ul><li>This version: the boundary list and the closed predicate set in Build, three ledger entries, the "won't do" item settled.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>87 · Budgets beyond lines; a state machine; Bend 2</summary><div class="body">
+      <p class="who">kyle</p><p>Does the budget have to be lines of code? A token budget per file, maybe. Should we build a full state machine, or look at Bend 2 for parts of this? Going for creative and ambitious.</p>
+      <p class="who">claude</p><ul><li>Measured the old repo: about 765k tokens. Four budgets instead of one: context in tokens per package, surface, vocabulary, imports; growth only through the ledger; a regenerability test.</li><li>No state-machine framework: the fold already is one. Bend 2 as a proof oracle writing the vectors, not the implementation; a time-boxed spike.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>88 · Fold it in; could Bend compile to Go?</summary><div class="body">
+      <p class="who">kyle</p><p>Yes, add it. How hard would a Go compiler for Bend be?</p>
+      <p class="who">claude</p><ul><li>Read <code>comp.ts</code>: a Go lane would follow the JS lane, an emitter, runtime and effects of roughly 1.5k to 2.5k lines. The catch is trust: proofs cover the source, so vectors would check the Go anyway, and it would be a fork.</li><li>This version: budgets and the spec stack in Build, three ledger entries, two Open items.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>89 · Lean 4 instead? Lenses too?</summary><div class="body">
+      <p class="who">kyle</p><p>What if Lean 4 were the prover? Does it make sense here, and could we prove lenses as well?</p>
+      <p class="who">claude</p><ul><li>Lean over Bend: Cedar already runs this pattern at scale (Lean model, proofs, differential testing against Rust); tactics, bytes, maturity.</li><li>Lenses: yes for the syntax we own: no-op and put-get per combinator, normal form, nothing dropped, escaping. Not CommonMark at large, editors or adapters.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>90 · Model first; a testing strategy without unit tests</summary><div class="body">
+      <p class="who">kyle</p><p>Do it: starting with this from the beginning would be a huge help, a way to extend scenarios as the Go grows without relying on tests. I dislike unit tests and prefer full end-to-end testing; Lean seems to take the unit tests' place.</p>
+      <p class="who">claude</p><ul><li>Yes, with the model leading by one step. Four checks: proofs, vectors, differential fuzzing, scenarios; tests touch only what users touch; every failure becomes a case; the walks become scenarios.</li><li>This version: Lean in the spec stack, the lens laws, a testing section, step 0 in the sequence, two ledger entries, two Open items.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>91 · Lay out the repo</summary><div class="body">
+      <p class="who">kyle</p><p>Let's lay out the repo structure next.</p>
+      <p class="who">claude</p><ul><li>Two Go modules instead of one: a core with no requires, so the import budget enforces itself; everything under <code>internal/</code> behind package <code>loops</code>; Lean twins per package; vectors as a pure render of the model.</li><li>Asked: two modules, the name, <code>.loops/</code>.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>92 · Two modules, strange-loops, .loops/</summary><div class="body">
+      <p class="who">kyle</p><p>Two modules is fine, keep strange-loops, and yes to <code>.loops/</code>.</p>
+      <p class="who">claude</p><ul><li>This version: "Repo structure" replaces Packaging in Build, with the tree diagram, the rules it enforces, package budgets and the step map; two ledger entries; the Lean model's home settled.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>93 · Rename the old repo; start step 0</summary><div class="body">
+      <p class="who">kyle</p><p>Rename the old repo and start step 0.</p>
+      <p class="who">claude</p><ul><li>Step 0 done: Lean model, proofs and 23 vectors, with CI that checks the proofs and fails on vector drift. The set decides; Count needs dedup; the keyed-section lens laws hold.</li><li>The rename needs you: no tool here renames a repo. This version: the spike adopted, laws marked proved, step 0 done.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>94 · A new repo instead; how far tonight?</summary><div class="body">
+      <p class="who">kyle</p><p>Start a new repo; I can rename and swap later. If I went to bed, how far could this go before we need to sit down together?</p>
+      <p class="who">claude</p><ul><li>Step 0 pushed to <code>strange-loops-next</code>, CI green. Overnight: step 1 end to end, the KDL parser, more folds in Lean; stop before step 2, whose decisions are taste (the local API, the CLI, spec syntax, the layout on disk).</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>95 · Go ahead, with PRs</summary><div class="body">
+      <p class="who">kyle</p><p>Continue as described, using PRs. Looking forward to discussing with some code to talk about.</p>
+      <p class="who">claude</p><ul><li>Three stacked PRs: layer 0 (model, Go, JS writer, budget checker), Latest, Sum, Min and Max in Lean, and the KDL parser. This version: step 1 in review, overnight choices listed in Open, numeric exactness to decide.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>96 · Release the KDL parser on its own?</summary><div class="body">
+      <p class="who">kyle</p><p>Go had no KDL parser? If we use ours, shouldn't it be released separately at some point?</p>
+      <p class="who">claude</p><ul><li>Go has no finished KDL 2.0 parser, so yes, later: a public printer, nightly fuzzing, a README crediting the suite. First decide whether KDL belongs in the core at all. Noted in Open.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>97 · A take on the PRs</summary><div class="body">
+      <p class="who">kyle</p><p>The PRs look clean. What's your take?</p>
+      <p class="who">claude</p><ul><li>The plumbing is good; package <code>loops</code> isn't designed yet. Two leaned choices matter most: refusing unknown envelope fields, and the id's preimage. Two of four checks are live. Merge in order; the API walk is next.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>98 · The API walk</summary><div class="body">
+      <p class="who">kyle</p><p>Agreed on pure functions plus a handle, specs as data (KDL is just a lens), JSON-RPC, refusals and an envelope version. Watching probably isn't core.</p>
+      <p class="who">claude</p><ul><li>The core gives a checkpoint; <code>serve</code> decides when to look. Walked dev2's hover: identity-aware reads go through <code>Fold</code>, and the handle is a realm.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>99 · A vocabulary pass</summary><div class="body">
+      <p class="who">kyle</p><p>Before going deeper, a coherence pass on the vocabulary: much of it came from strange loops. Keep standing, drop fact. Keep vertex: it's where loops meet, and nothing else names it.</p>
+      <p class="who">claude</p><ul><li>One word per concept. This version: the Glossary tab; renames across the page, with the conversation turns left as they were; the API walk in Build; five ledger entries; <i>spec</i>'s two meanings and Upsert's name in Open.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>100 · Protocol, LatestBy, and seal</summary><div class="body">
+      <p class="who">kyle</p><p>Protocol over spec, LatestBy over Upsert. The vocabulary is easier to say and explain now. Seal still feels off.</p>
+      <p class="who">claude</p><ul><li>Seal suggests hiding or signing; a tick does neither. Tick becomes the verb too, like commit in git, and a tick covers the records it folded.</li><li>The MCP walk: the handle narrows to a grant; withheld records come back erased; no tick tool, since agents emit markers; <code>Tick</code> splits from <code>Witness</code>. This version: all of it, plus "who runs a boundary?" in Open.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>101 · serve, remotely</summary><div class="body">
+      <p class="who">kyle</p><p>How would serve work remotely? Does it need subscriptions?</p>
+      <p class="who">claude</p><ul><li>No: the client holds its checkpoint, so <code>watch</code> is a stream that resumes. Places pull; pings stay deferred. Content ticks run anywhere, since a second run makes the same id; witness ticks run where their key lives. This version: "who runs a boundary?" settled, a ledger entry.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>102 · The CLI, and bulk emits</summary><div class="body">
+      <p class="who">kyle</p><p>Drop the zoom; the payload syntax is clean. Does JSONL on stdin cover agents that need to emit a suite of records?</p>
+      <p class="who">claude</p><ul><li>Yes, with two additions: a batch is one changeset, all or nothing, with <code>--stream</code> for collectors; and labels, as in <code>git fast-import</code>, so records in a batch can refer to each other before their ids exist. This version: the CLI in Build, a ledger entry.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>103 · Spec syntax and the layout on disk</summary><div class="body">
+      <p class="who">kyle</p><p>Walk the spec syntax and the <code>.loops/</code> layout, then revisit Go versus Rust.</p>
+      <p class="who">claude</p><ul><li>KDL keeps only the last of repeated properties, so the page's <code>kind=… kind=…</code> examples were wrong. Proposed: one node per clause, sets as arguments, <code>where</code> with six word operators, templates by <code>param</code>. The layout: anchor, vertices, segments closed on commit, store and places files per machine.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>104 · Is KDL still needed?</summary><div class="body">
+      <p class="who">kyle</p><p>KDL was there for iterating on a whole combined vertex. Is it still needed? Other formats, other conceptions? JSON for simplicity seems better.</p>
+      <p class="who">claude</p><ul><li>No: specs are small, closed and mostly written by programs and agents. JSON with a JSON Schema: no mapping layer, one schema for editors, agents and MCP, comments as a <code>note</code> field. Specs are records; with JSON the file is just the editing form from step 2. This version: Specs are JSON in Build, KDL out of the core, a ledger entry.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>105 · Go or Rust, again</summary><div class="body">
+      <p class="who">kyle</p><p>Honestly, the trend of Rust everywhere in AI work. And running inside a phone, or a browser extension, without a web app is powerful. JSON as the canonical format lends itself to that.</p>
+      <p class="who">claude</p><ul><li>Reading in a device needs the core itself, and there Rust is clearly ahead: WebAssembly of a few hundred KB, UniFFI for Swift and Kotlin. A strict compiler is a fast verifier for agents; the closed sets become enums; Cedar is the same stack. Guards: a dependency allowlist, no <code>unsafe</code>, no <code>async</code> or macros in the core. Switching costs a day now.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>106 · Bring everything into alignment</summary><div class="body">
+      <p class="who">kyle</p><p>A thorough page update: fold the decisions down, pull KDL out, and get it ready for a Rust build. Implementation starts in a new session.</p>
+      <p class="who">claude</p><ul><li>Version 31: Build rewritten for Rust and reordered as a brief, with "Ready to build" first; a Cargo workspace, module budgets and an allowlist; the <code>.loops/</code> layout; every example as JSON or CLI commands; the ledger folded from 92 entries to 33; Open pruned to what is open; the glossary's API words in Rust terms; sources for the Rust build.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>107 · Two reviews, and the core model</summary><div class="body">
+      <p class="who">kyle</p><p>Added a review compiled from Fable and Gemini Argon. Discuss what surfaced, particularly how to improve the Lean model and the core.</p>
+      <p class="who">claude</p><ul><li>The model was ahead of the page: Upsert's step never needed content order, and its proofs already say late records fold onto cached state. Not every fold can be a small step, though: supersession can bring back what a bounded state threw away. So two families: accumulating folds are commutative; folds over heads keep the heads and work their answer out from them.</li><li>The biggest addition: a payload is here, withheld or erased, and supersession reads only the envelope, so nothing replaced comes back. A <code>where</code> on a missing payload answers unknown, and results count what they couldn't read.</li><li>A content tick as a value, stored only as a signed tick record: no second envelope. With a vertex named by its spec's hash, vertex anchors and vertex standing go.</li></ul>
+      <p class="who">kyle</p><p>Agreed on all three; the tick as a value is elegant. Then on to the Lean proofs.</p>
+      <p class="who">claude</p><ul><li>Version 32: the three decisions in the ledger, Vertex, Resolution, Cases, Example and Glossary; the Lean step 2 plan and four laws in Build; a proof policy; Open's decimal leaning and a pointer to the review's other findings.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>108 · Back in sync, and the spec as data</summary><div class="body">
+      <p class="who">kyle</p><p>On to the spec-as-data work. Didn't we rename spec to protocol? Are we getting out of sync with the PRs?</p>
+      <p class="who">claude</p><ul><li>Yes. The normative prose became protocol; a vertex's spec kept its name. The repo still said <code>spec/</code>, Seal and Upsert, because the rename had been left to the Rust port. One commit caught the model up.</li><li>The spec as data: a closed type parsed from JSON, <code>where</code> with three answers, slots built from the two families. Payload tests must apply after supersession, or a filter brings back what was replaced. A labelled batch has one meaning.</li></ul>
+      <p class="who">kyle</p><p>Handle both: the PRs and the page.</p>
+      <p class="who">claude</p><ul><li>PRs 1 and 2 merged, PR 3 closed with its branch kept, PR 4 opened for step 2's model. Version 33: Build and the ledger say where things stand, the laws table shows step 2 proved, and the decision on payload tests is recorded.</li></ul>
+    </div></details>
+    <details class="unfold turn"><summary>109 · What have we proven, and prev per thing</summary><div class="body">
+      <p class="who">kyle</p><p>A deep think: what exactly have we proven? What edge conditions, races or assumptions could we be overlooking?</p>
+      <p class="who">claude</p><ul><li>Every law says: for a given set, the answer is a function of the set. Nothing says the set is complete, current, trusted or well dated; those limits are now written down.</li><li>Four holes, each reproduced against the model: envelope selection still ran before supersession; two places' forms of one record broke "the set decides"; <code>prev</code> was global; <code>about</code> was one key.</li></ul>
+      <p class="who">kyle</p><p>Per thing; global never made sense. A cross-thing <code>prev</code> shouldn't be allowed at all: it breaks a thing's provenance.</p>
+      <p class="who">claude</p><ul><li>So you can only replace what you hold, in a shared thing: <code>emit</code> refuses <code>prev-unknown</code> and <code>prev-unrelated</code>, readers refuse a cross-thing <code>prev</code>. A record about several things is current in each; about nothing is its own thing. Who may replace whom is a hook for step 3.</li><li>This version, 34: the ledger, Build, the laws table and the Glossary say so; PR 4 carries the proofs and 94 vectors.</li></ul>
+    </div></details>
+  </div>
+</section>

@@ -1,0 +1,162 @@
+<section class="panel" id="cases" role="tabpanel" aria-labelledby="t-cases">
+  <div class="panel-head"><h2>Three cases</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">The layer 1 model tested against three real stores: a novel, task orchestration, and the team's shared platform knowledge. Each one surfaced exactly one new idea, and none needed new machinery.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Case</th><th>What it surfaced</th></tr></thead>
+    <tbody>
+      <tr><td><b>Novel</b></td><td>The time axis can be a declared field (chapter, story time), not only <code>occurred</code> or <code>emitted</code>.</td></tr>
+      <tr><td><b>Orchestration</b></td><td>Specs are templates; vertices are instances created at run time, each with its own anchor.</td></tr>
+      <tr><td><b>Team store</b></td><td>Weights are records about observers, applied by a vertex at read time. Promotion is a stance.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The novel</h3>
+  <p>A hand-built store with one steward, made strict early because its shape is designed on purpose. Two vertices ask two questions of the same records: <i>what's the manuscript?</i> and <i>is the timeline consistent?</i> The JS front end is a lens; edits made in it are new records.</p>
+  <details class="unfold"><summary>Store and vertices</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># .loops/anchor
+{"kind":"store-anchor", "observer":"sl:a1", "name":"novel", "stewards":["sl:a1"]}
+
+# .loops/store.json
+{
+  "store": "novel",
+  "maturity": "strict",
+  "kinds": {
+    "scene":     { "fields": { "chapter": "int", "pov": "thing", "story-when": "edtf" } },
+    "character": { "fields": { "name": "string" } },
+    "note":      {}
+  },
+  "writers": [{ "allow": "sl:a1" }, { "allow": "sl:7f", "require-under": true }]
+}
+
+# .loops/vertices/manuscript.json
+{ "vertex": "manuscript",
+  "from": [{ "store": "novel", "kind": ["scene"] }],
+  "order": { "field": "chapter" },
+  "fold": { "scenes": { "latest-by": "id" } },
+  "boundary": [{ "when": "draft-complete" }],
+  "into": "novel" }
+
+# .loops/vertices/continuity.json
+{ "vertex": "continuity",
+  "note": "In-story chronology.",
+  "from": [{ "store": "novel", "kind": ["scene", "character"] }],
+  "order": { "field": "story-when" },
+  "fold": { "per-character": { "collect": true, "by": "pov" } } }</pre>
+  </div></details>
+
+  <h3>Task orchestration</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 216" role="img" aria-label="A slice spec, stored as a template record, is instantiated three times: vx:s1, vx:s2 and vx:s3, each the slice spec plus its parameters, named by their hash, so nothing is written to create one. Each slice ticks into the orchestrator, which sends a bundle to the requester.">
+        <rect class="box-amb" x="8" y="80" width="112" height="50" rx="9"/>
+        <text x="64" y="101" text-anchor="middle" class="s b">spec: slice</text>
+        <text x="64" y="118" text-anchor="middle" class="xs">a template record</text>
+        <text x="8" y="152" class="xs m">id = hash(spec + params);</text>
+        <text x="8" y="166" class="xs m">nothing to write</text>
+        <rect class="box-acc" x="170" y="20" width="100" height="40" rx="8"/><text x="220" y="38" text-anchor="middle" class="s b">vx:s1</text><text x="220" y="53" text-anchor="middle" class="xs">slice 1</text>
+        <rect class="box-acc" x="170" y="90" width="100" height="40" rx="8"/><text x="220" y="108" text-anchor="middle" class="s b">vx:s2</text><text x="220" y="123" text-anchor="middle" class="xs">slice 2</text>
+        <rect class="box-acc" x="170" y="160" width="100" height="40" rx="8"/><text x="220" y="178" text-anchor="middle" class="s b">vx:s3</text><text x="220" y="193" text-anchor="middle" class="xs">slice 3</text>
+        <line class="ln dash" x1="122" y1="100" x2="167" y2="42" marker-end="url(#ah)"/>
+        <line class="ln dash" x1="122" y1="105" x2="167" y2="110" marker-end="url(#ah)"/>
+        <line class="ln dash" x1="122" y1="110" x2="167" y2="178" marker-end="url(#ah)"/>
+        <rect class="box" x="300" y="85" width="92" height="40" rx="8"/><text x="346" y="103" text-anchor="middle" class="s b">orchestrator</text><text x="346" y="118" text-anchor="middle" class="xs m">vx:orch</text>
+        <line class="ln-amb" x1="272" y1="40" x2="298" y2="96" marker-end="url(#ah-amb)"/>
+        <line class="ln-amb" x1="272" y1="110" x2="297" y2="106" marker-end="url(#ah-amb)"/>
+        <line class="ln-amb" x1="272" y1="180" x2="298" y2="116" marker-end="url(#ah-amb)"/>
+        <text x="285" y="66" class="xs tb">ticks</text>
+        <line class="ln-amb" x1="346" y1="127" x2="346" y2="176" marker-end="url(#ah-amb)"/>
+        <text x="346" y="194" text-anchor="middle" class="xs tb">bundle →</text>
+        <text x="346" y="208" text-anchor="middle" class="xs tb">requester</text>
+      </svg>
+    </div>
+    <figcaption>Each instance is its spec plus parameters, named by their hash: nothing is written to create one, and two orchestrators running the same slice for the same task get the same vertex. "All my children ticked" is a content boundary on folded state, which today's <code>Boundary.conditions</code> already supports. One store per run makes a natural unit to archive or discard.</figcaption>
+  </figure>
+  <details class="unfold"><summary>Templates and an instance</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># templates the root store carries
+{ "vertex": "subagent",
+  "ticks": ["self"], "from": [{ "kind": ["step"] }],
+  "boundary": [{ "when": "task-complete" }] }
+
+{ "vertex": "slice", "param": ["children", "size"],
+  "note": "Reviewer judgments are records.",
+  "ticks": ["$children"], "from": [{ "kind": ["review"] }],
+  "fold": { "done":     { "count": true },
+            "approved": { "count": true, "where": { "verdict": { "is": "approved" } } } },
+  "boundary": [{ "state": "approved", "at-least": "$size" }] }
+
+{ "vertex": "orchestrator", "param": ["slices", "size", "requester"],
+  "ticks": ["$slices"],
+  "fold": { "ticked": { "count": true } },
+  "boundary": [{ "state": "ticked", "at-least": "$size" }],
+  "into": "$requester", "bundle": true }
+
+# an instance is the spec plus parameters; its id is their hash, so nothing is written
+loops read slice slice:=3 children:='["vx:a1…","vx:a2…"]' size:=2</pre>
+  </div></details>
+
+  <h3>The team store</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 302" role="img" aria-label="Three personal stores, for kyle, the director and a developer, promote records by stance into a team store kept in git, where each person writes their own segment and merging is union. The platform-knowledge vertex reads decisions plus tenure records, weights by observer, and ranks without hiding: the director says X, two developers observed Y since.">
+        <rect class="box dash" x="8" y="8" width="120" height="34" rx="8"/><text x="68" y="29" text-anchor="middle" class="s">kyle · personal</text>
+        <rect class="box dash" x="140" y="8" width="120" height="34" rx="8"/><text x="200" y="29" text-anchor="middle" class="s">director · personal</text>
+        <rect class="box dash" x="272" y="8" width="120" height="34" rx="8"/><text x="332" y="29" text-anchor="middle" class="s">dev · personal</text>
+        <line class="ln-acc" x1="68" y1="44" x2="68" y2="77" marker-end="url(#ah-acc)"/>
+        <line class="ln-acc" x1="200" y1="44" x2="200" y2="77" marker-end="url(#ah-acc)"/>
+        <line class="ln-acc" x1="332" y1="44" x2="332" y2="77" marker-end="url(#ah-acc)"/>
+        <text x="206" y="64" class="xs ta">promote (a stance)</text>
+        <rect class="panel" x="0" y="80" width="400" height="94" rx="10"/>
+        <text x="14" y="100" class="b">team store · in git</text>
+        <rect class="box" x="14" y="112" width="116" height="26" rx="5"/><text x="72" y="129" text-anchor="middle" class="xs">kyle's segment</text>
+        <rect class="box" x="142" y="112" width="116" height="26" rx="5"/><text x="200" y="129" text-anchor="middle" class="xs">director's segment</text>
+        <rect class="box" x="270" y="112" width="116" height="26" rx="5"/><text x="328" y="129" text-anchor="middle" class="xs">dev's segment</text>
+        <text x="14" y="162" class="xs m">merge is union · declared kinds · stewards: the leads</text>
+        <line class="ln" x1="200" y1="176" x2="200" y2="203" marker-end="url(#ah)"/>
+        <text x="208" y="194" class="xs m">decisions + tenure records</text>
+        <rect class="box-acc" x="60" y="206" width="280" height="50" rx="9"/>
+        <text x="200" y="227" text-anchor="middle" class="b">platform-knowledge vertex</text>
+        <text x="200" y="245" text-anchor="middle" class="xs">weight-by=tenure · rank, never hide</text>
+        <line class="ln" x1="200" y1="258" x2="200" y2="276" marker-end="url(#ah)"/>
+        <text x="200" y="294" text-anchor="middle" class="xs ta">"director says X · two devs observed Y since"</text>
+      </svg>
+    </div>
+    <figcaption>Shared store in git (A) plus personal stores (B), with promotion as the deliberate act between them. Central ingest (C) is ruled out: it would bake one weighting into the data.</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Shape</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td><b>A · Shared store in git</b>, per-developer segments, union merge</td><td>✓ the backbone</td></tr>
+      <tr><td><b>B · Personal stores</b>, read by composition</td><td>✓ for the half-formed and private</td></tr>
+      <tr><td><b>C · Central ingest</b>, weighted on the way in</td><td>✗ freezes one weighting into the data</td></tr>
+    </tbody>
+  </table></div>
+  <details class="unfold"><summary>Weighting by observer</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit tenure years:=20 domain=platform --about sl:director    # by sl:team-root
+loops emit tenure years:=14 domain=platform --about sl:a1          # by sl:team-root
+
+{ "vertex": "platform-knowledge",
+  "note": "Ranked by tenure, each with its time.",
+  "from": [{ "store": "team", "kind": ["decision", "process", "history"] }],
+  "fold": { "by-thing": { "collect": true, "by": "about", "weight-by": "tenure" } } }</pre>
+    <ul>
+      <li><b>Weights are records:</b> statements about observers, made by someone, so relative to whoever makes them.</li>
+      <li><b>Weighting lives in a vertex,</b> so a new developer, an auditor and the director can each weight the same store differently.</li>
+      <li><b>Tenure varies by domain.</b> Weight by tenure <i>and</i> evidence: who touched the code a record is about, and whose earlier claims were later affirmed. Both are already records.</li>
+      <li><b>Weighting ranks, never hides.</b> In a 20-year codebase, the junior developer's recent observation is often the one that catches the outdated assumption.</li>
+      <li><b>Weight ranks a collection, never Latest.</b> Corrected in version 12: this snippet used to read <code>"latest" weight-by</code>, which either buries this morning's observation under 2019 seniority or does nothing. "Director says X · two devs observed Y since" is a Collect ordered by weight that shows each record's time.</li>
+    </ul>
+  </div></details>
+  <details class="unfold"><summary>Promotion: what travels depends on the act</summary><div class="body">
+    <p>A record copied verbatim isn't a new record. With content addressing, it's the same record, with the same hash, held in two stores, with its original observer, signature and <code>emitted</code> intact.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Mode</th><th>Lands in the team store</th><th>Provenance</th></tr></thead>
+      <tbody>
+        <tr><td><b>Verbatim</b></td><td>the original record + a <code>promote</code> stance</td><td>complete: it is the original</td></tr>
+        <tr><td><b>Restated</b></td><td>a new record with <code>derived-from: &lt;hash&gt;</code></td><td>a pointer: an original exists, unreadable to the team</td></tr>
+        <tr><td><b>Summarized</b></td><td>a tick from a personal vertex, covering by hash</td><td>pointers, with an optional bundle</td></tr>
+        <tr><td><b>Agent-proposed</b></td><td>Wren drafts any of the above; your stance makes it count</td><td>as the chosen mode, plus Wren's grant</td></tr>
+      </tbody>
+    </table></div>
+    <p>In every mode the <code>promote</code> stance is what the team store's policy checks. Which mode will dominate is a usage question that can't be answered yet; the design supports all of them equally.</p>
+  </div></details>
+</section>

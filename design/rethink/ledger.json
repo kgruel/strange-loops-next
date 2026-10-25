@@ -1,0 +1,254 @@
+[
+  {
+    "kind": "decision",
+    "group": "Foundations",
+    "status": "settled",
+    "claim": "The core library is the product; the CLI is an add-on.",
+    "why": "The product is the protocol, its vectors and one implementation. Other languages meet it at the JSON format, the CLI or a socket. Lean on existing standards wherever one fits."
+  },
+  {
+    "kind": "decision",
+    "group": "Foundations",
+    "status": "settled",
+    "claim": "Rust, in a new <code>strange-loops</code> repo.",
+    "why": "A core crate with two allowlisted dependencies, a CLI crate, and the Lean model, vectors and scenarios beside them; the layout enforces the budgets. Reversed from Go in version 31, once phones and browser extensions needed the core itself. The repo keeps its own decisions in <code>.loops/</code>; migration is a collector that lives in the old repo."
+  },
+  {
+    "kind": "decision",
+    "group": "Foundations",
+    "status": "settled",
+    "claim": "One word per concept, one concept per word.",
+    "why": "Listed in the <a href=\"#glossary\" data-tab=\"glossary\">Glossary</a>. Record replaces fact; anchor, thing, place and realm absorb genesis, subject, residence and topology; seal retires, so observers emit, vertices tick and a tick covers records; the normative prose is the protocol; LatestBy replaces Upsert. Vertex stays on purpose: it is where loops meet."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "A store is a set, not a sequence.",
+    "why": "Receipt order leaves the fold. Underneath: immutable single-writer segments, content-addressed blobs, a derived index."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "Every record has an observer, and two times.",
+    "why": "Ingestion is a dumb observer reporting what a source holds: hearsay. <code>emitted</code> is the writer's word (RFC 3339); <code>occurred</code> is an optional claimed span (EDTF Level 1) that can be coarse."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "Identity is a content hash; signatures sit beside it.",
+    "why": "A salted payload commitment, an id over the canonical <code>{commit, env}</code>, an Ed25519 signature over <code>loops/record/v1:</code> plus the id. References stay opaque. Records are signed by default and a store carries its writers' key bindings, so it verifies itself. The version in the signed prefix lets a reader refuse only what is newer than it knows."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "A field belongs on the envelope only if the core reads it.",
+    "why": "<code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code> (a set of things), <code>prev</code> (a set), <code>under</code>. <code>derived-from</code>, <code>seen</code> and <code>refs</code> are payload. Unknown envelope fields are refused."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "A payload is here, withheld or erased; supersession reads only the envelope.",
+    "why": "<code>prev</code> sits on the envelope, so withholding or erasing a payload never brings back a record it replaced: no false resurrection. A <code>where</code> test on a missing payload answers unknown, and every result says how many of the records it covers it couldn't read. Added in version 32."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "Erasure is per store and small; privacy is withholding, not hiding.",
+    "why": "One erase kind removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant."
+  },
+  {
+    "kind": "decision",
+    "group": "Observers and standing",
+    "status": "settled",
+    "claim": "Observers are things, with lineages under their names.",
+    "why": "A lineage id is the hash of its anchor. Names, keys and models are records about a lineage. Names never take part in matching: they resolve at read, through name tables and <code>@home</code>."
+  },
+  {
+    "kind": "decision",
+    "group": "Observers and standing",
+    "status": "settled",
+    "claim": "Naming, key binding and authority stay separate.",
+    "why": "Authority is a grant record, pointed to by <code>under</code>. One stance shape covers affirm, adopt, dispute, retire and authorize. A delegate is a shared seat; an identity that emerges starts its own lineage and adopts what it wants to own."
+  },
+  {
+    "kind": "decision",
+    "group": "Observers and standing",
+    "status": "settled",
+    "claim": "Keys in tiers, and presence for what takes effect.",
+    "why": "A lineage pins its root key; each device has a presence key for standing changes and a device key for emits; agents run on session keys. A record that takes effect because of who signed it needs a person present, and a grant is presence given ahead of time: agents propose and narrow, never widen. Standing ends by retiring through what was held, never by time."
+  },
+  {
+    "kind": "decision",
+    "group": "Things",
+    "status": "settled",
+    "claim": "Identity lives in the record, in <code>about</code>.",
+    "why": "A thing is anchored by the record that starts it, or named by a typed natural key that tooling computes (URLs, birth keys for code); the core only compares strings. Primitives start with the reserved <code>*-anchor</code> kinds. Equivalence (<code>same-as</code>, <code>dispute</code>), provenance and succession stay separate, and <code>resolve-by</code> joins identities at read. An unknown name follows the store's maturity."
+  },
+  {
+    "kind": "decision",
+    "group": "Things",
+    "status": "settled",
+    "claim": "A facet is one kind about one thing, emitted whole.",
+    "why": "Current state is LatestBy per thing, with the kind chosen by <code>from</code>. <code>prev</code> is a set, so a fork shows as several heads, and later links are new records, never edits to <code>about</code>. A record about several things is current in each; a record about nothing lives in one thing of its own."
+  },
+  {
+    "kind": "decision",
+    "group": "Things",
+    "status": "settled",
+    "claim": "<code>prev</code> is succession within a thing.",
+    "why": "A record replaces another only in the things both are about, so a stray <code>prev</code> can't empty another thing's state or break its provenance. You can only replace what you hold: <code>emit</code> refuses a <code>prev</code> naming a record it can't see (<code>prev-unknown</code>) or one about other things (<code>prev-unrelated</code>), and readers refuse a record with a cross-thing <code>prev</code>. Moving or narrowing a record takes an explicit <code>retire</code> about the thing it leaves. Who may replace whom is a rule on envelopes; step 3 supplies it from standing (testimony by its author, facets by standing). Version 34."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "A vertex is a question; a store is a thing you write into.",
+    "why": "A vertex owns neither storage nor sources, and is named by its spec: its id is the hash of the canonical spec and its parameters, and a name record points at the current one. It has no anchor, key or standing, and the same spec with the same parameters is the same vertex wherever it runs (version 32). A store is a lineage with declarations as records and places kept per machine. Schema grows by accretion: dated declarations, no migrations, maturity from open to strict, enforced at admission."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "Specs are JSON, stored as records.",
+    "why": "Defined by JSON Schemas in <code>protocol/</code> and stored as records of kind <code>vertex</code>; comments are a <code>note</code>; a vertex with <code>param</code>s is a template. The core takes specs as data, hashed in canonical form."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "Six folds in two families, plus modifiers.",
+    "why": "Count, Sum, Min, Max, LatestBy and Collect, with <code>by</code>, <code>where</code>, <code>follow</code>, <code>order</code>, <code>limit</code>, a set mode, and <code>weight-by</code> on Collect's ranking only. Latest is LatestBy with no key, TopN is Collect with an order and a limit, Window is a time bucket used as <code>by</code>, and Avg is Sum and Count divided by the lens. Folds that only accumulate are commutative; folds that follow <code>prev</code> keep the heads and work their answer out from them. Either way the set decides, so a late record folds onto cached state: content order says which record wins, never the order records are read. Numeric folds are exact, the spec hash pins the vocabulary version, and vectors bind implementations. Version 32."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "Predicates are a closed, typed set.",
+    "why": "Six <code>where</code> operators over one record, or the vertex's own state for a boundary. No regex, arithmetic, user code or effects: classify by recording instead. Parse pipelines move into collectors, boundaries lose <code>run</code>, and there is no query language."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "Supersession runs over everything held; selection comes after.",
+    "why": "Each thing's state is worked out over every record the reader holds about it, before any vertex asks. <code>from</code>, envelope tests and payload tests then choose among the heads. Selecting first would bring back a task finished by a record of another kind, revised in a store the vertex doesn't read, closed by a successor a filter drops, or one whose successor is withheld. Counts and sums still include superseded records: they count history. Found while modelling the spec (versions 33 and 34)."
+  },
+  {
+    "kind": "decision",
+    "group": "Resolution · ticks",
+    "status": "settled",
+    "claim": "A tick is a value; a stored tick is a signed record.",
+    "why": "A content tick's id is the hash of its vertex, the ids it covers and its result, so two machines compute the same id and anyone holding the records checks it by recomputing. It's written down only when someone cites or sends it, as an ordinary record of kind <code>tick</code> signed by whoever wrote it, so layer 0 keeps one envelope. A witness tick is the same record, covering what the runner had. Once an input is erased, a numeric result rests on that signature instead of recomputation. A tick covers ids, so late ticks never cascade; revisits are new ticks citing old ones. Version 32."
+  },
+  {
+    "kind": "decision",
+    "group": "Resolution · ticks",
+    "status": "settled",
+    "claim": "Every result has two names.",
+    "why": "An input key over everything that shapes it, and a result hash; downstream keys use result hashes, so work stops where results stop changing. Name it, don't carry it. Late records fold onto cached state, so there is no partial rewind to build."
+  },
+  {
+    "kind": "decision",
+    "group": "Resolution · ticks",
+    "status": "leaning",
+    "claim": "State references form a DAG; ticks may loop.",
+    "why": "The stale review counters self-reinforcing salience. Hygiene vertices, one per surface, ship as a store's standard vertices."
+  },
+  {
+    "kind": "decision",
+    "group": "Places and sharing",
+    "status": "settled",
+    "claim": "A place is a location, a format and a scope.",
+    "why": "Roles are write, hold and blobs: JSONL where git needs it, SQLite where volume does. The index is derived and disposable."
+  },
+  {
+    "kind": "decision",
+    "group": "Places and sharing",
+    "status": "settled",
+    "claim": "Replication is set union by segment lists.",
+    "why": "A segment closes once committed, so branches only add files, and a committed segment changing outside an erase is the alarm. A static place is closed segments named by hash plus one mutable <code>segments.json</code>."
+  },
+  {
+    "kind": "decision",
+    "group": "Places and sharing",
+    "status": "settled",
+    "claim": "A realm is the stores its root name table reaches.",
+    "why": "Membership is a link, not containment. Across realms: compose by default, bridge only as an explicit signed tick, never replicate. A public store is a standing bridge, declared with presence."
+  },
+  {
+    "kind": "decision",
+    "group": "Places and sharing",
+    "status": "leaning",
+    "claim": "Federation is each person's own store, plus composition.",
+    "why": "Replies carry the thread's root in <code>about</code>; a ping says only where to look. Admission filters and weight ranks."
+  },
+  {
+    "kind": "decision",
+    "group": "Lenses and context",
+    "status": "settled",
+    "claim": "A lens is a collector with a base.",
+    "why": "The base is (tick, lens hash, audience): render, parse the edited file, diff by ids in the core, apply as one changeset. Absence is never an edit. A committed render is a promotion. One tick, many renders; anything a model writes is an observer's record."
+  },
+  {
+    "kind": "decision",
+    "group": "Lenses and context",
+    "status": "leaning",
+    "claim": "Context travels by tick.",
+    "why": "A reference reaches a reader in one of five states: here, fetchable, withheld, erased, unreachable. Bundles carry only what the receiver can't fetch, filtered by its grant. A session's witness tick is what it knew and retires its key. A brief is a signed record plus a tick by reference. A cloud run is a borrowed place, synced at every tick."
+  },
+  {
+    "kind": "decision",
+    "group": "The local API and its surfaces",
+    "status": "settled",
+    "claim": "One API under every surface.",
+    "why": "Pure functions plus a realm handle that narrows to a grant and never widens; identity-aware reads go through <code>fold</code>; <code>tick</code> and <code>witness</code> match the two kinds of tick; refusals are values with closed codes. <code>serve</code> speaks JSON-RPC that mirrors the crate, so the LSP, MCP and front ends are thin translators."
+  },
+  {
+    "kind": "decision",
+    "group": "The local API and its surfaces",
+    "status": "settled",
+    "claim": "No subscriptions, no coordinator.",
+    "why": "A watcher holds its own checkpoint. A boundary runs wherever the handle is when the record lands: content ticks anywhere, since a second run makes the same id; witness ticks where their key lives."
+  },
+  {
+    "kind": "decision",
+    "group": "The local API and its surfaces",
+    "status": "settled",
+    "claim": "The CLI is verb first, with the API's verbs.",
+    "why": "HTTPie's payload syntax, <code>--json</code> equal to what <code>serve</code> returns, no zoom flags. A batch is one changeset, and labels let records in it refer to each other."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "settled",
+    "claim": "The limits, in four tiers.",
+    "why": "Not the model, not in the core, not yet (each with a trigger), outside by design. Something enters the core only if two separate cases need it and it can't be built from records, ticks and lenses. No state-machine framework: each vertex already is one."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "settled",
+    "claim": "Budgets guard failures, not size.",
+    "why": "Tokens per module, the public API diffed, a closed vocabulary priced by the key, a dependency allowlist and inward layering. A budget grows only through a ledger entry that cites the rule for the core."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "settled",
+    "claim": "Laws, then vectors, then Rust; no unit tests.",
+    "why": "A Lean 4 model proves the laws, writes the vectors and is fuzzed against the core, one step ahead of it. Proofs, vectors, differential fuzzing and scenarios all test from outside; expected answers never come from the implementation, and every failure becomes a vector or a scenario."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "settled",
+    "claim": "Steps 0 and 1 are built; step 2 is proved in the model.",
+    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model, the implementation and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch, with 94 vectors in all."
+  }
+]

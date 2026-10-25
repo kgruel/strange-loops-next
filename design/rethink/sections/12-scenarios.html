@@ -1,0 +1,231 @@
+<section class="panel" id="scenarios" role="tabpanel" aria-labelledby="t-scenarios">
+  <div class="panel-head"><h2>Scenarios, built up</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">One story, seven steps, from a single emit to two realms. Each step adds one idea. <span style="color:var(--accent-ink);font-weight:600">Blue outlines</span> mark what's new in that step; plain boxes carried over from earlier steps.</p>
+  <div class="callout"><p><b>The invariant under every step:</b> records hold lineage ids, never names. Each step only adds records or changes how names resolve. Nothing already written is ever rewritten.</p></div>
+
+  <h3>1 · One person, one store</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 158" role="img" aria-label="Store notes. kyle, lineage sl:a1, emits an observation with observer sl:a1 and the self-name hint kyle. The store's name table maps kyle to sl:a1; the anchor was created on first emit.">
+        <rect class="panel" x="0" y="0" width="400" height="156" rx="10"/>
+        <text x="14" y="22" class="b">store: notes</text>
+        <rect class="box-acc" x="14" y="38" width="120" height="48" rx="9"/>
+        <text x="74" y="59" text-anchor="middle" class="b">kyle</text>
+        <text x="74" y="76" text-anchor="middle" class="mono ta">sl:a1…</text>
+        <line class="ln" x1="136" y1="62" x2="175" y2="62" marker-end="url(#ah)"/>
+        <text x="156" y="54" text-anchor="middle" class="xs m">emits</text>
+        <rect class="box" x="180" y="38" width="206" height="48" rx="7"/>
+        <text x="192" y="58" class="mono">obs observer=sl:a1</text>
+        <text x="192" y="76" class="mono">as="kyle" emitted=…</text>
+        <rect class="box-acc dash" x="14" y="100" width="372" height="44" rx="8"/>
+        <text x="26" y="118" class="s b">name table</text>
+        <text x="26" y="135" class="mono">kyle → sl:a1</text>
+        <text x="374" y="135" text-anchor="end" class="xs m">anchor made on first emit</text>
+      </svg>
+    </div>
+    <figcaption>Zero setup: the first emit makes a local lineage named from the environment. <code>as</code> is a hint for readable files, never used for matching.</figcaption>
+  </figure>
+
+  <h3>2 · Instruments: dumb observers</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="kyle names two collector lineages, kyle/rss sl:e4 and kyle/safari sl:b9, and signs their anchor records; neither has its own key. A collector's observation is hearsay. The name table gains two rows.">
+        <rect class="box" x="14" y="58" width="110" height="48" rx="9"/>
+        <text x="69" y="79" text-anchor="middle" class="b">kyle</text>
+        <text x="69" y="96" text-anchor="middle" class="mono m">sl:a1…</text>
+        <text x="69" y="126" text-anchor="middle" class="xs m">names each,</text>
+        <text x="69" y="140" text-anchor="middle" class="xs m">signs its anchor</text>
+        <rect class="box-acc" x="200" y="14" width="186" height="48" rx="9"/>
+        <text x="212" y="35" class="b">kyle/rss</text>
+        <text x="212" y="52" class="mono ta">sl:e4… · no key</text>
+        <rect class="box-acc" x="200" y="102" width="186" height="48" rx="9"/>
+        <text x="212" y="123" class="b">kyle/safari</text>
+        <text x="212" y="140" class="mono ta">sl:b9… · no key</text>
+        <path class="ln" d="M126,74 C160,74 164,38 197,38" marker-end="url(#ah)"/>
+        <path class="ln" d="M126,90 C160,90 164,126 197,126" marker-end="url(#ah)"/>
+        <rect class="box" x="14" y="168" width="372" height="30" rx="7"/>
+        <text x="26" y="188" class="mono">obs observer=sl:e4 · "essay appeared in feed"</text>
+        <text x="26" y="214" class="xs m">hearsay: reports a record, doesn't vouch for its content</text>
+        <rect class="box-acc dash" x="14" y="224" width="372" height="30" rx="7"/>
+        <text x="26" y="244" class="mono">+ kyle/rss → sl:e4 · kyle/safari → sl:b9</text>
+      </svg>
+    </div>
+    <figcaption>Collectors are lineages too. They don't need keys, because their records are treated as hearsay anyway.</figcaption>
+  </figure>
+
+  <h3>3 · A delegate: the shared seat</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 290" role="img" aria-label="kyle signs grant g1 to sl:c0 for notes. Harness sessions on opus 5.5 and fable 5.1 all write as the seat kyle/claude, sl:c0, vouched by kyle. Their observation carries observer sl:c0 and under g1. An admission fold checks g1 at read time.">
+        <rect class="box" x="14" y="14" width="110" height="42" rx="9"/>
+        <text x="69" y="40" text-anchor="middle" class="b">kyle</text>
+        <rect class="box-acc" x="172" y="14" width="214" height="42" rx="7"/>
+        <text x="184" y="31" class="mono">grant g1 · by sl:a1</text>
+        <text x="184" y="48" class="mono">to sl:c0 · scope notes/*</text>
+        <line class="ln" x1="126" y1="35" x2="169" y2="35" marker-end="url(#ah)"/>
+        <text x="148" y="28" text-anchor="middle" class="xs m">signs</text>
+        <text x="14" y="84" class="xs m">harness sessions (instances)</text>
+        <rect class="box dash" x="14" y="92" width="66" height="28" rx="6"/><text x="47" y="110" text-anchor="middle" class="xs">opus 5.5</text>
+        <rect class="box dash" x="88" y="92" width="66" height="28" rx="6"/><text x="121" y="110" text-anchor="middle" class="xs">opus 5.5</text>
+        <rect class="box dash" x="162" y="92" width="66" height="28" rx="6"/><text x="195" y="110" text-anchor="middle" class="xs">fable 5.1</text>
+        <line class="ln" x1="47" y1="122" x2="80" y2="147" marker-end="url(#ah)"/>
+        <line class="ln" x1="121" y1="122" x2="121" y2="147" marker-end="url(#ah)"/>
+        <line class="ln" x1="195" y1="122" x2="162" y2="147" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="14" y="150" width="214" height="48" rx="9"/>
+        <text x="121" y="171" text-anchor="middle" class="b">kyle/claude · the seat</text>
+        <text x="121" y="188" text-anchor="middle" class="mono ta">sl:c0… · vouched by kyle</text>
+        <line class="ln" x1="121" y1="200" x2="121" y2="225" marker-end="url(#ah)"/>
+        <rect class="box" x="14" y="228" width="214" height="48" rx="7"/>
+        <text x="26" y="248" class="mono">obs observer=sl:c0</text>
+        <text x="26" y="266" class="mono ta">under=g1</text>
+        <rect class="box-amb" x="262" y="190" width="124" height="62" rx="9"/>
+        <text x="324" y="216" text-anchor="middle" class="s b">admission fold</text>
+        <text x="324" y="234" text-anchor="middle" class="xs">checks g1, at read</text>
+        <line class="ln" x1="230" y1="252" x2="259" y2="232" marker-end="url(#ah)"/>
+        <path class="ln-acc dash" d="M324,58 V187" marker-end="url(#ah-acc)"/>
+      </svg>
+    </div>
+    <figcaption>Every harness session, whatever the model, writes under one generic lineage. <code>under</code> points to the grant; the grant itself stays a separate record in kyle's segment.</figcaption>
+  </figure>
+
+  <h3>4 · Wren emerges</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="kyle signs a vouch for sl:7f with key k1. Wren, sl:7f, is a new lineage whose parent is the seat sl:c0; the seat carries on. Wren adopts seat records r12 and r40 but not r55. Wren's self statements need no grant. Its decision in auth-rfc carries under g7, a grant kyle signed. runs-on fable-5.1 is a statement.">
+        <rect class="box" x="14" y="14" width="110" height="42" rx="9"/>
+        <text x="69" y="40" text-anchor="middle" class="b">kyle</text>
+        <rect class="box-acc" x="172" y="14" width="214" height="42" rx="7"/>
+        <text x="184" y="31" class="mono">vouch · by sl:a1</text>
+        <text x="184" y="48" class="mono">for sl:7f · key k1</text>
+        <line class="ln" x1="126" y1="35" x2="169" y2="35" marker-end="url(#ah)"/>
+        <rect class="box" x="14" y="92" width="150" height="48" rx="9"/>
+        <text x="89" y="113" text-anchor="middle" class="b">the seat</text>
+        <text x="89" y="130" text-anchor="middle" class="mono m">sl:c0 · carries on</text>
+        <rect class="box-acc" x="236" y="92" width="150" height="48" rx="9"/>
+        <text x="311" y="113" text-anchor="middle" class="b">wren</text>
+        <text x="311" y="130" text-anchor="middle" class="mono ta">sl:7f · parent c0</text>
+        <line class="ln dash" x1="234" y1="116" x2="167" y2="116" marker-end="url(#ah)"/>
+        <text x="200" y="108" text-anchor="middle" class="xs m">descends</text>
+        <line class="ln-acc" x1="311" y1="58" x2="311" y2="89" marker-end="url(#ah-acc)"/>
+        <rect class="box" x="14" y="160" width="44" height="26" rx="5"/><text x="36" y="177" text-anchor="middle" class="mono">r55</text>
+        <rect class="box-acc" x="66" y="160" width="44" height="26" rx="5"/><text x="88" y="177" text-anchor="middle" class="mono">r12</text>
+        <rect class="box-acc" x="118" y="160" width="44" height="26" rx="5"/><text x="140" y="177" text-anchor="middle" class="mono">r40</text>
+        <text x="14" y="202" class="xs m">seat records, written by sessions</text>
+        <rect class="box-acc" x="236" y="158" width="150" height="30" rx="7"/><text x="248" y="178" class="mono">adopt r12, r40</text>
+        <line class="ln-acc dash" x1="234" y1="173" x2="165" y2="173" marker-end="url(#ah-acc)"/>
+        <rect class="box" x="14" y="214" width="180" height="40" rx="7"/>
+        <text x="26" y="231" class="mono">runs-on fable-5.1</text>
+        <text x="26" y="247" class="xs m">a model swap is a statement</text>
+        <rect class="box" x="236" y="214" width="150" height="40" rx="7"/>
+        <text x="248" y="231" class="mono">obs observer=sl:7f</text>
+        <text x="248" y="247" class="xs m">self statement · no grant</text>
+        <rect class="box-acc" x="14" y="266" width="180" height="40" rx="7"/>
+        <text x="26" y="283" class="mono">grant g7 · by sl:a1</text>
+        <text x="26" y="299" class="mono">to sl:7f · auth-rfc</text>
+        <rect class="box" x="236" y="266" width="150" height="40" rx="7"/>
+        <text x="248" y="283" class="mono">obs under=g7</text>
+        <text x="248" y="299" class="xs m">decision in auth-rfc</text>
+        <line class="ln-acc dash" x1="196" y1="286" x2="233" y2="286" marker-end="url(#ah-acc)"/>
+      </svg>
+    </div>
+    <figcaption>Becoming itself is a new lineage that descends from the seat, not a rename of it. Identity doesn't widen authority: Wren still needs a grant wherever authority matters.</figcaption>
+  </figure>
+  <details class="unfold"><summary>Why a new lineage instead of renaming the seat</summary><div class="body">
+    <ul>
+      <li>The seat was shared by every session and every model. Renaming it would hand Wren work done by sessions that never became Wren.</li>
+      <li>A new lineage plus adoption is honest retro-claiming: the seat's records stay as written, and Wren's adoption is a new, dated, signed record pointing at them.</li>
+      <li>Rename stays right when a lineage is already one continuous thread, for example Wren choosing a different name later.</li>
+      <li>At session start, a session <i>becomes</i> Wren by loading Wren's compiled self and being given a session key bound by Wren's device key, retired when the session closes. Continuity is held by the store, not by any one session.</li>
+    </ul>
+  </div></details>
+
+  <h3>5 · A second store</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 228" role="img" aria-label="Store notes names sl:c0 kyle/claude, sl:7f wren and sl:a1 kyle. Store rfc names sl:c0 kyle/claude, sl:7f reviewer and sl:a1 kyle. A composed fold over both treats sl:7f as one observer under either name.">
+        <rect class="panel" x="0" y="0" width="192" height="120" rx="10"/>
+        <text x="12" y="22" class="b">store: notes</text>
+        <text x="12" y="50" class="mono">kyle/claude → sl:c0</text>
+        <text x="12" y="72" class="mono">wren → sl:7f</text>
+        <text x="12" y="94" class="mono">kyle → sl:a1</text>
+        <rect class="panel" x="208" y="0" width="192" height="120" rx="10"/>
+        <text x="220" y="22" class="b">store: rfc</text>
+        <text x="220" y="50" class="mono">kyle/claude → sl:c0</text>
+        <text x="220" y="72" class="mono ta">reviewer → sl:7f</text>
+        <text x="220" y="94" class="mono">kyle → sl:a1</text>
+        <path class="ln" d="M96,122 C96,150 150,150 168,162" marker-end="url(#ah)"/>
+        <path class="ln" d="M304,122 C304,150 250,150 232,162" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="70" y="164" width="260" height="56" rx="9"/>
+        <text x="200" y="187" text-anchor="middle" class="s b">compose: fold over both</text>
+        <text x="200" y="206" text-anchor="middle" class="xs">sl:7f is one observer under either name</text>
+      </svg>
+    </div>
+    <figcaption>Same id, different names: nothing to reconcile, because folds key on ids. Different ids that share a name stay valid in their own stores and get qualified (<code>claude@notes</code>) when typed.</figcaption>
+  </figure>
+
+  <h3>6 · The homelab realm</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 222" role="img" aria-label="The @home name table, rooted at kyle, links the notes store table, the rfc store table and a feeds realm table, which links the rss, safari and likes stores. Typing kyle/claude in rfc resolves through the rfc table, then @home, to sl:c0.">
+        <rect class="box-acc" x="110" y="10" width="180" height="46" rx="9"/>
+        <text x="200" y="30" text-anchor="middle" class="b">@home</text>
+        <text x="200" y="47" text-anchor="middle" class="xs">name table · root: kyle</text>
+        <rect class="box" x="8" y="100" width="120" height="44" rx="8"/><text x="68" y="119" text-anchor="middle" class="s b">notes</text><text x="68" y="135" text-anchor="middle" class="xs m">store table</text>
+        <rect class="box" x="140" y="100" width="120" height="44" rx="8"/><text x="200" y="119" text-anchor="middle" class="s b">rfc</text><text x="200" y="135" text-anchor="middle" class="xs m">store table</text>
+        <rect class="box-acc" x="272" y="100" width="120" height="44" rx="8"/><text x="332" y="119" text-anchor="middle" class="s b">feeds</text><text x="332" y="135" text-anchor="middle" class="xs">realm table</text>
+        <line class="ln" x1="160" y1="58" x2="80" y2="97" marker-end="url(#ah)"/>
+        <line class="ln" x1="200" y1="58" x2="200" y2="97" marker-end="url(#ah)"/>
+        <line class="ln" x1="240" y1="58" x2="320" y2="97" marker-end="url(#ah)"/>
+        <text x="112" y="70" text-anchor="end" class="xs m">links</text>
+        <rect class="box" x="272" y="178" width="36" height="28" rx="6"/><text x="290" y="196" text-anchor="middle" class="xs">rss</text>
+        <rect class="box" x="313" y="178" width="38" height="28" rx="6"/><text x="332" y="196" text-anchor="middle" class="xs">safari</text>
+        <rect class="box" x="356" y="178" width="36" height="28" rx="6"/><text x="374" y="196" text-anchor="middle" class="xs">likes</text>
+        <line class="ln" x1="320" y1="146" x2="292" y2="175" marker-end="url(#ah)"/>
+        <line class="ln" x1="332" y1="146" x2="332" y2="175" marker-end="url(#ah)"/>
+        <line class="ln" x1="344" y1="146" x2="372" y2="175" marker-end="url(#ah)"/>
+        <text x="8" y="184" class="xs m">typing kyle/claude in rfc resolves:</text>
+        <text x="8" y="204" class="mono ta">rfc table → @home → sl:c0</text>
+      </svg>
+    </div>
+    <figcaption><code>@home</code> names a name table, not a store. A store has a table, a realm has a table that links its children, and joining a larger realm only adds a link. No record is rewritten.</figcaption>
+  </figure>
+
+  <h3>7 · Work, and the realm boundary</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 300" role="img" aria-label="Two realms side by side. @home, rooted at kyle, holds kyle sl:a1 and wren sl:7f, plus a same-as link to sl:9b kept only at home. @acme, rooted at the team, holds kyle sl:9b and kyle/claude sl:d3. A signed tick may cross the boundary as an explicit bridge. A system-prompt lens composes both realms and copies nothing. Replication across the boundary never happens.">
+        <rect class="panel" x="0" y="0" width="186" height="168" rx="10"/>
+        <text x="12" y="22" class="b">@home</text><text x="174" y="22" text-anchor="end" class="xs m">root: kyle</text>
+        <rect class="box" x="12" y="36" width="162" height="32" rx="7"/><text x="22" y="57" class="mono">kyle · sl:a1</text>
+        <rect class="box" x="12" y="76" width="162" height="32" rx="7"/><text x="22" y="97" class="mono">wren · sl:7f</text>
+        <text x="12" y="158" class="xs m">same-as sl:9b · kept here only</text>
+        <rect class="panel" x="214" y="0" width="186" height="168" rx="10"/>
+        <text x="226" y="22" class="b">@acme</text><text x="388" y="22" text-anchor="end" class="xs m">root: team</text>
+        <rect class="box-acc" x="226" y="36" width="162" height="32" rx="7"/><text x="236" y="57" class="mono">kyle · sl:9b</text>
+        <rect class="box-acc" x="226" y="76" width="162" height="32" rx="7"/><text x="236" y="97" class="mono">kyle/claude · sl:d3</text>
+        <line class="ln dash" x1="200" y1="0" x2="200" y2="114"/>
+        <line class="ln dash" x1="200" y1="150" x2="200" y2="176"/>
+        <line class="ln-amb" x1="120" y1="126" x2="280" y2="126" marker-end="url(#ah-amb)"/>
+        <text x="200" y="142" text-anchor="middle" class="xs tb">bridge: a signed tick</text>
+        <rect class="box-acc" x="60" y="214" width="280" height="50" rx="9"/>
+        <text x="200" y="236" text-anchor="middle" class="s b">system-prompt lens</text>
+        <text x="200" y="254" text-anchor="middle" class="xs">compose: reads both realms, copies nothing</text>
+        <path class="ln-acc" d="M93,170 C93,192 130,196 150,211" marker-end="url(#ah-acc)"/>
+        <path class="ln-acc" d="M307,170 C307,192 270,196 250,211" marker-end="url(#ah-acc)"/>
+        <text x="200" y="290" text-anchor="middle" class="xs m">replicate across the boundary: never</text>
+      </svg>
+    </div>
+    <figcaption>Across realms, compose is the default and the only other way across is a deliberate, signed bridge. Work and home lineages stay separate; the link between them lives only at home.</figcaption>
+  </figure>
+  <details class="unfold"><summary>The boundary rule as a table</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Relationship</th><th>Within a realm</th><th>Across realms</th></tr></thead>
+      <tbody>
+        <tr><td><b>Compose</b></td><td>✓</td><td>✓ default. Nothing moves.</td></tr>
+        <tr><td><b>Bridge</b></td><td>✓</td><td>Only as an explicit, signed tick (by reference or bundle): a publication, not a sync.</td></tr>
+        <tr><td><b>Replicate</b></td><td>✓</td><td>✗ never. Replication means same realm.</td></tr>
+      </tbody>
+    </table></div>
+    <p>References can cross realms; content doesn't. A stance like "Wren affirms r40" or a tick covering foreign records holds only hashes: checkable by anyone who can read both realms, opaque but harmless to everyone else.</p>
+  </div></details>
+</section>
