@@ -11,7 +11,7 @@
     "group": "Foundations",
     "status": "settled",
     "claim": "Rust, in a new <code>strange-loops</code> repo.",
-    "why": "A core crate with two allowlisted dependencies, a CLI crate, and the Lean model, vectors and scenarios beside them; the layout enforces the budgets. Reversed from Go in version 31, once phones and browser extensions needed the core itself. The repo keeps its own decisions in <code>.loops/</code>; migration is a collector that lives in the old repo."
+    "why": "A core crate with two allowlisted dependencies, a CLI crate, and the Lean model, vectors and scenarios beside them; the layout enforces the budgets. Reversed from Go in version 31, once phones and browser extensions needed the core itself. The repo keeps its own decisions in <code>.loops/</code>; migration is a collector that lives in the old repo. Version 35 removed step 1's Go core (PR 6): until the data model is formalized, the repo holds the Lean model, its vectors and the JS writer, which stays as an independent second writer for layer 0."
   },
   {
     "kind": "decision",
@@ -45,6 +45,20 @@
     "kind": "decision",
     "group": "Layer 0 · the record",
     "status": "settled",
+    "claim": "Writing the same record twice is a no-op.",
+    "why": "A record's id covers its envelope, including <code>emitted</code>, plus its salt and payload. The same draft written twice is the same record, and set union absorbs it, in a batch or across batches. A new observation gets a fresh salt, so it gets a new id and is simply a new record. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "A record erases through its envelope field <code>erases</code>; any kind may erase.",
+    "why": "<code>erases</code> is a set of record ids, refused unless each is one, and never a label. It sits on the envelope, so every reader applies it, whatever its grant. Targets in <code>about</code> were rejected: <code>about: [r:X]</code> already names the thing X anchors, which holds X's revisions too, and a kind would decide which reading applied. No kind is reserved for erasing, so the field carries the meaning by itself, and a revision can erase what it replaces: <code>prev: [r:X], erases: [r:X]</code>. Authority keys on the field. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
     "claim": "A field belongs on the envelope only if the core reads it.",
     "why": "<code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code> (a set of things), <code>prev</code> (a set), <code>under</code>. <code>derived-from</code>, <code>seen</code> and <code>refs</code> are payload. Unknown envelope fields are refused."
   },
@@ -60,7 +74,21 @@
     "group": "Layer 0 · the record",
     "status": "settled",
     "claim": "Erasure is per store and small; privacy is withholding, not hiding.",
-    "why": "One erase kind removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant."
+    "why": "An erase removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "Numbers are what RFC 8785 reads: doubles, exact only within ±(2<sup>53</sup>−1).",
+    "why": "Past that range two numbers share one canonical form, so writers would disagree on an id. A payload number outside it is refused (<code>number-out-of-range</code>), not kept exactly. The range applies to the number as JCS reads it, so <code>9007199254740991.1</code> is accepted as <code>…991</code>. Non-integers are allowed. A number that must stay exact past the range belongs in a string. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "One checked write path, and what it returns carries the proof.",
+    "why": "<code>write</code> refuses, in order: a bad envelope, a salt that isn't 16 bytes, a repeated member name at any depth, and an out-of-range number. A batch writes every record through it, and its refusal never depends on the order of drafts or of a <code>prev</code> set. It returns a <code>Written</code> record that carries the proof, so a law that needs distinct member names takes them from the record. Version 35 (PR 7)."
   },
   {
     "kind": "decision",
@@ -75,6 +103,13 @@
     "status": "settled",
     "claim": "Naming, key binding and authority stay separate.",
     "why": "Authority is a grant record, pointed to by <code>under</code>. One stance shape covers affirm, adopt, dispute, retire and authorize. A delegate is a shared seat; an identity that emerges starts its own lineage and adopts what it wants to own."
+  },
+  {
+    "kind": "decision",
+    "group": "Observers and standing",
+    "status": "settled",
+    "claim": "A label may stand in <code>under</code>.",
+    "why": "A changeset can create a grant <code>@g</code> and act under it in the same batch. <code>under</code> takes labels as <code>about</code> and <code>prev</code> do, counts in cycle detection, and must name a record held in the batch or the store, like <code>prev</code>. It grants nothing extra: whether the grant holds is still decided at read time from its signer's standing, exactly as if it had been written first. Version 35."
   },
   {
     "kind": "decision",
@@ -95,7 +130,7 @@
     "group": "Things",
     "status": "settled",
     "claim": "A facet is one kind about one thing, emitted whole.",
-    "why": "Current state is LatestBy per thing, with the kind chosen by <code>from</code>. <code>prev</code> is a set, so a fork shows as several heads, and later links are new records, never edits to <code>about</code>. A record about several things is current in each; a record about nothing lives in one thing of its own."
+    "why": "Current state is LatestBy per thing, with the kind chosen by <code>from</code>. <code>prev</code> is a set, so a fork shows as several heads, and later links are new records, never edits to <code>about</code>. A record about several things is current in each; a record about nothing anchors a thing of its own, named by its id, and a revision of it is about that id, so unrelated records about nothing never fork each other (version 35)."
   },
   {
     "kind": "decision",
@@ -116,7 +151,7 @@
     "group": "Meaning · vertices and stores",
     "status": "settled",
     "claim": "Specs are JSON, stored as records.",
-    "why": "Defined by JSON Schemas in <code>protocol/</code> and stored as records of kind <code>vertex</code>; comments are a <code>note</code>; a vertex with <code>param</code>s is a template. The core takes specs as data, hashed in canonical form."
+    "why": "Defined by JSON Schemas in <code>protocol/</code> and stored as records of kind <code>vertex</code>; comments are a <code>note</code>; a vertex with <code>param</code>s is a template. The core takes specs as data, hashed in canonical form. A spec reads at least one source: one with no <code>from</code> is refused (<code>from-missing</code>), never run empty."
   },
   {
     "kind": "decision",
@@ -131,6 +166,20 @@
     "status": "settled",
     "claim": "Predicates are a closed, typed set.",
     "why": "Six <code>where</code> operators over one record, or the vertex's own state for a boundary. No regex, arithmetic, user code or effects: classify by recording instead. Parse pipelines move into collectors, boundaries lose <code>run</code>, and there is no query language."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "<code>where</code> can test any envelope field, named explicitly.",
+    "why": "Envelope fields are tested as <code>env.kind</code>, <code>env.observer</code>, <code>env.emitted</code>, <code>env.occurred</code>, <code>env.about</code>, <code>env.prev</code> and <code>env.under</code>, and a bare name always means a payload field, so no payload name is shadowed. Envelope tests always answer and choose among heads after supersession. <code>at-least</code> and <code>below</code> on times wait for the time ordering, and <code>observer</code> compares lineage ids until name tables arrive. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Meaning · vertices and stores",
+    "status": "settled",
+    "claim": "<code>unread</code> counts only what could change the answer.",
+    "why": "A record the reader can't read counts as unread only if its payload could change the result. With a <code>limit</code>, that is one newer than the last record kept, or any of them if fewer than the limit were kept; without a limit, every one counts. So <code>unread: 0</code> means the result is exactly what a reader holding everything would get, whatever the hidden payloads hold: a law to prove, not just a count. Version 35."
   },
   {
     "kind": "decision",
@@ -235,7 +284,7 @@
     "group": "Building",
     "status": "settled",
     "claim": "Budgets guard failures, not size.",
-    "why": "Tokens per module, the public API diffed, a closed vocabulary priced by the key, a dependency allowlist and inward layering. A budget grows only through a ledger entry that cites the rule for the core."
+    "why": "Tokens per module, the public API diffed, a closed vocabulary priced by the key, a dependency allowlist and inward layering. A budget grows only through a ledger entry that cites the rule for the core. The Go budget checker went with the Go core; budgets return with the Rust core's <code>xtask</code>."
   },
   {
     "kind": "decision",
@@ -248,7 +297,28 @@
     "kind": "decision",
     "group": "Building",
     "status": "settled",
-    "claim": "Steps 0 and 1 are built; step 2 is proved in the model.",
-    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model, the implementation and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch, with 94 vectors in all."
+    "claim": "A law counts only where its boundary establishes its hypotheses.",
+    "why": "The fold laws held. What failed were the boundaries: a law assumed distinct ids or distinct member names, and nothing guaranteed them. Parsing, writing and settling return types that carry their invariants, as <code>Written</code> does, and the laws take those types. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "leaning",
+    "claim": "An outside review at each modelling step.",
+    "why": "A reviewer from another lab gets the code and the docs, never our conclusions. Each finding becomes a vector, a theorem or a narrower claim. Codex found three of our five findings on its own and eight more besides."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "settled",
+    "claim": "Steps 0 and 1 are built; step 2 is modelled and reviewed.",
+    "why": "The set decides for LatestBy, Count counts repeats, and the keyed-section lens laws hold. Layer 0 agrees byte for byte across the model and an independent JS writer; erasure, sets and member order are proved for any hash. Step 2's model (PR 4) proves the two fold families, per-thing supersession over everything held, settling places and erase records, no false resurrection under any view, honest results, the spec as data and one meaning for a labelled batch. Our review, Codex's and Gemini's found the holes at the boundaries, not in the laws: PR 7 closes the write path and PR 9 gives the envelope <code>erases</code>; 109 vectors in all. Next: formalize the data model in Lean, one record from JSON text to what a reader holds, before step 3 or any Rust."
+  },
+  {
+    "kind": "decision",
+    "group": "Building",
+    "status": "settled",
+    "claim": "The design page is built from the repo.",
+    "why": "Its sections are HTML and its ledger is these records, in <code>design/rethink/</code>. <code>node design/build.mjs</code> renders the page, CI checks the render, projects.gruel.world serves it unlisted, and the claude.ai artifact is a mirror. Once <code>.loops/</code> exists, the ledger is read from it. Version 35."
   }
 ]

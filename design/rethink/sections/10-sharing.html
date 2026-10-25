@@ -28,7 +28,7 @@
     <figcaption>Each segment has one writer and only grows, so a place's state is just "last record held, per segment." Comparing those lists is the whole negotiation; closed segments compare by hash. This is the "manifest exchange" SQLite places needed.</figcaption>
   </figure>
   <ul>
-    <li><b>Erasure doesn't disturb it.</b> An <code>erase</code> travels like any record and each place applies it locally; ids and line counts stay put, so the lists still match.</li>
+    <li><b>Erasure doesn't disturb it.</b> A record that erases travels like any other and each place applies it locally; ids and line counts stay put, so the lists still match.</li>
     <li><b>Content ticks don't sync.</b> They're a cache anyone holding the records recomputes. Witness ticks are ordinary records and sync like them.</li>
   </ul>
 
@@ -103,7 +103,7 @@
       <tr><td><code>grant</code>, <code>vouch</code>, <code>retire</code>: who counts</td><td>ordinary emits</td></tr>
       <tr><td>a steward's <code>policy</code> or <code>declare</code> changeset; <code>affirm</code> of a proposal: what counts</td><td><code>affirm</code> and <code>dispute</code> as beliefs about content</td></tr>
       <tr><td><code>adopt</code> on someone else's behalf</td><td><code>name</code> records: mistakes are visible and fixable</td></tr>
-      <tr><td><code>erase</code>; <code>bridge</code> out of the realm; declaring a store public: can't be undone</td><td><code>spec</code>, and ticks</td></tr>
+      <tr><td>erasing (<code>erases</code>); <code>bridge</code> out of the realm; declaring a store public: can't be undone</td><td><code>spec</code>, and ticks</td></tr>
       <tr><td>creating a store or lineage</td><td><code>promote</code> within a grant</td></tr>
     </tbody>
   </table></div>

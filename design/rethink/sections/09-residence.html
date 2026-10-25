@@ -101,18 +101,18 @@
         <text x="200" y="224" text-anchor="middle" class="xs ta">every reference still resolves</text>
       </svg>
     </div>
-    <figcaption>The id was always computed over the commitment, <code>hash(envelope + hash(salt + payload))</code>, so removing the opening changes storage, not the record. One <code>erase</code> covers every verbatim copy in stores that honor it.</figcaption>
+    <figcaption>The id was always computed over the commitment, <code>hash(envelope + hash(salt + payload))</code>, so removing the opening changes storage, not the record. One erase covers every verbatim copy in stores that honor it.</figcaption>
   </figure>
   <div class="tbl"><table>
     <thead><tr><th>Piece</th><th>Why</th></tr></thead>
     <tbody>
       <tr><td><b>Hash the payload separately, salted, per payload</b></td><td>ids, ticks and what they cover survive erasure; the salt stops anyone confirming a guess</td></tr>
-      <tr><td><b>One reserved kind, <code>erase</code></b>, signed by a steward, per store</td><td>a visible gap, not a broken reference</td></tr>
+      <tr><td><b>One envelope field, <code>erases</code></b>, on a record signed by a steward, per store</td><td>a visible gap, not a broken reference</td></tr>
       <tr><td><b>Tick results reference, don't copy</b></td><td>nothing inside ticks needs chasing</td></tr>
       <tr><td><b>The envelope is permanent</b></td><td>personal identifiers go behind opaque anchors, never natural keys in <code>about</code></td></tr>
     </tbody>
   </table></div>
-  <p><b>The whole game:</b> find every record holding the data (search, then trace references from the originals), emit <code>erase</code> for each, and each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
+  <p><b>The whole game:</b> find every record holding the data (search, then trace references from the originals), emit a record whose <code>erases</code> names each, and each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
   <details class="unfold"><summary>Prevention, before cure</summary><div class="body"><ul>
     <li><b>Promotion</b> is a deliberate stance, so it's the review moment; agent-proposed promotions need yours.</li>
     <li><b>Store policy</b> can refuse whole sources ("never admit records from personal collectors").</li>

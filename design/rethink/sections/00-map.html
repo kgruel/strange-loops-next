@@ -10,7 +10,7 @@
     <li><span class="k">3</span><span class="t"><b>Composition</b><span>one vertex reading many stores; things, <code>about</code>, <code>resolve-by</code></span></span><span class="pill p-ok">closed</span></li>
     <li><span class="k">4</span><span class="t"><b>Places</b><span>places, store definitions, a slim index, small erasure</span></span><span class="pill p-ok">closed</span></li>
     <li><span class="k">5</span><span class="t"><b>Sharing</b><span>union by segment lists, key tiers, presence, retire through</span></span><span class="pill p-ok">closed</span></li>
-    <li class="here"><span class="k">→</span><span class="t"><b>Build</b><span>Rust, a Cargo workspace beside the Lean model; one local API, the CLI, specs as JSON; limits and budgets set; no unit tests; steps 0 and 1 done, step 2 proved in the model; next, the Rust port</span></span><span class="pill p-lean">building</span></li>
+    <li class="here"><span class="k">→</span><span class="t"><b>Build</b><span>Rust, a Cargo workspace beside the Lean model; one local API, the CLI, specs as JSON; limits and budgets set; no unit tests; steps 0 and 1 done, step 2 modelled and reviewed; next, formalize the data model in Lean</span></span><span class="pill p-lean">building</span></li>
     <li><span class="k">+</span><span class="t"><b>Horizons</b><span>editable lenses, selective disclosure, knowledge as a build</span></span><span class="pill p-next">exploring</span></li>
   </ol>
 
@@ -38,7 +38,7 @@
   </figure>
 
   <h3>Decision ledger</h3>
-  <p>Each decision is written as a record, the way the system would hold it. Folded in version 31: 92 entries became 33, grouped by layer. Version 32 settled three model questions raised by two outside reviews. The conversation turns in <a href="#sources" data-tab="sources">Sources</a> keep how each was reached.</p>
+  <p>Each decision is written as a record, the way the system would hold it. Folded in version 31: 92 entries became 33, grouped by layer. Version 32 settled three model questions raised by two outside reviews. Version 35 recorded what reviewing step 2's model found. The conversation turns in <a href="#sources" data-tab="sources">Sources</a> keep how each was reached.</p>
   <div class="ledger">
 <!-- build:ledger -->
   </div>
@@ -71,6 +71,7 @@
       <li>Laying out the repo turned the budgets into structure: a core module with nothing to require, one public package, and a store of its own decisions.</li>
       <li>Step 0 proved the first laws in a day and found that the law worth proving was not "incremental = batch" but "the set decides".</li>
       <li>Step 1, built overnight, found two things a design walk wouldn't: an off-by-one in number formatting that the standard's own data caught, and that a sum over floats can't satisfy "the set decides".</li>
+      <li>Version 35 reviewed step 2's model, with an outside review from Codex, and found the laws holding but the boundaries not establishing what they assume. A batch skipped the write checks, a repeated member name meant three different things, and refusals depended on order. Writing now returns its proof, Go left the repo, and this page moved into it. Next: the data model, formalized end to end, before anything is built on it.</li>
     </ol>
     <p>The full trail, turn by turn, is in the <a href="#sources" data-tab="sources">Sources</a> tab.</p>
   </div></details>
