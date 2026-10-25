@@ -56,7 +56,7 @@ const canonSet = (xs) => [...new Set(xs)].sort();
 export function envJson(env) {
   const out = { kind: env.kind, observer: env.observer, emitted: env.emitted };
   if (env.occurred !== undefined) out.occurred = env.occurred;
-  for (const k of ["about", "prev"]) {
+  for (const k of ["about", "prev", "erases"]) {
     if (env[k] && env[k].length) out[k] = canonSet(env[k]);
   }
   if (env.under !== undefined) out.under = env.under;
@@ -87,6 +87,7 @@ export function problem(env) {
   if (!(env.about ?? []).every(typedRef)) return "about-not-typed";
   if (!(env.prev ?? []).every(recordId)) return "prev-not-record-id";
   if (env.under !== undefined && !recordId(env.under)) return "under-not-record-id";
+  if (!(env.erases ?? []).every(recordId)) return "erases-not-record-id";
   return null;
 }
 
@@ -122,10 +123,59 @@ const inRange = (v) =>
   : v !== null && typeof v === "object" ? Object.values(v).every(inRange)
   : true;
 
+// JSON text to a value, refusing a repeated member name at any depth, which
+// JSON.parse would silently resolve to the last one.
+export function parse(text) {
+  let i = 0;
+  const ws = () => { while (" \t\n\r".includes(text[i]) && i < text.length) i++; };
+  const token = (re) => { re.lastIndex = i; const m = re.exec(text); if (!m) throw new Error(`bad JSON at ${i}`); i = re.lastIndex; return m[0]; };
+  const STR = /"(?:[^"\\\u0000-\u001f]|\\.)*"/y, NUM = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/y;
+  function value() {
+    ws();
+    const c = text[i];
+    if (c === "{") {
+      i++; const o = {}, seen = new Set();
+      ws(); if (text[i] === "}") { i++; return o; }
+      for (;;) {
+        ws(); const k = JSON.parse(token(STR));
+        if (seen.has(k)) throw new Error("member-duplicate");
+        // Defined, not assigned: assigning "__proto__" would set the prototype.
+        seen.add(k); ws(); token(/:/y);
+        Object.defineProperty(o, k, { value: value(), enumerable: true, writable: true, configurable: true });
+        ws();
+        if (text[i] === ",") { i++; continue; }
+        token(/\}/y); return o;
+      }
+    }
+    if (c === "[") {
+      i++; const a = [];
+      ws(); if (text[i] === "]") { i++; return a; }
+      for (;;) { a.push(value()); ws(); if (text[i] === ",") { i++; continue; } token(/\]/y); return a; }
+    }
+    if (c === '"') return JSON.parse(token(STR));
+    if (c === "t" || c === "f" || c === "n") return JSON.parse(token(/true|false|null/y));
+    return Number(token(NUM));
+  }
+  const v = value(); ws();
+  if (i !== text.length) throw new Error(`bad JSON at ${i}`);
+  return v;
+}
+
+const saltProblem = (salt) => (salt.length === 16 ? null : "salt-not-16-bytes");
+
+// Write a record from its payload as JSON text, checking in the model's order:
+// the envelope, the salt, repeated member names, then numbers.
+export function writeText(env, salt, text, seed) {
+  const why = problem(env) ?? saltProblem(salt);
+  if (why) throw new Error(why);
+  return seal(env, salt, parse(text), seed);
+}
+
 // Seal a record: the stored line, and the line after erasure. Refuses a bad
-// envelope, then a payload number it can't carry exactly (never rounded).
+// envelope, a salt that isn't 16 bytes, then a payload number outside
+// ±(2^53 - 1) as JSON reads it.
 export function seal(env, salt, payload, seed) {
-  const why = problem(env) ?? (inRange(payload) ? null : "number-out-of-range");
+  const why = problem(env) ?? saltProblem(salt) ?? (inRange(payload) ? null : "number-out-of-range");
   if (why) throw new Error(why);
   const commit = commitOf(salt, payload);
   const id = idOf(env, commit);

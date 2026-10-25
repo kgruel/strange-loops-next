@@ -12,9 +12,8 @@
         "under": "r:short"
       }
     ],
-    "payloads": [
-      {}
-    ]
+    "salt": "2mu4qvwndgviunjgx26n2kktuy",
+    "payload_text": "{}"
   },
   "expect": {
     "refused": "under-not-record-id"

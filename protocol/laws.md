@@ -78,9 +78,10 @@ reader settles the forms its places hold into one record per id, refuses
 records whose `prev` it can't accept, and works out each thing's state over
 everything left:
 
-* **Settle.** A payload any place holds is kept. An erase record in the set
-  naming an id erases every form of it. A form that arrives erased with no
-  erase record behind it counts as withheld.
+* **Settle.** A payload any place holds is kept. A record in the set whose
+  `erases` names an id erases every form of it, whatever that record's kind.
+  A form that arrives erased with no such record behind it counts as
+  withheld.
 * **Admit.** A record whose `prev` names a held record it shares no thing
   with is refused (`prev-unrelated`), as is one the store's rule says may
   not replace it (`prev-not-permitted`). The rule reads only envelopes;
@@ -94,7 +95,7 @@ everything left:
 |---|---|---|---|
 | `settle.set` | `settle_eq`, `settle_distinct` | what a reader keeps depends only on which forms its places hold, one record per id | `realm/01`–`03` |
 | `settle.keeps` | `settle_keeps` | a payload any place holds is kept unless erased | `realm/01`, `02` |
-| `settle.erased` | `settle_erased` | once an erase record is held, every form of its target is erased | `realm/03` |
+| `settle.erased` | `settle_erased` | once a record naming it in `erases` is held, every form of its target is erased | `realm/03`, `09` |
 | `admit.set` | `admit_same`, `refusalOf_none` | admission depends only on the set; a record is refused exactly when it isn't entitled to its `prev` | `realm/04` |
 | `admit.no-cross` | `admit_no_cross` | an admitted record's `prev` names only held records it shares a thing with and may replace | `realm/04`, `08` |
 | `thing.local` | `stateIn_local`, `perThing_set_decides` | a thing's state depends only on the records about it; the set decides per thing | `realm/04`–`08`, `fold/latest-by/*` |
@@ -133,11 +134,15 @@ matches, or is withheld.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`, `02` |
-| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a `prev` naming a record not held, or one about other things | `batch/10`–`14` |
+| `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`–`03` |
+| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a draft `write` refuses, a `prev` naming a record not held, or one about other things | `batch/10`–`17` |
+| `batch.refuse-order` | `firstRefusal_set`, `writeProblem_codes` | the refusal reported depends only on which refusals there are: across the batch, labels, then writing, then `prev-unknown`, then `prev-unrelated` | `batch/15`, `16` |
 
-`gen` checks every batch vector against `Meaning`, in every rotation of its
-drafts.
+`gen` checks every batch vector in every rotation of its drafts, and again
+with each draft's `prev` reversed: an accepted batch must give the same
+records, one per draft, each as `Meaning` says; a refused one must give the
+same code. What isn't proved yet is that `resolveBatch` returns the meaning
+`Meaning.unique` speaks of; `gen` checks it on the vectors.
 
 ## Lens: keyed sections (`model/Laws/Lens.lean`)
 
@@ -158,10 +163,12 @@ drafts.
 |---|---|---|---|
 | `record.erasure` | `erase_keeps_id`, `erase_idem` | forgetting the opening never changes the id | `record/08`, every `erased_line` |
 | `record.commit` | `opening_checks` | a record's own salt and payload open its commitment | every stored record vector |
-| `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about` or `prev` never changes the id | `record/02`, `03` |
+| `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about`, `prev` or `erases` never changes the id | `record/02`, `03`, `11` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
-| `record.refuse` | (by construction) | a bad envelope, or a payload number outside ±(2^53 − 1), is refused with a stated reason | `record/20`–`29` |
+| `record.refuse` | (by construction) | a bad envelope, a salt that isn't 16 bytes, a repeated member name or a payload number outside ±(2^53 − 1) is refused with a stated reason | `record/20`–`33` |
+| `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15`, `17` |
+| `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
 
 The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
 computed by reference code in `model/Gen/` that checks itself against

@@ -5,3 +5,4 @@ import Laws.Numeric
 import Laws.Families
 import Laws.Spec
 import Laws.Batch
+import Laws.Write

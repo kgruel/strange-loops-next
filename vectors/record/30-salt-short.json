@@ -1,0 +1,20 @@
+{
+  "vector": "30-salt-short",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "salt": "ovorzucpeu4mbscuqsqvvpxq",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "salt-not-16-bytes"
+  }
+}

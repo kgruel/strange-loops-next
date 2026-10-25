@@ -11,9 +11,8 @@
         "emitted": "2026-10-21T05:30:00-04:00"
       }
     ],
-    "payloads": [
-      {}
-    ]
+    "salt": "hln264jfzfcjtawgurjix64yba",
+    "payload_text": "{}"
   },
   "expect": {
     "refused": "observer-not-typed"

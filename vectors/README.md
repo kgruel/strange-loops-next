@@ -32,10 +32,10 @@ implementation folds each order separately; every one must produce
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
 Each record's `about` is a set of things. It carries `n`, the integer the
-numeric folds read, and may carry `observer`, `erases` (an erase record's
-targets) and `fields`, further payload fields by name. A record whose payload the reader
-doesn't hold has `shown` (`withheld` or `erased`) instead of `value`, `n` and
-`fields`.
+numeric folds read, and may carry `observer`, `erases` (the ids whose
+payloads it erases, whatever its kind) and `fields`, further payload fields
+by name. A record whose payload the reader doesn't hold has `shown`
+(`withheld` or `erased`) instead of `value`, `n` and `fields`.
 
 ## `fold/heads`
 
@@ -78,13 +78,15 @@ envelope tests then choose heads, and payload tests filter them.
 ## `batch`
 
 `input.drafts` is one changeset: each draft has an optional `label`
-(`@name`), an envelope whose `about` and `prev` may use labels, a `salt` and
-a payload. `input.held` lists what the store already holds: each id and its
+(`@name`), an envelope whose `about` and `prev` may use labels (`erases` may
+not), a `salt` and a payload. `input.held` lists what the store already holds: each id and its
 `about`. `expect.records` gives each record's `id` and canonical envelope
 with labels replaced by ids, in the order given; or `expect.refused`:
-`label-duplicate`, `label-unknown`, `label-cycle`, `prev-unknown` or
-`prev-unrelated`, checked in that order. Every order of the drafts gives the
-same records.
+`label-duplicate`, `label-unknown`, `label-cycle`, a code `write` gives
+(the first, in `protocol/record.md`'s order, among every draft's), then
+`prev-unknown` or `prev-unrelated`, each checked across the whole batch.
+Every order of the drafts, and of each `prev` set, gives the same records or
+the same refusal.
 
 ## `realm`
 
@@ -111,5 +113,8 @@ commitment), the `salt` and the signing key's `seed` (both base32).
 commitment, the id's preimage, the id, the signing key and signature, and
 the stored line before and after erasure.
 
-A refused vector has `expect.refused`: writing its first envelope with its
-first payload is refused for that reason, per `protocol/record.md`.
+A refused vector has `expect.refused`: writing its envelope with its `salt`
+(base32) and its payload is refused for that reason, per
+`protocol/record.md`. The payload is given as JSON text, `payload_text`, so
+a repeated member name survives into the vector; parse it with a parser that
+refuses repeats.

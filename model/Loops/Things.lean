@@ -9,10 +9,11 @@ hold into one set:
 
 * **Settle.** Several places may hold different forms of one record: here in
   one, withheld or erased in another. The reader keeps one record per id:
-  the payload if any place holds it, erased if an erase record in the set
-  names it, and withheld otherwise. A form that arrives erased with no erase
-  record behind it counts as withheld, so no place can blank a payload by
-  claiming erasure, and erasure sticks once the erase record is held.
+  the payload if any place holds it, erased if a record in the set names it
+  in `erases`, whatever that record's kind, and withheld otherwise. A form
+  that arrives erased with no such record behind it counts as withheld, so no
+  place can blank a payload by claiming erasure, and erasure sticks once the
+  erasing record is held.
 * **Admit.** `prev` is succession within a thing. A record whose `prev` names
   a held record it shares no thing with (`prev-unrelated`), or one the store's
   rule says it may not replace (`prev-not-permitted`), is refused. The rule is
@@ -46,7 +47,7 @@ def thingsOf (xs : List Record) : List String := canonSet (xs.flatMap Record.thi
 def idsOf (xs : List Record) : List Nat := xs.foldl (fun ns r => insertId r.id ns) []
 
 def erasedIn (xs : List Record) (i : Nat) : Bool :=
-  xs.any fun e => e.kind == "erase" && e.erases.contains i
+  xs.any fun e => e.erases.contains i
 
 /-- From the forms of one record: one that is here, or else the withheld form. -/
 def baseForm (forms : List Record) : Option Record :=
