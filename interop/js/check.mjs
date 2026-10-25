@@ -20,7 +20,10 @@ for (const f of readdirSync(join(dir, "record")).sort()) {
   const n = `record/${v.vector}`;
   const envs = v.input.envs;
   if (v.expect.refused) {
-    expect(`${n} refused`, L.problem(envs[0]), v.expect.refused);
+    let got = null;
+    try { L.seal(envs[0], new Uint8Array(16), v.input.payloads[0], new Uint8Array(32)); }
+    catch (e) { got = e.message; }
+    expect(`${n} refused`, got, v.expect.refused);
     continue;
   }
   const salt = L.base32Decode(v.input.salt);

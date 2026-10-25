@@ -41,6 +41,14 @@ RFC 8785 (JCS): members sorted by UTF-16 code units, minimal string escapes,
 ECMAScript number formatting, no whitespace. Object member names must be
 distinct.
 
+JCS reads every number as an IEEE-754 double, which holds an integer exactly
+only within ±(2^53 − 1). Past that, two different numbers share one canonical
+form (9007199254740993 becomes 9007199254740992), and an implementation that
+kept the number exactly would compute a different id. So a writer refuses a
+payload holding a number outside ±(2^53 − 1) with `number-out-of-range`,
+after the envelope checks, never rounding it. A number too large for that
+belongs in a string.
+
 ## Commitment, id, signature
 
 ```

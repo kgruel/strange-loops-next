@@ -74,10 +74,39 @@ type Sealed struct {
 	ID      string
 }
 
-// Seal commits to a payload and names the record, refusing a bad envelope.
+// maxExact is the largest integer an IEEE-754 double holds exactly, 2^53 - 1.
+const maxExact = 1<<53 - 1
+
+// inRange reports whether every number in v lies within ±(2^53 - 1). Past
+// that, two different numbers share one canonical form.
+func inRange(v Value) bool {
+	switch t := v.(type) {
+	case float64:
+		return t >= -maxExact && t <= maxExact
+	case []Value:
+		for _, x := range t {
+			if !inRange(x) {
+				return false
+			}
+		}
+	case *Object:
+		for _, x := range t.Values {
+			if !inRange(x) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// Seal commits to a payload and names the record, refusing a bad envelope,
+// then a payload number it can't carry exactly (refused, never rounded).
 func Seal(env Env, salt []byte, payload Value) (Sealed, error) {
 	if why := env.Problem(); why != "" {
 		return Sealed{}, errors.New(why)
+	}
+	if !inRange(payload) {
+		return Sealed{}, errors.New("number-out-of-range")
 	}
 	commit, err := Commit(salt, payload)
 	if err != nil {

@@ -54,6 +54,12 @@ def make (env : Env) (salt : List UInt8) (payload : Json) : Stored :=
 
 def erase (H : Hash) (r : Stored) : Stored := ⟨r.env, .erased (r.commit H)⟩
 
+/-- Why a record is refused when it is written, if it is: its envelope first,
+then a payload number outside ±(2^53 − 1), which is refused rather than
+rounded (`number-out-of-range`). -/
+def writeProblem (env : Env) (payload : Json) : Option String :=
+  env.problem <|> if payload.inRange then none else some "number-out-of-range"
+
 /-- An opening checks against a commitment the reader already holds. -/
 def opens (H : Hash) (commit : String) (salt : List UInt8) (payload : Json) : Bool :=
   commitOf H salt payload == commit

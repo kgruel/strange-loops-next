@@ -31,9 +31,10 @@ addition isn't associative, so the order records arrive in would change a
 sum, and `sum.perm` would be false. Decimals, if they come, must be exact
 too.
 
-The model's integers are unbounded; an implementation's are not. Each
-payload number is within ±2^53 (RFC 8785), so implementations accumulate
-sums in 128 bits: overflowing that takes more than 2^74 records. An
+The model's integers are unbounded; an implementation's are not. A writer
+refuses a payload number outside ±(2^53 − 1) (`number-out-of-range`, see
+`protocol/record.md`), so implementations accumulate sums in 128 bits:
+overflowing that takes more than 2^74 records. An
 implementation that cannot hold a sum refuses with `sum-overflow`, never
 wraps.
 
@@ -160,7 +161,7 @@ drafts.
 | `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about` or `prev` never changes the id | `record/02`, `03` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
-| `record.refuse` | (by construction) | a bad envelope is refused with a stated reason | `record/20`–`28` |
+| `record.refuse` | (by construction) | a bad envelope, or a payload number outside ±(2^53 − 1), is refused with a stated reason | `record/20`–`29` |
 
 The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
 computed by reference code in `model/Gen/` that checks itself against

@@ -67,8 +67,9 @@ func TestRecordVectors(t *testing.T) {
 				t.Fatal(err)
 			}
 			if want := str(v, "expect", "refused"); want != "" {
-				if got := env.Problem(); got != want {
-					t.Fatalf("refused: got %q, want %q", got, want)
+				_, err := loops.Seal(env, make([]byte, 16), payloads[0])
+				if err == nil || err.Error() != want {
+					t.Fatalf("refused: got %v, want %q", err, want)
 				}
 				return
 			}

@@ -109,4 +109,29 @@ def Json.membersDistinct : List (String × Json) → Bool
   | (_, v) :: kvs => v.keysDistinct && Json.membersDistinct kvs
 end
 
+/-! ## Numbers a record can carry exactly
+
+RFC 8785 reads every number as an IEEE-754 double, which holds an integer
+exactly only within ±(2^53 − 1). Past that, two different numbers share one
+canonical form, so writers would disagree on a record's id. -/
+
+def maxExact : Int := 2 ^ 53 - 1
+
+mutual
+/-- Every number in the value lies within ±(2^53 − 1). -/
+def Json.inRange : Json → Bool
+  | .int i => decide (-maxExact ≤ i) && decide (i ≤ maxExact)
+  | .arr xs => Json.allInRange xs
+  | .obj kvs => Json.membersInRange kvs
+  | _ => true
+
+def Json.allInRange : List Json → Bool
+  | [] => true
+  | x :: xs => x.inRange && Json.allInRange xs
+
+def Json.membersInRange : List (String × Json) → Bool
+  | [] => true
+  | (_, v) :: kvs => v.inRange && Json.membersInRange kvs
+end
+
 end Loops

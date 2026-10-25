@@ -111,4 +111,5 @@ commitment), the `salt` and the signing key's `seed` (both base32).
 commitment, the id's preimage, the id, the signing key and signature, and
 the stored line before and after erasure.
 
-A refused vector has `expect.refused`: the reason, per `protocol/record.md`.
+A refused vector has `expect.refused`: writing its first envelope with its
+first payload is refused for that reason, per `protocol/record.md`.
