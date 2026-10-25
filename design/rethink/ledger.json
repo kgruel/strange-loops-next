@@ -52,6 +52,13 @@
     "kind": "decision",
     "group": "Layer 0 · the record",
     "status": "settled",
+    "claim": "A record erases through its envelope field <code>erases</code>; any kind may erase.",
+    "why": "<code>erases</code> is a set of record ids, refused unless each is one, and never a label. It sits on the envelope, so every reader applies it, whatever its grant. Targets in <code>about</code> were rejected: <code>about: [r:X]</code> already names the thing X anchors, which holds X's revisions too, and a kind would decide which reading applied. No kind is reserved for erasing, so the field carries the meaning by itself, and a revision can erase what it replaces: <code>prev: [r:X], erases: [r:X]</code>. Authority keys on the field. Version 35."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
     "claim": "A field belongs on the envelope only if the core reads it.",
     "why": "<code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code> (a set of things), <code>prev</code> (a set), <code>under</code>. <code>derived-from</code>, <code>seen</code> and <code>refs</code> are payload. Unknown envelope fields are refused."
   },
@@ -67,7 +74,7 @@
     "group": "Layer 0 · the record",
     "status": "settled",
     "claim": "Erasure is per store and small; privacy is withholding, not hiding.",
-    "why": "One erase kind removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant."
+    "why": "An erase removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant."
   },
   {
     "kind": "decision",

@@ -443,7 +443,7 @@ loops emit reply body="chapter 3 makes the opposite bet" \
       <li><b>Re-anchoring:</b> the text hash differs from <code>seen</code>, so the selectors work: exact quote, then a fuzzy match on quote, prefix and suffix (as Hypothesis does), else an orphan: "this passage was changed or removed", with your quote.</li>
       <li><b>Dynamic pages</b> (ads, personalization, paywalls) differ per visitor, so hash the extracted article and treat staleness as advisory.</li>
       <li><b>Snapshots are optional:</b> a personal, erasable blob never shared, or a Wayback Machine link as a reference.</li>
-      <li><b>Retracting:</b> an <code>erase</code> propagates and the file holding the original is rewritten. Named by hash, the rewrite is a new file and <code>segments.json</code> points to it. Anyone who already pulled it keeps their copy, and caches linger. Erasure here is cooperative; publishing is publishing.</li>
+      <li><b>Retracting:</b> a record that erases propagates and the file holding the original is rewritten. Named by hash, the rewrite is a new file and <code>segments.json</code> points to it. Anyone who already pulled it keeps their copy, and caches linger. Erasure here is cooperative; publishing is publishing.</li>
     </ul>
   </div></details>
 

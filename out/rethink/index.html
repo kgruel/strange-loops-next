@@ -277,9 +277,10 @@ dl.env .sep{grid-column:1/-1;border-top:1px dashed var(--line);margin:3px 0}
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">Every record has an observer, and two times.</div><div class="why">Ingestion is a dumb observer reporting what a source holds: hearsay. <code>emitted</code> is the writer's word (RFC 3339); <code>occurred</code> is an optional claimed span (EDTF Level 1) that can be coarse.</div></div>
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">Identity is a content hash; signatures sit beside it.</div><div class="why">A salted payload commitment, an id over the canonical <code>{commit, env}</code>, an Ed25519 signature over <code>loops/record/v1:</code> plus the id. References stay opaque. Records are signed by default and a store carries its writers' key bindings, so it verifies itself. The version in the signed prefix lets a reader refuse only what is newer than it knows.</div></div>
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">Writing the same record twice is a no-op.</div><div class="why">A record's id covers its envelope, including <code>emitted</code>, plus its salt and payload. The same draft written twice is the same record, and set union absorbs it, in a batch or across batches. A new observation gets a fresh salt, so it gets a new id and is simply a new record. Version 35.</div></div>
+    <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">A record erases through its envelope field <code>erases</code>; any kind may erase.</div><div class="why"><code>erases</code> is a set of record ids, refused unless each is one, and never a label. It sits on the envelope, so every reader applies it, whatever its grant. Targets in <code>about</code> were rejected: <code>about: [r:X]</code> already names the thing X anchors, which holds X's revisions too, and a kind would decide which reading applied. No kind is reserved for erasing, so the field carries the meaning by itself, and a revision can erase what it replaces: <code>prev: [r:X], erases: [r:X]</code>. Authority keys on the field. Version 35.</div></div>
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">A field belongs on the envelope only if the core reads it.</div><div class="why"><code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code> (a set of things), <code>prev</code> (a set), <code>under</code>. <code>derived-from</code>, <code>seen</code> and <code>refs</code> are payload. Unknown envelope fields are refused.</div></div>
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">A payload is here, withheld or erased; supersession reads only the envelope.</div><div class="why"><code>prev</code> sits on the envelope, so withholding or erasing a payload never brings back a record it replaced: no false resurrection. A <code>where</code> test on a missing payload answers unknown, and every result says how many of the records it covers it couldn't read. Added in version 32.</div></div>
-    <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">Erasure is per store and small; privacy is withholding, not hiding.</div><div class="why">One erase kind removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant.</div></div>
+    <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">Erasure is per store and small; privacy is withholding, not hiding.</div><div class="why">An erase removes a payload and keeps its commitment, so ids and ticks still hold. When places hold different forms of a record, the reader keeps the payload if any place has it, erased once an erase record naming it is held, withheld otherwise: a bare erased copy never blanks a payload, and erasure sticks. Disclosure splits by kind when recording. Anything derived is as private as its least-public input and travels under the same grant.</div></div>
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">Numbers are what RFC 8785 reads: doubles, exact only within ±(2<sup>53</sup>−1).</div><div class="why">Past that range two numbers share one canonical form, so writers would disagree on an id. A payload number outside it is refused (<code>number-out-of-range</code>), not kept exactly. The range applies to the number as JCS reads it, so <code>9007199254740991.1</code> is accepted as <code>…991</code>. Non-integers are allowed. A number that must stay exact past the range belongs in a string. Version 35.</div></div>
     <div class="rec"><div class="meta"><span>kind: decision</span><span class="pill p-ok">settled</span></div><div class="claim">One checked write path, and what it returns carries the proof.</div><div class="why"><code>write</code> refuses, in order: a bad envelope, a salt that isn't 16 bytes, a repeated member name at any depth, and an out-of-range number. A batch writes every record through it, and its refusal never depends on the order of drafts or of a <code>prev</code> set. It returns a <code>Written</code> record that carries the proof, so a law that needs distinct member names takes them from the record. Version 35 (PR 7).</div></div>
     <h4>Observers and standing</h4>
@@ -2019,18 +2020,18 @@ loops emit dispute --about r:x2 --about r:x3                                    
         <text x="200" y="224" text-anchor="middle" class="xs ta">every reference still resolves</text>
       </svg>
     </div>
-    <figcaption>The id was always computed over the commitment, <code>hash(envelope + hash(salt + payload))</code>, so removing the opening changes storage, not the record. One <code>erase</code> covers every verbatim copy in stores that honor it.</figcaption>
+    <figcaption>The id was always computed over the commitment, <code>hash(envelope + hash(salt + payload))</code>, so removing the opening changes storage, not the record. One erase covers every verbatim copy in stores that honor it.</figcaption>
   </figure>
   <div class="tbl"><table>
     <thead><tr><th>Piece</th><th>Why</th></tr></thead>
     <tbody>
       <tr><td><b>Hash the payload separately, salted, per payload</b></td><td>ids, ticks and what they cover survive erasure; the salt stops anyone confirming a guess</td></tr>
-      <tr><td><b>One reserved kind, <code>erase</code></b>, signed by a steward, per store</td><td>a visible gap, not a broken reference</td></tr>
+      <tr><td><b>One envelope field, <code>erases</code></b>, on a record signed by a steward, per store</td><td>a visible gap, not a broken reference</td></tr>
       <tr><td><b>Tick results reference, don't copy</b></td><td>nothing inside ticks needs chasing</td></tr>
       <tr><td><b>The envelope is permanent</b></td><td>personal identifiers go behind opaque anchors, never natural keys in <code>about</code></td></tr>
     </tbody>
   </table></div>
-  <p><b>The whole game:</b> find every record holding the data (search, then trace references from the originals), emit <code>erase</code> for each, and each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
+  <p><b>The whole game:</b> find every record holding the data (search, then trace references from the originals), emit a record whose <code>erases</code> names each, and each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
   <details class="unfold"><summary>Prevention, before cure</summary><div class="body"><ul>
     <li><b>Promotion</b> is a deliberate stance, so it's the review moment; agent-proposed promotions need yours.</li>
     <li><b>Store policy</b> can refuse whole sources ("never admit records from personal collectors").</li>
@@ -2085,7 +2086,7 @@ loops emit dispute --about r:x2 --about r:x3                                    
     <figcaption>Each segment has one writer and only grows, so a place's state is just "last record held, per segment." Comparing those lists is the whole negotiation; closed segments compare by hash. This is the "manifest exchange" SQLite places needed.</figcaption>
   </figure>
   <ul>
-    <li><b>Erasure doesn't disturb it.</b> An <code>erase</code> travels like any record and each place applies it locally; ids and line counts stay put, so the lists still match.</li>
+    <li><b>Erasure doesn't disturb it.</b> A record that erases travels like any other and each place applies it locally; ids and line counts stay put, so the lists still match.</li>
     <li><b>Content ticks don't sync.</b> They're a cache anyone holding the records recomputes. Witness ticks are ordinary records and sync like them.</li>
   </ul>
 
@@ -2160,7 +2161,7 @@ loops emit dispute --about r:x2 --about r:x3                                    
       <tr><td><code>grant</code>, <code>vouch</code>, <code>retire</code>: who counts</td><td>ordinary emits</td></tr>
       <tr><td>a steward's <code>policy</code> or <code>declare</code> changeset; <code>affirm</code> of a proposal: what counts</td><td><code>affirm</code> and <code>dispute</code> as beliefs about content</td></tr>
       <tr><td><code>adopt</code> on someone else's behalf</td><td><code>name</code> records: mistakes are visible and fixable</td></tr>
-      <tr><td><code>erase</code>; <code>bridge</code> out of the realm; declaring a store public: can't be undone</td><td><code>spec</code>, and ticks</td></tr>
+      <tr><td>an <code>erases</code>; <code>bridge</code> out of the realm; declaring a store public: can't be undone</td><td><code>spec</code>, and ticks</td></tr>
       <tr><td>creating a store or lineage</td><td><code>promote</code> within a grant</td></tr>
     </tbody>
   </table></div>
@@ -2961,7 +2962,7 @@ loops emit decision title="Move auth-svc behind the gateway" status=accepted \
 #   → T:mig, from vertex migration, covering T:adr-2019 r:n31 r:n33, about r:x1
 
 # hygiene/private flags a note holding a customer's phone number
-loops emit erase --about r:n9                                          # sl:director; one line rewritten in git</pre>
+loops emit redaction --erases r:n9                                     # sl:director; one line rewritten in git</pre>
   </div></details>
 
   <details class="unfold"><summary>One machine's <code>places.json</code></summary><div class="body">
@@ -3453,7 +3454,7 @@ loops emit reply body="chapter 3 makes the opposite bet" \
       <li><b>Re-anchoring:</b> the text hash differs from <code>seen</code>, so the selectors work: exact quote, then a fuzzy match on quote, prefix and suffix (as Hypothesis does), else an orphan: "this passage was changed or removed", with your quote.</li>
       <li><b>Dynamic pages</b> (ads, personalization, paywalls) differ per visitor, so hash the extracted article and treat staleness as advisory.</li>
       <li><b>Snapshots are optional:</b> a personal, erasable blob never shared, or a Wayback Machine link as a reference.</li>
-      <li><b>Retracting:</b> an <code>erase</code> propagates and the file holding the original is rewritten. Named by hash, the rewrite is a new file and <code>segments.json</code> points to it. Anyone who already pulled it keeps their copy, and caches linger. Erasure here is cooperative; publishing is publishing.</li>
+      <li><b>Retracting:</b> a record that erases propagates and the file holding the original is rewritten. Named by hash, the rewrite is a new file and <code>segments.json</code> points to it. Anyone who already pulled it keeps their copy, and caches linger. Erasure here is cooperative; publishing is publishing.</li>
     </ul>
   </div></details>
 
