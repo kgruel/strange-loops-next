@@ -21,7 +21,7 @@ for (const f of readdirSync(join(dir, "record")).sort()) {
   const envs = v.input.envs;
   if (v.expect.refused) {
     let got = null;
-    try { L.seal(envs[0], new Uint8Array(16), v.input.payloads[0], new Uint8Array(32)); }
+    try { L.writeText(envs[0], L.base32Decode(v.input.salt), v.input.payload_text, new Uint8Array(32)); }
     catch (e) { got = e.message; }
     expect(`${n} refused`, got, v.expect.refused);
     continue;
@@ -41,6 +41,8 @@ for (const f of readdirSync(join(dir, "record")).sort()) {
   expect(`${n} erased line`, r.erasedLine, v.expect.erased_line);
   for (const [i, e] of envs.entries()) expect(`${n} env variant ${i}`, L.idOf(e, r.commit), v.expect.id);
   for (const [i, p] of v.input.payloads.entries()) expect(`${n} payload variant ${i}`, L.commitOf(salt, p), v.expect.commit);
+  // The same record, its payload read from text by the strict parser.
+  expect(`${n} from text`, L.writeText(envs[0], salt, JSON.stringify(v.input.payloads[0]), seed).id, v.expect.id);
 }
 
 // RFC 8785: the reference test data, and ECMAScript number formatting.

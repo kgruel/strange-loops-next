@@ -1,0 +1,20 @@
+{
+  "vector": "32-proto-out-of-range",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "salt": "hh7eycceuvcdox74zk7xq7dhxy",
+    "payload_text": "{\"__proto__\":9007199254740992}"
+  },
+  "expect": {
+    "refused": "number-out-of-range"
+  }
+}

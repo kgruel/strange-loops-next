@@ -134,10 +134,14 @@ matches, or is withheld.
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
 | `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`, `02` |
-| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a `prev` naming a record not held, or one about other things | `batch/10`–`14` |
+| `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a draft `write` refuses, a `prev` naming a record not held, or one about other things | `batch/10`–`16` |
+| `batch.refuse-order` | `firstRefusal_set`, `writeProblem_codes` | the refusal reported depends only on which refusals there are: across the batch, labels, then writing, then `prev-unknown`, then `prev-unrelated` | `batch/15`, `16` |
 
-`gen` checks every batch vector against `Meaning`, in every rotation of its
-drafts.
+`gen` checks every batch vector in every rotation of its drafts, and again
+with each draft's `prev` reversed: an accepted batch must give the same
+records, one per draft, each as `Meaning` says; a refused one must give the
+same code. What isn't proved yet is that `resolveBatch` returns the meaning
+`Meaning.unique` speaks of; `gen` checks it on the vectors.
 
 ## Lens: keyed sections (`model/Laws/Lens.lean`)
 
@@ -161,7 +165,9 @@ drafts.
 | `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about` or `prev` never changes the id | `record/02`, `03` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
-| `record.refuse` | (by construction) | a bad envelope, or a payload number outside ±(2^53 − 1), is refused with a stated reason | `record/20`–`29` |
+| `record.refuse` | (by construction) | a bad envelope, a salt that isn't 16 bytes, a repeated member name or a payload number outside ±(2^53 − 1) is refused with a stated reason | `record/20`–`32` |
+| `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15` |
+| `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
 
 The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
 computed by reference code in `model/Gen/` that checks itself against

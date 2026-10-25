@@ -12,9 +12,8 @@
         "about": ["auth"]
       }
     ],
-    "payloads": [
-      {}
-    ]
+    "salt": "hwl5d3aofyx2btkjaysb4sdj24",
+    "payload_text": "{}"
   },
   "expect": {
     "refused": "about-not-typed"
