@@ -1,0 +1,213 @@
+<section class="panel" id="sharing" role="tabpanel" aria-labelledby="t-sharing">
+  <div class="panel-head"><h2>Layer 5: sharing</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Sharing adds nothing new. Replication is <b>set union</b>, compared segment by segment. Delivery isn't trust: <b>admission</b> decides what counts. Keys come in tiers, standing changes need <b>a person present</b>, and standing ends with <b>"retire through"</b>, a cut by what was held, never by time.</p>
+  <p><span class="pill p-ok">layer closed</span> Every piece reuses something from below: segments (layer 4), admission and stances (layer 1), witness ticks (layer 2), key bindings (observers).</p>
+
+  <h3>What moves</h3>
+  <p>Whole stores, within a realm only (across realms: compose or bridge). Records never change and every fold depends only on the set, so <b>two places holding the same records show the same state</b>, whatever order they arrived in. Concurrent edits are two heads on <code>prev</code>: data, not a sync failure.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 252" role="img" aria-label="Two places, laptop and homelab, each list every segment and the last record they hold from it. Laptop has sl:a1/laptop through r57, sl:a1/homelab through r12, and a closed session segment s-0420. Homelab has sl:a1/laptop through r41, sl:a1/homelab through r30, and no s-0420. Laptop sends r42 to r57 and the closed segment; homelab sends r13 to r30. Same records give the same state in any arrival order.">
+        <rect class="panel" x="4" y="4" width="190" height="144" rx="10"/>
+        <text x="16" y="26" class="b">laptop</text><text x="182" y="26" text-anchor="end" class="xs m">holds through</text>
+        <rect class="box" x="14" y="38" width="170" height="28" rx="6"/><text x="22" y="56" class="mono">sl:a1/laptop</text><text x="176" y="56" text-anchor="end" class="mono">r57</text>
+        <rect class="box" x="14" y="72" width="170" height="28" rx="6"/><text x="22" y="90" class="mono">sl:a1/homelab</text><text x="176" y="90" text-anchor="end" class="mono">r12</text>
+        <rect class="box-acc" x="14" y="106" width="170" height="28" rx="6"/><text x="22" y="124" class="mono">sl:7f/s-0420</text><text x="176" y="124" text-anchor="end" class="mono">#c3</text>
+        <rect class="panel" x="206" y="4" width="190" height="144" rx="10"/>
+        <text x="218" y="26" class="b">homelab</text><text x="384" y="26" text-anchor="end" class="xs m">holds through</text>
+        <rect class="box" x="216" y="38" width="170" height="28" rx="6"/><text x="224" y="56" class="mono">sl:a1/laptop</text><text x="378" y="56" text-anchor="end" class="mono">r41</text>
+        <rect class="box" x="216" y="72" width="170" height="28" rx="6"/><text x="224" y="90" class="mono">sl:a1/homelab</text><text x="378" y="90" text-anchor="end" class="mono">r30</text>
+        <rect class="box dash" x="216" y="106" width="170" height="28" rx="6"/><text x="224" y="124" class="mono m">sl:7f/s-0420</text><text x="378" y="124" text-anchor="end" class="mono m">—</text>
+        <text x="200" y="174" text-anchor="middle" class="xs ta">r42…r57 · s-0420 whole (closed, by hash)</text>
+        <line class="ln-acc" x1="110" y1="182" x2="290" y2="182" marker-end="url(#ah-acc)"/>
+        <line class="ln-amb" x1="290" y1="206" x2="110" y2="206" marker-end="url(#ah-amb)"/>
+        <text x="200" y="224" text-anchor="middle" class="xs tb">r13…r30</text>
+        <text x="200" y="246" text-anchor="middle" class="xs m">same records ⇒ same state, in any arrival order</text>
+      </svg>
+    </div>
+    <figcaption>Each segment has one writer and only grows, so a place's state is just "last record held, per segment." Comparing those lists is the whole negotiation; closed segments compare by hash. This is the "manifest exchange" SQLite places needed.</figcaption>
+  </figure>
+  <ul>
+    <li><b>Erasure doesn't disturb it.</b> An <code>erase</code> travels like any record and each place applies it locally; ids and line counts stay put, so the lists still match.</li>
+    <li><b>Content ticks don't sync.</b> They're a cache anyone holding the records recomputes. Witness ticks are ordinary records and sync like them.</li>
+  </ul>
+
+  <h3>How it moves</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Transport</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td><b>Git</b></td><td>commit <code>segments/</code>, <code>anchor</code> and small blobs; leave out the index, <code>places.json</code> and <code>store.json</code> (a rendering, like the index; the changeset record is what gets reviewed). Pull is union.</td></tr>
+      <tr><td><b>Other places</b> (SQLite, S3, NAS)</td><td>compare segment lists, send the difference</td></tr>
+      <tr><td><b>Bundles</b></td><td>a tick plus what it cites, for bridges across realms</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>No <code>merge=union</code>.</b> Each segment file has one writer, and in a git place a file closes once committed: the next write opens a new one. So one writer working on two branches adds two files, and merging only ever adds files. A committed segment file that changes, outside a steward's erase, is the alarm: a mislabeled device or a forgery. A union driver would quietly join the files.</li>
+    <li><b>Corrected in version 13:</b> with one growing file per device, a writer appending on two branches made a legitimate conflict. The <a href="#horizons/h-lsp" data-tab="horizons" data-sub="h-lsp">LSP walk</a> found it.</li>
+    <li><b>The device label is per write place, not per machine.</b> Two clones of one repo on the same laptop would otherwise share a segment file.</li>
+  </ul>
+
+  <h3>Who counts</h3>
+  <p><b>Delivery isn't trust.</b> Anyone can hand you records. The id proves the content is intact, the signature proves who wrote it, and admission decides whether it counts.</p>
+  <div class="cards">
+    <div class="card acc"><h5>What gets signed</h5><p>The record's <b>id</b>, prefixed <code>loops/record/v1</code>. The signature sits beside the record, outside the id: <code>sig { key, ed25519 }</code>. It survives erasure (the id covers the payload's commitment), and a stripped copy is the same record with less proof.</p></div>
+    <div class="card"><h5>When it's checked</h5><p>Once per record per machine, when it enters the index, which caches the verdict. Ed25519 takes tens of microseconds: a million records is well under a minute, once.</p></div>
+    <div class="card"><h5>Signing by default</h5><p>The CLI makes keys silently on first run and signs every emit; store policy decides what's checked. Unsigned records only come from importers and outside tools, and the hygiene vertex counts them.</p></div>
+    <div class="card"><h5>Stores verify themselves</h5><p>On your first write into a store, your anchor and current key bindings are copied in verbatim. Every signature in a store can be checked from that store, by any replica, offline.</p></div>
+  </div>
+
+  <h3>Keys</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 242" role="img" aria-label="Kyle's lineage sl:a1 is the hash of its anchor and pins the root key. The root key binds a presence key, behind Touch ID, which signs standing changes, and a device key, with no prompt, which signs ordinary emits. Wren's lineage sl:7f has a device key that binds a session key per session, retired when the session closes. Agents never hold a presence key.">
+        <rect class="box-acc" x="12" y="8" width="246" height="32" rx="7"/><text x="135" y="29" text-anchor="middle" class="mono">kyle · sl:a1 = hash(anchor)</text>
+        <line class="ln" x1="135" y1="40" x2="135" y2="58" marker-end="url(#ah)"/>
+        <rect class="box" x="60" y="60" width="150" height="32" rx="7"/><text x="135" y="81" text-anchor="middle" class="b">root key</text>
+        <text x="135" y="108" text-anchor="middle" class="xs m">binds keys · offline-ish</text>
+        <line class="ln" x1="110" y1="112" x2="74" y2="128" marker-end="url(#ah)"/>
+        <line class="ln" x1="160" y1="112" x2="198" y2="128" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="12" y="130" width="118" height="32" rx="7"/><text x="71" y="151" text-anchor="middle" class="s">presence key</text>
+        <rect class="box" x="141" y="130" width="118" height="32" rx="7"/><text x="200" y="151" text-anchor="middle" class="s">device key</text>
+        <text x="71" y="180" text-anchor="middle" class="xs tb">Touch ID</text><text x="71" y="194" text-anchor="middle" class="xs m">changes standing</text>
+        <text x="200" y="180" text-anchor="middle" class="xs">no prompt</text><text x="200" y="194" text-anchor="middle" class="xs m">ordinary emits</text>
+        <rect class="box-acc" x="270" y="8" width="118" height="32" rx="7"/><text x="329" y="29" text-anchor="middle" class="mono">wren · sl:7f</text>
+        <line class="ln" x1="329" y1="40" x2="329" y2="58" marker-end="url(#ah)"/>
+        <rect class="box" x="270" y="60" width="118" height="32" rx="7"/><text x="329" y="81" text-anchor="middle" class="s">device key</text>
+        <text x="329" y="108" text-anchor="middle" class="xs m">binds, under a grant</text>
+        <line class="ln" x1="329" y1="112" x2="329" y2="128" marker-end="url(#ah)"/>
+        <rect class="box dash" x="270" y="130" width="118" height="32" rx="7"/><text x="329" y="151" text-anchor="middle" class="s">session key</text>
+        <text x="329" y="180" text-anchor="middle" class="xs">one per session</text><text x="329" y="194" text-anchor="middle" class="xs m">retired at close</text>
+        <text x="200" y="230" text-anchor="middle" class="xs ta">agents never hold a presence key</text>
+      </svg>
+    </div>
+    <figcaption>A lineage id pins its root key, the way a store id pins its stewards. One device key per segment, so a lost device costs one key.</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Moment</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>First run, new person</td><td>root, presence and device keys; anchor, key bindings and a name record. The root starts on that machine; the CLI offers a printable recovery key once.</td></tr>
+      <tr><td>First run, new machine</td><td><b>pair</b>: an existing device or the root vouches for the new keys (like linking a Signal device), or use the recovery key</td></tr>
+      <tr><td>Every emit</td><td>signed by the device key; you never see it</td></tr>
+      <tr><td>No signer (keychain locked)</td><td>stores that require signatures refuse; others write unsigned and the hygiene vertex counts it</td></tr>
+      <tr><td>Lost root and recovery key</td><td>a new lineage that descends from the old one and adopts its records; no recovery machinery</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Where keys live:</b> the OS keychain by default; a file readable only by its owner on headless machines (<code>~/.config/loops/keys/&lt;lineage&gt;/&lt;device&gt;</code>, the way SSH keeps keys); never in <code>.loops/</code> or any place. The signer is a small interface: keychain, file, later ssh-agent or a hardware key. Ed25519 only.</p>
+  <p><b>Domain vouching</b> only when colleagues must agree what <code>@acme</code> means: <code>https://acme.com/.well-known/loops</code> maps the name to a root store id. The domain vouches for the mapping, never for content.</p>
+
+  <h3>Presence: what needs a person</h3>
+  <p>Every record is durable, so that isn't the test. The test is <b>whether a record takes effect because of who signed it</b>, plus acts that can't be undone.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Needs you present</th><th>Doesn't</th></tr></thead>
+    <tbody>
+      <tr><td><code>grant</code>, <code>vouch</code>, <code>retire</code>: who counts</td><td>ordinary emits</td></tr>
+      <tr><td>a steward's <code>policy</code> or <code>declare</code> changeset; <code>affirm</code> of a proposal: what counts</td><td><code>affirm</code> and <code>dispute</code> as beliefs about content</td></tr>
+      <tr><td><code>adopt</code> on someone else's behalf</td><td><code>name</code> records: mistakes are visible and fixable</td></tr>
+      <tr><td><code>erase</code>; <code>bridge</code> out of the realm; declaring a store public: can't be undone</td><td><code>spec</code>, and ticks</td></tr>
+      <tr><td>creating a store or lineage</td><td><code>promote</code> within a grant</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>A grant is presence given ahead of time.</b> One tap when granting; the agent then acts within scope without asking.</li>
+    <li><b>To go further, an agent proposes.</b> A changeset or grant request without standing is already a visible proposal; your <code>affirm</code> is the tap. That's the elevated-request flow, and the model already had it.</li>
+    <li><b>Narrow without you, never widen.</b> Wren can hand a sub-agent part of what it holds (Macaroons, Biscuit, UCAN attenuate the same way).</li>
+    <li><b>One tap per act, no grace window.</b> An act can cover many records (a changeset, a batch promotion); the next act needs a fresh tap, so nothing rides a sudo-style window.</li>
+    <li><b>Checked at admission.</b> A standing-changing record counts only if a presence key signed it.</li>
+  </ul>
+  <details class="unfold"><summary>The honest limit on presence</summary><div class="body">
+    <p>A presence key's binding says "used only with you present", and other replicas take that on trust: Touch ID protects your machine, not their view of it. Hardware keys can prove it, since FIDO signatures carry a user-presence flag inside the signed bytes, but that means a second signature format beside Ed25519. Start with the keychain claim; add hardware proof only if someone needs it.</p>
+  </div></details>
+
+  <h3>Agents</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Threat</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td><b>A.</b> the agent signs as you</td><td>presence for anything that changes standing; sandboxing for the rest</td></tr>
+      <tr><td><b>B.</b> the agent signs as itself beyond its grant</td><td>already covered: admission at read ignores records outside the grant</td></tr>
+      <tr><td><b>C.</b> the agent's key leaks</td><td>session keys: worth little, retired when the session closes</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Session keys.</b> Wren's device key binds a key per session under a grant; at close, the signer retires it through the session's last record. A crashed session is retired when the signer next starts. No expiry timestamp, which could be backdated.</li>
+    <li><b>Agents may hold their key.</b> Remote and local agents work the same way: the protection is that the key is worth little, not that it's hidden. It still never enters the session's context, environment or logs.</li>
+    <li><b>Attribution comes free.</b> Each record shows which session wrote it, and the binding can carry <code>runs-on</code>.</li>
+    <li><b>Cost:</b> one small segment per session, closed and hashed at the end.</li>
+  </ul>
+  <div class="tbl"><table>
+    <thead><tr><th>Where the agent runs</th><th>Can it sign ordinary records as you?</th></tr></thead>
+    <tbody>
+      <tr><td>same OS user, no sandbox</td><td><b>yes</b>: ordinary records only, ended cleanly by a cut; it can't change standing</td></tr>
+      <tr><td>sandboxed (Claude Code's sandbox, a container, a separate user)</td><td><b>no</b>: your keys are out of reach; it has only its session key</td></tr>
+      <tr><td>remote or cloud</td><td><b>no</b>, by construction</td></tr>
+    </tbody>
+  </table></div>
+  <p>Sandboxing is an operating-system concern, not part of loops; loops makes all three setups safe the same way. Later, a local signer can sit outside the sandbox behind a socket (as ssh-agent or 1Password's SSH agent do), signing only as Wren, only within its grant: defence in depth.</p>
+
+  <h3>Ending standing: retire through</h3>
+  <p>Two cases, one mechanism: a key stops speaking for a lineage (lost laptop, stolen key, rotation), or an observer stops writing to a store (a colleague leaves, a grant ends). <code>emitted</code> is self-stamped, so a cut by time can be dodged by backdating. <b>Cut by what was held instead.</b></p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 196" role="img" aria-label="The segment sl:7f/laptop holds r1 to r6. A retire record for key k7 through r4 cuts after r4: r1 to r4 stay admitted, r5 and r6 are kept and visible but don't count. A forged record dated 2025 isn't in the held prefix, so it doesn't count either.">
+        <text x="12" y="20" class="xs m">segments/sl:7f/laptop.jsonl</text>
+        <rect class="box-acc" x="12" y="30" width="52" height="32" rx="6"/><text x="38" y="51" text-anchor="middle" class="mono">r1</text>
+        <rect class="box-acc" x="72" y="30" width="52" height="32" rx="6"/><text x="98" y="51" text-anchor="middle" class="mono">r2</text>
+        <rect class="box-acc" x="132" y="30" width="52" height="32" rx="6"/><text x="158" y="51" text-anchor="middle" class="mono">r3</text>
+        <rect class="box-acc" x="192" y="30" width="52" height="32" rx="6"/><text x="218" y="51" text-anchor="middle" class="mono">r4</text>
+        <rect class="box dash" x="262" y="30" width="52" height="32" rx="6"/><text x="288" y="51" text-anchor="middle" class="mono m">r5</text>
+        <rect class="box dash" x="322" y="30" width="52" height="32" rx="6"/><text x="348" y="51" text-anchor="middle" class="mono m">r6</text>
+        <line class="ln-amb dash" x1="253" y1="22" x2="253" y2="72"/>
+        <line class="ln-acc" x1="12" y1="78" x2="244" y2="78"/>
+        <text x="128" y="94" text-anchor="middle" class="xs ta">admitted</text>
+        <text x="318" y="84" text-anchor="middle" class="xs m">kept, visible,</text>
+        <text x="318" y="97" text-anchor="middle" class="xs m">doesn't count</text>
+        <rect class="box-amb" x="168" y="124" width="220" height="32" rx="7"/><text x="278" y="145" text-anchor="middle" class="s">retire key k7 through r4</text>
+        <line class="ln-amb" x1="253" y1="122" x2="253" y2="76" marker-end="url(#ah-amb)"/>
+        <rect class="box dash" x="12" y="124" width="120" height="32" rx="7"/><text x="72" y="145" text-anchor="middle" class="s">forged · 2025</text>
+        <text x="12" y="184" class="xs m">a backdated forgery isn't in the held prefix, so it doesn't count</text>
+      </svg>
+    </div>
+    <figcaption>A segment has one writer and only grows, so "through r4" fixes everything before it exactly. It's a witness tick in miniature ("what I had from this key when I revoked it"), stored compactly. No time is involved.</figcaption>
+  </figure>
+  <ul>
+    <li><b>Late but legitimate records</b> written before the cut but not yet seen by the steward arrive afterwards: kept, not counted, flagged by the hygiene vertex, and affirmed by the steward if genuine.</li>
+    <li><b>Departure isn't distrust.</b> A colleague who leaves keeps every record admitted; they just can't add more. If a key was stolen before anyone noticed, the steward disputes specific records. Nothing is rewritten.</li>
+    <li><b>Pairing falls with the key.</b> Devices a stolen key paired after the cut lose standing too: their bindings sit in the cut-off part of its segment.</li>
+    <li><b>Rotation</b> is a new binding, then the old key retired through its last record.</li>
+  </ul>
+
+  <h3>A boundary: withholding, not hiding</h3>
+  <p><span class="pill p-ok">settled</span> Privacy in Loops is <b>withholding</b>: a record, or anything computed from it, reaches you or it doesn't. Anything computed from a record carries some of it (a render, a fold result, a count, a summary, an embedding), so <b>a derived thing is as private as its least-public input</b> and travels under the same grant.</p>
+  <ul>
+    <li><b>What it offers:</b> envelopes and salted commitments show that something is withheld without showing what; folds over envelopes can be checked; unreachable hides even whether a record exists.</li>
+    <li><b>What it doesn't:</b> computing over records a reader can't see while keeping them hidden. That needs zero-knowledge proofs or secure computation, and nothing needs them yet.</li>
+    <li><b>So a computed claim you can't recompute is only attested:</b> it rests on the signer, and lenses say so.</li>
+  </ul>
+
+  <h3>Run against the examples</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Case</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>Team platform</td><td>clone, write to your own segment, open a PR. Joining is a steward's policy changeset (one tap); leaving is "retire through" your last record.</td></tr>
+      <tr><td>Novel co-author</td><td>novel replicates to their laptop via git or the NAS; their lineage is added as a writer. They never see <code>feed</code>.</td></tr>
+      <tr><td>Feed, laptop and homelab</td><td>the two places compare segment lists</td></tr>
+      <tr><td>Wren, a run</td><td>a session key under <code>g:runs</code>; promotions into <code>runs/*</code> need no tap; retired at close</td></tr>
+      <tr><td>Wren loses a laptop</td><td>retire that device key through its last record; you vouch for a new one</td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="unfold"><summary>What Arrival needed that we don't</summary><div class="body">
+    <p>Head attestation, rollback detection and equivocation proofs protected against untrusted replicas. Inside a realm the places are yours or your team's; across realms nothing replicates. Git's conflict on a segment file is the cheap alarm for the one case left.</p>
+  </div></details>
+  <details class="unfold source"><summary>Prior art</summary><div class="body"><ul>
+    <li>Secure Scuttlebutt and Hypercore: per-writer append-only logs, replicated by comparing "how far I have each feed"</li>
+    <li>Matrix cross-signing, Keybase device provisioning, Signal linked devices: device keys under an identity key; pairing</li>
+    <li>did:plc: rotation keys separate from the signing key</li>
+    <li>SSH certificates and Sigstore (Fulcio): short-lived keys bound to an identity</li>
+    <li>ssh-agent, 1Password SSH agent: signing through a socket, approval prompts</li>
+    <li>FIDO2 / WebAuthn: user-presence and user-verification flags inside signed data</li>
+    <li>Macaroons, Biscuit, UCAN: attenuating delegation</li>
+    <li>Certificate Transparency (RFC 9162): a signed prefix of an append-only log as evidence</li>
+    <li>AT Protocol handle resolution, Nostr NIP-05: a domain vouching for a name</li>
+    <li>RFC 8032: Ed25519</li>
+  </ul></div></details>
+</section>

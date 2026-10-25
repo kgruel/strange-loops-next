@@ -1,0 +1,192 @@
+<section class="panel" id="topology" role="tabpanel" aria-labelledby="t-topology">
+  <div class="panel-head"><h2>Realms</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Stores relate in three ways: compose, bridge and replicate. Only replication moves whole stores, and it is the only one that needs merge semantics. Most stores have one writer. Ticks are records that reference what they cover, and they can travel alone or with everything below them. How vertices tick is in <a href="#resolution" data-tab="resolution">Resolution</a>.</p>
+
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 410" role="img" aria-label="Three relationships. Compose: browsing, likes and feeds stores read by a salience vertex that emits a digest. Bridge: a subagent tick enters a slice vertex, whose tick enters an orchestrator. Replicate: one store on alice's laptop, a git remote and bob's laptop, synced by union.">
+        <rect class="panel" x="0" y="0" width="400" height="132" rx="10"/>
+        <text x="14" y="22" class="b">Compose: one vertex reads many stores</text>
+        <rect class="box" x="12" y="38" width="110" height="30" rx="7"/><text x="67" y="58" text-anchor="middle" class="s">browsing</text>
+        <rect class="box" x="145" y="38" width="110" height="30" rx="7"/><text x="200" y="58" text-anchor="middle" class="s">likes</text>
+        <rect class="box" x="278" y="38" width="110" height="30" rx="7"/><text x="333" y="58" text-anchor="middle" class="s">feeds</text>
+        <line class="ln" x1="67" y1="70" x2="150" y2="88" marker-end="url(#ah)"/>
+        <line class="ln" x1="200" y1="70" x2="200" y2="88" marker-end="url(#ah)"/>
+        <line class="ln" x1="333" y1="70" x2="250" y2="88" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="120" y="91" width="160" height="30" rx="7"/><text x="200" y="111" text-anchor="middle" class="s b">salience vertex</text>
+        <line class="ln-amb" x1="282" y1="106" x2="322" y2="106" marker-end="url(#ah-amb)"/><text x="328" y="110" class="s tb">digest</text>
+        <rect class="panel" x="0" y="142" width="400" height="118" rx="10"/>
+        <text x="14" y="164" class="b">Bridge: a tick enters another vertex</text>
+        <rect class="box" x="12" y="190" width="100" height="30" rx="7"/><text x="62" y="210" text-anchor="middle" class="s">subagent</text>
+        <rect class="box" x="150" y="190" width="100" height="30" rx="7"/><text x="200" y="210" text-anchor="middle" class="s">slice</text>
+        <rect class="box" x="288" y="190" width="100" height="30" rx="7"/><text x="338" y="210" text-anchor="middle" class="s">orchestrator</text>
+        <line class="ln-amb" x1="114" y1="205" x2="147" y2="205" marker-end="url(#ah-amb)"/><text x="130" y="186" text-anchor="middle" class="xs tb">tick</text>
+        <line class="ln-amb" x1="252" y1="205" x2="285" y2="205" marker-end="url(#ah-amb)"/><text x="268" y="186" text-anchor="middle" class="xs tb">tick</text>
+        <text x="14" y="246" class="xs m">each tick carries everything below it, by reference or as a bundle</text>
+        <rect class="panel" x="0" y="270" width="400" height="136" rx="10"/>
+        <text x="14" y="292" class="b">Replicate: one store in several places</text>
+        <rect class="box" x="12" y="312" width="110" height="30" rx="7"/><text x="67" y="332" text-anchor="middle" class="s">alice's laptop</text>
+        <rect class="box" x="145" y="312" width="110" height="30" rx="7"/><text x="200" y="332" text-anchor="middle" class="s">git remote</text>
+        <rect class="box" x="278" y="312" width="110" height="30" rx="7"/><text x="333" y="332" text-anchor="middle" class="s">bob's laptop</text>
+        <line class="ln-acc" x1="125" y1="327" x2="142" y2="327" marker-start="url(#ah-acc)" marker-end="url(#ah-acc)"/>
+        <line class="ln-acc" x1="258" y1="327" x2="275" y2="327" marker-start="url(#ah-acc)" marker-end="url(#ah-acc)"/>
+        <text x="14" y="370" class="xs m">same set of segments; sync is union</text>
+        <text x="14" y="388" class="xs m">the only relationship that moves whole stores</text>
+      </svg>
+    </div>
+    <figcaption>Composition forces content order. Receipt order can't exist across stores, because no single receiver saw all three.</figcaption>
+  </figure>
+
+  <h3>The orchestration chain</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 390" role="img" aria-label="Subagent vertices tick into slice vertices, which tick into the orchestrator, which ticks to you. A reviewer is an observer that emits an approval record into a slice. Session logs are blobs referenced by hash.">
+        <rect class="box-acc" x="140" y="8" width="120" height="32" rx="8"/><text x="200" y="29" text-anchor="middle" class="b">you</text>
+        <rect class="box" x="110" y="78" width="180" height="34" rx="8"/><text x="200" y="100" text-anchor="middle" class="s b">orchestrator vertex</text>
+        <line class="ln-amb" x1="200" y1="76" x2="200" y2="44" marker-end="url(#ah-amb)"/><text x="208" y="64" class="xs tb">tick: message + all below</text>
+        <rect class="box" x="20" y="158" width="150" height="34" rx="8"/><text x="95" y="180" text-anchor="middle" class="s b">slice vertex</text>
+        <rect class="box" x="230" y="158" width="150" height="34" rx="8"/><text x="305" y="180" text-anchor="middle" class="s b">slice vertex</text>
+        <line class="ln-amb" x1="95" y1="156" x2="168" y2="115" marker-end="url(#ah-amb)"/><text x="112" y="136" class="xs tb">tick</text>
+        <line class="ln-amb" x1="305" y1="156" x2="232" y2="115" marker-end="url(#ah-amb)"/><text x="276" y="136" class="xs tb">tick</text>
+        <rect class="box" x="8" y="244" width="110" height="34" rx="8"/><text x="63" y="266" text-anchor="middle" class="s">subagent vertex</text>
+        <rect class="box-acc" x="128" y="244" width="100" height="34" rx="8"/><text x="178" y="266" text-anchor="middle" class="s">reviewer</text>
+        <rect class="box" x="250" y="244" width="140" height="34" rx="8"/><text x="320" y="266" text-anchor="middle" class="s">subagent vertices</text>
+        <line class="ln-amb" x1="63" y1="242" x2="78" y2="195" marker-end="url(#ah-amb)"/><text x="42" y="222" class="xs tb">tick</text>
+        <line class="ln-acc dash" x1="178" y1="242" x2="130" y2="195" marker-end="url(#ah-acc)"/><text x="160" y="214" class="xs ta">record: approved</text>
+        <line class="ln-amb" x1="320" y1="242" x2="305" y2="195" marker-end="url(#ah-amb)"/><text x="318" y="222" class="xs tb">tick</text>
+        <rect class="box dash" x="8" y="320" width="110" height="34" rx="8"/><text x="63" y="342" text-anchor="middle" class="s">session logs</text>
+        <line class="ln" x1="63" y1="318" x2="63" y2="281" marker-end="url(#ah)"/><text x="72" y="304" class="xs m">blobs, by hash</text>
+        <line class="ln-amb" x1="14" y1="378" x2="40" y2="378"/><text x="46" y="382" class="xs">tick (record from a vertex)</text>
+        <line class="ln-acc dash" x1="206" y1="378" x2="232" y2="378"/><text x="238" y="382" class="xs">record from an observer</text>
+      </svg>
+    </div>
+    <figcaption>Vertices take ticks as input directly. The reviewer is a real observer: it reads the subagent's tick and emits a judgment. Forwarding a conclusion is a tick flowing in; judging one is an observer's record.</figcaption>
+  </figure>
+
+  <h3>By reference or as a bundle</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 225" role="img" aria-label="Tick T covers f1, f2 and a child tick, which covers f3 and f4. Sending by reference sends T alone. Sending a bundle sends T plus its whole closure.">
+        <rect class="faint dash" x="20" y="16" width="370" height="202" rx="12"/>
+        <rect class="ln-acc dash" x="160" y="26" width="80" height="48" rx="9" fill="none"/>
+        <text x="246" y="44" class="xs ta">by reference:</text><text x="246" y="58" class="xs ta">T alone</text>
+        <rect class="box-amb" x="170" y="34" width="60" height="30" rx="7"/><text x="200" y="54" text-anchor="middle" class="mono b">T</text>
+        <line class="ln" x1="200" y1="66" x2="65" y2="108"/><line class="ln" x1="200" y1="66" x2="145" y2="108"/><line class="ln" x1="200" y1="66" x2="265" y2="108"/>
+        <rect class="box" x="40" y="110" width="50" height="28" rx="6"/><text x="65" y="129" text-anchor="middle" class="mono">f1</text>
+        <rect class="box" x="120" y="110" width="50" height="28" rx="6"/><text x="145" y="129" text-anchor="middle" class="mono">f2</text>
+        <rect class="box-amb" x="226" y="110" width="78" height="28" rx="6"/><text x="265" y="129" text-anchor="middle" class="mono">t-child</text>
+        <line class="ln" x1="265" y1="140" x2="240" y2="172"/><line class="ln" x1="265" y1="140" x2="310" y2="172"/>
+        <rect class="box" x="220" y="174" width="40" height="26" rx="6"/><text x="240" y="192" text-anchor="middle" class="mono">f3</text>
+        <rect class="box" x="290" y="174" width="40" height="26" rx="6"/><text x="310" y="192" text-anchor="middle" class="mono">f4</text>
+        <text x="338" y="192" class="xs m">… logs</text>
+        <text x="32" y="208" class="xs m">bundle = T + its closure</text>
+      </svg>
+    </div>
+    <figcaption>This is git's split between commits that reference trees and packfiles that bundle them. Each record keeps its original observer and signature, so the receiver verifies without trusting the sender. T's identity is the same either way.</figcaption>
+  </figure>
+
+  <h3>The substrate</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 300" role="img" aria-label="Three writers each append their own chain of segments: kyle, kyle/safari, kyle/claude. Closed segments are immutable; the newest is open. Segments reference content-addressed blobs. An index and checkpoints are derived from everything and can be rebuilt.">
+        <text x="8" y="44" class="mono">kyle</text>
+        <text x="8" y="94" class="mono">kyle/safari</text>
+        <text x="8" y="144" class="mono">kyle/claude</text>
+        <rect class="box" x="110" y="27" width="48" height="26" rx="5"/><rect class="box" x="174" y="27" width="48" height="26" rx="5"/><rect class="box dash" x="238" y="27" width="48" height="26" rx="5"/>
+        <line class="ln" x1="172" y1="40" x2="161" y2="40" marker-end="url(#ah)"/><line class="ln" x1="236" y1="40" x2="225" y2="40" marker-end="url(#ah)"/>
+        <rect class="box" x="110" y="77" width="48" height="26" rx="5"/><rect class="box dash" x="174" y="77" width="48" height="26" rx="5"/>
+        <line class="ln" x1="172" y1="90" x2="161" y2="90" marker-end="url(#ah)"/>
+        <rect class="box" x="110" y="127" width="48" height="26" rx="5"/><rect class="box" x="174" y="127" width="48" height="26" rx="5"/><rect class="box dash" x="238" y="127" width="48" height="26" rx="5"/>
+        <line class="ln" x1="172" y1="140" x2="161" y2="140" marker-end="url(#ah)"/><line class="ln" x1="236" y1="140" x2="225" y2="140" marker-end="url(#ah)"/>
+        <text x="300" y="44" class="xs m">← chains to the</text><text x="300" y="58" class="xs m">previous hash</text>
+        <text x="300" y="132" class="xs m">dashed = open,</text><text x="300" y="146" class="xs m">others closed</text>
+        <circle class="box-amb" cx="134" cy="204" r="13"/><circle class="box-amb" cx="198" cy="204" r="13"/><circle class="box-amb" cx="262" cy="204" r="13"/>
+        <line class="ln dash" x1="134" y1="155" x2="134" y2="189"/><line class="ln dash" x1="198" y1="155" x2="198" y2="189"/><line class="ln dash" x1="262" y1="155" x2="262" y2="189"/>
+        <text x="134" y="234" text-anchor="middle" class="xs m">log</text><text x="198" y="234" text-anchor="middle" class="xs m">transcript</text><text x="262" y="234" text-anchor="middle" class="xs m">article</text>
+        <text x="300" y="208" class="xs m">blobs, by hash</text>
+        <rect class="box dash" x="8" y="248" width="384" height="44" rx="8"/>
+        <text x="200" y="267" text-anchor="middle" class="s b">index · checkpoints (SQLite)</text>
+        <text x="200" y="284" text-anchor="middle" class="xs m">derived from all segments; disposable; rebuildable</text>
+      </svg>
+    </div>
+    <figcaption>A store is a set of segments plus a derived index. A segment is written by exactly one writer, so there are never write conflicts. Anything that can hold immutable files can host a store: a directory, a git tree, S3, a blob table.</figcaption>
+  </figure>
+
+  <h3>Realms and the boundary rule</h3>
+  <p>A realm is a <b>name table plus a boundary rule</b>. <code>@home</code> names a table, not a store: every store has one, a realm has one that links its children, and a domain can optionally vouch for one. Because records hold only hash ids, joining stores into larger realms changes how names resolve and never rewrites data.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Relationship</th><th>Within a realm</th><th>Across realms</th></tr></thead>
+    <tbody>
+      <tr><td><b>Compose</b></td><td>✓</td><td>✓ default. Nothing moves.</td></tr>
+      <tr><td><b>Bridge</b></td><td>✓</td><td>Only as an explicit, signed tick: a publication, not a sync.</td></tr>
+      <tr><td><b>Replicate</b></td><td>✓</td><td>✗ never.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Diagrams: <a href="#scenarios" data-tab="scenarios">Scenarios</a>, steps 5 to 7.</p>
+  <details class="unfold"><summary>What happens when stores or realms join</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Situation</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Same lineage, different names</td><td>Nothing to do. Folds unify by id; lenses pick a display name.</td></tr>
+        <tr><td>Different lineages, same name</td><td>Both valid in their own stores. The unqualified name is ambiguous at input; use <code>claude@notes</code> or add a petname to the parent table.</td></tr>
+        <tr><td>One entity given two lineages before joining</td><td>A <code>same-as</code> record, signed by both or vouched by you. Link, never merge.</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><b>Resolution</b> follows a search path: current store's table, then its parents, then any <code>@home</code> named explicitly.</li>
+      <li><b>Realm names are your petnames</b> for root tables, so nested realms need no DNS-style hierarchy. A domain matters only when colleagues must agree what <code>@acme</code> means.</li>
+      <li><b>Work is an ownership boundary.</b> At work the root is the team and your work lineage is admitted by their grants. Work and home lineages stay separate; any <code>same-as</code> between them lives only at home.</li>
+      <li><b>Lens output stays with the reader.</b> A compiled system prompt drawn from both realms is computed at read; if kept, it's a tick in the reading realm that references foreign records by hash.</li>
+    </ul>
+  </div></details>
+
+  <details class="unfold"><summary>How a tick enters another vertex: options A, B, C</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th></th><th>Mechanism</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><b>A</b></td><td>Ticks flow directly; a vertex folds records and ticks</td><td><span class="pill p-ok">chosen</span> Simplest. "The vertex is where loops meet."</td></tr>
+        <tr><td>B</td><td>The vertex turns its tick into an observation with observer = the vertex</td><td>Blurs observations and ticks. What the code does today.</td></tr>
+        <tr><td>C</td><td>An observer (a bridge) sits on every wire</td><td>My first proposal. One moving part too many.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Consequence for layer 1: a spec routes and folds records. A route must be able to say "ticks from vertex V" as easily as "records of kind K." A fold over child ticks, like "how many slices passed review," is ordinary.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Why immutable segments instead of a log with a head</summary><div class="body">
+    <ul>
+      <li><b>Git-storable but not git-only.</b> The backend contract shrinks to put, get and list on immutable blobs, compared with Arrival's atomic compare-and-append.</li>
+      <li><b>Replication is a union of segments.</b> Writers never touch each other's segments.</li>
+      <li><b>Composition is the same union, at read time.</b> "Combining stores is an ordinary local operation" becomes literally true: compose and merge are one operation at different scopes.</li>
+      <li><b>Witness order survives without an authority.</b> Each writer's segment chain is that observer's receipt order, hash-linked.</li>
+    </ul>
+    <p>For the team case in git: segments per writer and device, <code>.loops/segments/&lt;lineage&gt;/&lt;device&gt;/</code>, each file closed once committed. <b>Corrected:</b> an earlier version suggested <code>merge=union</code> in <code>.gitattributes</code> as a safety net. With one writer per file an honest pull never conflicts on a segment, so a conflict is an alarm; see <a href="#sharing" data-tab="sharing">Sharing</a>. Decision records get reviewed in the same PR as the code they explain.</p>
+  </div></details>
+
+  <details class="unfold"><summary>What survives from Arrival</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Arrival</th><th>In this model</th></tr></thead>
+      <tbody>
+        <tr><td>Hash-chained history</td><td>per-writer segment chains</td></tr>
+        <tr><td>One authority per lineage</td><td>trivially true: one writer per chain</td></tr>
+        <tr><td>Backend-neutral ledger contract</td><td>immutable blob put / get / list</td></tr>
+        <tr><td>Wire format</td><td>segment format (canonical JSONL is fine)</td></tr>
+        <tr><td>Head attestation, rollback, equivocation</td><td>optional verification layer for untrusted peers</td></tr>
+        <tr><td>Re-custody, epochs, sidecar</td><td>dropped</td></tr>
+      </tbody>
+    </table></div>
+    <p>Arrival was right to want storage neutrality. The trouble was its unit: an ordered log with a head needs authority, and immutable segments don't.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Privacy falls out of references</summary><div class="body">
+    <p>Composition and bridging never copy raw records. A salience tick can be shared while the browsing history it covered stays private. For anyone without access, the references don't resolve, and the signature and root still prove the tick is authentic. Email can't leak into a shared repo just because a vertex looked at it.</p>
+  </div></details>
+
+  <details class="unfold"><summary>The hard parts that remain</summary><div class="body">
+    <ol>
+      <li><b>Resolving a reference across stores.</b> A small locator registry (store name to path or URL); ticks may carry hints. Bundles cover the cross-machine case.</li>
+      <li><b>Erasure.</b> A writer can compact its own segments. Record hashes don't change, and ticks that covered an erased record keep their root while that record becomes unresolvable. Design this early.</li>
+      <li><b>Declarations in multi-writer stores.</b> Settled per store by convention, not by protocol.</li>
+      <li><b>Clock skew.</b> For human-scale stores, emitted plus id tie-breaks is probably enough. A hybrid logical clock is available if not.</li>
+    </ol>
+  </div></details>
+</section>

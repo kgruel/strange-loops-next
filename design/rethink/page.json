@@ -1,0 +1,80 @@
+{
+  "sections": [
+    {
+      "id": "map",
+      "tab": "Map"
+    },
+    {
+      "id": "diagnosis",
+      "tab": "Diagnosis"
+    },
+    {
+      "id": "record",
+      "tab": "Record"
+    },
+    {
+      "id": "observers",
+      "tab": "Observers"
+    },
+    {
+      "id": "lineage",
+      "tab": "Lineage"
+    },
+    {
+      "id": "meaning",
+      "tab": "Vertex &amp; store"
+    },
+    {
+      "id": "cases",
+      "tab": "Cases"
+    },
+    {
+      "id": "things",
+      "tab": "Things"
+    },
+    {
+      "id": "resolution",
+      "tab": "Resolution"
+    },
+    {
+      "id": "residence",
+      "tab": "Places"
+    },
+    {
+      "id": "sharing",
+      "tab": "Sharing"
+    },
+    {
+      "id": "topology",
+      "tab": "Realms"
+    },
+    {
+      "id": "scenarios",
+      "tab": "Scenarios"
+    },
+    {
+      "id": "example",
+      "tab": "Example"
+    },
+    {
+      "id": "horizons",
+      "tab": "Horizons"
+    },
+    {
+      "id": "build",
+      "tab": "Build"
+    },
+    {
+      "id": "open",
+      "tab": "Open"
+    },
+    {
+      "id": "glossary",
+      "tab": "Glossary"
+    },
+    {
+      "id": "sources",
+      "tab": "Sources"
+    }
+  ]
+}

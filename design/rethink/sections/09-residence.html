@@ -1,0 +1,138 @@
+<section class="panel" id="residence" role="tabpanel" aria-labelledby="t-residence">
+  <div class="panel-head"><h2>Layer 4: places</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Places owe the layers above very little: list records, get one by id, what's new since a checkpoint, a blob by hash, and a disposable index. Everything else is a per-store, per-machine choice: <b>where</b> segments live, in what <b>format</b>, and how much of the store each machine <b>holds</b>.</p>
+  <p><span class="pill p-ok">layer closed</span> Segment sync between places is a comparison of segment lists; see <a href="#sharing" data-tab="sharing">Sharing</a>.</p>
+
+  <h3>A store on disk</h3>
+  <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">.loops/                                     in git?
+  anchor                                    yes   the store's anchor record; its st: id travels with a clone
+  vertices/&lt;name&gt;.json                      yes   the editing form of the store's vertex records
+  segments/&lt;observer&gt;/&lt;device&gt;/&lt;hash&gt;.jsonl  yes   closed, immutable
+  segments/&lt;observer&gt;/&lt;device&gt;/open.jsonl   no    the one file being appended to
+  blobs/&lt;hash&gt;                              small ones; large or erasable ones go to a blob place
+  store.json                                no    a render of the declarations: edit, then loops apply
+  .gitignore                                yes   written by the first emit
+
+~/.config/loops/places.json                 per machine, never shared
+~/.config/loops/keys/                       the file signer; the OS keychain otherwise
+~/.cache/loops/index.db                     derived, disposable</pre>
+  <p>Discovery walks up to the nearest <code>.loops/</code>, the way git finds <code>.git</code>. Zero-config is <code>.loops/</code> alone, JSONL, no <code>places.json</code>. The device in a segment path is a label per write place, created on first run; it keeps two writers out of one file, and each segment is signed by exactly one device key. In a git place a segment file closes once it is committed and the next write opens a new one, so a writer on two branches adds two files instead of forking one. A store whose places are all SQLite can be a single <code>store.db</code> holding the same things.</p>
+
+  <h3>Defining a store</h3>
+  <p>The old <code>.vertex</code> file did four jobs at once. Each now has its own home:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Concern</th><th>Was in <code>.vertex</code></th><th>New home</th><th>Travels?</th></tr></thead>
+    <tbody>
+      <tr><td>kinds, fields, reference fields, lifecycle, <code>search</code>, <code>preview</code>, writer policy, stewards, natural-key rules</td><td>each loop block</td><td><b>store declarations</b></td><td>with the store</td></tr>
+      <tr><td><code>from</code>, <code>fold</code>, <code>boundary</code>, <code>into</code>, <code>weight-by</code>, <code>resolve-by</code></td><td>each loop block</td><td><b>vertex spec</b></td><td>with the store that carries it</td></tr>
+      <tr><td><code>parse</code>, <code>discover</code></td><td>loop and source blocks</td><td><b>collector</b>: parse specs travel; source bindings stay on the machine</td><td>split</td></tr>
+      <tr><td><code>store "./data/…"</code></td><td>top line</td><td><b><code>places.json</code></b></td><td>never</td></tr>
+    </tbody>
+  </table></div>
+  <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{
+  "store": "team-platform",
+  "maturity": "declared",
+  "stewards": ["sl:w1", "sl:director"],
+  "shared": { "format": "jsonl" },
+  "refuse": [{ "from": "personal-ingest" }],
+  "kinds": {
+    "decision": {
+      "fields":  { "title": "string", "status": { "enum": ["proposed", "accepted", "superseded"] } },
+      "refs":    ["evidence"],
+      "facet":   "status",
+      "search":  ["title", "body"],
+      "preview": ["title", "status"]
+    },
+    "note": { "search": ["body"], "erasable": true }
+  },
+  "carries": ["platform-knowledge", "hygiene/things", "hygiene/kinds"]
+}</pre>
+  <p><code>shared</code>: shared places stay reviewable in PRs. <code>refuse</code>: prevention, before erasure is needed. <code>refs</code>: reference fields, once called edges. <code>facet</code>: emitted whole. <code>search</code>: worth indexing; each machine decides. <code>preview</code>: how lenses show it by default. <code>erasable</code>: payloads go to a blob place.</p>
+  <ul>
+    <li><b>Updating a store is an emit.</b> <code>apply</code> compares the file with current declarations and emits one changeset record, so a half-synced replica never sees half a change. Breaking changes are refused (a new kind instead); removals emit <code>retire</code>.</li>
+    <li><b>It's a performative.</b> A steward's changeset takes effect. Anyone else's is a visible proposal that takes effect if a steward affirms it.</li>
+    <li><b>Concurrent edits are forks,</b> two heads on <code>prev</code>, resolved by a steward stance. No merge conflicts in a config file.</li>
+    <li><b>A record is judged by the declarations in effect at its <code>emitted</code>.</b> Raising a store to strict doesn't reject its history. A record emitted before a declaration it would violate, but arriving after it, is flagged: the late-record pattern applied to definitions.</li>
+    <li><b>The definition has a history:</b> what the store looked like in 2021 is a fold over its declarations.</li>
+  </ul>
+
+  <h3>Places</h3>
+  <p>A place is a <b>location, a format and a scope</b>, holding segments. The store is the union of its segments across places. Remixing is safe because ids are computed over canonical bytes (JCS), not a file format; segments are immutable and single-writer, so sync is union; and ticks already say what they saw, so partial places stay honest.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Role</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><b>write</b></td><td>where this machine appends its own segments</td></tr>
+      <tr><td><b>hold</b></td><td>a copy of segments, whole or scoped (scope by <code>emitted</code>, never <code>occurred</code>, or late records go missing)</td></tr>
+      <tr><td><b>blobs</b></td><td>where large or erasable payloads live</td></tr>
+    </tbody>
+  </table></div>
+  <p>The index isn't a place: it's derived and per machine. What the remix enables: <b>git as interchange</b> (JSONL in git for sync and review, SQLite as a fast working copy), <b>tiering</b> (recent on the laptop, everything on the homelab, cold in object storage), <b>erasable payloads</b> in a blob place outside git, and <b>backups</b> that are just places.</p>
+
+  <h3>The index, without doubling storage</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Store</th><th>Segment format</th><th>Duplication</th></tr></thead>
+    <tbody>
+      <tr><td>Team / project, in git</td><td>JSONL + slim index</td><td>small: envelopes and offsets</td></tr>
+      <tr><td>Novel</td><td>either</td><td>small</td></tr>
+      <tr><td>Personal ingestion (mail, feeds, history)</td><td>SQLite tables, index in the same file</td><td>none</td></tr>
+    </tbody>
+  </table></div>
+  <p>The index holds envelopes and byte offsets, never payloads. Full-text search uses SQLite FTS5 <b>contentless</b> tables (the inverted index only; <code>contentless_delete</code> lets erasure remove rows), opt-in per kind. The store declares which fields are worth searching; each machine decides whether to build it.</p>
+
+  <h3>Erasure</h3>
+  <p>The need that matters: <b>private data that shows up where it shouldn't</b>, usually fine at home but landed in a shared store. Retraction is a status (<code>retire</code>); a leaked secret must be rotated anyway. So erasure acts per store, and stays small.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 230" role="img" aria-label="Before erasure a stored line holds the envelope with id r:9f, the salt and the payload. Erasure replaces salt and payload with the commitment hash. A tick that covered r:9f, a summary about it, and a promoted copy with the same id all still point at the unchanged envelope.">
+        <text x="12" y="20" class="xs m">stored line, before</text>
+        <rect class="box" x="12" y="28" width="170" height="34" rx="6"/><text x="97" y="49" text-anchor="middle" class="s">envelope · id r:9f…</text>
+        <rect class="box-amb" x="186" y="28" width="60" height="34" rx="6"/><text x="216" y="49" text-anchor="middle" class="s">salt</text>
+        <rect class="box-amb" x="250" y="28" width="138" height="34" rx="6"/><text x="319" y="49" text-anchor="middle" class="s">payload</text>
+        <line class="ln" x1="216" y1="64" x2="216" y2="94" marker-end="url(#ah)"/><text x="208" y="83" text-anchor="end" class="xs tb">erase: replace the opening</text>
+        <text x="12" y="90" class="xs m">after</text>
+        <rect class="box" x="12" y="98" width="170" height="34" rx="6"/><text x="97" y="119" text-anchor="middle" class="s">envelope · id r:9f…</text>
+        <rect class="box dash" x="186" y="98" width="202" height="34" rx="6"/><text x="287" y="119" text-anchor="middle" class="s">commitment h(salt + payload)</text>
+        <rect class="box" x="12" y="172" width="120" height="32" rx="6"/><text x="72" y="192" text-anchor="middle" class="xs">tick covers r:9f</text>
+        <rect class="box" x="140" y="172" width="120" height="32" rx="6"/><text x="200" y="192" text-anchor="middle" class="xs">summary about r:9f</text>
+        <rect class="box" x="268" y="172" width="120" height="32" rx="6"/><text x="328" y="192" text-anchor="middle" class="xs">promoted copy, same id</text>
+        <line class="ln-acc" x1="72" y1="170" x2="60" y2="135" marker-end="url(#ah-acc)"/>
+        <line class="ln-acc" x1="200" y1="170" x2="120" y2="135" marker-end="url(#ah-acc)"/>
+        <line class="ln-acc" x1="328" y1="170" x2="165" y2="135" marker-end="url(#ah-acc)"/>
+        <text x="200" y="224" text-anchor="middle" class="xs ta">every reference still resolves</text>
+      </svg>
+    </div>
+    <figcaption>The id was always computed over the commitment, <code>hash(envelope + hash(salt + payload))</code>, so removing the opening changes storage, not the record. One <code>erase</code> covers every verbatim copy in stores that honor it.</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Piece</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b>Hash the payload separately, salted, per payload</b></td><td>ids, ticks and what they cover survive erasure; the salt stops anyone confirming a guess</td></tr>
+      <tr><td><b>One reserved kind, <code>erase</code></b>, signed by a steward, per store</td><td>a visible gap, not a broken reference</td></tr>
+      <tr><td><b>Tick results reference, don't copy</b></td><td>nothing inside ticks needs chasing</td></tr>
+      <tr><td><b>The envelope is permanent</b></td><td>personal identifiers go behind opaque anchors, never natural keys in <code>about</code></td></tr>
+    </tbody>
+  </table></div>
+  <p><b>The whole game:</b> find every record holding the data (search, then trace references from the originals), emit <code>erase</code> for each, and each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
+  <details class="unfold"><summary>Prevention, before cure</summary><div class="body"><ul>
+    <li><b>Promotion</b> is a deliberate stance, so it's the review moment; agent-proposed promotions need yours.</li>
+    <li><b>Store policy</b> can refuse whole sources ("never admit records from personal collectors").</li>
+    <li><b>A hygiene vertex</b> flags likely-personal payloads (emails, phone numbers, health terms) for the stale review; secret scanning sits in the same place.</li>
+  </ul></div></details>
+  <details class="unfold"><summary>What true erasure would look like</summary><div class="body">
+    <p>A record shouldn't contain its data; it should <b>commit</b> to it. <code>hash(salt + payload)</code> is a hiding commitment; erasure is forgetting the opening.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Level</th><th>Gone</th><th>Still leaks</th></tr></thead>
+      <tbody>
+        <tr><td><b>1 · Payload</b></td><td>data and salt</td><td>who, when, what kind, about what</td></tr>
+        <tr><td><b>2 · Envelope too</b></td><td>everything but the id</td><td>only the graph: something was covered here, cited there</td></tr>
+        <tr><td><b>3 · Topology</b></td><td>the references</td><td>nothing, but it rewrites other records and breaks immutability</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><b>Keeping references is what makes erasure finishable.</b> The hard part is everything derived from a record; surviving references let a hygiene vertex trace them.</li>
+      <li><b>Physical media:</b> on SSDs deletion isn't reliable, which is why NIST SP 800-88 accepts cryptographic erase.</li>
+      <li><b>Other parties:</b> what someone has read in plaintext, they can keep. True erasure across parties exists only where content never left your control: the realm boundary rule, "references cross, content doesn't", is also the erasure design.</li>
+      <li><b>The exotic end:</b> per-field salted digests (IETF SD-JWT) allow field-level erasure; a facet split gets the same result without it. Chameleon hashes (redactable blockchains, Ateniese et al. 2017) swap content under the same hash, at the cost of a master key over all history.</li>
+    </ul>
+  </div></details>
+</section>

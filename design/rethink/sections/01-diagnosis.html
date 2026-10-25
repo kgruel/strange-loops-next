@@ -1,0 +1,188 @@
+<section class="panel" id="diagnosis" role="tabpanel" aria-labelledby="t-diagnosis">
+  <div class="panel-head"><h2>Diagnosis</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">The model is small. A closed set of about ten folds covers it in roughly 3,600 lines. The codebase around it is about 77,000 lines, and much of that is custody machinery, migration and duplicated storage encodings. The rewrite pays off through what it leaves out more than through the language.</p>
+
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 305" role="img" aria-label="Source lines by package. engine 29.9k, of which 8.9k is the arrival protocol; CLI 28.4k; lang 6.1k; atoms 3.6k; migrate 3.1k; sdk 2.6k; store 2.2k; sign 0.5k; custody 0.3k.">
+        <line class="faint" x1="84" y1="30" x2="84" y2="280"/>
+        <text x="297" y="28" text-anchor="middle" class="xs tb">arrival 8.9k</text>
+        <text x="78" y="48" text-anchor="end" class="s">engine</text>
+        <rect class="bar-a" x="84" y="37" width="174.3" height="14" rx="3"><title>engine, non-arrival: 20,913 lines</title></rect>
+        <rect class="bar-b" x="260.3" y="37" width="74.5" height="14" rx="3"><title>engine/arrival_*.py: 8,940 lines</title></rect>
+        <text x="341" y="48" class="s mono">29.9k</text>
+        <text x="78" y="76" text-anchor="end" class="s">CLI app</text>
+        <rect class="bar-a" x="84" y="65" width="236.8" height="14" rx="3"><title>apps/loops: 28,414 lines</title></rect>
+        <text x="327" y="76" class="s mono">28.4k</text>
+        <text x="78" y="104" text-anchor="end" class="s">lang</text>
+        <rect class="bar-a" x="84" y="93" width="51.2" height="14" rx="3"><title>lang: 6,145 lines</title></rect>
+        <text x="141" y="104" class="s mono">6.1k</text>
+        <text x="78" y="132" text-anchor="end" class="s">atoms</text>
+        <rect class="bar-a" x="84" y="121" width="29.7" height="14" rx="3"><title>atoms: 3,568 lines (the model itself)</title></rect>
+        <text x="120" y="132" class="s mono">3.6k</text><text x="160" y="132" class="xs m">the model itself</text>
+        <text x="78" y="160" text-anchor="end" class="s">migrate</text>
+        <rect class="bar-a" x="84" y="149" width="25.8" height="14" rx="3"><title>migrate: 3,096 lines</title></rect>
+        <text x="116" y="160" class="s mono">3.1k</text><text x="160" y="160" class="xs m">gone with no back-compat</text>
+        <text x="78" y="188" text-anchor="end" class="s">sdk</text>
+        <rect class="bar-a" x="84" y="177" width="21.9" height="14" rx="3"><title>sdk: 2,630 lines</title></rect>
+        <text x="112" y="188" class="s mono">2.6k</text>
+        <text x="78" y="216" text-anchor="end" class="s">store</text>
+        <rect class="bar-a" x="84" y="205" width="18.1" height="14" rx="3"><title>store: 2,169 lines</title></rect>
+        <text x="108" y="216" class="s mono">2.2k</text>
+        <text x="78" y="244" text-anchor="end" class="s">sign</text>
+        <rect class="bar-a" x="84" y="233" width="3.8" height="14" rx="1.5"><title>sign: 457 lines</title></rect>
+        <text x="94" y="244" class="s mono">0.5k</text>
+        <text x="78" y="272" text-anchor="end" class="s">custody</text>
+        <rect class="bar-a" x="84" y="261" width="3" height="14" rx="1.5"><title>custody: 333 lines</title></rect>
+        <text x="94" y="272" class="s mono">0.3k</text>
+        <rect class="bar-a" x="84" y="289" width="10" height="10" rx="2"/><text x="99" y="298" class="xs">code</text>
+        <rect class="bar-b" x="140" y="289" width="10" height="10" rx="2"/><text x="155" y="298" class="xs">arrival protocol (engine/arrival_*.py)</text>
+      </svg>
+    </div>
+    <figcaption>Python source lines excluding tests. There are about 115,000 more lines of tests. Hover a bar for exact counts.</figcaption>
+  </figure>
+
+  <h3>Where Arrival went wrong</h3>
+  <p>The use case is several people writing records and sharing them, which is a multi-writer, merge-by-default problem. Arrival's core invariant is "one lineage has exactly one designated authority," which is single-writer custody. The two conflict.</p>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="Top: Arrival, an ordered log of six records with a head and an authority doing compare-and-append. Bottom: two sets, alice's a b c and bob's c d e, whose union is a b c d e with no head and no authority.">
+        <rect class="panel" x="0" y="0" width="400" height="150" rx="10"/>
+        <text x="16" y="26" class="b">Arrival: one ordered log, one authority</text>
+        <g>
+          <rect class="box" x="16" y="56" width="30" height="30" rx="5"/><text x="31" y="76" text-anchor="middle" class="mono">1</text>
+          <rect class="box" x="66" y="56" width="30" height="30" rx="5"/><text x="81" y="76" text-anchor="middle" class="mono">2</text>
+          <rect class="box" x="116" y="56" width="30" height="30" rx="5"/><text x="131" y="76" text-anchor="middle" class="mono">3</text>
+          <rect class="box" x="166" y="56" width="30" height="30" rx="5"/><text x="181" y="76" text-anchor="middle" class="mono">4</text>
+          <rect class="box" x="216" y="56" width="30" height="30" rx="5"/><text x="231" y="76" text-anchor="middle" class="mono">5</text>
+          <rect class="box-amb" x="266" y="56" width="30" height="30" rx="5"/><text x="281" y="76" text-anchor="middle" class="mono">6</text>
+          <line class="ln" x1="48" y1="71" x2="63" y2="71" marker-end="url(#ah)"/>
+          <line class="ln" x1="98" y1="71" x2="113" y2="71" marker-end="url(#ah)"/>
+          <line class="ln" x1="148" y1="71" x2="163" y2="71" marker-end="url(#ah)"/>
+          <line class="ln" x1="198" y1="71" x2="213" y2="71" marker-end="url(#ah)"/>
+          <line class="ln" x1="248" y1="71" x2="263" y2="71" marker-end="url(#ah)"/>
+          <text x="281" y="48" text-anchor="middle" class="xs tb">head</text>
+          <rect class="box-acc" x="322" y="56" width="70" height="30" rx="5"/><text x="357" y="75" text-anchor="middle" class="s">authority</text>
+          <line class="ln-acc" x1="320" y1="71" x2="299" y2="71" marker-end="url(#ah-acc)"/>
+        </g>
+        <text x="16" y="114" class="s m">compare-and-append at the head; every replica defers to it</text>
+        <text x="16" y="134" class="s m">then: rollback, equivocation, epochs, re-custody ceremonies</text>
+
+        <rect class="panel" x="0" y="166" width="400" height="150" rx="10"/>
+        <text x="16" y="192" class="b">Sharing needs: a set. Merge is union.</text>
+        <text x="20" y="220" class="xs m">alice</text>
+        <circle class="dot" cx="36" cy="244" r="13"/><text x="36" y="248" text-anchor="middle" class="mono">a</text>
+        <circle class="dot" cx="66" cy="244" r="13"/><text x="66" y="248" text-anchor="middle" class="mono">b</text>
+        <circle class="dot" cx="51" cy="272" r="13"/><text x="51" y="276" text-anchor="middle" class="mono">c</text>
+        <text x="120" y="220" class="xs m">bob</text>
+        <circle class="dot" cx="136" cy="244" r="13"/><text x="136" y="248" text-anchor="middle" class="mono">c</text>
+        <circle class="dot" cx="166" cy="244" r="13"/><text x="166" y="248" text-anchor="middle" class="mono">d</text>
+        <circle class="dot" cx="151" cy="272" r="13"/><text x="151" y="276" text-anchor="middle" class="mono">e</text>
+        <text x="212" y="266" text-anchor="middle" class="big">∪</text>
+        <text x="250" y="220" class="xs m">anyone, in any order</text>
+        <circle class="dot" cx="262" cy="244" r="13"/><text x="262" y="248" text-anchor="middle" class="mono">a</text>
+        <circle class="dot" cx="292" cy="244" r="13"/><text x="292" y="248" text-anchor="middle" class="mono">b</text>
+        <circle class="dot" cx="322" cy="244" r="13"/><text x="322" y="248" text-anchor="middle" class="mono">c</text>
+        <circle class="dot" cx="277" cy="272" r="13"/><text x="277" y="276" text-anchor="middle" class="mono">d</text>
+        <circle class="dot" cx="307" cy="272" r="13"/><text x="307" y="276" text-anchor="middle" class="mono">e</text>
+        <text x="16" y="306" class="s m">no head, no authority, no order to agree on</text>
+      </svg>
+    </div>
+    <figcaption>A mutable head needs an authority, which means coordination. An immutable set needs neither.</figcaption>
+  </figure>
+
+  <h3>Receipt order broke convergence</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 245" role="img" aria-label="Under receipt order, store A folds f1 then f2 and gets closed; store B received f2 first and gets open, so they diverge. Under content order both fold f1 then f2 and get closed.">
+        <text x="0" y="18" class="b">Receipt order</text>
+        <text x="0" y="54" class="s">store A</text>
+        <rect class="box" x="110" y="37" width="50" height="26" rx="6"/><text x="135" y="54" text-anchor="middle" class="mono">f1</text>
+        <line class="ln" x1="162" y1="50" x2="177" y2="50" marker-end="url(#ah)"/>
+        <rect class="box" x="180" y="37" width="50" height="26" rx="6"/><text x="205" y="54" text-anchor="middle" class="mono">f2</text>
+        <line class="ln" x1="234" y1="50" x2="259" y2="50" marker-end="url(#ah)"/>
+        <rect class="box" x="262" y="37" width="134" height="26" rx="6"/><text x="329" y="54" text-anchor="middle" class="s">Latest = closed</text>
+        <text x="0" y="92" class="s">store B</text>
+        <rect class="box" x="110" y="75" width="50" height="26" rx="6"/><text x="135" y="92" text-anchor="middle" class="mono">f2</text>
+        <line class="ln" x1="162" y1="88" x2="177" y2="88" marker-end="url(#ah)"/>
+        <rect class="box" x="180" y="75" width="50" height="26" rx="6"/><text x="205" y="92" text-anchor="middle" class="mono">f1</text>
+        <line class="ln" x1="234" y1="88" x2="259" y2="88" marker-end="url(#ah)"/>
+        <rect class="box-amb" x="262" y="75" width="134" height="26" rx="6"/><text x="329" y="92" text-anchor="middle" class="s">Latest = open (diverged)</text>
+        <line class="faint" x1="0" y1="124" x2="400" y2="124"/>
+        <text x="0" y="150" class="b">Content order (occurred, emitted, id)</text>
+        <text x="0" y="186" class="s">store A</text>
+        <rect class="box" x="110" y="169" width="50" height="26" rx="6"/><text x="135" y="186" text-anchor="middle" class="mono">f1</text>
+        <line class="ln" x1="162" y1="182" x2="177" y2="182" marker-end="url(#ah)"/>
+        <rect class="box" x="180" y="169" width="50" height="26" rx="6"/><text x="205" y="186" text-anchor="middle" class="mono">f2</text>
+        <line class="ln" x1="234" y1="182" x2="259" y2="182" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="262" y="169" width="134" height="26" rx="6"/><text x="329" y="186" text-anchor="middle" class="s">Latest = closed</text>
+        <text x="0" y="224" class="s">store B</text>
+        <rect class="box" x="110" y="207" width="50" height="26" rx="6"/><text x="135" y="224" text-anchor="middle" class="mono">f1</text>
+        <line class="ln" x1="162" y1="220" x2="177" y2="220" marker-end="url(#ah)"/>
+        <rect class="box" x="180" y="207" width="50" height="26" rx="6"/><text x="205" y="224" text-anchor="middle" class="mono">f2</text>
+        <line class="ln" x1="234" y1="220" x2="259" y2="220" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="262" y="207" width="134" height="26" rx="6"/><text x="329" y="224" text-anchor="middle" class="s">Latest = closed</text>
+      </svg>
+    </div>
+    <figcaption>f1 says the status is open at 09:00. f2 says it's closed at 10:00. Store B happened to receive f2 first. With receipt order, two people holding the same records see a different current state.</figcaption>
+  </figure>
+
+  <details class="unfold"><summary>What the codebase is, in numbers</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>Package</th><th>Source</th><th>Tests</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>libs/engine</td><td class="num">29,853</td><td class="num">46,885</td><td>vertex, stores (SQLite, JSONL, arrival), reader, admission</td></tr>
+        <tr><td>apps/loops</td><td class="num">28,414</td><td class="num">37,005</td><td>CLI, lenses, TUI</td></tr>
+        <tr><td>libs/lang</td><td class="num">6,145</td><td class="num">8,851</td><td>KDL declarations to AST</td></tr>
+        <tr><td>libs/atoms</td><td class="num">3,568</td><td class="num">4,907</td><td>Fact, Spec, the fold vocabulary</td></tr>
+        <tr><td>libs/migrate</td><td class="num">3,096</td><td class="num">3,504</td><td>legacy to arrival migration</td></tr>
+        <tr><td>libs/sdk</td><td class="num">2,630</td><td class="num">7,643</td><td>library surface over the engine</td></tr>
+        <tr><td>libs/store</td><td class="num">2,169</td><td class="num">5,155</td><td>merge, slice, transport</td></tr>
+        <tr><td>libs/sign</td><td class="num">457</td><td class="num">405</td><td>RSA JWTs and Ed25519</td></tr>
+        <tr><td>libs/custody</td><td class="num">333</td><td class="num">174</td><td>signing glue</td></tr>
+      </tbody>
+    </table></div>
+    <p>The fold vocabulary is closed: <code>Count</code>, <code>Sum</code>, <code>Min</code>, <code>Max</code>, <code>LatestBy</code> and <code>Collect</code>, with a few modifiers. That makes the semantics portable, because there's no arbitrary user code to carry across languages.</p>
+    <p>Things a rewrite can drop: <code>migrate</code>, two of the three storage encodings, the RSA JWT path, and the custody ceremonies. My estimate for the essential core is 5,000 to 8,000 lines in a compiled language.</p>
+    <details class="source"><summary>Arrival files inside engine</summary><div class="body">
+      <div class="tbl"><table><tbody>
+        <tr><td>arrival.py</td><td class="num">2,148</td></tr><tr><td>arrival_head_seam.py</td><td class="num">1,775</td></tr>
+        <tr><td>arrival_head_attestation.py</td><td class="num">1,680</td></tr><tr><td>arrival_file_backend.py</td><td class="num">878</td></tr>
+        <tr><td>arrival_store.py</td><td class="num">766</td></tr><tr><td>arrival_projection.py</td><td class="num">622</td></tr>
+        <tr><td>arrival_contract.py</td><td class="num">524</td></tr><tr><td>arrival_body.py</td><td class="num">318</td></tr>
+        <tr><td>arrival_registry.py</td><td class="num">229</td></tr>
+      </tbody></table></div>
+      <p>Related but not counted: <code>canonical_audit.py</code> (1,171), <code>witness.py</code> (917), <code>ceremony.py</code> (831), <code>admission.py</code> (739). The repo root also holds about 30 <code>GATE-*</code>, <code>*-FIX-REPORT</code> and <code>SOLHIGH-*</code> files from rounds of adversarial review.</p>
+    </div></details>
+  </div></details>
+
+  <details class="unfold"><summary>Performance: what's the language and what's the algorithm</summary><div class="body">
+    <p>The characterization ledger shows the main costs are algorithmic. Raw append is flat. Everything above it was linear in depth, so filling a store was quadratic.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Probe</th><th>1k</th><th>5k</th><th>20k</th><th>Growth</th></tr></thead>
+      <tbody>
+        <tr><td>store_append (raw SQLite)</td><td class="num">0.020</td><td class="num">0.022</td><td class="num">0.020</td><td class="num">1.0×</td></tr>
+        <tr><td>engine_receive_held</td><td class="num">2.731</td><td class="num">10.306</td><td class="num">45.326</td><td class="num">16.6×</td></tr>
+        <tr><td>sdk_emit_fact</td><td class="num">8.004</td><td class="num">28.945</td><td class="num">123.311</td><td class="num">15.4×</td></tr>
+        <tr><td>sdk_read_page_100</td><td class="num">0.686</td><td class="num">0.809</td><td class="num">1.192</td><td class="num">1.7×</td></tr>
+      </tbody>
+    </table></div>
+    <p>Times in milliseconds, before the receipt-order change. Receipt order cut held-handle receive by 69% at 1k and 87% at 5k. <code>sdk_emit_fact</code> didn't move, because every emit cold-opens the vertex and replays the whole prefix.</p>
+    <ul>
+      <li><b>The language fixes:</b> CLI cold start (61 ms of Python imports) and constant factors.</li>
+      <li><b>The language doesn't fix:</b> replay on open. That needs cached state. Start whole-vertex: cache each vertex's state keyed by its spec, its covered set and the tick ids of the vertices it reads, and refold the vertex when any of them changes. Partial rewind to a checkpoint waits until a real store hurts: across vertices that read each other, its invalidation would become the new Arrival.</li>
+    </ul>
+    <details class="source"><summary>benchmarks/LEDGER.md</summary><div class="body">
+      <p>Findings 1 to 6: every write re-folded the entire history; ingest was quadratic; the read path is fine; the SDK's stateless surface is a constant tax; search only covers declared kinds; receipt-order fold-in-place fixed held handles only. Measured 2026-08-15 on one machine. Treat sub-10% deltas as unproven.</p>
+    </div></details>
+  </div></details>
+
+  <details class="unfold"><summary>How Arrival grew</summary><div class="body">
+    <p>Sharing knowledge about a large work platform, among colleagues, encoded into git or JSONL, led to "mergeable by default." Arrival answered with a backend-neutral custody protocol: lineages, dense ordinals, hash chaining, compare-and-append, head attestations, and later rollback and equivocation detection, epochs and re-custody.</p>
+    <p>Receipt order came from the performance work. Folding on <code>(ts, id)</code> made ingest quadratic, so fold order became the order this store received facts. That's store-local by definition, so <code>merge(A,B)</code> and <code>merge(B,A)</code> give different fold sequences. Mergeability then had to be rebuilt on top through custody, which is where the scope spiralled.</p>
+    <details class="source"><summary>docs/RECEIPT_ORDER_FOLD.md and libs/store/src/store/merge.py</summary><div class="body">
+      <p>"Receipt order is store-local. A rowid means something only relative to the store that assigned it." The merge docstring: "No claim is made about event time, about rowids as a primitive, or about the relationship between merge(A,B) and merge(B,A)."</p>
+      <p>Arrival overview, ratified 26 Aug 2026: "At any moment, one lineage has exactly one designated authority."</p>
+    </div></details>
+  </div></details>
+</section>

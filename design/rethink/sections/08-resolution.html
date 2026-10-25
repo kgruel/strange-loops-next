@@ -1,0 +1,159 @@
+<section class="panel" id="resolution" role="tabpanel" aria-labelledby="t-resolution">
+  <div class="panel-head"><h2>Layer 2: resolution</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">A fold is pure, so state can always be recomputed. A tick exists only when something must be <b>cited, sent, shown or marked</b>. Ticks come in two kinds, split by how their records were chosen: <b>content ticks</b> anyone can reproduce, and <b>witness ticks</b> that record what someone had.</p>
+  <p><span class="pill p-ok">layer closed</span> Erasure inside tick results and the cost of verification move to layer 4, places.</p>
+
+  <h3>What a tick claims</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>Claim</th><th>Trusted by</th></tr></thead>
+    <tbody>
+      <tr><td><b>Computed</b></td><td>"Folding exactly these records with this spec gives this state."</td><td>recomputing; no signature needed</td></tr>
+      <tr><td><b>Witnessed</b></td><td>"When this boundary fired, these are the records I had."</td><td>only whoever witnessed it, so it's signed</td></tr>
+      <tr><td><b>Asserted</b></td><td>a summary, a recap, a judgment</td><td>its author, so it leaves the tick and becomes a record <i>about</i> it</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Two kinds of tick</h3>
+  <div class="cards">
+    <div class="card acc">
+      <h5>Content tick</h5>
+      <dl class="env">
+        <dt>vertex</dt><dd>hash of the spec and its parameters, which pins the fold vocabulary</dd>
+        <dt>covers</dt><dd>ids chosen by the records themselves</dd>
+        <dt>window</dt><dd>the concrete window, if any</dd>
+        <dt>result</dt><dd>the folded state, with how many covered payloads it couldn't read</dd>
+        <dt>id</dt><dd>hash of vertex, covers and result</dd>
+      </dl>
+      <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">A value, not a record: no observer, no time, no signature. Two machines compute the same id. Stored only when cited or sent, as a tick record its writer signs.</p>
+    </div>
+    <div class="card amb">
+      <h5>Witness tick</h5>
+      <dl class="env">
+        <dt>kind</dt><dd><code>tick</code>: an ordinary record</dd>
+        <dt>observer</dt><dd>whoever ran it</dd>
+        <dt>emitted</dt><dd>the runner's "now"</dd>
+        <dt>payload</dt><dd>a tick value: vertex, covers, window, result; the set is what the runner had</dd>
+        <dt>sig</dt><dd>the runner's signature</dd>
+      </dl>
+      <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Never reproducible, and never pretends to be. Its value is historical: what was known, shown or sent.</p>
+    </div>
+  </div>
+  <p>Every tick's result can be checked against its covered ids, and both are written down the same way: a stored content tick is a tick record too, signed by whoever cited or sent it. The kinds differ only in how the set was chosen; what a witness tick asks you to trust is that the set was complete. Once an input is erased, a numeric result can't be recomputed and rests on the signature; a result made of references still can be.</p>
+
+  <h3>How the set is chosen</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Mode</th><th>The set is</th><th>Late records</th><th>Suits</th></tr></thead>
+    <tbody>
+      <tr><td><b>By window</b></td><td>records whose <code>occurred</code> starts in a span</td><td>ticks again</td><td>aggregates where completeness is the point: weekly health, last month's HOA records</td></tr>
+      <tr><td><b>By reference</b></td><td>the closure of what a record cites</td><td>never affected</td><td>decisions: an ADR covers the evidence it cites, never evidence its deciders didn't see</td></tr>
+      <tr><td><b>By witness</b></td><td>what the runner had</td><td>never ticks again</td><td>digests, handoffs, packets, reviews</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Late records and revisits</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 248" role="img" aria-label="On an occurred axis, tick T1 covers a 2019 window. A late record with occurred in 2019 arrives in 2026, so the vertex ticks again, T1 prime, with prev pointing at T1. Separately, revisit findings occurring in 2026 are covered by a new tick T2, about the same thing, which cites T1 as an input.">
+        <rect class="box" x="24" y="24" width="110" height="40" rx="8"/><text x="79" y="41" text-anchor="middle" class="s b">T1</text><text x="79" y="56" text-anchor="middle" class="xs">covers the 2019 window</text>
+        <rect class="box-amb" x="24" y="96" width="110" height="40" rx="8"/><text x="79" y="113" text-anchor="middle" class="s b">T1′ · late tick</text><text x="79" y="128" text-anchor="middle" class="xs">prev → T1</text>
+        <line class="ln-amb" x1="79" y1="94" x2="79" y2="67" marker-end="url(#ah-amb)"/><text x="86" y="84" class="xs tb">prev</text>
+        <rect class="box-acc" x="256" y="24" width="128" height="40" rx="8"/><text x="320" y="41" text-anchor="middle" class="s b">T2 · revisit</text><text x="320" y="56" text-anchor="middle" class="xs">about the same thing</text>
+        <line class="ln-acc" x1="254" y1="44" x2="137" y2="44" marker-end="url(#ah-acc)"/><text x="195" y="37" text-anchor="middle" class="xs ta">cites T1 as input</text>
+        <rect class="box dash" x="24" y="180" width="110" height="28" rx="6"/>
+        <circle class="dot" cx="44" cy="194" r="4"/><circle class="dot" cx="64" cy="194" r="4"/><circle class="dot" cx="84" cy="194" r="4"/>
+        <circle class="fill-amb" cx="118" cy="194" r="5"/>
+        <line class="ln-amb dash" x1="118" y1="187" x2="104" y2="139" marker-end="url(#ah-amb)"/>
+        <text x="146" y="166" class="xs tb">late record</text><text x="146" y="179" class="xs tb">occurred 2019, arrives 2026</text>
+        <circle class="fill-acc" cx="300" cy="194" r="4"/><circle class="fill-acc" cx="320" cy="194" r="4"/><circle class="fill-acc" cx="340" cy="194" r="4"/>
+        <text x="320" y="176" text-anchor="middle" class="xs ta">revisit findings</text>
+        <line class="ln-acc" x1="320" y1="166" x2="320" y2="67" marker-end="url(#ah-acc)"/><text x="326" y="120" class="xs ta">covers</text>
+        <line class="ln" x1="16" y1="216" x2="390" y2="216" marker-end="url(#ah)"/>
+        <text x="79" y="234" text-anchor="middle" class="xs m">2019</text>
+        <text x="320" y="234" text-anchor="middle" class="xs m">2026</text>
+        <text x="390" y="234" text-anchor="end" class="xs m">occurred →</text>
+      </svg>
+    </div>
+    <figcaption><code>occurred</code> decides, not <code>about</code>. A record occurring inside a covered window arrives late, and the window vertex ticks again with <code>prev</code>. Work in 2026 on the same thing is a revisit: a new tick that cites the old one. The old conclusion stays true of 2019.</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>What happens</th><th>Example</th><th>Response</th></tr></thead>
+    <tbody>
+      <tr><td><b>Late record</b></td><td>a 2019 email ingested in 2026, <code>occurred: 2019</code></td><td>window vertices tick again with <code>prev</code></td></tr>
+      <tr><td><b>Revisit</b></td><td>2026 migration work re-examines the ADR</td><td>a new tick about the same thing, citing the old</td></tr>
+      <tr><td><b>Correction</b></td><td>in 2026 someone disputes a 2019 claim</td><td>a revisit: the dispute occurs now</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>No cascades.</b> A parent tick covers ids, and ids never change. When a child ticks again, the parent still cites the original child, which is accurate: that's what it folded. A hygiene vertex flags "cites a superseded tick", and someone decides whether a revisit is worth it. Staleness is a flag, not a recomputation. A vertex reading <code>ticks-from</code> follows <code>prev</code> chains to the head, as Latest does.</p>
+
+  <h3>Across the cases</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Case</th><th>Boundary</th><th>Kind</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Novel</b> · draft 2</td><td>you emit <code>draft-complete</code></td><td>content</td><td>latest prose per chapter; anyone reproduces "draft 2"</td></tr>
+      <tr><td><b>Novel</b> · sent to beta readers</td><td>sending</td><td>witness</td><td>what you actually sent, which can differ if a phone save arrives late</td></tr>
+      <tr><td><b>Novel</b> · continuity</td><td>none</td><td>—</td><td>no tick: a lens, nothing to cite or send</td></tr>
+      <tr><td><b>Orchestration</b> · subagent</td><td>agent emits <code>task-complete</code></td><td>content</td><td>its steps; the agent's report is a record about the tick</td></tr>
+      <tr><td><b>Orchestration</b> · slice, orchestrator</td><td>approved = children; all ticked</td><td>content</td><td>covers child ticks, so verification recurses down the tree</td></tr>
+      <tr><td><b>Orchestration</b> · late step</td><td>a step after <code>task-complete</code></td><td>ticks again</td><td>also an anomaly: the agent kept going after declaring done</td></tr>
+      <tr><td><b>Team</b> · ADR accepted</td><td>status → accepted</td><td>content, by reference</td><td>the decision, its cited evidence, pins for tenure and identity</td></tr>
+      <tr><td><b>Team</b> · weekly digest</td><td>every Monday</td><td>witness</td><td>what the team was shown</td></tr>
+      <tr><td><b>Team</b> · summarized promotion</td><td>you promote</td><td>content, by reference</td><td>the team can't recompute it; trust rests on your signed promote</td></tr>
+      <tr><td><b>Incident</b> · handoff</td><td>14:00 handoff</td><td>witness</td><td>what we knew, when</td></tr>
+      <tr><td><b>Incident</b> · resolved</td><td>status → resolved</td><td>content</td><td>the final state; a late log makes it tick again</td></tr>
+      <tr><td><b>Homelab</b> · health</td><td>collector emits <code>cycle-complete</code></td><td>content</td><td>a cron trigger made content by a marker record</td></tr>
+      <tr><td><b>Salience</b> · morning digest</td><td>every 7:00</td><td>witness</td><td>what you were shown; reads and dismissals point at it</td></tr>
+      <tr><td><b>Stale review</b></td><td>an item comes due</td><td>witness</td><td>what was put in front of you; your affirm or retire points at it</td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="unfold"><summary>The HOA recap before a board meeting</summary><div class="body"><ol>
+    <li><b>The thing.</b> The management company's email domain, "board meeting" calendar events, payments and documents: several anchors and natural keys joined through <code>resolve-by</code>.</li>
+    <li><b>The window.</b> "Last month" is relative, so the tick records the concrete span, <code>occurred: 2026-09-18/2026-10-18</code>. A later check checks that span.</li>
+    <li><b>The trigger.</b> Pulled on demand, so a witness tick: "the HOA records I had on the 18th". Scheduled two days before each meeting is still operational, even though the date comes from a calendar record.</li>
+    <li><b>The recap.</b> Wren's summary is a record about the tick: the tick holds what was known; the summary holds the claim.</li>
+    <li><b>To the board.</b> Another realm, so a bridge. The summary and a few chosen records cross; the tick crosses by reference, and your emails stay home.</li>
+  </ol></div></details>
+
+  <details class="unfold"><summary>What a postmortem keeps</summary><div class="body">
+    <div class="tbl"><table>
+      <thead><tr><th>In an investigation</th><th>Is</th><th>From</th></tr></thead>
+      <tbody>
+        <tr><td>a finding; "this log is evidence"</td><td>an emitted record with references</td><td>a person or Wren</td></tr>
+        <tr><td>"as of the 14:00 handoff we had these"</td><td>witness tick</td><td>whoever ran the view, signed</td></tr>
+        <tr><td>resolved</td><td>content tick</td><td>the incident view; anyone recomputes it</td></tr>
+        <tr><td>a summary of the incident</td><td>record about the tick</td><td>its author</td></tr>
+      </tbody>
+    </table></div>
+    <p>A selection of records is an emit, not a tick: a person chose it. The investigation and its occurrences are separate things; a recurrence is a new record or anchor the investigation cites, and needs no tick. Witness ticks keep what was known when; the content tick, replaced if late evidence arrives, keeps what was true.</p>
+  </div></details>
+
+  <h3>Rules of thumb</h3>
+  <ul>
+    <li><b>Prefer content boundaries, made with marker records.</b> <code>draft-complete</code>, <code>task-complete</code>, <code>cycle-complete</code> and <code>resolved</code> turn moments into content. The marker's emitter is the witness, as an ordinary signed record.</li>
+    <li><b>Witness ticks are for what someone saw, knew, sent or was shown.</b> Their value is historical, never a claim to be the truth.</li>
+    <li><b>Verifiability depends on what the reader holds.</b> A holder recomputes. Someone with only a reference trusts the signed act that sent it (promote or bridge). A bundle makes a tick verifiable anywhere.</li>
+    <li><b>Dependencies verify lazily.</b> The tenure or identity vertex's content tick at the same cut can be computed on demand; pins are just tick ids.</li>
+    <li><b>Not every vertex ticks.</b> Only when something must be cited, sent, shown or marked.</li>
+  </ul>
+
+  <details class="unfold"><summary>Where ticks live, and who writes them</summary><div class="body">
+    <p>A content tick is a value: recomputed on demand, and written down only when cited or sent, as a tick record signed by whoever writes it. <code>into</code> names where that record lands. Admission there works by recomputing (for a store that holds the records) or by the writer's grant. A vertex never signs anything; the observer who ran it signs.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Determinism, across implementations</summary><div class="body"><ul>
+    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. Numeric folds are exact: integers, or decimals at a scale the spec declares; never floats, whose sums change with order (found in step 1).</li>
+    <li><b>The spec hash pins the fold-vocabulary version.</b> Otherwise a change to LatestBy's semantics would change results under an unchanged hash.</li>
+    <li><b>Conformance vectors bind implementations.</b> The vectors in <code>vectors/</code> are how any two implementations, such as the Rust core and a JavaScript record writer, stay bit-for-bit identical; they become a requirement.</li>
+    <li><b>Window membership:</b> a record belongs if the start of its <code>occurred</code> span falls in the window; records without <code>occurred</code> use <code>emitted</code>. A spec may override.</li>
+    <li><b>Empty windows:</b> a witness tick may be empty ("monitoring saw nothing all night" is information); a content vertex never ticks over an empty set.</li>
+  </ul></div></details>
+
+  <details class="unfold"><summary>Boundary modes in today's code</summary><div class="body">
+    <p><code>Boundary(mode="when"|"after"|"every", conditions)</code> in <code>libs/atoms/src/atoms/boundary.py</code> already holds the split: <code>when</code> a kind arrives, <code>after</code> N records, and conditions on folded state are content boundaries. <code>every</code> is the only operational mode, along with a manual "tick now".</p>
+  </div></details>
+
+  <details class="unfold"><summary>Prior art: the Dataflow model</summary><div class="body">
+    <p>Stream processing met late data head-on: event time vs processing time, watermarks, triggers, and refinements or retractions of earlier results. <code>occurred</code> is event time, a boundary is a trigger, and ticking again with <code>prev</code> is an accumulating refinement.</p>
+    <details class="source"><summary>Akidau et al., VLDB 2015</summary><div class="body"><p>Akidau et al., "The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing", PVLDB 8(12), 2015. <a href="http://www.vldb.org/pvldb/vol8/p1792-Akidau.pdf" rel="noopener">vldb.org/pvldb/vol8/p1792-Akidau.pdf</a></p></div></details>
+  </div></details>
+</section>

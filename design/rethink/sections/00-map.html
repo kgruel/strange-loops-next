@@ -1,0 +1,77 @@
+<section class="panel" id="map" role="tabpanel" aria-labelledby="t-map">
+  <div class="panel-head"><h2>Where we are</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Arrival tried to make a single-writer custody log carry every kind of sharing. Going back to the roots: records form an observed <b>set</b>, meaning binds at read, the observer is first-class, and stores avoid coordination by being <b>immutable</b>, so they never need an authority. For the whole picture built up one step at a time, start with <a href="#scenarios" data-tab="scenarios">Scenarios</a>; for everything at once, see the <a href="#example" data-tab="example">worked example</a>.</p>
+
+  <h3>The walk, layer by layer</h3>
+  <ol class="layers">
+    <li><span class="k">0</span><span class="t"><b>Record</b><span>records, observers, <code>about</code> (things), <code>prev</code>, two kinds of time</span></span><span class="pill p-ok">mostly settled</span></li>
+    <li><span class="k">1</span><span class="t"><b>Meaning</b><span>vertex and store: a question, and a thing you write into</span></span><span class="pill p-ok">closed</span></li>
+    <li><span class="k">2</span><span class="t"><b>Resolution</b><span>content and witness ticks; window, reference, witness sets; late ticks</span></span><span class="pill p-ok">closed</span></li>
+    <li><span class="k">3</span><span class="t"><b>Composition</b><span>one vertex reading many stores; things, <code>about</code>, <code>resolve-by</code></span></span><span class="pill p-ok">closed</span></li>
+    <li><span class="k">4</span><span class="t"><b>Places</b><span>places, store definitions, a slim index, small erasure</span></span><span class="pill p-ok">closed</span></li>
+    <li><span class="k">5</span><span class="t"><b>Sharing</b><span>union by segment lists, key tiers, presence, retire through</span></span><span class="pill p-ok">closed</span></li>
+    <li class="here"><span class="k">→</span><span class="t"><b>Build</b><span>Rust, a Cargo workspace beside the Lean model; one local API, the CLI, specs as JSON; limits and budgets set; no unit tests; steps 0 and 1 done, step 2 proved in the model; next, the Rust port</span></span><span class="pill p-lean">building</span></li>
+    <li><span class="k">+</span><span class="t"><b>Horizons</b><span>editable lenses, selective disclosure, knowledge as a build</span></span><span class="pill p-next">exploring</span></li>
+  </ol>
+
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 380" role="img" aria-label="The loop: world observed by an observer, who emits a record into a store; a vertex reads it through a spec and ticks at a boundary; the tick returns to an observer through a lens, or feeds a higher vertex.">
+        <rect class="box" x="100" y="8" width="200" height="38" rx="8"/><text x="200" y="32" text-anchor="middle" class="b">world</text>
+        <rect class="box-acc" x="100" y="72" width="200" height="38" rx="8"/><text x="200" y="96" text-anchor="middle" class="b">observer</text>
+        <rect class="box" x="100" y="136" width="200" height="38" rx="8"/><text x="200" y="160" text-anchor="middle" class="b">record</text>
+        <rect class="box" x="100" y="200" width="200" height="38" rx="8"/><text x="200" y="224" text-anchor="middle" class="b">store (a set)</text>
+        <rect class="box" x="100" y="264" width="200" height="38" rx="8"/><text x="200" y="288" text-anchor="middle" class="b">vertex · spec · folds</text>
+        <rect class="box-amb" x="100" y="328" width="200" height="38" rx="8"/><text x="200" y="352" text-anchor="middle" class="b">tick</text>
+        <line class="ln" x1="200" y1="48" x2="200" y2="69" marker-end="url(#ah)"/><text x="210" y="63" class="s m">observed by</text>
+        <line class="ln" x1="200" y1="112" x2="200" y2="133" marker-end="url(#ah)"/><text x="210" y="127" class="s m">emits</text>
+        <line class="ln" x1="200" y1="176" x2="200" y2="197" marker-end="url(#ah)"/><text x="210" y="191" class="s m">appends to</text>
+        <line class="ln" x1="200" y1="240" x2="200" y2="261" marker-end="url(#ah)"/><text x="210" y="255" class="s m">read through</text>
+        <line class="ln" x1="200" y1="304" x2="200" y2="325" marker-end="url(#ah)"/><text x="210" y="319" class="s m">at a boundary</text>
+        <path class="ln-acc" d="M300,347 H360 V91 H304" marker-end="url(#ah-acc)"/>
+        <text x="374" y="219" text-anchor="middle" class="s ta" transform="rotate(90 374 219)">lens → attention → new record</text>
+        <path class="ln dash" d="M100,347 H44 V283 H97" marker-end="url(#ah)"/>
+        <text x="32" y="316" text-anchor="middle" class="xs m" transform="rotate(-90 32 316)">into a higher vertex</text>
+      </svg>
+    </div>
+    <figcaption>The loop closes through an observer, not through the mechanism. A tick can also feed a higher vertex directly (dashed).</figcaption>
+  </figure>
+
+  <h3>Decision ledger</h3>
+  <p>Each decision is written as a record, the way the system would hold it. Folded in version 31: 92 entries became 33, grouped by layer. Version 32 settled three model questions raised by two outside reviews. The conversation turns in <a href="#sources" data-tab="sources">Sources</a> keep how each was reached.</p>
+  <div class="ledger">
+<!-- build:ledger -->
+  </div>
+
+  <details class="unfold"><summary>How the conversation moved</summary><div class="body">
+    <ol>
+      <li>Started as a language question: rewrite in something faster and easier to install.</li>
+      <li>Narrowed to the real pain: Arrival grew out of hand while trying to make stores shareable and mergeable by default.</li>
+      <li>Widened again to the full topology: personal stores, ingestion, composition, ticks in agent orchestration. Git is one place a store can live, not the only one.</li>
+      <li>Then went back to first principles, layer by layer. Layer 0 (the record) and the observer took most of the time, which is right, since everything else is built on them.</li>
+      <li>Layer 1 closed against three real cases. Composition opened by asking what a thing is, and moved identity from the fold into the record.</li>
+      <li>Resolution split ticks into content and witness, and found that most "late ticks" are really revisits.</li>
+      <li>Places kept erasure small, split the old vertex file four ways, and a worked example tested everything together.</li>
+      <li>Sharing needed nothing new: union, admission, witness-style cuts and key bindings. The work went into keys, presence and agents.</li>
+      <li>Build chose Go once bindings dropped out, then Rust in version 31, once phones and extensions needed the core itself. Horizons collected what the design makes cheap: editable lenses, selective disclosure, knowledge as a build.</li>
+      <li>Versions 26 to 31 walked the local API, MCP and the CLI, ran a vocabulary pass (seal retired, vertex kept), made specs JSON, and moved the build to Rust, with the page folded into a build brief.</li>
+      <li>Version 32 took two outside reviews and settled three things in the model: folds come in two families, both proved to depend only on the set; a payload is here, withheld or erased, and supersession never reads it; a tick is a value, stored only as a signed record. A vertex became the hash of its spec, which removed vertex anchors and vertex standing.</li>
+      <li>Version 34 asked what the model actually proves. Four holes, each reproduced against it: selection ran before supersession, two places' forms of one record broke "the set decides", <code>prev</code> was global, and <code>about</code> was one key. Now <code>prev</code> is succession within a thing, supersession runs over everything held, erasure is a record, and <code>about</code> is a set.</li>
+      <li>Version 33 caught the repo up: the model took the vocabulary (<code>protocol/</code>, LatestBy, Stored), PRs 1 and 2 merged, and step 2's model went up as PR 4. Modelling the spec found that payload tests must apply after supersession, or a filter brings back what was replaced.</li>
+      <li>A second opinion from Gemini found seams the page had papered over: a weighted Latest, <code>prev</code> as one pointer, SKOS left in the example. Each closed with parts already in the model.</li>
+      <li>Walking the LSP end to end replaced "paths as dated names" with birth keys read along each branch's history, and made git segment files close on commit. Nothing entered the core.</li>
+      <li>Walking web annotation found federation already there: each person's own store, composed. Publishing became a declaration on the store, and admission became the spam filter.</li>
+      <li>Walking context by tick id turned into a walk about references a reader can't fully see: five states, shown honestly, with provenance carried into an agent's context.</li>
+      <li>Extending it to the whole pipeline, from a design thread to a cloud run and back, separated what a place holds from what an agent sees, and made the trip up a disclosure and the trip home a plain sync.</li>
+      <li>Unpacking knowledge as a build gave every result two names, so work stops where results stop changing, and stated plainly what privacy here is: withholding, not hiding.</li>
+      <li>Breaking the editable lens on purpose changed its contract, not the record: a base names its lens and audience, a committed render is a promotion, and absence is never an edit.</li>
+      <li>Drawing the limits found the spec's predicates drifting toward a language. They closed to a typed set, parse pipelines left for collectors, and anything more gets recorded by an observer.</li>
+      <li>Asking what a size budget is for turned one line count into four budgets, and a proof language found a role outside the build: proving the fold laws and writing the vectors the core must pass.</li>
+      <li>Choosing Lean 4 over Bend 2 brought the lens laws into reach for the syntax we own, and replaced unit tests with four checks that never take their answer from the code they check.</li>
+      <li>Laying out the repo turned the budgets into structure: a core module with nothing to require, one public package, and a store of its own decisions.</li>
+      <li>Step 0 proved the first laws in a day and found that the law worth proving was not "incremental = batch" but "the set decides".</li>
+      <li>Step 1, built overnight, found two things a design walk wouldn't: an off-by-one in number formatting that the standard's own data caught, and that a sum over floats can't satisfy "the set decides".</li>
+    </ol>
+    <p>The full trail, turn by turn, is in the <a href="#sources" data-tab="sources">Sources</a> tab.</p>
+  </div></details>
+</section>

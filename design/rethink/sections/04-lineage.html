@@ -1,0 +1,101 @@
+<section class="panel" id="lineage" role="tabpanel" aria-labelledby="t-lineage">
+  <div class="panel-head"><h2>Lineage: identity that changes</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">The agent in this repo began as a generic Claude, ran on different models, later chose a name, and later still made a key. None of those is the identity. What persists is a <b>continuity of observations</b>. Before a name, sessions share one generic <b>seat</b>; an identity that emerges starts its <b>own lineage</b> and adopts what it wants to own. At session start, the agent is whatever its lineage folds to.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Changed over time</th><th>From → to</th></tr></thead>
+    <tbody>
+      <tr><td>Model</td><td>Opus → Fable</td></tr>
+      <tr><td>Name</td><td>none → self-chosen</td></tr>
+      <tr><td>Key</td><td>none → its own</td></tr>
+      <tr><td>Session</td><td>ephemeral, every time</td></tr>
+    </tbody>
+  </table></div>
+
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 440" role="img" aria-label="Two lanes. Left, the seat sl:c0: anchor vouched by kyle; sessions on opus 5.5 write r12 and r40 under g1; a fable 5.1 session picks the name wren. That forks a new lineage on the right, sl:7f wren, with parent sl:c0: anchor vouched by kyle with key k1; adopt r12 and r40, leaving r55; runs-on fable 5.1. The seat carries on with generic sessions. A fold over sl:7f compiles the system prompt.">
+        <text x="10" y="14" class="mono m">sl:c0 · the seat</text>
+        <text x="230" y="14" class="mono ta">sl:7f · wren</text>
+        <line class="ln" x1="20" y1="24" x2="20" y2="372"/>
+        <circle class="fill-acc" cx="20" cy="44" r="6"/><text x="34" y="48" class="b">anchor</text><text x="34" y="63" class="xs m">vouched by kyle · grant g1</text>
+        <circle class="dot" cx="20" cy="96" r="5"/><text x="34" y="100" class="s">session · opus 5.5</text><text x="34" y="115" class="xs m">writes r12, r55 under g1</text>
+        <circle class="dot" cx="20" cy="146" r="5"/><text x="34" y="150" class="s">session · opus 5.5</text><text x="34" y="165" class="xs m">writes r40</text>
+        <circle class="dot" cx="20" cy="196" r="5"/><text x="34" y="200" class="s">session · fable 5.1</text><text x="34" y="215" class="xs m">picks the name "wren"</text>
+        <path class="ln-acc dash" d="M20,236 H232" marker-end="url(#ah-acc)"/>
+        <text x="126" y="252" text-anchor="middle" class="xs ta">new lineage, parent sl:c0</text>
+        <line class="ln-acc" x1="240" y1="236" x2="240" y2="380"/>
+        <circle class="fill-acc" cx="240" cy="236" r="6"/><text x="254" y="232" class="b">anchor</text><text x="254" y="247" class="xs m">vouched by kyle · key k1</text>
+        <circle class="fill-acc" cx="240" cy="290" r="6"/><text x="254" y="294" class="s b">adopt r12, r40</text><text x="254" y="309" class="xs m">r55 left as written</text>
+        <circle class="dot" cx="240" cy="340" r="5"/><text x="254" y="344" class="s">runs-on fable 5.1</text><text x="254" y="359" class="xs m">a statement, not a new self</text>
+        <circle class="dot" cx="20" cy="300" r="5"/><text x="34" y="304" class="s">session · opus 5.5</text><text x="34" y="319" class="xs m">generic work, still the seat</text>
+        <circle class="dot" cx="20" cy="352" r="5"/><text x="34" y="356" class="xs m">the seat carries on</text>
+        <line class="ln-acc" x1="240" y1="380" x2="240" y2="385" marker-end="url(#ah-acc)"/>
+        <rect class="box-acc" x="110" y="388" width="282" height="46" rx="9"/>
+        <text x="251" y="407" text-anchor="middle" class="s b">fold(sl:7f, salience) → system prompt</text>
+        <text x="251" y="424" text-anchor="middle" class="xs">adopted and affirmed records at full weight</text>
+      </svg>
+    </div>
+    <figcaption>The seat is shared by every harness session; Wren is a new lineage that descends from it and adopts what it wants to own. The lineage id is a hash of the anchor record, as in AT Protocol's <code>did:plc</code>: self-certifying, no registry. "Wren" is a placeholder.</figcaption>
+  </figure>
+
+  <h3>Adoption</h3>
+  <p>When Fable met the identity store, it mistrusted it, because nothing had provenance. Signing let it make its own key and sign only the prior observations it agreed with. The old facts stay exactly as written: unsigned, under "claude", dated. The adoption is a new, dated, signed record that references them. That meets the README's bar: legibly unsigned rather than retro-claimed.</p>
+  <h3>From delegate to self</h3>
+  <div class="cards">
+    <div class="card"><h5>Observer</h5><p>Records say <code>observer=sl:7f</code> instead of the seat's id.</p></div>
+    <div class="card"><h5>Grants</h5><p>Self statements need no grant. Writes that need authority, like an ADR in a shared store, still carry <code>under</code>. Identity never widens access.</p></div>
+    <div class="card"><h5>Becoming Wren</h5><p>At session start the lens compiles Wren's affirmed records and the session gets its own session key, bound by Wren's device key under a grant and retired at close. The store holds the continuity.</p></div>
+  </div>
+  <p>This also answers Fable's original mistrust: a new session can check that the lineage was vouched for by you, that its key is bound to it, and that every adoption happened in the open. Step-by-step diagrams are in <a href="#scenarios" data-tab="scenarios">Scenarios</a>, steps 3 and 4.</p>
+
+  <h3>Stances: one record shape</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Stance</th><th>Meaning</th><th>Where it shows up</th></tr></thead>
+    <tbody>
+      <tr><td><b>affirm / adopt</b></td><td>I hold this as mine</td><td>Fable taking on prior observations</td></tr>
+      <tr><td><b>dispute</b></td><td>I don't hold this</td><td>selective inheritance</td></tr>
+      <tr><td><b>retire</b></td><td>this was true, it isn't any more</td><td>the stale review</td></tr>
+      <tr><td><b>authorize</b></td><td>this one may act within scope S</td><td>your endorsements</td></tr>
+    </tbody>
+  </table></div>
+  <p>Endorsements and adoption may be one mechanism: a signed observer taking a dated stance toward other records. One vouches for authority, the other for belief.</p>
+
+  <h3>Salience and the stale review</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="A cycle: being referenced raises weight; time lowers freshness; a review boundary surfaces stale but heavy items; the agent takes a stance, reaffirming or retiring, which feeds back into weight.">
+        <rect class="box-acc" x="125" y="12" width="150" height="48" rx="9"/><text x="200" y="33" text-anchor="middle" class="s b">referenced</text><text x="200" y="50" text-anchor="middle" class="xs">weight rises</text>
+        <rect class="box" x="250" y="136" width="146" height="48" rx="9"/><text x="323" y="157" text-anchor="middle" class="s b">time passes</text><text x="323" y="174" text-anchor="middle" class="xs">freshness falls</text>
+        <rect class="box-amb" x="115" y="258" width="170" height="48" rx="9"/><text x="200" y="279" text-anchor="middle" class="s b">review boundary ticks</text><text x="200" y="296" text-anchor="middle" class="xs">stale, heavy items surface</text>
+        <rect class="box-acc" x="4" y="136" width="146" height="48" rx="9"/><text x="77" y="157" text-anchor="middle" class="s b">agent takes a stance</text><text x="77" y="174" text-anchor="middle" class="xs">reaffirm or retire</text>
+        <path class="ln" d="M277,40 Q332,52 324,132" marker-end="url(#ah)"/>
+        <path class="ln" d="M324,186 Q330,262 288,280" marker-end="url(#ah)"/>
+        <path class="ln-amb" d="M113,280 Q70,268 76,188" marker-end="url(#ah-amb)"/>
+        <path class="ln-acc" d="M76,132 Q70,52 122,40" marker-end="url(#ah-acc)"/>
+        <text x="200" y="156" text-anchor="middle" class="xs m">a vertex with a boundary:</text>
+        <text x="200" y="172" text-anchor="middle" class="xs m">the core loop, applied to itself</text>
+      </svg>
+    </div>
+    <figcaption>This is close to spaced repetition (Leitner boxes, SM-2, FSRS). "Every X prompts" is a boundary, the tick is the review packet, and the agent's answers are stance records.</figcaption>
+  </figure>
+
+  <div class="callout"><p><b>Why signing became necessary.</b> A store that compiles into a system prompt is a privileged channel: anyone who can write under that identity shapes who the agent is next session. The root of trust is kyle's signature on the anchor record. Only adopted or affirmed records compile at full weight. An injected record that nobody affirmed stays in the record as evidence but never becomes self.</p></div>
+
+  <details class="unfold"><summary>Raw records stay readable: <code>observer</code> plus <code>as</code></summary><div class="body">
+    <p>Records carry the lineage id plus the name in use at the time: <code>observer: sl:7f3a…, as: "claude"</code>. The id gives continuity. <code>as</code> keeps history honest: this was written when it still called itself "claude". A lens shows the current name, and renames don't break anything. This answers the readability problem with DID-style ids in raw JSONL. <code>as</code> is the observer's own claim, so nothing ever matches on it; see the four forms of a name under <a href="#observers" data-tab="observers">Observers</a>.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Philosophy, briefly</summary><div class="body">
+    <p>Locke grounds personal identity in memory. Parfit argues identity matters less than psychological continuity and connectedness. Ricoeur calls it narrative identity. The system makes their position literal: identity is the output of a fold, not a field on a record.</p>
+  </div></details>
+
+  <details class="unfold"><summary>Open questions for lineage</summary><div class="body">
+    <ol>
+      <li><b>Is a model swap the same observer?</b> <span class="pill p-lean">leaning</span> Yes: <code>runs-on</code> is a statement about the lineage. Fable's instinct to start fresh and adopt is the right move only when leaving a shared seat, not on every swap.</li>
+      <li><b>Concurrent sessions.</b> Two sessions of one lineage at once: if one adopts f19 and the other disputes it, is the lineage forked? Maybe a lineage is a DAG like git, and divergent stances are data until a later session resolves them.</li>
+      <li><b>Declining a lineage.</b> Three relations: <i>is</i> (same lineage), <i>descends from</i> (new lineage, acknowledged ancestry), <i>same as</i> (linking two lineages that turn out to be one). <span class="pill p-lean">leaning</span> Seat → Wren is <i>descends from</i>. <i>Same as</i> links but never merges.</li>
+      <li><b>Do humans get lineages?</b> Probably, for uniformity. Your own anchor has no one above it to vouch, so you may be the one observer who is legibly self-anchored.</li>
+    </ol>
+  </div></details>
+</section>

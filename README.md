@@ -14,6 +14,8 @@ writer that must agree with it byte for byte.
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS writer for layer 0 |
+| `design/` | the design page's source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `build.mjs` renders it |
+| `out/rethink/` | the design page, written by `node design/build.mjs`, never by hand |
 
 Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
 `xtask` checking token and surface budgets); `scenarios/` (end-to-end walks),
@@ -34,3 +36,25 @@ editing one by hand fails CI. Then:
 ```sh
 node interop/js/check.mjs vectors   # the JS writer passes every vector
 ```
+
+## The design page
+
+The design walk ("Strange Loops Rethink") is built from `design/rethink/`:
+one HTML file per tab under `sections/`, the decision ledger as records in
+`ledger.json`, and the shared `styles.css`, `app.js`, `head.html` and
+`top.html`. Edit those, then:
+
+```sh
+node design/build.mjs       # writes out/rethink/index.html; commit it with the source
+```
+
+CI rebuilds it and fails if `out/` differs, as with the vectors. To publish:
+
+* **The site:** in `projects.gruel.world`, `npm run sync:strange-loops`
+  snapshots the committed page (it refuses uncommitted output), then push its
+  `main`. It is served unlisted, with `noindex`, at
+  `https://projects.gruel.world/strange-loops/rethink/`.
+* **The claude.ai artifact** is a mirror:
+  `node design/build.mjs --fragment <file>` writes the page as the artifact
+  takes it (no document wrapper; the host adds its own), and that file is
+  republished to the same artifact URL.

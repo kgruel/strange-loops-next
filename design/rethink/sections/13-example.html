@@ -1,0 +1,313 @@
+<section class="panel" id="example" role="tabpanel" aria-labelledby="t-example">
+  <div class="panel-head"><h2>A worked example</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Every case so far, in one mature setup: six stores across two realms and three machines, plus a bridge to an HOA board. Commands are the CLI's, store files and vertices are their JSON, and ids are shortened (<code>r:a1…</code>). Records a person doesn't type, such as ticks, are described in comments. On disk every record is a JSONL line or a SQLite row.</p>
+
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 372" role="img" aria-label="The home realm holds five stores: root (names, identity, digests, on the laptop), novel (laptop and NAS), feed (homelab, plus 90 days on the laptop), homelab (incidents and health) and per-run stores. Root composes over feed for the HOA recap and salience. A run bundles its result into the homelab store. Root bridges a signed recap to the HOA board realm. The work realm holds kyle's work store, which promotes into the team-platform store in git. Nothing replicates across realms.">
+        <rect class="panel" x="0" y="0" width="400" height="214" rx="10"/>
+        <text x="12" y="18" class="b">@home realm</text>
+        <rect class="box-acc" x="12" y="28" width="116" height="56" rx="8"/><text x="70" y="45" text-anchor="middle" class="s b">root</text><text x="70" y="60" text-anchor="middle" class="xs">names · identity</text><text x="70" y="74" text-anchor="middle" class="xs m">laptop · nas</text>
+        <rect class="box" x="142" y="28" width="116" height="56" rx="8"/><text x="200" y="45" text-anchor="middle" class="s b">novel</text><text x="200" y="60" text-anchor="middle" class="xs">chapters · drafts</text><text x="200" y="74" text-anchor="middle" class="xs m">laptop · nas</text>
+        <rect class="box" x="272" y="28" width="116" height="56" rx="8"/><text x="330" y="45" text-anchor="middle" class="s b">feed</text><text x="330" y="60" text-anchor="middle" class="xs">mail · cal · rss</text><text x="330" y="74" text-anchor="middle" class="xs m">homelab · laptop 90d</text>
+        <path class="ln-acc" d="M300,86 V106 H70 V89" marker-end="url(#ah-acc)"/>
+        <text x="185" y="101" text-anchor="middle" class="xs ta">composes: HOA recap, salience</text>
+        <rect class="box" x="142" y="132" width="116" height="56" rx="8"/><text x="200" y="149" text-anchor="middle" class="s b">homelab</text><text x="200" y="164" text-anchor="middle" class="xs">incidents · health</text><text x="200" y="178" text-anchor="middle" class="xs m">homelab · laptop</text>
+        <rect class="box dash" x="272" y="132" width="116" height="56" rx="8"/><text x="330" y="149" text-anchor="middle" class="s b">runs/…</text><text x="330" y="164" text-anchor="middle" class="xs">one store per run</text><text x="330" y="178" text-anchor="middle" class="xs m">laptop</text>
+        <line class="ln-amb" x1="270" y1="160" x2="261" y2="160" marker-end="url(#ah-amb)"/>
+        <text x="265" y="204" text-anchor="middle" class="xs tb">bundle → evidence</text>
+        <path class="ln-amb dash" d="M40,86 V238 H338 V259" marker-end="url(#ah-amb)"/>
+        <text x="190" y="232" text-anchor="middle" class="xs tb">bridge: a signed recap, summary only</text>
+        <rect class="panel" x="0" y="262" width="260" height="106" rx="10"/>
+        <text x="12" y="280" class="b">work realm</text>
+        <rect class="box" x="12" y="290" width="110" height="56" rx="8"/><text x="67" y="307" text-anchor="middle" class="s b">kyle · work</text><text x="67" y="322" text-anchor="middle" class="xs">personal</text><text x="67" y="336" text-anchor="middle" class="xs m">work laptop</text>
+        <rect class="box-acc" x="138" y="290" width="110" height="56" rx="8"/><text x="193" y="307" text-anchor="middle" class="s b">team-platform</text><text x="193" y="322" text-anchor="middle" class="xs">decisions · notes</text><text x="193" y="336" text-anchor="middle" class="xs m">git</text>
+        <line class="ln-acc" x1="124" y1="318" x2="135" y2="318" marker-end="url(#ah-acc)"/>
+        <text x="130" y="362" text-anchor="middle" class="xs ta">promote</text>
+        <rect class="box dash" x="276" y="262" width="124" height="46" rx="8"/><text x="338" y="281" text-anchor="middle" class="s b">HOA board</text><text x="338" y="296" text-anchor="middle" class="xs m">another realm</text>
+        <text x="338" y="334" text-anchor="middle" class="xs m">no replication</text><text x="338" y="348" text-anchor="middle" class="xs m">across realms</text>
+      </svg>
+    </div>
+    <figcaption>Each store is a lineage with its own definition. The realm's own store, <code>root</code>, holds the name table and the vertices that read across stores. Arrows are the only ways content moves: compose (read), bundle (a tick with its closure), promote (a stance) and bridge (a signed tick into another realm).</figcaption>
+  </figure>
+
+  <h3>How the realm composes</h3>
+  <p>A realm is not a store. <code>@home</code> is everything reachable from one name table, under one trust root (kyle's anchor key). That name table lives in a small store of its own, <code>root</code>; every other store keeps its own anchor, definition and places.</p>
+  <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">@home realm
+└─ root          name table + cross-store vertices + spec templates
+     name "novel"   → st:n4…      name "wren" → sl:7f…
+     name "feed"    → st:f2…      name "HOA"  → r:h1…
+     name "homelab" → st:h9…
+     vertices: identity · salience · hoa-recap · hygiene
+├─ novel         own anchor, own store.json, own places (laptop, NAS)
+├─ feed          own anchor, own store.json, own places (homelab SQLite, laptop 90 days)
+├─ homelab       …
+└─ runs/*        disposable, one per run</pre>
+  <ul>
+    <li><b>Membership is a link, not containment.</b> A store belongs to <code>@home</code> because <code>root</code> holds a name record pointing at its <code>st:</code> id. The store doesn't know its realm; joining adds links and never rewrites, so one store could be named in two realms' tables.</li>
+    <li><b>Names live at two levels.</b> Realm-wide names (stores, Wren, the HOA) live in <code>root</code>. Names local to one store, such as the novel's characters or the team's components, live in that store.</li>
+    <li><b>Cross-store work lives in <code>root</code>.</b> A vertex reading several stores needs a carrier, and none of the stores it reads is the right one. It resolves store names through <code>root</code>'s table, and its ticks land in <code>root</code> unless it says <code>into</code>.</li>
+    <li><b>Why not one big store:</b> places and formats, stewards and maturity, erasure scope, what you share and with whom, and lifecycle all differ per store. A co-author can get <code>novel</code> without ever seeing <code>feed</code>.</li>
+  </ul>
+
+  <h3>The observers</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Lineage</th><th>Names</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>sl:a1</code></td><td>kyle</td><td>trust root of <code>@home</code></td></tr>
+      <tr><td><code>sl:c0</code></td><td>kyle/claude</td><td>the shared seat; works under grants</td></tr>
+      <tr><td><code>sl:7f</code></td><td>wren</td><td>descends from the seat, vouched by kyle; drafts summaries and findings under grants</td></tr>
+      <tr><td><code>sl:m1</code> …</td><td>kyle/mail, kyle/calendar, kyle/rss, collector/docker@lab</td><td>dumb observers reporting records</td></tr>
+      <tr><td><code>sl:w1</code></td><td>kyle (work)</td><td>a separate lineage; any <code>same-as</code> with <code>sl:a1</code> lives only at home</td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="unfold"><summary><b>root</b> · the realm's own store</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># root's store.json
+{ "store": "root", "stewards": ["sl:a1"],
+  "kinds": { "read": {}, "dismiss": {} },
+  "carries": ["identity", "salience", "hoa-recap", "hygiene/things", "hygiene/names",
+              "subagent", "slice", "orchestrator"] }
+
+# the @home name table
+loops emit name name=wren --about sl:7f
+loops emit name name=HOA --about r:h1
+loops emit name name="Willow Creek HOA" --about r:h1
+loops emit same-as --about r:h1 --about org:willowcreek-mgmt.example              # anchor ≡ natural key
+
+{ "vertex": "identity",
+  "note": "The latest stance per pair.",
+  "from": [{ "store": "root", "kind": ["same-as", "dispute"] }],
+  "fold": { "pairs": { "latest-by": "about" } } }
+
+{ "vertex": "salience",
+  "note": "Who touched each thing; a witness tick each morning.",
+  "from": [{ "store": "feed", "kind": ["feed-item", "visit", "like"] },
+           { "store": "root", "kind": ["read", "dismiss"] }],
+  "resolve": "identity",
+  "fold": { "observers": { "collect": "observer", "set": true, "by": "about" } },
+  "boundary": [{ "every": "07:00" }] }
+
+{ "vertex": "hoa-recap",
+  "note": "Pulled on demand before a meeting: a witness tick over the last 30 days.",
+  "from": [{ "store": "feed", "about": "r:h1",
+             "kind": ["mail-message", "calendar-event", "payment", "document"] }],
+  "resolve": "identity",
+  "window": { "occurred": "last 30d" },
+  "boundary": [{ "manual": true }] }</pre>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># before the board meeting
+loops tick hoa-recap --witness
+#   → T:hoa: a witness tick by sl:a1, occurred 2026-09-18/2026-10-18, covering 42 ids
+loops emit summary text="…" --about T:hoa --under g:recaps                        # by sl:7f
+#   then a bridge to @hoa-board carrying the summary and citing T:hoa: a signed tick; the emails stay home
+
+# the loop closing on the morning digest
+loops emit read refs:='["r:f12…"]' --about T:digest-1019</pre>
+  </div></details>
+
+  <details class="unfold"><summary><b>novel</b> · facets, forks and drafts</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># .loops/store.json
+{
+  "store": "novel", "maturity": "strict", "stewards": ["sl:a1"],
+  "writers": [{ "allow": "sl:a1" },
+              { "allow": "sl:7f", "under": "g:novel-notes", "kinds": ["chapter-note"] }],
+  "kinds": {
+    "chapter-start":    { "fields": { "title": "string" } },
+    "chapter-prose":    { "facet": true, "fields": { "text": "blob" }, "search": ["text"] },
+    "chapter-mentions": { "facet": true, "refs": ["characters", "ideas"] },
+    "book-order":       { "facet": true, "refs": ["chapters"] },
+    "chapter-note":     { "search": ["text"] },
+    "character-start":  { "fields": { "name": "string" } },
+    "draft-complete":   { "fields": { "label": "string" } }
+  },
+  "carries": ["chapter", "manuscript", "continuity"]
+}
+
+loops emit chapter-start title="The Lighthouse"                                   # → r:a1
+loops emit chapter-prose text=blob:h:… --about r:a1 --prev r:p2                   # laptop
+loops emit chapter-prose text=blob:h:… --about r:a1 --prev r:p2                   # phone: two heads, a visible fork
+loops emit chapter-mentions characters:='["r:c1"]' ideas:='["r:i9"]' --about r:a1
+loops emit book-order chapters:='["r:a4","r:a1","r:a2"]' --about r:b0 --prev r:o3  # a move is one record
+loops emit draft-complete label="draft 2"                                         # the marker
+
+# .loops/vertices/chapter.json
+{ "vertex": "chapter", "param": ["chapter"],
+  "from": [{ "store": "novel", "about": "$chapter" }],
+  "fold": { "facets": { "latest-by": "kind", "follow": "prev" },
+            "notes":  { "collect": true, "where": { "kind": { "is": "chapter-note" } } } } }
+
+# .loops/vertices/manuscript.json
+{ "vertex": "manuscript",
+  "from": [{ "store": "novel", "kind": ["chapter-prose", "book-order"] }],
+  "fold": { "chapters": { "latest-by": "about", "follow": "prev" },
+            "order":    { "latest": true, "follow": "prev", "where": { "kind": { "is": "book-order" } } } },
+  "boundary": [{ "when": "draft-complete" }] }
+
+# .loops/vertices/continuity.json: a lens, never ticks
+{ "vertex": "continuity",
+  "from": [{ "store": "novel", "kind": ["chapter-prose", "character-start"] }],
+  "order": { "field": "story-when" } }
+
+#   draft-complete → a content tick covering the head prose ids: "draft 2", reproducible anywhere
+loops tick manuscript --witness                    # beta readers: what you sent them</pre>
+  </div></details>
+
+  <details class="unfold"><summary><b>feed</b> · ingestion in SQLite, erasable mail</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># feed's store.json
+{
+  "store": "feed", "stewards": ["sl:a1"],
+  "kinds": {
+    "mail-message":   { "fields": { "subject": "string", "body": "blob" }, "erasable": true, "search": ["subject", "body"] },
+    "calendar-event": { "fields": { "title": "string" }, "search": ["title"] },
+    "feed-item":      { "fields": { "title": "string" } },
+    "visit":          { "fields": { "seconds": "int" } },
+    "payment":        { "fields": { "amount": "decimal" }, "erasable": true }
+  },
+  "natural": { "url": { "normalize": ["strip-tracking", "lowercase-host"] },
+               "org": { "normalize": ["registrable-domain"] } },
+  "parse": ["feed/mail-v2", "feed/ics-v1"]
+}
+
+# collectors write JSONL to `loops emit - --stream`, each signing as itself
+{"kind":"mail-message", "about":["org:willowcreek-mgmt.example"], "occurred":"2026-10-02T14:11-07:00", "payload":{"subject":"Pool resurfacing bids", "body":"blob:…"}}
+{"kind":"calendar-event", "about":["r:h1"], "occurred":"2026-10-21T19:00/PT2H", "payload":{"title":"HOA board meeting"}}
+{"kind":"feed-item", "about":["url:example.com/essay"]}           ← kyle/rss; fetched twice, two records</pre>
+  <p>Parse specs travel with the store; sources and credentials don't.</p>
+  </div></details>
+
+  <details class="unfold"><summary><b>homelab</b> · an incident, a run, a late log</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># homelab's store.json
+{
+  "store": "homelab", "stewards": ["sl:a1"],
+  "kinds": {
+    "log":               { "fields": { "line": "string" }, "search": ["line"] },
+    "cycle-complete":    {},
+    "incident-start":    { "fields": { "title": "string" } },
+    "incident-status":   { "facet": true, "fields": { "status": { "enum": ["open", "mitigated", "resolved"] } } },
+    "incident-evidence": { "refs": ["refs"] },
+    "finding":           { "refs": ["refs"], "search": ["text"] }
+  },
+  "natural": { "svc": { "normalize": ["lowercase"] } },
+  "carries": ["health", "incident"]
+}
+
+# the docker collector, signing as collector/docker@lab
+{"kind":"log", "about":["svc:jellyfin@nas"], "payload":{"line":"…stall…"}}          ← r:l7
+{"kind":"cycle-complete"}                                                            ← its marker
+
+loops emit incident-start title="jellyfin stalls"                                    # → r:i1
+loops emit incident-evidence refs:='["r:l7"]' --about r:i1
+loops emit finding text="transcode cache full" refs:='["r:l7","r:l9"]' \
+    --about r:i1 --under g:homelab-ops                                               # by sl:7f
+loops emit incident-status status=resolved --about r:i1
+
+{ "vertex": "health",
+  "note": "A cron made content by a marker.",
+  "from": [{ "store": "homelab", "kind": ["log"] }],
+  "fold": { "errors": { "count": true, "by": "about" } },
+  "boundary": [{ "when": "cycle-complete" }] }
+
+{ "vertex": "incident", "param": ["incident"],
+  "from": [{ "store": "homelab", "about": "$incident", "follow-refs": true }],
+  "fold": { "state":    { "latest-by": "kind", "follow": "prev" },
+            "evidence": { "collect": true, "set": true } },
+  "boundary": [{ "when": "incident-status", "where": { "status": { "is": "resolved" } } },
+               { "manual": true }] }
+
+loops tick incident incident=r:i1 --witness       # a handoff: what we knew, signed by sl:a1
+#   resolved → T:res, a content tick: the final state
+#   the collector was offline; a log with occurred inside the window arrives a day later:
+#   the vertex ticks again, prev T:res, covering … + r:l12; the handoffs are untouched</pre>
+    <p>The investigation also spawned an agent run, its own store:</p>
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># the run's store.json
+{ "store": "runs/2026-10-19-jellyfin", "stewards": ["sl:a1"],
+  "writers": [{ "allow": "sl:c0", "under": "g:runs" }] }
+
+# the run's vertex is subagent with task=r:t1, named by their hash; nothing is written to start it
+loops emit step … --about r:t1                                         # by sl:c0
+loops emit task-complete --about r:t1                                  # sl:c0's marker → content tick T:t1
+loops emit review verdict=approved --about T:t1                        # by sl:a1
+#   the orchestrator ticks into homelab as a bundle, and it lands as evidence for r:i1</pre>
+  </div></details>
+
+  <details class="unfold"><summary><b>team-platform</b> · the work realm, in git</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># team-platform's store.json
+{
+  "store": "team-platform", "maturity": "declared",
+  "stewards": ["sl:w1", "sl:director"],
+  "shared": { "format": "jsonl" },
+  "refuse": [{ "from": "personal-ingest" }],
+  "kinds": {
+    "component-start": { "fields": { "name": "string" } },
+    "decision": { "fields": { "title": "string", "status": { "enum": ["proposed", "accepted", "superseded"] } },
+                  "refs": ["evidence"], "facet": "status", "search": ["title", "body"], "preview": ["title", "status"] },
+    "note":   { "search": ["body"], "erasable": true },
+    "tenure": { "fields": { "years": "int", "domain": "string" } }
+  },
+  "carries": ["identity", "platform-knowledge", "adr", "hygiene/things", "hygiene/private"]
+}
+
+loops emit component-start name=auth-svc                               # sl:dev1 → r:x1
+loops emit component-start name="SSO gateway"                          # sl:director → r:x3
+loops emit same-as --about r:x1 --about r:x3                           # sl:dev2: a guess
+loops emit dispute --about r:x1 --about r:x3                           # sl:director: not the same thing
+loops emit note body="the proxy in front of auth-svc" --about r:x3 --about r:x1   # sl:director
+loops emit decision title="Move auth-svc behind the gateway" status=accepted \
+    evidence:='["r:n4","r:n7"]' --about r:x1 --occurred 2019-04
+
+{ "vertex": "adr",
+  "from": [{ "store": "team-platform", "kind": ["decision"] }],
+  "boundary": [{ "when": "decision", "where": { "status": { "is": "accepted" } } }],
+  "covers": "reference" }
+
+#   → T:adr-2019, a content tick covering r:d2 r:n4 r:n7: the cited evidence, never later arrivals
+#   2026: migration work revisits it, a new tick citing the old one:
+#   → T:mig, from vertex migration, covering T:adr-2019 r:n31 r:n33, about r:x1
+
+# hygiene/private flags a note holding a customer's phone number
+loops emit erase --about r:n9                                          # sl:director; one line rewritten in git</pre>
+  </div></details>
+
+  <details class="unfold"><summary>One machine's <code>places.json</code></summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># ~/.config/loops/places.json: the home laptop; never shared
+{
+  "stores": {
+    "root":    [{ "place": "laptop", "path": "~/root/.loops",  "format": "jsonl", "role": ["write", "hold"] },
+                { "place": "nas",    "url": "ssh://nas/loops/root",               "role": ["hold"] }],
+    "novel":   [{ "place": "laptop", "path": "~/novel/.loops", "format": "jsonl", "role": ["write", "hold"] },
+                { "place": "nas",    "url": "ssh://nas/backup/novel",             "role": ["hold"] }],
+    "feed":    [{ "place": "laptop", "path": "~/.loops/feed.db", "format": "sqlite", "role": ["hold"], "scope": "emitted 90d" },
+                { "place": "vault",  "url": "s3://…/feed-blobs", "role": ["blobs"] }],
+    "homelab": [{ "place": "laptop", "path": "~/.loops/homelab.db", "format": "sqlite", "role": ["hold"] }],
+    "runs/*":  [{ "place": "laptop", "path": "~/.loops/runs/", "format": "jsonl", "role": ["write", "hold"] }]
+  },
+  "index": { "path": "~/.cache/loops/index.db", "search": ["root", "novel", "homelab"] }
+}
+
+# on the homelab, the feed store's place also binds its collectors; credentials never leave
+{ "stores": { "feed": [{
+    "place": "homelab", "path": "/srv/loops/feed.db", "format": "sqlite", "role": ["write", "hold"],
+    "collect": [{ "name": "mail", "source": "imap://…", "parse": "feed/mail-v2", "as": "kyle/mail" }] }] } }</pre>
+  </div></details>
+
+  <details class="unfold"><summary>One record on disk, before and after erasure</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T10:12:44-05:00","about":["r:x1"]},
+ "salt":"q8Zt…","payload":{"body":"Called the customer back at 555-…"}}
+
+{"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T10:12:44-05:00","about":["r:x1"]},
+ "commit":"h:7ab1…"}</pre>
+    <p><code>id = hash(canonical(env) + commit)</code> and <code>commit = hash(salt + canonical(payload))</code>, so the second line still verifies, every reference to <code>r:9f3c</code> still resolves, and nothing else in the repository changes.</p>
+  </div></details>
+
+  <h3>What the example surfaced</h3>
+  <ul>
+    <li><b>A realm needs its own store.</b> <code>@home</code> names a name table, and name records are records, so they live somewhere: the <code>root</code> store. It's also the natural carrier for vertices that read across stores (identity, salience, the HOA recap) and for spec templates.</li>
+    <li><b>A vertex's ticks default <code>into</code> the store that carries it.</b> The HOA recap lands in <code>root</code>, the incident's ticks in <code>homelab</code>; a run says <code>into</code> explicitly.</li>
+    <li><b>Collectors split like stores do.</b> Parse specs are shareable and a store can carry them; source bindings and credentials stay in <code>places.json</code> beside the place they write. A parse spec is an ordinary kind: collectors read it, the core doesn't.</li>
+    <li><b>Natural-key rules are declarations</b> (<code>natural "org" normalize=…</code>), and a <code>same-as</code> between an anchor and a natural key joins minted and natural identity.</li>
+    <li><b>Relative windows need tick syntax:</b> <code>"window": {"occurred": "last 30d"}</code> in the spec, a concrete span on the tick.</li>
+    <li><b><code>"follow": "prev"</code> appears on every facet fold.</b> It should probably be the default wherever records carry <code>prev</code>.</li>
+    <li><b>Corrected in version 12:</b> this example used a SKOS <code>match</code> kind. Identity is <code>same-as</code> and <code>dispute</code>; the director's knowledge is a dispute plus a note about both components.</li>
+    <li><b>Reference-only tick payloads paid off:</b> erasing the note in the team store changed nothing in any tick.</li>
+  </ul>
+</section>

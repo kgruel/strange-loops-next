@@ -1,0 +1,275 @@
+<section class="panel" id="things" role="tabpanel" aria-labelledby="t-things">
+  <div class="panel-head"><h2>Things and <code>about</code></h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="gist">Records are the only thing stored. A <b>thing</b> is what a record is about. Identity moves out of the fold and into the record, through <code>about</code> on the envelope. Tested against every case so far, it holds with no new machinery and six refinements.</p>
+  <p><span class="pill p-ok">layer closed</span> Composition starts here: a vertex reading many stores can only merge meaning if it can tell when two records are about the same thing. It closed on three more decisions:</p>
+  <ul>
+    <li><b>Promotion carries its anchor</b> verbatim when the target store lacks it. Across realms a natural key is content, not a reference (<code>svc:auth@corp-prod</code> says something), so it crosses only by bridge. A public store is a standing bridge, which is how <code>url:</code> keys meet across realms (see the web annotation walk in <a href="#horizons/h-web" data-tab="horizons" data-sub="h-web">Horizons</a>).</li>
+    <li><b>Input resolves against the target store's names first, then home.</b> What a miss does follows the store's maturity (see "Referencing a thing mid-flow" below), and it always happens in the target store, so personal petnames don't leak into team anchors.</li>
+    <li><b><code>as</code> drops from the envelope.</b> The name in effect at <code>emitted</code> is a fold over dated name records; the automatic first-emit anchor carries the initial self-name.</li>
+  </ul>
+
+  <h3>Three categories, two readers</h3>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>What it is</th><th>Examples</th><th>Identity</th><th>Who reads its lineage</th></tr></thead>
+    <tbody>
+      <tr><td><b>Record</b></td><td>an immutable claim; the only thing stored</td><td>log snippet, RSS entry, prose save, tick</td><td>content hash</td><td>none: a record is a point</td></tr>
+      <tr><td><b>Thing</b></td><td>what records are <i>about</i></td><td>chapter, incident, service, URL, Mara</td><td>an anchoring record, or a natural key</td><td>vertices only</td></tr>
+      <tr><td><b>Primitive</b></td><td>what the system is made of</td><td>observer, store, vertex</td><td><code>*-anchor</code> lineage</td><td>the core library itself</td></tr>
+    </tbody>
+  </table></div>
+  <p>A chapter has a lineage just as an observer does: a first record, then later records that fold into its current self. The difference is who reads it. The core folds observers, stores and vertices to decide admission, signatures and writer policy. It never needs to know what a chapter is. Primitives have <b>standing</b>: they can sign, hold a grant, admit a record. A thing is acted on and never acts.</p>
+
+  <h3>Where identity lives</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="Left, loops today: a decision fact and a thread fact both carry topic=auth in their payload, and a vertex folds by topic; nothing names the thing, so the link exists only in the fold. Right, now: a component-start record anchors r:x1, the decision and thread records both say about r:x1, and the vertex groups by about; the link is in the record.">
+        <text x="88" y="18" text-anchor="middle" class="b">loops today</text>
+        <text x="298" y="18" text-anchor="middle" class="b">now</text>
+        <line class="faint" x1="193" y1="8" x2="193" y2="248"/>
+        <rect class="box dash" x="8" y="30" width="160" height="36" rx="8"/><text x="88" y="52" text-anchor="middle" class="xs m">nothing names the thing</text>
+        <rect class="box" x="8" y="80" width="160" height="36" rx="8"/><text x="88" y="95" text-anchor="middle" class="s b">decision</text><text x="88" y="109" text-anchor="middle" class="xs m">payload topic=auth</text>
+        <rect class="box" x="8" y="124" width="160" height="36" rx="8"/><text x="88" y="139" text-anchor="middle" class="s b">thread</text><text x="88" y="153" text-anchor="middle" class="xs m">payload topic=auth</text>
+        <rect class="box" x="8" y="180" width="160" height="40" rx="8"/><text x="88" y="197" text-anchor="middle" class="s b">vertex</text><text x="88" y="211" text-anchor="middle" class="xs">fold by "topic"</text>
+        <line class="ln" x1="88" y1="162" x2="88" y2="177" marker-end="url(#ah)"/>
+        <path class="ln" d="M168,98 H180 V200 H171" marker-end="url(#ah)"/>
+        <text x="88" y="242" text-anchor="middle" class="xs tb">the link exists only in the fold</text>
+        <rect class="box-amb" x="218" y="30" width="160" height="36" rx="8"/><text x="298" y="45" text-anchor="middle" class="s b">component-start</text><text x="298" y="59" text-anchor="middle" class="xs">→ r:x1</text>
+        <rect class="box" x="218" y="80" width="160" height="36" rx="8"/><text x="298" y="95" text-anchor="middle" class="s b">decision</text><text x="298" y="109" text-anchor="middle" class="xs ta">about r:x1</text>
+        <rect class="box" x="218" y="124" width="160" height="36" rx="8"/><text x="298" y="139" text-anchor="middle" class="s b">thread</text><text x="298" y="153" text-anchor="middle" class="xs ta">about r:x1</text>
+        <path class="ln-acc" d="M378,98 H390"/>
+        <path class="ln-acc" d="M378,142 H390 V48 H381" marker-end="url(#ah-acc)"/>
+        <rect class="box" x="218" y="180" width="160" height="40" rx="8"/><text x="298" y="197" text-anchor="middle" class="s b">vertex</text><text x="298" y="211" text-anchor="middle" class="xs">group by about</text>
+        <line class="ln" x1="298" y1="162" x2="298" y2="177" marker-end="url(#ah)"/>
+        <path class="ln" d="M218,98 H206 V200 H215" marker-end="url(#ah)"/>
+        <text x="298" y="242" text-anchor="middle" class="xs ta">the link is in the record</text>
+      </svg>
+    </div>
+    <figcaption>Today a vertex picks a payload field (<code>Upsert key="topic"</code>), so two facts are related only because their strings happen to match. Now the emitter states the thing. The old style survives as the case with no <code>about</code>: a vertex can still group by any payload field, including ones nobody declared as identity.</figcaption>
+  </figure>
+  <p><code>about</code> is the emitter's <b>claim</b> ("this is about r:x1"). A fold key is the vertex's <b>question</b> ("group these by host"). Both stay. <code>about</code> can point at three sorts of target: a record id that anchors a thing (<code>r:…</code>), a natural key (<code>url:…</code>, <code>host:…</code>, <code>svc:…</code>), or a primitive (<code>sl:…</code>, <code>st:…</code>, <code>vx:…</code>).</p>
+
+  <h3>Case: a chapter, in facets</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="A chapter-start record anchors r:a1. Four facets are about it: prose saves p1 and p2 chained by prev, then two p3 saves from laptop and phone that both name p2 as prev; titles t1 and t2; mentions m1 and m2, with m2 referencing Mara r:c1; and notes n1 to n3, collected rather than chained. The chapter view upserts by kind and shows the prose fork.">
+        <rect class="box-amb" x="8" y="74" width="100" height="44" rx="9"/><text x="58" y="92" text-anchor="middle" class="s b">chapter-start</text><text x="58" y="107" text-anchor="middle" class="xs">r:a1</text>
+        <text x="58" y="136" text-anchor="middle" class="xs ta">every record:</text><text x="58" y="150" text-anchor="middle" class="xs ta">about r:a1</text>
+        <line class="ln-acc" x1="122" y1="39" x2="122" y2="169"/>
+        <line class="ln-acc" x1="122" y1="39" x2="128" y2="39"/><line class="ln-acc" x1="122" y1="97" x2="128" y2="97"/><line class="ln-acc" x1="122" y1="133" x2="128" y2="133"/><line class="ln-acc" x1="122" y1="169" x2="128" y2="169"/>
+        <line class="ln-acc" x1="122" y1="96" x2="111" y2="96" marker-end="url(#ah-acc)"/>
+        <text x="178" y="43" text-anchor="end" class="xs m">prose</text>
+        <text x="178" y="101" text-anchor="end" class="xs m">title</text>
+        <text x="178" y="137" text-anchor="end" class="xs m">mentions</text>
+        <text x="178" y="173" text-anchor="end" class="xs m">notes</text>
+        <rect class="box" x="186" y="28" width="40" height="22" rx="5"/><text x="206" y="43" text-anchor="middle" class="xs">p1</text>
+        <rect class="box" x="240" y="28" width="40" height="22" rx="5"/><text x="260" y="43" text-anchor="middle" class="xs">p2</text>
+        <line class="ln" x1="240" y1="39" x2="229" y2="39" marker-end="url(#ah)"/>
+        <text x="233" y="22" text-anchor="middle" class="xs m">prev</text>
+        <rect class="box-amb" x="300" y="6" width="84" height="22" rx="5"/><text x="342" y="21" text-anchor="middle" class="xs">p3 · laptop</text>
+        <rect class="box-amb" x="300" y="50" width="84" height="22" rx="5"/><text x="342" y="65" text-anchor="middle" class="xs">p3 · phone</text>
+        <line class="ln-amb" x1="300" y1="19" x2="284" y2="34" marker-end="url(#ah-amb)"/>
+        <line class="ln-amb" x1="300" y1="59" x2="284" y2="45" marker-end="url(#ah-amb)"/>
+        <rect class="box" x="186" y="86" width="40" height="22" rx="5"/><text x="206" y="101" text-anchor="middle" class="xs">t1</text>
+        <rect class="box" x="240" y="86" width="40" height="22" rx="5"/><text x="260" y="101" text-anchor="middle" class="xs">t2</text>
+        <line class="ln" x1="240" y1="97" x2="229" y2="97" marker-end="url(#ah)"/>
+        <rect class="box" x="186" y="122" width="40" height="22" rx="5"/><text x="206" y="137" text-anchor="middle" class="xs">m1</text>
+        <rect class="box" x="240" y="122" width="40" height="22" rx="5"/><text x="260" y="137" text-anchor="middle" class="xs">m2</text>
+        <line class="ln" x1="240" y1="133" x2="229" y2="133" marker-end="url(#ah)"/>
+        <rect class="box dash" x="304" y="122" width="80" height="22" rx="5"/><text x="344" y="137" text-anchor="middle" class="xs">Mara · r:c1</text>
+        <line class="ln dash" x1="281" y1="133" x2="301" y2="133" marker-end="url(#ah)"/>
+        <rect class="box" x="186" y="158" width="40" height="22" rx="5"/><text x="206" y="173" text-anchor="middle" class="xs">n1</text>
+        <rect class="box" x="240" y="158" width="40" height="22" rx="5"/><text x="260" y="173" text-anchor="middle" class="xs">n2</text>
+        <rect class="box" x="294" y="158" width="40" height="22" rx="5"/><text x="314" y="173" text-anchor="middle" class="xs">n3</text>
+        <line class="ln" x1="200" y1="184" x2="200" y2="197" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="8" y="200" width="384" height="46" rx="9"/>
+        <text x="200" y="219" text-anchor="middle" class="s b">chapter view · LatestBy key=kind over about r:a1</text>
+        <text x="200" y="236" text-anchor="middle" class="xs">two prose saves share prev p2 → a fork, shown, not hidden</text>
+      </svg>
+    </div>
+    <figcaption>Each facet is one kind about one thing, emitted whole. Saving prose never copies the title; changing mentions never copies the prose. Notes add up, so they're collected, not chained. The dashed arrow is a reference in the payload, not <code>about</code>: the mentions record is <i>about</i> the chapter and <i>refers to</i> Mara.</figcaption>
+  </figure>
+  <p><span class="pill p-ok">holds</span> The fold is LatestBy keyed by kind, once a key may name an envelope field. Renumbering, retitling and splitting a chapter all leave <code>r:a1</code> intact. Diffs inside prose stay out of the model: git and a future blob store compress similar snapshots underneath.</p>
+
+  <h3>Case: a homelab incident</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="The docker collector emits a log snippet r:l7 about the natural key svc:jellyfin@nas. Kyle emits an incident-start, r:i1. Later an incident-evidence record is about r:i1 and refers to r:l7. The incident view selects records about r:i1 and follows their references. A wrong link is retired as a record; the snippet never changes.">
+        <rect class="box" x="8" y="8" width="150" height="34" rx="8"/><text x="83" y="22" text-anchor="middle" class="s b">docker collector</text><text x="83" y="35" text-anchor="middle" class="xs m">an observer</text>
+        <rect class="box" x="242" y="8" width="150" height="34" rx="8"/><text x="317" y="22" text-anchor="middle" class="s b">kyle</text><text x="317" y="35" text-anchor="middle" class="xs m">an observer</text>
+        <line class="ln" x1="83" y1="44" x2="83" y2="67" marker-end="url(#ah)"/><text x="91" y="59" class="xs m">emits</text>
+        <line class="ln" x1="317" y1="44" x2="317" y2="67" marker-end="url(#ah)"/><text x="325" y="59" class="xs m">emits</text>
+        <rect class="box" x="8" y="70" width="150" height="44" rx="8"/><text x="83" y="88" text-anchor="middle" class="s b">log snippet · r:l7</text><text x="83" y="104" text-anchor="middle" class="xs ta">about svc:jellyfin@nas</text>
+        <rect class="box-amb" x="242" y="70" width="150" height="44" rx="8"/><text x="317" y="88" text-anchor="middle" class="s b">incident-start</text><text x="317" y="104" text-anchor="middle" class="xs">→ r:i1</text>
+        <rect class="box" x="125" y="142" width="150" height="44" rx="8"/><text x="200" y="160" text-anchor="middle" class="s b">incident-evidence</text><text x="200" y="176" text-anchor="middle" class="xs">about r:i1 · ref r:l7</text>
+        <line class="ln-acc" x1="252" y1="140" x2="292" y2="117" marker-end="url(#ah-acc)"/><text x="284" y="138" class="xs ta">about</text>
+        <line class="ln dash" x1="148" y1="140" x2="108" y2="117" marker-end="url(#ah)"/><text x="116" y="138" text-anchor="end" class="xs m">ref</text>
+        <line class="ln" x1="200" y1="188" x2="200" y2="207" marker-end="url(#ah)"/>
+        <rect class="box-acc" x="8" y="210" width="384" height="44" rx="9"/>
+        <text x="200" y="228" text-anchor="middle" class="s b">incident view · select about r:i1, follow refs</text>
+        <text x="200" y="245" text-anchor="middle" class="xs">a wrong link is retired as a record; the snippet never changes</text>
+      </svg>
+    </div>
+    <figcaption>The collector can't know about an incident that doesn't exist yet, and it shouldn't. Its claim (this log is from jellyfin) stays true. The claim that might be wrong (this log is evidence for r:i1) lives in its own record, which can be retired.</figcaption>
+  </figure>
+  <p><span class="pill p-ok">holds, and simplifies</span> Linking after the fact needs no selection by state, which retracts a worry from the previous turn. A later link is a new record <i>about the target</i> that <i>refers to</i> the evidence. The view selects by what records carry and follows references, like a join. Nothing ever edits <code>about</code>.</p>
+
+  <h3>Case: the team platform</h3>
+  <figure>
+    <div class="fig">
+      <svg class="dg" viewBox="0 0 400 334" role="img" aria-label="Three people name one service three ways: auth-svc, the auth service, SSO gateway. No name matches, so each input mints an anchor: r:x1, r:x2, r:x3. Kyle records same-as x1 x2, a developer same-as x2 x3, and the director disputes x2 x3. An identity vertex folds those per pair, with stewards deciding. The platform-knowledge vertex uses it through resolve-by, a state reference, and groups notes about x1, x2 and x3 by class: x1 and x2 together, x3 apart.">
+        <rect class="box dash" x="8" y="8" width="120" height="36" rx="8"/><text x="68" y="23" text-anchor="middle" class="s">"auth-svc"</text><text x="68" y="37" text-anchor="middle" class="xs m">a developer</text>
+        <rect class="box dash" x="140" y="8" width="120" height="36" rx="8"/><text x="200" y="23" text-anchor="middle" class="s">"the auth service"</text><text x="200" y="37" text-anchor="middle" class="xs m">kyle</text>
+        <rect class="box dash" x="272" y="8" width="120" height="36" rx="8"/><text x="332" y="23" text-anchor="middle" class="s">"SSO gateway"</text><text x="332" y="37" text-anchor="middle" class="xs m">director</text>
+        <line class="ln" x1="68" y1="46" x2="68" y2="67" marker-end="url(#ah)"/>
+        <line class="ln" x1="200" y1="46" x2="200" y2="67" marker-end="url(#ah)"/>
+        <line class="ln" x1="332" y1="46" x2="332" y2="67" marker-end="url(#ah)"/>
+        <text x="207" y="61" class="xs m">no match → mint</text>
+        <rect class="box-amb" x="8" y="70" width="120" height="34" rx="8"/><text x="68" y="84" text-anchor="middle" class="s b">r:x1</text><text x="68" y="97" text-anchor="middle" class="xs">component-start</text>
+        <rect class="box-amb" x="140" y="70" width="120" height="34" rx="8"/><text x="200" y="84" text-anchor="middle" class="s b">r:x2</text><text x="200" y="97" text-anchor="middle" class="xs">component-start</text>
+        <rect class="box-amb" x="272" y="70" width="120" height="34" rx="8"/><text x="332" y="84" text-anchor="middle" class="s b">r:x3</text><text x="332" y="97" text-anchor="middle" class="xs">component-start</text>
+        <rect class="box" x="8" y="130" width="100" height="36" rx="7"/><text x="58" y="145" text-anchor="middle" class="s">same-as x1 x2</text><text x="58" y="159" text-anchor="middle" class="xs m">kyle</text>
+        <rect class="box" x="116" y="130" width="100" height="36" rx="7"/><text x="166" y="145" text-anchor="middle" class="s">same-as x2 x3</text><text x="166" y="159" text-anchor="middle" class="xs m">a developer</text>
+        <rect class="box" x="224" y="130" width="100" height="36" rx="7"/><text x="274" y="145" text-anchor="middle" class="s tb">dispute x2 x3</text><text x="274" y="159" text-anchor="middle" class="xs m">director</text>
+        <line class="ln" x1="58" y1="168" x2="58" y2="189" marker-end="url(#ah)"/>
+        <line class="ln" x1="166" y1="168" x2="166" y2="189" marker-end="url(#ah)"/>
+        <line class="ln" x1="274" y1="168" x2="274" y2="189" marker-end="url(#ah)"/>
+        <rect class="box" x="8" y="192" width="332" height="40" rx="9"/><text x="174" y="209" text-anchor="middle" class="s b">identity vertex</text><text x="174" y="224" text-anchor="middle" class="xs">per pair, latest stance · stewards decide</text>
+        <line class="ln-acc" x1="174" y1="234" x2="174" y2="255" marker-end="url(#ah-acc)"/><text x="182" y="249" class="xs ta">resolve-by (a state reference)</text>
+        <rect class="box-acc" x="8" y="258" width="332" height="40" rx="9"/><text x="174" y="275" text-anchor="middle" class="s b">platform-knowledge</text><text x="174" y="290" text-anchor="middle" class="xs">notes grouped by class: {x1, x2} · x3 apart</text>
+        <path class="ln dash" d="M366,106 V278 H343" marker-end="url(#ah)"/>
+        <text x="380" y="192" text-anchor="middle" class="xs m" transform="rotate(90 380 192)">notes about x1 · x2 · x3</text>
+        <text x="174" y="322" text-anchor="middle" class="xs ta">another reader's identity vertex may join x3 back in</text>
+      </svg>
+    </div>
+    <figcaption>Duplicates are the expected path, not a failure: three people, three vocabularies, three anchors. Merging them is a claim someone makes, disputable like any other, and each reader's identity vertex decides which claims count. Afterwards all three names resolve to the class through the name tables.</figcaption>
+  </figure>
+  <p><span class="pill p-lean">holds, with one new parameter</span> <code>resolve-by=&lt;identity vertex&gt;</code> maps each <code>about</code> to its class before grouping. It's the third state reference, after <code>admitted-by</code> and <code>weight-by</code>, and the DAG rule covers it. This is the only place identity needs state.</p>
+
+  <h3>The other cases</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Case</th><th><code>about</code> points at</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><b>RSS feed</b></td><td>a natural key, <code>url:…</code>, normalized (tracking parameters stripped)</td><td>✓ Two fetches are two records ("seen at 9:00", "seen at 15:00"), because <code>emitted</code> is hashed; Latest grouped by URL collapses them. Hash dedup applies only to true copies (promotion, merging replicas). One article under two URLs takes a <code>same-as</code>.</td></tr>
+      <tr><td><b>Observers</b></td><td>a primitive: <code>tenure about=sl:director</code>, a stance about <code>sl:7f</code></td><td>✓ Already how the earlier cases were written.</td></tr>
+      <tr><td><b>Orchestration</b></td><td>a parameter, <code>"task": "r:t3"</code>, inside the vertex's id</td><td>✓ A vertex instance is a question about one task, which says plainly what "a vertex is a question" meant.</td></tr>
+      <tr><td><b>Salience</b></td><td>whatever records touch: <code>about</code> plus references</td><td>✓ "Observers who touched this" needs <code>resolve-by</code>, or three names count as three things.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What the exercise changed</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Refinement</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><b><code>about</code> holds things; references are payload values that are ids.</b> A set, usually of one.</td><td>A decision about two services folds into both views. The mentions record is about the chapter and refers to Mara: different roles, so different places. Facets take exactly one thing.</td></tr>
+      <tr><td><b>Later links are records,</b> about the target and referring to the evidence.</td><td>No selection by state; a correction retires the link record, never the evidence.</td></tr>
+      <tr><td><b><code>resolve-by</code></b> is the third state reference.</td><td>Identity across anchors is disputed, so it's a fold, read like <code>weight-by</code>.</td></tr>
+      <tr><td><b>Natural keys are typed</b>: <code>prefix:value</code>, with normalization declared per prefix in the store.</td><td>Makes <code>url:</code>, <code>host:</code>, <code>svc:</code> comparable without minting.</td></tr>
+      <tr><td><b>Only primitives use the reserved <code>*-anchor</code> kinds.</b> Any other thing is anchored by whatever record starts it.</td><td>Keeps the reserved list short; thing kinds stay in user vocabulary.</td></tr>
+      <tr><td><b><code>prev</code> is a general link and a set,</b> and Latest follows it. Two records sharing a <code>prev</code> are a fork; one record naming both heads merges it.</td><td>Prose saves, name records and stances all hit concurrent edits. Following the chain takes clock skew out of "current". Heads are records nothing else names in <code>prev</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Identity, counted</h3>
+  <p>About fifteen identity-related concepts were named along the way. Side by side, they collapse:</p>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>How many</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td><b>Identifiers</b></td><td>2</td><td>A <b>content hash</b>: record ids, and also lineage, store and vertex ids and thing anchors, which are hashes of the records that started them (prefixes are labels, not separate systems). A <b>natural key</b>, <code>prefix:value</code>.</td></tr>
+      <tr><td><b>Names</b></td><td>1</td><td>Name records in name tables. Self-name, petname paths and <code>@home</code> are forms of it. Never matched.</td></tr>
+      <tr><td><b>Envelope pointers</b></td><td>4</td><td><code>about</code> · <code>prev</code> · <code>under</code> · <code>covers</code> (ticks)</td></tr>
+      <tr><td><b>Vertex state references</b></td><td>3</td><td><code>admitted-by</code> · <code>weight-by</code> · <code>resolve-by</code></td></tr>
+      <tr><td><b>Everything else</b></td><td></td><td>A record whose <code>about</code> points at something. Stances point at a record; <code>same-as</code> at two things; vouch, grant, tenure and <code>runs-on</code> at a lineage; name records at what they name.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Family</th><th>Relates</th><th>Carried by</th><th>Read by</th></tr></thead>
+    <tbody>
+      <tr><td><b>Equivalence</b></td><td>thing ↔ thing</td><td><code>same-as</code> records</td><td>identity vertex, through <code>resolve-by</code></td></tr>
+      <tr><td><b>Provenance</b></td><td>record → its source or authority</td><td><code>under</code>, <code>covers</code>; <code>derived-from</code> in the payload</td><td>admission, verification, hygiene</td></tr>
+      <tr><td><b>Succession</b></td><td>record → the records it replaces</td><td><code>prev</code></td><td>Latest</td></tr>
+    </tbody>
+  </table></div>
+  <p>The three families stay separate; blurring them is the <code>owl:sameAs</code> failure. That settled <code>derived-from</code>: a restated promotion keeps the thing's identity through <code>about</code>, so the link back to its original is provenance only, and a payload convention.</p>
+
+  <h3>Discipline in an open store</h3>
+  <p>In a semantic store, convention is what keeps a growing store aligned. Admission happens at read time, so discipline can tighten after a store has grown messy: nothing is rewritten, and records that don't meet the new rules become visible rejections. A schema-first store must be disciplined from day one; this one can be disciplined as it matures.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Surface</th><th>Disciplined by</th><th>Drift looks like</th></tr></thead>
+    <tbody>
+      <tr><td><b>Kinds</b></td><td>declarations, maturity open → strict</td><td>kinds in use but never declared; near-duplicate kinds</td></tr>
+      <tr><td><b>Things</b></td><td>anchors, <code>same-as</code></td><td>near-duplicate anchors; <code>about</code> values that aren't ids</td></tr>
+      <tr><td><b>Names</b></td><td>name tables</td><td>one name pointing at two things</td></tr>
+      <tr><td><b>Natural keys</b></td><td>normalization per prefix</td><td>the same key normalized two ways</td></tr>
+    </tbody>
+  </table></div>
+  <p>Each surface gets a <b>hygiene vertex</b> that feeds the stale review. They are the standard vertices a store carries, which turns that earlier lean into a concrete yes.</p>
+  <h3>Referencing a thing mid-flow</h3>
+  <p>Referencing something should cost the word you'd say. What happens when that word isn't a known name follows the store's maturity:</p>
+  <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit note --about "auth service" "token refresh races on cold start"
+
+open      about="topic:auth-service"                 // no extra record; echoed back for reuse
+declared  component-start name="auth service"        // r:x9, then the note about r:x9
+strict    refused: no thing called "auth service"; did you mean auth-svc (r:x1)?</pre>
+  <ul>
+    <li><b>Keys converge on their own.</b> Two agents who write <code>topic:auth-service</code> meet without coordinating. Anchors never collide, so minting on every miss makes duplicates: three anchors for one service in the team case above.</li>
+    <li><b>Minting becomes deliberate</b> when a thing must survive a rename or be told apart from a namesake. It comes with a <code>same-as</code> from the key to the new anchor, and every early record joins the anchor's class through <code>resolve-by</code>. No migration.</li>
+    <li><b>The start record carries the first name,</b> as an anchor carries a self-name; no separate name record.</li>
+    <li><b>Only <code>about</code> joins.</b> A record that names its topic only in a payload field (<code>topic=auth</code>) is reached by a vertex grouping on that field, or by a later record about the key that refers to it. <code>resolve-by</code> never reads payloads.</li>
+  </ul>
+
+  <details class="unfold"><summary>Matching: one equality relation is enough</summary><div class="body">
+    <p>Linked Data's best-documented failure is <code>owl:sameAs</code>: used loosely for "same", "closely related" and "roughly the same", and global and transitive, so a few sloppy links merged unrelated entities across whole datasets. Here <code>same-as</code> is local and disputable, folded per reader. The other guard is a cheap place to say "related", so nobody overloads "same".</p>
+    <p>SKOS's mapping relations (<code>exactMatch</code>, <code>closeMatch</code>, <code>broadMatch</code>, <code>narrowMatch</code>, <code>relatedMatch</code>) were adopted as an opt-in vocabulary and then dropped. They mix the families in one kind: equivalence, hierarchy and association. And "related" throws away what was observed: the director meant "SSO gateway is the proxy in front of auth-svc", which is a note about both things, not a tag.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Relationship</th><th>Recorded as</th><th>Read by</th></tr></thead>
+      <tbody>
+        <tr><td>Same thing, two anchors</td><td><code>same-as</code>; <code>dispute</code> breaks it</td><td>the identity vertex, through <code>resolve-by</code></td></tr>
+        <tr><td>Two things in one observation</td><td>a record about both (<code>about</code> is a set), or a payload reference</td><td>every view of either thing; backlinks</td></tr>
+        <tr><td>A typed relationship, once it matters</td><td>a declared kind with named references: <code>kind "fronts" { ref "proxy" "service" }</code></td><td>lenses, the LSP</td></tr>
+        <tr><td>One thing split from another</td><td>the new anchors' start records refer to the original (<code>split-from</code>, a payload convention)</td><td>lenses follow it for ancestry</td></tr>
+      </tbody>
+    </table></div>
+    <p><code>same-as</code> means "always the same thing", so it can't record a split: joining a monolith to the two services it became would pour every later observation of each into the other. <code>prev</code> stays inside one thing's chain. Observations about the monolith stay about the monolith.</p>
+    <p>None of it enters the core; <code>same-as</code> isn't even a reserved kind. The core holds only <code>resolve-by</code>'s contract: connected components over the pairs a vertex accepts.</p>
+    <details class="source"><summary>Halpin et al.</summary><div class="body"><p>Halpin, Hayes, McCusker, McGuinness and Thompson, "When owl:sameAs isn't the same: an analysis of identity in Linked Data" (ISWC 2010). <a href="https://www.w3.org/TR/skos-reference/" rel="noopener">SKOS Reference</a>, W3C Recommendation (2009), section 10: mapping properties, considered and dropped.</p></div></details>
+  </div></details>
+
+  <details class="unfold"><summary>Where it strains</summary><div class="body"><ul>
+    <li><b>Choosing natural keys is a modeling decision made at collection.</b> A container id dies with the container; the collector has to pick the stable key (<code>svc:jellyfin@nas</code>). A bad choice can only be repaired afterwards with <code>same-as</code>.</li>
+    <li><b>Duplicate anchors will pile up</b> in the team store, though fewer in open stores, where a miss writes a key instead of minting. That's expected; a hygiene vertex (name similarity, or Wren proposing matches) feeding the stale review keeps them from piling up unmerged. See Discipline above.</li>
+    <li><b><code>resolve-by</code> is more than a lookup.</b> The identity vertex folds edges (LatestBy per pair, latest stance wins); turning edges into classes is a connected-components step that lives in <code>resolve-by</code>. That keeps the fold vocabulary closed, but the step has to be specified as carefully as a fold. A class's display id (lean: the earliest anchor in content order) can change when classes merge. Nothing stores it, and lenses show names, so that's acceptable.</li>
+    <li><b>Recognizing references by prefix</b> can misfire on a string that only looks like an id. Strict stores declare their reference fields; open stores accept the guess.</li>
+    <li><b>"Everything about auth-svc" across a large class</b> is an index question. It belongs to places (layer 4), not to the semantics.</li>
+  </ul></div></details>
+
+  <details class="unfold"><summary>The cases as records and vertices</summary><div class="body">
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># the novel
+loops emit chapter-start title="The Lighthouse"                                   # → r:a1
+loops emit chapter-prose text=blob:… --about r:a1 --prev r:p2
+loops emit chapter-mentions characters:='["r:c1"]' ideas:='["r:i9"]' --about r:a1
+
+{ "vertex": "chapter", "param": ["chapter"],
+  "from": [{ "store": "novel", "about": "$chapter" }],
+  "fold": { "facets": { "latest-by": "kind" },
+            "notes":  { "collect": true, "where": { "kind": { "is": "chapter-note" } } } } }
+
+# the homelab
+loops emit log --about svc:jellyfin@nas                                           # by the collector
+loops emit incident-start title="jellyfin stalls"                                 # → r:i1
+loops emit incident-evidence refs:='["r:l7"]' --about r:i1
+
+# the team store
+loops emit same-as --about r:x1 --about r:x2                                      # kyle
+loops emit dispute --about r:x2 --about r:x3                                      # director
+
+{ "vertex": "identity",
+  "note": "The latest stance per pair.",
+  "from": [{ "store": "team", "kind": ["same-as", "dispute"] }],
+  "fold": { "pairs": { "latest-by": "about" } } }
+
+{ "vertex": "platform-knowledge",
+  "from": [{ "store": "team", "kind": ["decision", "note"] }],
+  "resolve": "identity",
+  "fold": { "by-thing": { "collect": true, "by": "about", "weight-by": "tenure" } } }</pre>
+  </div></details>
+</section>
