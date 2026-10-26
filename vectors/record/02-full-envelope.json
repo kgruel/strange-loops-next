@@ -9,7 +9,7 @@
         "kind": "decision",
         "observer": "sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa",
         "emitted": "2026-10-21T09:15:02.250+01:00",
-        "occurred": "2026-10-17T09:14/PT4M",
+        "occurred": "2026-10-17T09:14:03Z/2026-10-17T09:18:13Z",
         "about": ["topic:auth", "url:https://example.com/x"],
         "prev": ["r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a"],
         "under": "r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq"
@@ -25,15 +25,15 @@
     "seed": "3dv2jaex3gi6dr3m3x5uj3rbeuppu6jtt7us7d6nrq4jsiejykna"
   },
   "expect": {
-    "env_canonical": "{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14/PT4M\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"}",
+    "env_canonical": "{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14:03Z/2026-10-17T09:18:13Z\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"}",
     "payload_canonical": "{\"choice\":\"device flow\",\"why\":[\"no browser on the box\"]}",
     "commit": "h:czvpdk5bta2wohwht76xcuyl5rdbaxakx2vqtcrgexfavbxtfuia",
-    "id_preimage": "{\"commit\":\"h:czvpdk5bta2wohwht76xcuyl5rdbaxakx2vqtcrgexfavbxtfuia\",\"env\":{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14/PT4M\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"}}",
-    "id": "r:k2bunsrpt6lgekagz3di26hcuyqk3mbs72j7caofj6s6rruif76a",
-    "signing_input": "loops/record/v1:r:k2bunsrpt6lgekagz3di26hcuyqk3mbs72j7caofj6s6rruif76a",
+    "id_preimage": "{\"commit\":\"h:czvpdk5bta2wohwht76xcuyl5rdbaxakx2vqtcrgexfavbxtfuia\",\"env\":{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14:03Z/2026-10-17T09:18:13Z\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"}}",
+    "id": "r:ohsnmptrdnn33y63nrxqdajmfr6hmctdbmaqhoeaj6cvdzwtqtnq",
+    "signing_input": "loops/record/v1:r:ohsnmptrdnn33y63nrxqdajmfr6hmctdbmaqhoeaj6cvdzwtqtnq",
     "key": "k:evv3i4jodj6u2f557aky4bkkfjnmi2t35fircg3r3nqj2fwb3hfa",
-    "ed25519": "b4r4xem5rtmbtcgi6q4qqq6zsmnu5zf4yp76ie4wm6ntn5s4kwnef6up2b4sn7iftwq3gsvea6un2n3kzal6drfngmapv5fahxw2eaq",
-    "line": "{\"env\":{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14/PT4M\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"},\"id\":\"r:k2bunsrpt6lgekagz3di26hcuyqk3mbs72j7caofj6s6rruif76a\",\"payload\":{\"choice\":\"device flow\",\"why\":[\"no browser on the box\"]},\"salt\":\"yer5mo2lf63wsctpnku5nnsi5m\",\"sig\":{\"ed25519\":\"b4r4xem5rtmbtcgi6q4qqq6zsmnu5zf4yp76ie4wm6ntn5s4kwnef6up2b4sn7iftwq3gsvea6un2n3kzal6drfngmapv5fahxw2eaq\",\"key\":\"k:evv3i4jodj6u2f557aky4bkkfjnmi2t35fircg3r3nqj2fwb3hfa\"}}",
-    "erased_line": "{\"commit\":\"h:czvpdk5bta2wohwht76xcuyl5rdbaxakx2vqtcrgexfavbxtfuia\",\"env\":{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14/PT4M\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"},\"id\":\"r:k2bunsrpt6lgekagz3di26hcuyqk3mbs72j7caofj6s6rruif76a\",\"sig\":{\"ed25519\":\"b4r4xem5rtmbtcgi6q4qqq6zsmnu5zf4yp76ie4wm6ntn5s4kwnef6up2b4sn7iftwq3gsvea6un2n3kzal6drfngmapv5fahxw2eaq\",\"key\":\"k:evv3i4jodj6u2f557aky4bkkfjnmi2t35fircg3r3nqj2fwb3hfa\"}}"
+    "ed25519": "ix5s7rdtwhxv3gb3mhaonej3zyaugoh2yjvbrrfzt4tflsbn5cidcrspsy7thbdi2dx5ch32mtg6vuro3msoohsrcaiq6nbgoqregbq",
+    "line": "{\"env\":{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14:03Z/2026-10-17T09:18:13Z\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"},\"id\":\"r:ohsnmptrdnn33y63nrxqdajmfr6hmctdbmaqhoeaj6cvdzwtqtnq\",\"payload\":{\"choice\":\"device flow\",\"why\":[\"no browser on the box\"]},\"salt\":\"yer5mo2lf63wsctpnku5nnsi5m\",\"sig\":{\"ed25519\":\"ix5s7rdtwhxv3gb3mhaonej3zyaugoh2yjvbrrfzt4tflsbn5cidcrspsy7thbdi2dx5ch32mtg6vuro3msoohsrcaiq6nbgoqregbq\",\"key\":\"k:evv3i4jodj6u2f557aky4bkkfjnmi2t35fircg3r3nqj2fwb3hfa\"}}",
+    "erased_line": "{\"commit\":\"h:czvpdk5bta2wohwht76xcuyl5rdbaxakx2vqtcrgexfavbxtfuia\",\"env\":{\"about\":[\"topic:auth\",\"url:https://example.com/x\"],\"emitted\":\"2026-10-21T09:15:02.250+01:00\",\"kind\":\"decision\",\"observer\":\"sl:bp3omtdcwozo5lfwykwzp4qw7qswqlyjpaij3hjktcdkbvfefvfa\",\"occurred\":\"2026-10-17T09:14:03Z/2026-10-17T09:18:13Z\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"under\":\"r:on5byly4eocsmqjzle3hr56qudvsr5j4vurngzzybzegpbd75mlq\"},\"id\":\"r:ohsnmptrdnn33y63nrxqdajmfr6hmctdbmaqhoeaj6cvdzwtqtnq\",\"sig\":{\"ed25519\":\"ix5s7rdtwhxv3gb3mhaonej3zyaugoh2yjvbrrfzt4tflsbn5cidcrspsy7thbdi2dx5ch32mtg6vuro3msoohsrcaiq6nbgoqregbq\",\"key\":\"k:evv3i4jodj6u2f557aky4bkkfjnmi2t35fircg3r3nqj2fwb3hfa\"}}"
   }
 }

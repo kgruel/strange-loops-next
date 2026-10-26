@@ -1,0 +1,25 @@
+{
+  "vector": "06-open-end",
+  "layer": "occurred",
+  "laws": ["occurred.span"],
+  "source": "model",
+  "input": {
+    "occurred": ["2019/..", "2026-10-17T09:14:03Z/..", "201X/.."]
+  },
+  "expect": {
+    "spans": [
+      {
+        "start": "2019-01-01T00:00:00Z",
+        "end": null
+      },
+      {
+        "start": "2026-10-17T09:14:03Z",
+        "end": null
+      },
+      {
+        "start": "2010-01-01T00:00:00Z",
+        "end": null
+      }
+    ]
+  }
+}

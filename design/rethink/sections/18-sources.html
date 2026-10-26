@@ -575,5 +575,15 @@
       <p class="who">kyle</p><p>Per thing; global never made sense. A cross-thing <code>prev</code> shouldn't be allowed at all: it breaks a thing's provenance.</p>
       <p class="who">claude</p><ul><li>So you can only replace what you hold, in a shared thing: <code>emit</code> refuses <code>prev-unknown</code> and <code>prev-unrelated</code>, readers refuse a cross-thing <code>prev</code>. A record about several things is current in each; about nothing is its own thing. Who may replace whom is a hook for step 3.</li><li>This version, 34: the ledger, Build, the laws table and the Glossary say so; PR 4 carries the proofs and 94 vectors.</li></ul>
     </div></details>
+    <details class="unfold turn"><summary>110 · What <code>occurred</code> can say</summary><div class="body">
+      <p class="who">kyle</p><p>Unpack the EDTF subset before formalizing it.</p>
+      <p class="who">claude</p><ul><li>The core reads <code>occurred</code> only to order and to window, so the test is whether a form names exactly one span. Dates, qualifiers, trailing unspecified digits and date intervals do; seasons, open or unknown starts and unknown ends don't.</li><li>EDTF has no durations and no times in intervals, so the page's own four-minute visit wasn't EDTF. Proposed: a closed grammar of our own, built from ISO 8601 and EDTF Level 1, kept narrow because widening later is free.</li></ul>
+      <p class="who">kyle</p><p>Calendar dates as UTC days. Start and end instants rather than durations, which is too much flexibility. Allow an open end. A span of no length first at a tie.</p>
+      <p class="who">claude</p><ul><li>PR 11: the grammar in <code>protocol/record.md</code>, its order proved a strict total order, a qualifier proved never to change a span, refusals as <code>occurred-not-span</code>, and <code>vectors/occurred/</code>, checked by an independent JS reader.</li></ul>
+      <p class="who">kyle</p><p>Run the Astra and Argon reviews on the PR.</p>
+      <p class="who">claude</p><ul><li>About 280,000 fuzzed inputs, no disagreement between Lean and JS. Both found that a year-0000 instant with a positive offset couldn't be rendered, and that three laws said more than they proved. Argon also found two invalid examples on the Example tab and proved the missing law: moments compare as exact decimals.</li><li>Asked: render year −1, or refuse it? Is <code>2009/2009-06</code> meant? Should <code>where</code> on a time compare whole spans or starts?</li></ul>
+      <p class="who">kyle</p><p>Render it. Yes. Starts.</p>
+      <p class="who">claude</p><ul><li>Each law now says what its theorem proves, on the reader itself; years render signed; the prose names the date shapes, the day boundary, fractions and <code>:60</code>; the <code>where</code> record says tests compare starts, so a pair of bounds selects what a window does.</li></ul>
+    </div></details>
   </div>
 </section>

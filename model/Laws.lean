@@ -6,3 +6,4 @@ import Laws.Families
 import Laws.Spec
 import Laws.Batch
 import Laws.Write
+import Laws.Time

@@ -1,5 +1,5 @@
 import Loops.Json
-import Loops.Time
+import Loops.Occurred
 
 /-!
 # Envelope
@@ -56,6 +56,7 @@ def Env.problem (e : Env) : Option String :=
   if e.kind.isEmpty then some "kind-empty"
   else if !typedRef e.observer then some "observer-not-typed"
   else if !validEmitted e.emitted then some "emitted-not-rfc3339"
+  else if !(e.occurred.map fun s => (occurredSpan? s).isSome).getD true then some "occurred-not-span"
   else if !e.about.all typedRef then some "about-not-typed"
   else if !e.prev.all recordId then some "prev-not-record-id"
   else if !(e.under.map recordId).getD true then some "under-not-record-id"
