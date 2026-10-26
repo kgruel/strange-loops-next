@@ -12,8 +12,8 @@
           "about": ["host:b"],
           "value": "v50",
           "prev": [],
-          "occurred": 110,
-          "emitted": 110,
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
           "n": 9
         },
         {
@@ -22,8 +22,8 @@
           "about": ["host:b"],
           "value": "v51",
           "prev": ["r:00000032"],
-          "occurred": 120,
-          "emitted": 120,
+          "emitted": "2026-10-01T00:02:00Z",
+          "occurred": "2026-10-01T00:02:00Z",
           "n": 1
         }
       ],
@@ -34,8 +34,8 @@
           "about": ["host:b"],
           "value": "v51",
           "prev": ["r:00000032"],
-          "occurred": 120,
-          "emitted": 120,
+          "emitted": "2026-10-01T00:02:00Z",
+          "occurred": "2026-10-01T00:02:00Z",
           "n": 1
         },
         {
@@ -44,8 +44,8 @@
           "about": ["host:b"],
           "value": "v50",
           "prev": [],
-          "occurred": 110,
-          "emitted": 110,
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
           "n": 9
         }
       ]

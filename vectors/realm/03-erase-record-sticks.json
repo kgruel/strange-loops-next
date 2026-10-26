@@ -11,8 +11,8 @@
         "about": ["host:a"],
         "value": "",
         "prev": [],
-        "occurred": 100,
-        "emitted": 100,
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
         "n": 40
       },
       {
@@ -20,8 +20,8 @@
         "kind": "load",
         "about": ["host:a"],
         "prev": [],
-        "occurred": 100,
-        "emitted": 100,
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
         "shown": "erased"
       },
       {
@@ -30,8 +30,8 @@
         "about": [],
         "value": "",
         "prev": [],
-        "occurred": 110,
-        "emitted": 110,
+        "emitted": "2026-10-01T00:01:50Z",
+        "occurred": "2026-10-01T00:01:50Z",
         "erases": ["r:00000051"],
         "n": 0
       },
@@ -41,8 +41,8 @@
         "about": ["host:a"],
         "value": "",
         "prev": [],
-        "occurred": 100,
-        "emitted": 100,
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
         "n": 40
       }
     ]

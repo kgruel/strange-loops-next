@@ -11,8 +11,8 @@
         "about": [],
         "value": "",
         "prev": [],
-        "occurred": 1,
-        "emitted": 1,
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
         "n": 0
       },
       {
@@ -21,8 +21,8 @@
         "about": ["r:00000081"],
         "value": "",
         "prev": ["r:00000081"],
-        "occurred": 2,
-        "emitted": 2,
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
         "n": 0
       },
       {
@@ -31,8 +31,8 @@
         "about": [],
         "value": "",
         "prev": [],
-        "occurred": 3,
-        "emitted": 3,
+        "emitted": "2026-10-01T00:00:03Z",
+        "occurred": "2026-10-01T00:00:03Z",
         "n": 0
       }
     ]

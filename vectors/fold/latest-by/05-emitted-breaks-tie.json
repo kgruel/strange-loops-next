@@ -7,45 +7,45 @@
     "orders": [
       [
         {
-          "id": "r:00000013",
-          "kind": "decision",
-          "about": ["topic:auth"],
-          "value": "v19",
-          "prev": [],
-          "occurred": 150,
-          "emitted": 150,
-          "n": 0
-        },
-        {
           "id": "r:00000016",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v22",
           "prev": [],
-          "occurred": 200,
-          "emitted": 210,
+          "emitted": "2026-10-01T00:03:30Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0
+        },
+        {
+          "id": "r:00000019",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v25",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:25Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         }
       ],
       [
         {
+          "id": "r:00000019",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v25",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:25Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0
+        },
+        {
           "id": "r:00000016",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v22",
           "prev": [],
-          "occurred": 200,
-          "emitted": 210,
-          "n": 0
-        },
-        {
-          "id": "r:00000013",
-          "kind": "decision",
-          "about": ["topic:auth"],
-          "value": "v19",
-          "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:03:30Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         }
       ]
@@ -53,9 +53,9 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:00000016", "r:00000013"],
+      "heads": ["r:00000016", "r:00000019"],
       "winner": "r:00000016",
-      "others": ["r:00000013"]
+      "others": ["r:00000019"]
     }
   }
 }

@@ -12,8 +12,8 @@
           "about": ["load"],
           "value": "v33",
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "n": 5
         },
         {
@@ -22,8 +22,8 @@
           "about": ["load"],
           "value": "v34",
           "prev": [],
-          "occurred": 110,
-          "emitted": 110,
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
           "n": -3
         },
         {
@@ -32,8 +32,8 @@
           "about": ["load"],
           "value": "v35",
           "prev": [],
-          "occurred": 120,
-          "emitted": 120,
+          "emitted": "2026-10-01T00:02:00Z",
+          "occurred": "2026-10-01T00:02:00Z",
           "n": 40
         },
         {
@@ -42,8 +42,8 @@
           "about": ["load"],
           "value": "v33",
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "n": 5
         },
         {
@@ -52,8 +52,8 @@
           "about": ["load"],
           "value": "v34",
           "prev": [],
-          "occurred": 110,
-          "emitted": 110,
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
           "n": -3
         },
         {
@@ -62,8 +62,8 @@
           "about": ["load"],
           "value": "v35",
           "prev": [],
-          "occurred": 120,
-          "emitted": 120,
+          "emitted": "2026-10-01T00:02:00Z",
+          "occurred": "2026-10-01T00:02:00Z",
           "n": 40
         }
       ]

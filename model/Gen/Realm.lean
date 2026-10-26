@@ -18,7 +18,7 @@ open Loops
 
 def r (id : Nat) (kind : String) (about : List String) (t : Nat) (prev : List Nat := []) :
     Record :=
-  { id, kind, about, value := "", prev, occurred := t, emitted := t }
+  { id, kind, about, value := "", prev, occurred := claimAt t, emitted := stampAt t }
 
 -- one record, held in full in one place and erased in another
 def full : Record := { r 0x51 "load" ["host:a"] 100 with n := 40 }

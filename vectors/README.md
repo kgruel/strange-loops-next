@@ -31,7 +31,10 @@ implementation folds each order separately; every one must produce
 * Latest: the `winner` and the `others`.
 * Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
 
-Each record's `about` is a set of things. It carries `n`, the integer the
+Each record's `about` is a set of things. It carries `emitted` and may carry
+`occurred`, both as text per `protocol/record.md`; content order reads them
+as spans: by start, then end (a record without `occurred` is an instant at
+its `emitted`), then `emitted`, then id. It carries `n`, the integer the
 numeric folds read, and may carry `observer`, `erases` (the ids whose
 payloads it erases, whatever its kind) and `fields`, further payload fields
 by name. A record whose payload the reader doesn't hold has `shown`

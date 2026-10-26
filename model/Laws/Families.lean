@@ -144,11 +144,11 @@ theorem OverHeads.late {σ} (answer : LatestBy → σ) {xs ys : List Record} (r 
 /-! ## Why there are two families -/
 
 def cx.a : Record :=
-  { id := 1, kind := "load", about := ["k1"], value := "", prev := [], occurred := 1, emitted := 1, n := 5 }
+  { id := 1, kind := "load", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
 def cx.b : Record :=
-  { id := 2, kind := "load", about := ["k2"], value := "", prev := [], occurred := 2, emitted := 2, n := 9 }
+  { id := 2, kind := "load", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
 def cx.c : Record :=
-  { id := 3, kind := "load", about := ["k2"], value := "", prev := [2], occurred := 3, emitted := 3, n := 1 }
+  { id := 3, kind := "load", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
 
 /-- A bounded state can't follow `prev`. Max holds 9 after `[a, b]` and after
 `[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and
@@ -169,7 +169,7 @@ theorem View.newer {f : Record → Record} (hf : View f) {a b : Record} :
     Newer (f a) (f b) ↔ Newer a b := by
   have ea := hf.envelope a
   have eb := hf.envelope b
-  unfold Newer
+  unfold Newer Record.span
   rw [ea.id, ea.occurred, ea.emitted, eb.id, eb.occurred, eb.emitted]
 
 theorem View.addressed {f : Record → Record} (hf : View f) {xs : List Record}

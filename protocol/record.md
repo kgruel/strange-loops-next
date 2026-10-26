@@ -79,7 +79,9 @@ possibly coarse. It is one of:
   spellings of one span are two different envelopes with two different ids.
 * **Order.** Spans order by start, then end. A span of no length comes
   before a longer one with the same start, and a span with no end comes
-  after any that has one.
+  after any that has one. Content order reads a record's span this way,
+  then its `emitted`, then its id; a record without `occurred` is an instant
+  at its `emitted`.
 * **Moments.** An instant's moment is its whole seconds in UTC, then its
   fraction, compared exactly at any length: trailing zeros don't count
   (`.5` and `.500` are the same moment). `:60` on any minute is the first
@@ -144,8 +146,9 @@ After erasure the opening is replaced by the commitment:
 
 ## Not yet
 
-* `occurred` is checked and has an order, but content order and windows
-  still read the model's plain numbers; they move to spans next.
+* Windows, which hold the records whose span starts in them (start
+  included, end excluded), arrive with ticks; `where` tests on `env.`
+  fields, comparing a time by its start, arrive next.
 * Key bindings, presence keys and admission arrive with standing (step 3).
 * Lone UTF-16 surrogates in strings are invalid JSON for RFC 8785, and
   decoders disagree on them: some replace them, JavaScript keeps them.

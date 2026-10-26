@@ -7,6 +7,25 @@ import Gen.Json
 
 open Loops Gen
 
+/-! ## Fixture times
+
+A fixture's time `t` is `t` seconds into 2026-10-01, UTC: a stamp for
+`emitted`, and a claim of the same instant for `occurred`. `timesCheck`
+confirms every such text reads, so neither falls back silently. -/
+
+def pad2 (n : Nat) : String := if n < 10 then s!"0{n}" else toString n
+
+def timeText (t : Nat) : String := s!"2026-10-01T{pad2 (t / 3600)}:{pad2 (t / 60 % 60)}:{pad2 (t % 60)}Z"
+
+def stampAt (t : Nat) : Stamp := (Stamp.of? (timeText t)).getD default
+
+def claimAt (t : Nat) : Option Claim := Claim.of? (timeText t)
+
+def timesCheck : Except String Unit :=
+  for t in List.range 3600 do
+    if (Stamp.of? (timeText t)).isNone || (Claim.of? (timeText t)).isNone then
+      throw s!"fixture time {t} doesn't read: {timeText t}"
+
 def jVal : Val → J
   | .str s => .str s
   | .int i => .int i
@@ -24,7 +43,10 @@ def jRecord (r : Record) : J :=
     (if r.observer.isEmpty then [] else [("observer", .str r.observer)]) ++
     [("about", .arr (r.about.map .str))]
   let rest := [("prev", .arr (r.prev.map (.str ∘ idText))),
-    ("occurred", .num r.occurred), ("emitted", .num r.emitted)] ++
+    ("emitted", .str r.emitted.text)] ++
+    (match r.occurred with
+      | some c => [("occurred", .str c.text)]
+      | none => []) ++
     (if r.erases.isEmpty then [] else [("erases", .arr (r.erases.map (.str ∘ idText)))])
   let fields := if r.fields.isEmpty then [] else [("fields", .obj (r.fields.map fun (k, v) => (k, jVal v)))]
   match r.shown with

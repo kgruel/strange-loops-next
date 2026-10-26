@@ -1,9 +1,13 @@
+import Loops.Occurred
+
 /-!
 # Record
 
-The record as the folds see it. Step 0 keeps it abstract: an id is a number
-standing for a content hash (rendered as fixed-width hex, so byte order and
-numeric order agree), times are plain numbers, and the payload is opaque.
+The record as the folds see it. An id is a number standing for a content
+hash (rendered as fixed-width hex, so byte order and numeric order agree),
+and the payload is opaque. Times are real: `emitted` is a `Stamp` and
+`occurred`, when there is one, a `Claim`, each its text with what it reads
+as.
 -/
 
 namespace Loops
@@ -32,8 +36,10 @@ structure Record where
   about    : List String := []
   value    : String
   prev     : List Nat
-  occurred : Nat
-  emitted  : Nat
+  /-- The claimed past, if the observer gave one. -/
+  occurred : Option Claim := none
+  /-- The observer's now. -/
+  emitted  : Stamp
   /-- The ids whose payloads this record erases, whatever its kind. -/
   erases   : List Nat := []
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
@@ -50,11 +56,19 @@ def idText (n : Nat) : String :=
   let d := Nat.toDigits 16 n
   "r:" ++ String.ofList (List.replicate (8 - d.length) '0' ++ d)
 
-/-- Content order, newest first: `occurred`, then `emitted`, then id. -/
+/-- The span content order reads: `occurred`'s, or without one, `emitted` as
+a span of no length. -/
+def Record.span (r : Record) : Span :=
+  match r.occurred with
+  | some c => c.span
+  | none => Span.point r.emitted.moment
+
+/-- Content order, newest first: the span (by start, then end), then
+`emitted`, then id. -/
 def Newer (a b : Record) : Prop :=
-  a.occurred > b.occurred ∨
-  (a.occurred = b.occurred ∧
-    (a.emitted > b.emitted ∨ (a.emitted = b.emitted ∧ a.id > b.id)))
+  b.span.Before a.span ∨
+  (a.span = b.span ∧
+    (b.emitted.moment < a.emitted.moment ∨ (a.emitted.moment = b.emitted.moment ∧ a.id > b.id)))
 
 instance (a b : Record) : Decidable (Newer a b) := by
   unfold Newer; infer_instance
@@ -105,18 +119,5 @@ def Record.num (r : Record) (name : String) : Option Int :=
 
 /-- Withhold the payloads of the records `p` picks, as a narrowed grant does. -/
 def withholding (p : Record → Bool) (r : Record) : Record := if p r then r.withhold else r
-
-theorem Newer.asymm {a b : Record} (h : Newer a b) : ¬ Newer b a := by
-  unfold Newer at *; omega
-
-theorem Newer.irrefl (a : Record) : ¬ Newer a a := by
-  unfold Newer; omega
-
-theorem Newer.trans {a b c : Record} (h₁ : Newer a b) (h₂ : Newer b c) : Newer a c := by
-  unfold Newer at *; omega
-
-/-- Any two records are ordered, or share an id. -/
-theorem Newer.total (a b : Record) : Newer a b ∨ Newer b a ∨ a.id = b.id := by
-  unfold Newer; omega
 
 end Loops

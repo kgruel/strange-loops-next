@@ -11,8 +11,8 @@
         "about": ["task:1"],
         "value": "",
         "prev": [],
-        "occurred": 1,
-        "emitted": 1,
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
         "n": 0
       },
       {
@@ -21,8 +21,8 @@
         "about": ["task:1"],
         "value": "",
         "prev": ["r:00000091"],
-        "occurred": 2,
-        "emitted": 2,
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
         "n": 0
       }
     ]

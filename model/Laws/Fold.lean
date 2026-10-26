@@ -1,4 +1,5 @@
 import Loops.Fold
+import Laws.Order
 
 /-!
 # Laws of the folds

@@ -12,8 +12,8 @@
           "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "n": 0
         },
         {
@@ -22,8 +22,8 @@
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         }
       ],
@@ -34,8 +34,8 @@
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         },
         {
@@ -44,8 +44,8 @@
           "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "n": 0
         },
         {
@@ -54,8 +54,8 @@
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         },
         {
@@ -64,8 +64,8 @@
           "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "n": 0
         }
       ]

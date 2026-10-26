@@ -34,7 +34,8 @@ def jOutcome : Outcome → J
 
 def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
     (prev : List Nat := []) (value : String := s!"v{id}") : Record :=
-  { id, kind := "decision", about := [thing], value, prev, occurred, emitted }
+  { id, kind := "decision", about := [thing], value, prev, occurred := claimAt occurred,
+    emitted := stampAt emitted }
 
 def r1 := rec 0x11 "topic:auth" 100
 def r2 := rec 0x12 "topic:auth" 200 (prev := [0x11])
@@ -44,6 +45,18 @@ def r5 := rec 0x15 "topic:cache" 120
 def r6 := rec 0x16 "topic:auth" 200 (emitted := 210)
 def r7 := rec 0x17 "topic:auth" 200 (emitted := 210)
 def r8 := rec 0x18 "topic:cache" 400 (prev := [0x99])
+-- r6's `occurred`, an earlier `emitted` and a later id: only `emitted` puts r6 first
+def r9 := rec 0x19 "topic:auth" 200 (emitted := 205)
+
+-- content order on real times: without `occurred`, the record sits at its
+-- `emitted`; at one start, an instant, then a month, then an open span
+def t1 := { rec 0x31 "topic:auth" 300 (emitted := 600) with occurred := claimAt 300 }
+def t2 := { rec 0x32 "topic:auth" 0 (emitted := 420) with occurred := none }
+def t3 := { rec 0x33 "topic:auth" 0 (emitted := 900) with occurred := none }
+def u1 := { rec 0x41 "topic:auth" 0 (emitted := 60) with occurred := Claim.of? "2026-10-01T00:00:00Z" }
+def u2 := { rec 0x42 "topic:auth" 0 (emitted := 30) with occurred := Claim.of? "2026-10" }
+def u3 := { rec 0x43 "topic:auth" 0 (emitted := 10) with occurred := Claim.of? "2026-10-01/.." }
+def u4 := { rec 0x44 "topic:auth" 0 (emitted := 20) with occurred := Claim.of? "2026" }
 
 def n1 := { rec 0x21 "load" 100 with n := 5 }
 def n2 := { rec 0x22 "load" 110 with n := -3 }
@@ -100,13 +113,15 @@ def latestByCases : List FoldCase := [
   ⟨"02-fork", ["latest-by.set", "latest-by.order"], rotations [r1, r3]⟩,
   ⟨"03-chain", ["latest-by.set"], [[r1, r2]]⟩,
   ⟨"04-chain-late", ["latest-by.set"], [[r2, r1]]⟩,
-  ⟨"05-emitted-breaks-tie", ["latest-by.order"], rotations [r3, r6]⟩,
+  ⟨"05-emitted-breaks-tie", ["latest-by.order"], rotations [r6, r9]⟩,
   ⟨"06-id-breaks-tie", ["latest-by.order"], rotations [r6, r7]⟩,
   ⟨"07-merge", ["latest-by.set"], rotations [r1, r2, r3, r4]⟩,
   ⟨"08-repeats", ["latest-by.repeats"], [[r1, r3], [r1, r3, r1, r3], [r3, r1, r3]]⟩,
   ⟨"09-converge", ["latest-by.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
   ⟨"10-two-things", ["latest-by.set"], rotations [r1, r5, r3]⟩,
-  ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩
+  ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩,
+  ⟨"12-emitted-without-occurred", ["latest-by.order"], rotations [t1, t2, t3]⟩,
+  ⟨"13-span-order", ["latest-by.order"], rotations [u1, u2, u3, u4]⟩
 ]
 
 def headsCases : List FoldCase := [
@@ -265,6 +280,7 @@ def orFail : Except String J → IO J
   | .error e => throw (IO.userError e)
 
 def main (args : List String) : IO UInt32 := do
+  if let .error e := timesCheck then throw (IO.userError e)
   let dir : System.FilePath := args.headD "../vectors"
   for sub in ["fold", "lens", "record", "spec", "batch", "realm", "occurred"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)

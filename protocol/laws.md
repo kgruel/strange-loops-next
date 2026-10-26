@@ -12,7 +12,8 @@ vectors; the model is what the vectors come from.
 | `count.perm` | `Count.perm` | arrival order doesn't change a count | `fold/count/01`, `02` |
 | `count.repeats` | `Count.repeats` | a repeated delivery is counted again, so the store must hand each id over once | `fold/count/03` |
 | `latest-by.set` | `LatestBy.set_decides` | the state depends only on the set of records folded | `fold/latest-by/*` |
-| `latest-by.order` | `LatestBy.perm` | winners follow content order: `prev`, then `occurred`, `emitted`, id | `fold/latest-by/02`, `05`, `06` |
+| `latest-by.order` | `LatestBy.perm` | winners follow content order: `prev`, then the span, `emitted`, id | `fold/latest-by/02`, `05`, `06`, `12`, `13` |
+| content order | `Newer.irrefl`, `Newer.trans`, `Newer.total` (`Laws/Order.lean`) | records order by span (`occurred`'s, or `emitted` as an instant), then `emitted`, then id: a strict total order on distinct ids | `fold/latest-by/05`, `06`, `12`, `13` |
 | `latest-by.repeats` | `LatestBy.repeats` | re-delivering records changes nothing | `fold/latest-by/08` |
 | `latest-by.converge` | `LatestBy.converge` | two places syncing in either direction reach the same state | `fold/latest-by/09` |
 
@@ -213,7 +214,7 @@ current, trusted or well dated:
   (`r:00000011`) so byte order and numeric order agree. Nothing yet connects
   these records to layer 0's real ones.
 * The payload is `value`, `n` and named `fields`.
-* In the fold model, `occurred` and `emitted` are still plain numbers. Layer 0
-  reads both as moments (`Loops/Time.lean`, `Loops/Occurred.lean`); moving
-  content order and windows onto spans is next.
+* Fold records carry their times as text with what each reads as (`Stamp`,
+  `Claim`); a record's other envelope fields are as written, not read from
+  an envelope.
 * Text is a list of lines; splitting a file into lines is outside the model.
