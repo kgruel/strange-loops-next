@@ -49,7 +49,8 @@ for (const f of readdirSync(join(dir, "record")).sort()) {
 const pad = (n, w = 2) => String(n).padStart(w, "0");
 const utc = ([secs, frac]) => {
   const t = new Date(secs * 1000);
-  return `${pad(t.getUTCFullYear(), 4)}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T` +
+  const y = t.getUTCFullYear();
+  return `${y < 0 ? "-" + pad(-y, 4) : pad(y, 4)}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T` +
     `${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}:${pad(t.getUTCSeconds())}${frac ? "." + frac : ""}Z`;
 };
 for (const f of readdirSync(join(dir, "occurred")).sort()) {

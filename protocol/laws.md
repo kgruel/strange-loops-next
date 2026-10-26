@@ -174,11 +174,15 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `occurred.span` | (by construction: `Span.ok`) | each form names one span, and its end is never before its start | `occurred/01`–`06` |
-| `occurred.qualifier` | `qualifier_ignored`, `point_qualified` | a qualifier never changes a date's span | `occurred/03`, `05` |
-| `occurred.instant` | `instant_stripped` | an instant has one moment however its fraction is written | `occurred/04` |
+| `occurred.span` | `occurred_point`, `occurred_open`, `occurred_interval`, `point_le` | every point the reader accepts becomes the span the grammar gives it, alone, with `..` or with a second point starting no earlier; a span's end is never before its start | `occurred/01`–`06` |
+| `occurred.qualifier` | `occurred_qualified`, `occurred_qualified_start`, `occurred_qualified_end` | a qualifier never changes a span, on a date alone or on either end of an interval | `occurred/03`, `05` |
+| `occurred.moment` | `instant_canonical`, `point_canonical`, `moment_lt_iff_scaled`, `stripZeros_replicate_zero` | every moment the reader makes is whole seconds then digits not ending in zero; comparing two as lists is comparing them as exact decimals; trailing zeros never change one | `occurred/04` |
 | `occurred.order` | `Span.before_irrefl`, `Span.before_trans`, `Span.before_total` | spans order by start then end, an open end last: a strict total order, so every store orders them the same | `occurred/08` |
-| `occurred.refuse` | (by construction) | every other text is refused with `occurred-not-span` | `occurred/07`, `record/34` |
+| `occurred.refuse` | (by construction) | a text the reader doesn't accept is refused with `occurred-not-span`, never guessed at | `occurred/07`, `record/34` |
+
+Which texts are points is the definition itself (`dateDays?`, `instant?`),
+pinned by the vectors rather than by a theorem about the grammar. The
+acceptance and decimal-order proofs are adapted from Gemini's review.
 
 The laws hold for any hash function. The vectors use SHA-256 and Ed25519,
 computed by reference code in `model/Gen/` that checks itself against

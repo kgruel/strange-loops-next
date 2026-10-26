@@ -179,7 +179,7 @@
     "group": "Meaning · vertices and stores",
     "status": "settled",
     "claim": "<code>where</code> can test any envelope field, named explicitly.",
-    "why": "Envelope fields are tested as <code>env.kind</code>, <code>env.observer</code>, <code>env.emitted</code>, <code>env.occurred</code>, <code>env.about</code>, <code>env.prev</code> and <code>env.under</code>, and a bare name always means a payload field, so no payload name is shadowed. Envelope tests always answer and choose among heads after supersession. <code>at-least</code> and <code>below</code> on times wait for the time ordering, and <code>observer</code> compares lineage ids until name tables arrive. Version 35."
+    "why": "Envelope fields are tested as <code>env.kind</code>, <code>env.observer</code>, <code>env.emitted</code>, <code>env.occurred</code>, <code>env.about</code>, <code>env.prev</code> and <code>env.under</code>, and a bare name always means a payload field, so no payload name is shadowed. Envelope tests always answer and choose among heads after supersession. <code>at-least</code> and <code>below</code> on a time compare starts: <code>2019-01</code> is at least <code>2019</code>, so <code>at-least: 2019, below: 2020</code> selects what the 2019 window does, and a record without <code>occurred</code> passes neither. Windows hold the records whose start falls in them, start included and end excluded, using <code>emitted</code> when there is no <code>occurred</code>. Whole-span order was weighed and rejected: it puts <code>2019-01</code> below <code>2019</code>, since the two start together and January ends first. And <code>observer</code> compares lineage ids until name tables arrive. Version 35."
   },
   {
     "kind": "decision",

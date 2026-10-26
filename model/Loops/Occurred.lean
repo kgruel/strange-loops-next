@@ -84,14 +84,31 @@ def point? (cs : List Char) : Option (Moment × Moment) :=
 def Span.closed? (a b : Moment) : Option Span :=
   if h : a ≤ b then some ⟨a, some b, fun e he => by cases he; exact h⟩ else none
 
-def occurredSpan? (s : String) : Option Span :=
-  match s.splitOn "/" with
-  | [p] => (point? p.toList).bind fun (a, b) => Span.closed? a b
-  | [p, ".."] => (point? p.toList).map fun (a, _) => ⟨a, none, fun _ h => by cases h⟩
-  | [p, q] =>
-    match point? p.toList, point? q.toList with
-    | some (a, _), some (b, e) => if a ≤ b then Span.closed? a e else none
-    | _, _ => none
-  | _ => none
+/-- The text before the first `/`, and the text after it if there is one. -/
+def halves (cs : List Char) : List Char × Option (List Char) :=
+  match cs.dropWhile (· != '/') with
+  | [] => (cs.takeWhile (· != '/'), none)
+  | _ :: b => (cs.takeWhile (· != '/'), some b)
+
+/-- A point alone: its own span. -/
+def single (p : List Char) : Option Span := (point? p).bind fun (a, b) => Span.closed? a b
+
+/-- A point and `..`: from its start, with no end. -/
+def openFrom (p : List Char) : Option Span :=
+  (point? p).map fun (a, _) => ⟨a, none, fun _ h => by cases h⟩
+
+/-- Two points, the second starting no earlier: from the first's start to the second's end. -/
+def between (p q : List Char) : Option Span :=
+  match point? p, point? q with
+  | some (a, _), some (b, e) => if a ≤ b then Span.closed? a e else none
+  | _, _ => none
+
+def spanOf (p : List Char) : Option (List Char) → Option Span
+  | none => single p
+  | some q => if q = ['.', '.'] then openFrom p else if q.contains '/' then none else between p q
+
+def occurredSpanOf (cs : List Char) : Option Span := spanOf (halves cs).1 (halves cs).2
+
+def occurredSpan? (s : String) : Option Span := occurredSpanOf s.toList
 
 end Loops

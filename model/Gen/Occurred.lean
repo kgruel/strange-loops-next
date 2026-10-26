@@ -30,14 +30,17 @@ def pad (w n : Nat) : String :=
   let s := toString n
   String.ofList (List.replicate (w - s.length) '0') ++ s
 
-/-- A moment in UTC, as RFC 3339 writes it. -/
+/-- A year as ISO 8601 writes one, with a sign before year 0 and five digits past 9999. -/
+def year (y : Int) : String := if y < 0 then "-" ++ pad 4 (-y).toNat else pad 4 y.toNat
+
+/-- A moment in UTC, as RFC 3339 writes it. An offset can carry an instant in
+year 0000 or 9999 just past the calendar's ends, so years are signed. -/
 def utc : Moment → Except String String
   | [] => throw "empty moment"
   | s :: frac => do
     let (y, mo, d) := civil (s / 86400)
-    if y < 0 then throw s!"moment {s} is before year 0"
     let r := (s % 86400).toNat
-    return s!"{pad 4 y.toNat}-{pad 2 mo}-{pad 2 d}T{pad 2 (r / 3600)}:{pad 2 (r / 60 % 60)}:{pad 2 (r % 60)}" ++
+    return s!"{year y}-{pad 2 mo}-{pad 2 d}T{pad 2 (r / 3600)}:{pad 2 (r / 60 % 60)}:{pad 2 (r % 60)}" ++
       (if frac.isEmpty then "" else "." ++ String.join (frac.map toString)) ++ "Z"
 
 def jSpan (sp : Span) : Except String J := do
@@ -66,10 +69,13 @@ def cases : List Case := [
     texts := ["201X", "20XX", "2004-XX", "1985-04-XX", "1985-XX-XX", "99XX"] },
   { name := "03-qualifiers", laws := ["occurred.span", "occurred.qualifier"],
     texts := ["2009", "2009?", "2009~", "2009%", "2004-06-11?", "201X~"] },
-  { name := "04-instants", laws := ["occurred.span", "occurred.instant"],
+  { name := "04-instants", laws := ["occurred.span", "occurred.moment"],
     texts := ["2026-10-17T09:14:03Z", "2026-10-17T04:14:03-05:00", "2026-10-17T23:30:00-01:00",
       "2026-10-17T09:14:03.250Z", "2026-10-17T09:14:03.25Z", "2026-10-17T09:14:03.000Z",
-      "2016-12-31T23:59:60Z", "1969-12-31T23:59:59.5Z"] },
+      "2016-12-31T23:59:60Z", "2026-10-17T12:34:60.5Z", "1969-12-31T23:59:59.5Z",
+      "2026-10-17T09:14:03.0000000001Z",
+      -- written in year 0000 or 9999, but in UTC just outside it
+      "0000-01-01T00:00:00+01:00", "9999-12-31T23:30:00-01:00"] },
   { name := "05-intervals", laws := ["occurred.span", "occurred.qualifier"],
     texts := ["2009-07/2011-03", "2026-10-17T09:14:03Z/2026-10-17T09:18:13Z",
       "2026-10-17/2026-10-17T12:00:00Z", "2004-06~/2004-09?", "2009/2009",
@@ -130,6 +136,9 @@ def selfCheck : Except String Unit := do
     match instant? s.toList with
     | some m => if (← utc m) != s then throw s!"self-check failed: {s} renders as {← utc m}"
     | none => throw s!"self-check failed: {s} refused"
+  for (m, want) in [([dayNumber 0 1 1 * 86400 - 3600], "-0001-12-31T23:00:00Z"),
+      ([dayNumber 10000 1 1 * 86400 + 1800], "10000-01-01T00:30:00Z")] do
+    if (← utc m) != want then throw s!"self-check failed: {m} renders as {← utc m}, not {want}"
   for (y, m, d, n) in [(1970, 1, 1, 0), (2000, 3, 1, 11017), (1900, 1, 1, -25567), (0, 1, 1, -719528)] do
     if dayNumber y m d != n then throw s!"self-check failed: day {y}-{m}-{d} is {dayNumber y m d}, not {n}"
 

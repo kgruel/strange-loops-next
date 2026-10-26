@@ -24,7 +24,8 @@ vectors in `vectors/record/`.
 * A **record id** is `r:` and 52 base32 characters.
 * **`emitted`** is `YYYY-MM-DDTHH:MM:SS`, an optional fraction, then `Z` or
   `±HH:MM`. Only upper-case `T` and `Z`, a real calendar day, hours to 23,
-  minutes to 59, seconds to 60 (a leap second), offsets to `23:59`.
+  minutes to 59, seconds to 60 on any minute (a leap second), offsets to
+  `23:59`. The fraction is `.` and one or more digits, of any length.
 * **`occurred`** is a span of time. Its grammar is below.
 * **Sets** (`about`, `prev`, `erases`) have one canonical form: sorted by UTF-16 code
   units, repeats removed, and left out when empty.
@@ -57,27 +58,34 @@ possibly coarse. It is one of:
 
 | Form | Example | Span |
 |---|---|---|
-| a calendar date | `2009`, `2009-07`, `2009-07-14` | the whole year, month or day |
-| a date with its last digits unspecified | `201X`, `20XX`, `2004-XX`, `1985-04-XX`, `1985-XX-XX` | the decade, century, year or month |
+| a calendar date: `YYYY`, `YYYY-MM` or `YYYY-MM-DD` | `2009`, `2009-07`, `2009-07-14` | the whole year, month or day |
+| a date with its last digits unspecified: `YYYX`, `YYXX`, `YYYY-XX`, `YYYY-MM-XX` or `YYYY-XX-XX`, and no other shape | `201X`, `20XX`, `2004-XX`, `1985-04-XX`, `1985-XX-XX` | the decade (`YYYX`), century (`YYXX`), year (`YYYY-XX`, `YYYY-XX-XX`) or month (`YYYY-MM-XX`) |
 | either, then one qualifier | `2009?` (uncertain), `2009~` (approximate), `2009%` (both) | the date's own span |
 | an instant, as `emitted` writes one | `2026-10-17T09:14:03Z` | a span of no length |
 | `a/b`, two of those | `2009-07/2011-03`, `2026-10-17T09:14:03Z/2026-10-17T09:18:13Z` | from the start of `a` to the end of `b` |
 | `a/..` | `2019/..` | from the start of `a`, with no end yet |
 
 * Calendar dates are UTC days of the proleptic Gregorian calendar, years
-  0000 to 9999. Unspecified digits follow EDTF Level 1: only the last one or
-  two digits of a year, and a month or day only when everything after it is
-  unspecified too.
+  0000 to 9999. A date's span starts at `00:00:00Z` on its first day and
+  ends at `00:00:00Z` on the day after its last: `2009` runs from
+  `2009-01-01T00:00:00Z` to `2010-01-01T00:00:00Z`, where `2010` starts.
+  Unspecified digits follow EDTF Level 1, in exactly the five shapes above.
 * A qualifier is part of the claim and stays in the text; it never changes
   the span. Instants take no qualifier.
-* In `a/b`, `b` may not start before `a` does.
+* In `a/b`, `b` may not start before `a` does. The span ends where `b`
+  ends, even when that is before `a` ends: `2009/2009-06` runs from the
+  start of 2009 to the end of June 2009.
 * The text is kept as written, as `emitted` keeps the writer's offset. Two
   spellings of one span are two different envelopes with two different ids.
 * **Order.** Spans order by start, then end. A span of no length comes
   before a longer one with the same start, and a span with no end comes
-  after any that has one. An instant's moment is its whole seconds in UTC,
-  then its fraction (`.5` and `.500` are the same moment); a leap second is
-  the first second of the next minute.
+  after any that has one.
+* **Moments.** An instant's moment is its whole seconds in UTC, then its
+  fraction, compared exactly at any length: trailing zeros don't count
+  (`.5` and `.500` are the same moment). `:60` on any minute is the first
+  second of the next minute, its fraction kept: `12:34:60.5Z` is
+  `12:35:00.5Z`. An offset can carry an instant written in year 0000 or 9999
+  just outside those years in UTC; it is accepted as written.
 
 The forms come from ISO 8601 and EDTF Level 1 (ISO 8601-2), but this is the
 whole grammar: no durations (write the end instant: `start/end`), seasons,

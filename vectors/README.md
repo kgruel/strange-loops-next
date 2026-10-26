@@ -101,7 +101,8 @@ must give the same.
 
 `input.occurred` lists `occurred` texts. `expect.spans` gives each one's
 span, `start` and `end` as UTC instants (`end` is `null` when the span has
-no end yet, and the end of year 9999 is `10000-01-01T00:00:00Z`), or
+no end yet; years outside 0000 to 9999 are signed or five digits, as
+`-0001-12-31T23:00:00Z` and `10000-01-01T00:00:00Z`), or
 `refused`, in the same order. In `08-order`, `expect["oldest-first"]` is the
 texts sorted by span, per `protocol/record.md`.
 
