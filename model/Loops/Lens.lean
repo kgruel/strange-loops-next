@@ -26,8 +26,10 @@ def reserved (l : Line) : Bool := l.take 3 == fence || l.head? == some '\\'
 
 def escape (l : Line) : Line := if reserved l then '\\' :: l else l
 
+/-- Removes a backslash only where `escape` would have put one: before a line
+that needs it. Any other leading backslash is the line's own text, kept. -/
 def unescape : Line → Line
-  | '\\' :: l => l
+  | '\\' :: l => if reserved l then l else '\\' :: l
   | l => l
 
 def header (id : Line) : Line := fence ++ ' ' :: id

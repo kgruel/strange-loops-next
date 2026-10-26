@@ -232,7 +232,10 @@ def lensCases : List LensCase := [
   ⟨"06-dropped-section", ["lens.nothing-dropped", "lens.absence-not-edit"], base, edited (·.take 1)⟩,
   ⟨"07-unclosed", ["lens.refuse"], base, [L "::: decision:auth", L "Use OAuth device flow."]⟩,
   ⟨"08-fence-in-body", ["lens.refuse"], base, [L "::: decision:auth", L ":::x", L ":::"]⟩,
-  ⟨"09-text-outside", ["lens.refuse"], base, [L "stray line"] ++ render base⟩
+  ⟨"09-text-outside", ["lens.refuse"], base, [L "stray line"] ++ render base⟩,
+  -- a backslash the text itself starts with, before nothing that needs escaping, is kept
+  ⟨"10-backslash-kept", ["lens.escaping", "lens.put-get"], base,
+    render [base[0]!] ++ [L "::: decision:cache", L "\\No cache until reads are slow.", L ":::"]⟩
 ]
 
 def lensVector (c : LensCase) : Except String J := do
