@@ -63,6 +63,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -77,6 +78,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabda",
           "kind": "task-done",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -87,6 +89,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -104,6 +107,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabda",
           "kind": "task-done",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -114,6 +118,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -129,6 +134,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -145,6 +151,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -160,6 +167,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -174,6 +182,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabda",
           "kind": "task-done",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],

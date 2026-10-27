@@ -23,8 +23,13 @@ the closed vocabulary with an optional `where`.
   (`Loops.Things`); `from` and the envelope tests then choose heads, and the
   payload tests filter them. Selecting first would bring back a record whose
   successor is of another kind, or no longer matches, or is withheld.
-* `about`, `prev` and `erases` are sets, so a test on one asks whether it
-  holds a value.
+* `about`, `prev`, `under` and `erases` are sets, so a test on one asks
+  whether it holds a value, and `present` whether it holds any.
+* **Arguments** must be what layer 0 would accept in their field, since
+  nothing else can match; a payload field takes text, a number or a boolean.
+* **The spec is explicit.** No key repeats, a `where` names at least one
+  field, and latest-by writes `"follow": "prev"`; collect without it takes
+  every selected record, superseded or not.
 
 Step 2 accepts these keys. `ticks`, `boundary` and the other spec keys are
 recognized and carried, not yet evaluated; `as`, `by`, `order`, `set` and
@@ -59,22 +64,26 @@ def EnvField.name : EnvField → String
   | .emitted => "emitted"
   | .occurred => "occurred"
 
-/-- What a field holds, which decides what a test on it may compare against. -/
+/-- What a field holds, which decides what a test on it may compare against:
+only what layer 0 would accept in that field, since nothing else can match. -/
 inductive FieldType where
-  /-- Text: `kind`, `observer`, `about`. -/
+  /-- Text that isn't empty: `kind`. -/
   | text
+  /-- Typed references, `prefix:value`: `observer`, `about`. -/
+  | refs
   /-- Record ids: `prev`, `under`, `erases`. -/
   | ids
   /-- Times: `emitted`, `occurred`. -/
   | time
-  /-- A payload field: any value. -/
+  /-- A payload field: text, a number or a boolean. -/
   | payload
   deriving Repr, DecidableEq
 
 def EnvField.type : EnvField → FieldType
+  | .kind => .text
+  | .observer | .about => .refs
   | .prev | .under | .erases => .ids
   | .emitted | .occurred => .time
-  | .kind | .observer | .about => .text
 
 /-- Where a field lives: on the envelope, or in the payload. -/
 inductive Field where
@@ -315,12 +324,15 @@ abbrev Parse := Except Refusal
 
 def refuse {α : Type} (code path : String) : Parse α := throw ⟨code, path⟩
 
-/-- What a test on a field of this type may compare against: text for text,
-a record id for ids, a time in `occurred`'s grammar for times, any value for
-a payload field. -/
+/-- What a test on a field of this type may compare against, by layer 0's
+own checks: text that isn't empty for `kind`, a typed reference for
+`observer` and `about`, a record id for ids, a time in `occurred`'s grammar
+for times; text, a number or a boolean for a payload field. -/
 def parseArg (ty : FieldType) (path : String) : Json → Parse Arg
   | .str s => match ty with
-    | .text | .payload => pure (.val (.str s))
+    | .payload => pure (.val (.str s))
+    | .text => if s.isEmpty then refuse "where-invalid" path else pure (.val (.str s))
+    | .refs => if typedRef s then pure (.val (.str s)) else refuse "where-invalid" path
     | .ids => if recordId s then pure (.val (.str s)) else refuse "where-invalid" path
     | .time => match Claim.of? s with
       | some c => pure (.time c)
@@ -344,7 +356,9 @@ def parseOp (ty : FieldType) (path : String) : String × Json → Parse Op
   | ("below", v) => .below <$> parseBound ty path v
   | _ => refuse "where-invalid" path
 
+/-- A `where` map: at least one field, each with at least one test. -/
 def parseWhere (path : String) : Json → Parse (List Cond)
+  | .obj [] => refuse "where-invalid" path
   | .obj fs => do
     let css ← fs.mapM fun (name, ops) => do
       let p := s!"{path}.{name}"
@@ -365,10 +379,13 @@ def specKeys : List String :=
   ["vertex", "note", "from", "fold", "ticks", "order", "resolve", "window", "boundary",
     "param", "covers", "into", "bundle"]
 
+/-- Spec paths: a member's key after its object's path, joined by `.`. -/
+def memberPath (path k : String) : String := if path = "" then k else s!"{path}.{k}"
+
 def checkKeys (allowed : List String) (path : String) (kvs : List (String × Json)) :
     Parse Unit :=
   match kvs.find? (!allowed.contains ·.1) with
-  | some (k, _) => refuse "unknown-key" (if path = "" then k else s!"{path}.{k}")
+  | some (k, _) => refuse "unknown-key" (memberPath path k)
   | none => pure ()
 
 def parseSlot (name : String) : Json → Parse Slot
@@ -379,7 +396,8 @@ def parseSlot (name : String) : Json → Parse Slot
       | [p] => pure p
       | _ => refuse "fold-type" path
     let follow ← match kvs.lookup "follow" with
-      | none => pure false
+      | none =>
+        if t = "latest-by" then refuse "follow-missing" s!"{path}.follow" else pure false
       | some (.str "prev") =>
         if t = "collect" || t = "latest-by" then pure true
         else refuse "follow-invalid" s!"{path}.follow"
@@ -404,9 +422,10 @@ def parseSlot (name : String) : Json → Parse Slot
     pure ⟨name, type, cond⟩
   | _ => refuse "fold-invalid" s!"fold.{name}"
 
+/-- Kinds `from` takes: text that isn't empty, as layer 0 requires of `kind`. -/
 def parseKinds (path : String) : Json → Parse (List String)
   | .arr ks => ks.mapM fun
-    | .str k => pure k
+    | .str k => if k.isEmpty then refuse "from-invalid" path else pure k
     | _ => refuse "from-invalid" path
   | _ => refuse "from-invalid" path
 
@@ -421,15 +440,33 @@ def parseSource : Json → Parse Source
       | some j => parseKinds "from.kind" j
     let about ← match kvs.lookup "about" with
       | none => pure none
-      | some (.str a) => pure (some a)
+      | some (.str a) => if typedRef a then pure (some a) else refuse "from-invalid" "from.about"
       | some _ => refuse "from-invalid" "from.about"
     pure ⟨store, kinds, about⟩
   | _ => refuse "from-invalid" "from"
 
-/-- Parse a spec. Checked in order: an object, known keys, `vertex`, `from`,
-then each slot of `fold`. A spec reads at least one source: one with no
-`from`, or an empty one, is refused (`from-missing`), never run empty. -/
-def Spec.ofJson : Json → Parse Spec
+mutual
+/-- Where a key first repeats in its object, depth first in member order:
+the repeat's path. Array elements share their array's path, as spec paths
+have no indexes. -/
+def Json.repeatAt (path : String) : Json → Option String
+  | .arr xs => Json.repeatIn path xs
+  | .obj kvs => Json.repeatMember path [] kvs
+  | _ => none
+
+def Json.repeatIn (path : String) : List Json → Option String
+  | [] => none
+  | x :: xs => (x.repeatAt path).orElse fun _ => Json.repeatIn path xs
+
+def Json.repeatMember (path : String) (seen : List String) : List (String × Json) → Option String
+  | [] => none
+  | (k, v) :: kvs =>
+    if seen.contains k then some (memberPath path k)
+    else (v.repeatAt (memberPath path k)).orElse fun _ => Json.repeatMember path (k :: seen) kvs
+end
+
+/-- A spec whose keys are distinct. -/
+def Spec.ofObject : Json → Parse Spec
   | .obj kvs => do
     checkKeys specKeys "" kvs
     let vertex ← match kvs.lookup "vertex" with
@@ -445,6 +482,14 @@ def Spec.ofJson : Json → Parse Spec
       | some _ => refuse "fold-invalid" "fold"
     pure ⟨vertex, sources, slots⟩
   | _ => refuse "spec-not-object" ""
+
+/-- Parse a spec. Checked in order: no key repeats in any object
+(`member-duplicate`, layer 0's rule, at the first repeat), an object, known
+keys, `vertex`, `from`, then each slot of `fold`. A spec reads at least one
+source: one with no `from`, or an empty one, is refused (`from-missing`),
+never run empty. -/
+def Spec.ofJson (j : Json) : Parse Spec :=
+  if !j.keysDistinct then refuse "member-duplicate" ((j.repeatAt "").getD "") else Spec.ofObject j
 
 /-! ## Back to JSON: the parsed form, as the vectors show it -/
 

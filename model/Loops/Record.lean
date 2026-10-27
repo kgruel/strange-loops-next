@@ -32,7 +32,7 @@ structure Record where
   id       : Nat
   kind     : String
   /-- Who says so. -/
-  observer : String := ""
+  observer : String
   /-- The things this record is about: a set. -/
   about    : List String := []
   value    : String

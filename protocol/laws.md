@@ -111,35 +111,60 @@ refuses a `prev` naming a record neither in the batch nor in the store
 A spec parses into a closed type: `from` selects by envelope, and `fold`
 names slots, each one fold with an optional `where`. `where` has six
 operators (`is`, `not`, `present`, `absent`, `at-least`, `below`) and three
-answers; a `where` map holds when every test does. A test names an envelope
-field as `env.` and its name (`env.kind`, `env.observer`, `env.about`,
-`env.prev`, `env.under`, `env.erases`, `env.emitted`, `env.occurred`); any
-other name is a payload field, and `env.` with a name the envelope doesn't
-have is refused. `about`, `prev` and `erases` are sets, so a test on one asks
-whether it holds a value. What a test compares against must fit its field,
-or the spec is refused (`where-invalid`): text for text, a record id for ids,
-a time in `occurred`'s grammar for a time, a number for `at-least` and
-`below` on a payload field. A time is tested by what it reads as: `is` asks
-for the same span however either is spelled, `at-least` and `below` compare
-starts, and a record without `occurred` passes neither. Accumulating slots select,
-then fold. Slots over heads (latest-by, collect) read each thing's state,
-already settled over everything the reader holds; `from` and the envelope
-tests then choose heads, and payload tests filter them. Selecting first
-would bring back a record whose successor is of another kind, no longer
-matches, or is withheld.
+answers; a `where` map holds when every test does, and has at least one.
+A test names an envelope field as `env.` and its name (`env.kind`,
+`env.observer`, `env.about`, `env.prev`, `env.under`, `env.erases`,
+`env.emitted`, `env.occurred`); any other name is a payload field, and
+`env.` with a name the envelope doesn't have is refused. `env.` reads the
+envelope as written: a record about nothing has an empty `about`, though it
+anchors a thing named by its own id. `about`, `prev`, `under` and `erases`
+are sets (`under` of at most one): `is` asks whether the set holds the
+value, `not` whether it doesn't, and `present` whether it holds anything.
+
+What a test compares against must be what layer 0 would accept in its
+field, since nothing else can match; otherwise the spec is refused
+(`where-invalid`). That is text that isn't empty for `kind`, a typed
+reference (`prefix:value`) for `observer` and `about`, a record id for
+`prev`, `under` and `erases`, and a time in `occurred`'s grammar for
+`emitted` and `occurred`. A payload field takes text, a whole number or a
+boolean, and `at-least` and `below` take a number there and a time on a
+time. `present` and `absent` take `true`. `from` holds its kinds and its
+`about` to the same rule. A time is tested by what it reads as: `is` asks
+for the same span however either is spelled, `at-least` and `below`
+compare starts, and a record without `occurred` passes neither.
+
+Accumulating slots select, then fold; a numeric fold (sum, min, max) counts
+a selected record as unread when its payload isn't held or lacks the field
+as a number. Slots over heads (latest-by, and collect with
+`"follow": "prev"`) read each thing's state, already settled over
+everything the reader holds; `from` and the envelope tests then choose
+heads, and payload tests filter them. Selecting first would bring back a
+record whose successor is of another kind, no longer matches, or is
+withheld. Latest-by always follows `prev`, and a spec must say so; collect
+without it takes every selected record, superseded or not.
+
+A spec is JSON with no key repeated in any object (layer 0's
+`member-duplicate`), checked before anything else, so its parsed form
+renders back to it. Then, in order: an object, known keys, `vertex`, `from`,
+and each slot in the order written. A slot checks its keys, one fold type,
+`follow`, `limit`, the fold's argument, then `where`, its fields in the order
+written and each field's tests in turn. A refusal's path is the offending
+member's: keys joined by `.`, with no index into arrays, and a test's
+refusal names its field.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
 | `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below`, `Op.atLeast_below_time` | `not` is the complement of `is`, `absent` of `present`; on a number, or a time, exactly one of `at-least` and `below` holds | `spec/run/06`, `07` |
-| `where.typed` | `Op.ordered_like_only` | `at-least` and `below` compare numbers with numbers and times with times, and hold for nothing else; a bound that doesn't fit its field is refused | `spec/run/07`, `spec/parse/23`, `25`, `28` |
-| `where.time` | `Cond.occurred_is`, `Cond.occurred_atLeast`, `Cond.occurred_below`, `Cond.occurred_missing`, `Cond.time_meaning` | a test on a time reads its span, never its spelling: `is` asks for the same span, `at-least` and `below` compare starts, and a record without `occurred` passes neither | `spec/run/06` |
+| `where.typed` | `Op.ordered_like_only`, `parseOp_ok_iff`, `parseArg_ok_iff`, `parseBound_ok_iff` | `at-least` and `below` compare numbers with numbers and times with times, and hold for nothing else; a test is accepted exactly when its argument fits its field (`Op.Fits`), and renders back to what was written | `spec/run/07`, `spec/parse/22`–`37` |
+| `where.fields` | `Cond.text_is`, `Cond.about_is`, `Cond.set_present`, `Cond.emitted_is`, `Cond.emitted_atLeast`, `Cond.emitted_below` | each envelope field reads as what it holds: `kind` and `observer` as their text, a set as its members, `emitted` as its own instant | `spec/run/08` |
+| `where.time` | `Cond.occurred_is`, `Cond.occurred_atLeast`, `Cond.occurred_below`, `Cond.occurred_missing`, `Cond.time_meaning`, `Op.time_arg_meaning` | a test on a time reads its span, never its spelling, the record's or the argument's: `is` asks for the same span, `at-least` and `below` compare starts, and a record without `occurred` passes neither | `spec/run/06`, `08` |
 | `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record, withheld or not | every `spec/run` vector |
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
-| `spec.after-supersession` | `Spec.view_state` | slots over heads read each thing's state, which under a view is the full reader's with payloads hidden; selection never brings back what was superseded | `spec/run/03`, `04` |
-| `spec.parse` | (checked by `gen`) | the parsed form parses back to itself; refusals name a closed code and a path; a spec with no source is refused (`from-missing`), never run empty | `spec/parse/*` |
+| `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads: records no record about their thing has superseded, so selection never brings back what was superseded; under a view each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
+| `spec.parse` | `Spec.ofJson_repeat`, `Json.repeatAt_none`; the rest checked by `gen` | a spec with a repeated key is refused at the repeat; the parsed form parses back to itself; refusals name a closed code and a path; a spec with no source is refused (`from-missing`), never run empty | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
 

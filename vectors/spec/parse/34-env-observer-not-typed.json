@@ -1,0 +1,30 @@
+{
+  "vector": "34-env-observer-not-typed",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "env.observer": {
+              "is": "alice"
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "where-invalid",
+    "path": "fold.c.where.env.observer"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "vector": "32-env-text-as-bool",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "env.kind": {
+              "not": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "where-invalid",
+    "path": "fold.c.where.env.kind"
+  }
+}

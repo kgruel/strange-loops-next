@@ -8,6 +8,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
         "kind": "task",
+        "observer": "sl:kyle",
         "about": ["task:1"],
         "value": "",
         "prev": [],
@@ -18,6 +19,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
         "kind": "task-done",
+        "observer": "sl:kyle",
         "about": ["task:1"],
         "value": "",
         "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"],

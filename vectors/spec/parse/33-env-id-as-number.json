@@ -1,0 +1,30 @@
+{
+  "vector": "33-env-id-as-number",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "env.prev": {
+              "is": 5
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "where-invalid",
+    "path": "fold.c.where.env.prev"
+  }
+}

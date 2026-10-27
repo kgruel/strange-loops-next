@@ -9,6 +9,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaza",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["host:b"],
           "value": "v50",
           "prev": [],
@@ -19,6 +20,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["host:b"],
           "value": "v51",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaza"],
@@ -31,6 +33,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["host:b"],
           "value": "v51",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaza"],
@@ -41,6 +44,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaza",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["host:b"],
           "value": "v50",
           "prev": [],

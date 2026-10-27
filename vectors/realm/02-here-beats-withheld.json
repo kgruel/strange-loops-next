@@ -8,6 +8,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
+        "observer": "sl:kyle",
         "about": ["host:a"],
         "prev": [],
         "emitted": "2026-10-01T00:01:40Z",
@@ -17,6 +18,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
+        "observer": "sl:kyle",
         "about": ["host:a"],
         "value": "",
         "prev": [],
@@ -27,6 +29,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
+        "observer": "sl:kyle",
         "about": ["host:a"],
         "prev": [],
         "emitted": "2026-10-01T00:01:40Z",

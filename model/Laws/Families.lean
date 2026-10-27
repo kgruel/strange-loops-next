@@ -144,11 +144,11 @@ theorem OverHeads.late {σ} (answer : LatestBy → σ) {xs ys : List Record} (r 
 /-! ## Why there are two families -/
 
 def cx.a : Record :=
-  { id := 1, kind := "load", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
+  { id := 1, kind := "load", observer := "sl:x", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
 def cx.b : Record :=
-  { id := 2, kind := "load", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
+  { id := 2, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
 def cx.c : Record :=
-  { id := 3, kind := "load", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
+  { id := 3, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
 
 /-- Max can't follow `prev`. Max holds 9 after `[a, b]` and after
 `[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and

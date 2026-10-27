@@ -35,7 +35,7 @@ def jOutcome : Outcome → J
 def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
     (prev : List Nat := []) (value : String := s!"v{id}")
     (okO : Reads occurred := by decide) (okE : Reads emitted := by decide) : Record :=
-  { id, kind := "decision", about := [thing], value, prev, occurred := some (claimAt occurred okO),
+  { id, kind := "decision", observer := "sl:kyle", about := [thing], value, prev, occurred := some (claimAt occurred okO),
     emitted := stampAt emitted okE }
 
 def r1 := rec 0x11 "topic:auth" 100

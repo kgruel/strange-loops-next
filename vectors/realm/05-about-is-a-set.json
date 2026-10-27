@@ -8,6 +8,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
         "kind": "status",
+        "observer": "sl:kyle",
         "about": ["svc:auth", "svc:billing"],
         "value": "",
         "prev": [],
@@ -18,6 +19,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
         "kind": "status",
+        "observer": "sl:kyle",
         "about": ["svc:auth"],
         "value": "",
         "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],

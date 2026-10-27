@@ -250,7 +250,7 @@ loops emit chapter-mentions characters:='["r:c1"]' ideas:='["r:i9"]' --about r:a
 
 { "vertex": "chapter", "param": ["chapter"],
   "from": [{ "store": "novel", "about": "$chapter" }],
-  "fold": { "facets": { "latest-by": "kind" },
+  "fold": { "facets": { "latest-by": "kind", "follow": "prev" },
             "notes":  { "collect": true, "where": { "env.kind": { "is": "chapter-note" } } } } }
 
 # the homelab
@@ -265,7 +265,7 @@ loops emit dispute --about r:x2 --about r:x3                                    
 { "vertex": "identity",
   "note": "The latest stance per pair.",
   "from": [{ "store": "team", "kind": ["same-as", "dispute"] }],
-  "fold": { "pairs": { "latest-by": "about" } } }
+  "fold": { "pairs": { "latest-by": "about", "follow": "prev" } } }
 
 { "vertex": "platform-knowledge",
   "from": [{ "store": "team", "kind": ["decision", "note"] }],

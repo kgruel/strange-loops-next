@@ -9,6 +9,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v17",
           "prev": [],
@@ -19,6 +20,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
@@ -30,6 +32,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
@@ -39,6 +42,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v17",
           "prev": [],

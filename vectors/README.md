@@ -61,16 +61,20 @@ reader holding everything gets. `expect.max` is as in `fold/heads`.
 envelope always answers; a test on a payload the reader doesn't hold answers unknown.
 `expect.count` and `expect.sum` give the `value` over the selected, readable
 records and how many covered records were `unread`: unknown to the test, or
-selected but needed by the fold and not held. Count needs no payload.
+selected but needed by the fold and not readable. Count needs no payload;
+sum, min and max read a record only when its payload is held and has the
+field as a number.
 
 ## `spec/parse`
 
 `input.spec` is a vertex's spec as JSON. `expect` is either `parsed`, the
 spec in its parsed form (which parses back to itself), or `refused` with the
 `path` of the offending key, per `protocol/laws.md`. Refusals are checked in
-order: an object, known keys, `vertex`, `from` (present and non-empty), then
-each slot. In `where`, `env.<field>` names an envelope field and any other
-name a payload field; a time keeps its spelling in the parsed form.
+order: no key repeated in any object (`member-duplicate`, at the repeat), an
+object, known keys, `vertex`, `from` (present and non-empty), then each slot
+as `protocol/laws.md` orders it. In `where`, `env.<field>` names an envelope
+field and any other name a payload field; an argument must be what layer 0
+accepts in its field; a time keeps its spelling in the parsed form.
 
 ## `spec/run`
 
@@ -78,9 +82,11 @@ name a payload field; a time keeps its spelling in the parsed form.
 slot of `fold` and what it holds: `value` and `unread` for count, sum, min
 and max; for latest-by, each thing's current records (`things`), and for
 collect the records newest first (`heads`), each with what the reader holds
-of it, and how many heads a payload test couldn't answer (`unread`). Over
-heads, supersession runs over everything held, per thing; `from` and the
-envelope tests then choose heads, and payload tests filter them.
+of it, and how many a payload test couldn't answer (`unread`). Latest-by,
+and collect with `"follow": "prev"`, read heads: supersession runs over
+everything held, per thing, then `from` and the envelope tests choose heads
+and payload tests filter them. Collect without `follow` takes every selected
+record, superseded or not.
 
 ## `batch`
 
