@@ -1,5 +1,6 @@
 import Loops.Things
 import Loops.Json
+import Loops.Envelope
 
 /-!
 # The spec, as data
@@ -9,16 +10,21 @@ by what their envelopes carry, and `fold` names slots, each one fold from
 the closed vocabulary with an optional `where`.
 
 * **`where`** has six operators: `is`, `not`, `present`, `absent`,
-  `at-least`, `below`. A test on `kind` or `about` reads the envelope and
-  always answers; a test on a payload field answers unknown when the payload
-  is missing. A `where` map holds when every test does (Kleene's and).
+  `at-least`, `below`. `env.<field>` names an envelope field, and a test on
+  one always answers; any other name is a payload field, and a test on it
+  answers unknown when the payload is missing. A `where` map holds when
+  every test does (Kleene's and).
+* **Times** (`env.emitted`, `env.occurred`) are tested by what they read as:
+  `is` asks for the same span, however it is spelled, and `at-least` and
+  `below` compare starts. A record without `occurred` passes neither.
 * **Accumulating slots** (count, sum, min, max) select, then fold.
 * **Slots over heads** (latest-by, collect) read each thing's state, which
   supersession has already settled over everything the reader holds
   (`Loops.Things`); `from` and the envelope tests then choose heads, and the
   payload tests filter them. Selecting first would bring back a record whose
   successor is of another kind, or no longer matches, or is withheld.
-* `about` is a set, so a test on it asks whether the record is about a thing.
+* `about`, `prev` and `erases` are sets, so a test on one asks whether it
+  holds a value.
 
 Step 2 accepts these keys. `ticks`, `boundary` and the other spec keys are
 recognized and carried, not yet evaluated; `as`, `by`, `order`, `set` and
@@ -29,34 +35,93 @@ namespace Loops
 
 /-! ## `where` -/
 
-/-- Where a field lives. `kind` and `about` are on the envelope; any other
-name is a payload field. -/
-inductive Field where
+/-- An envelope field, named in `where` as `env.<name>`. -/
+inductive EnvField where
   | kind
+  | observer
   | about
+  | prev
+  | under
+  | erases
+  | emitted
+  | occurred
+  deriving Repr, DecidableEq
+
+def EnvField.all : List EnvField := [.kind, .observer, .about, .prev, .under, .erases, .emitted, .occurred]
+
+def EnvField.name : EnvField → String
+  | .kind => "kind"
+  | .observer => "observer"
+  | .about => "about"
+  | .prev => "prev"
+  | .under => "under"
+  | .erases => "erases"
+  | .emitted => "emitted"
+  | .occurred => "occurred"
+
+/-- What a field holds, which decides what a test on it may compare against. -/
+inductive FieldType where
+  /-- Text: `kind`, `observer`, `about`. -/
+  | text
+  /-- Record ids: `prev`, `under`, `erases`. -/
+  | ids
+  /-- Times: `emitted`, `occurred`. -/
+  | time
+  /-- A payload field: any value. -/
+  | payload
+  deriving Repr, DecidableEq
+
+def EnvField.type : EnvField → FieldType
+  | .prev | .under | .erases => .ids
+  | .emitted | .occurred => .time
+  | .kind | .observer | .about => .text
+
+/-- Where a field lives: on the envelope, or in the payload. -/
+inductive Field where
+  | env (f : EnvField)
   | payload (name : String)
   deriving Repr, DecidableEq
 
-def Field.ofName (s : String) : Field :=
-  if s = "kind" then .kind else if s = "about" then .about else .payload s
+def envPrefix : String := "env."
+
+/-- A field by its name in `where`; `none` for `env.` and a name the envelope
+doesn't have. -/
+def Field.ofName (s : String) : Option Field :=
+  if envPrefix.isPrefixOf s then (EnvField.all.find? (envPrefix ++ ·.name == s)).map .env
+  else some (.payload s)
 
 def Field.name : Field → String
-  | .kind => "kind"
-  | .about => "about"
+  | .env f => envPrefix ++ f.name
   | .payload s => s
 
 def Field.onEnvelope : Field → Bool
+  | .env _ => true
   | .payload _ => false
-  | _ => true
 
-/-- The closed set of operators. -/
+def Field.type : Field → FieldType
+  | .env f => f.type
+  | .payload _ => .payload
+
+/-- One thing a field holds, as a test reads it: a value, or a time as its span. -/
+inductive Item where
+  | val (v : Val)
+  | time (s : Span)
+  deriving Repr, DecidableEq
+
+/-- What a test compares against: a value, or a time as written with the span it reads as. -/
+inductive Arg where
+  | val (v : Val)
+  | time (c : Claim)
+  deriving Repr, DecidableEq
+
+/-- The closed set of operators. `at-least` and `below` take a number or a time. -/
 inductive Op where
-  | is (v : Val)
-  | not (v : Val)
+  | is (a : Arg)
+  | not (a : Arg)
   | present
   | absent
-  | atLeast (i : Int)
-  | below (i : Int)
+  | atLeast (a : Arg)
+  | below (a : Arg)
   deriving Repr, DecidableEq
 
 structure Cond where
@@ -64,31 +129,49 @@ structure Cond where
   op : Op
   deriving Repr, DecidableEq
 
-/-- The values a field holds for this reader (none, one, or a set, as for
-`about`), or `none` when its payload is missing. -/
-def Field.read : Field → Record → Option (List Val)
-  | .kind, r => some [.str r.kind]
-  | .about, r => some (r.about.map .str)
-  | .payload f, r => if r.shown = .here then some (r.get f).toList else none
+/-- The items a field holds for this reader (none, one, or a set, as for
+`about`), or `none` when its payload is missing. Ids read as their text, which
+has one spelling per id; times read as spans, `emitted` as an instant. -/
+def Field.read : Field → Record → Option (List Item)
+  | .env .kind, r => some [.val (.str r.kind)]
+  | .env .observer, r => some [.val (.str r.observer)]
+  | .env .about, r => some (r.about.map (.val ∘ .str))
+  | .env .prev, r => some (r.prev.map (.val ∘ .str ∘ idText))
+  | .env .under, r => some (r.under.toList.map (.val ∘ .str ∘ idText))
+  | .env .erases, r => some (r.erases.map (.val ∘ .str ∘ idText))
+  | .env .emitted, r => some [.time (Span.point r.emitted.moment)]
+  | .env .occurred, r => some (r.occurred.toList.map (.time ∘ (·.span)))
+  | .payload f, r => if r.shown = .here then some ((r.get f).toList.map .val) else none
 
-def Val.atLeast (i : Int) : Val → Bool
-  | .int j => decide (i ≤ j)
-  | _ => false
+/-- Whether an item is what the argument names: the same value, or the same span. -/
+def Arg.matches : Arg → Item → Bool
+  | .val v, .val w => v == w
+  | .time c, .time s => c.span == s
+  | _, _ => false
 
-def Val.below (i : Int) : Val → Bool
-  | .int j => decide (j < i)
-  | _ => false
+/-- Whether an item is at least the bound: numbers by value, times by start. -/
+def Item.atLeast : Arg → Item → Bool
+  | .val (.int i), .val (.int j) => decide (i ≤ j)
+  | .time c, .time s => decide (c.span.start ≤ s.start)
+  | _, _ => false
 
-/-- An operator on what a field holds. `is` asks whether a value is among
-them and `not` is its complement; `absent` is the complement of `present`;
-`at-least` and `below` hold only for numbers. -/
-def Op.test : Op → List Val → Bool
-  | .is v, xs => xs.contains v
-  | .not v, xs => !xs.contains v
+/-- Whether an item is below the bound: numbers by value, times by start. -/
+def Item.below : Arg → Item → Bool
+  | .val (.int i), .val (.int j) => decide (j < i)
+  | .time c, .time s => decide (s.start < c.span.start)
+  | _, _ => false
+
+/-- An operator on what a field holds. `is` asks whether an item is the
+argument and `not` is its complement; `absent` is the complement of
+`present`; `at-least` and `below` compare numbers with numbers and times with
+times, and hold for nothing else. -/
+def Op.test : Op → List Item → Bool
+  | .is a, xs => xs.any a.matches
+  | .not a, xs => !xs.any a.matches
   | .present, xs => !xs.isEmpty
   | .absent, xs => xs.isEmpty
-  | .atLeast i, xs => xs.any (Val.atLeast i)
-  | .below i, xs => xs.any (Val.below i)
+  | .atLeast a, xs => xs.any (Item.atLeast a)
+  | .below a, xs => xs.any (Item.below a)
 
 def Cond.eval (c : Cond) (r : Record) : Tri :=
   match c.field.read r with
@@ -232,28 +315,45 @@ abbrev Parse := Except Refusal
 
 def refuse {α : Type} (code path : String) : Parse α := throw ⟨code, path⟩
 
-def parseVal (path : String) : Json → Parse Val
-  | .str s => pure (.str s)
-  | .int i => pure (.int i)
-  | .bool b => pure (.bool b)
+/-- What a test on a field of this type may compare against: text for text,
+a record id for ids, a time in `occurred`'s grammar for times, any value for
+a payload field. -/
+def parseArg (ty : FieldType) (path : String) : Json → Parse Arg
+  | .str s => match ty with
+    | .text | .payload => pure (.val (.str s))
+    | .ids => if recordId s then pure (.val (.str s)) else refuse "where-invalid" path
+    | .time => match Claim.of? s with
+      | some c => pure (.time c)
+      | none => refuse "where-invalid" path
+  | .int i => if ty = .payload then pure (.val (.int i)) else refuse "where-invalid" path
+  | .bool b => if ty = .payload then pure (.val (.bool b)) else refuse "where-invalid" path
   | _ => refuse "where-invalid" path
 
-def parseOp (path : String) : String × Json → Parse Op
-  | ("is", v) => .is <$> parseVal path v
-  | ("not", v) => .not <$> parseVal path v
+/-- A bound for `at-least` or `below`: a number on a payload field, a time on a time. -/
+def parseBound (ty : FieldType) (path : String) : Json → Parse Arg
+  | .int i => if ty = .payload then pure (.val (.int i)) else refuse "where-invalid" path
+  | .str s => if ty = .time then parseArg ty path (.str s) else refuse "where-invalid" path
+  | _ => refuse "where-invalid" path
+
+def parseOp (ty : FieldType) (path : String) : String × Json → Parse Op
+  | ("is", v) => .is <$> parseArg ty path v
+  | ("not", v) => .not <$> parseArg ty path v
   | ("present", .bool true) => pure .present
   | ("absent", .bool true) => pure .absent
-  | ("at-least", .int i) => pure (.atLeast i)
-  | ("below", .int i) => pure (.below i)
+  | ("at-least", v) => .atLeast <$> parseBound ty path v
+  | ("below", v) => .below <$> parseBound ty path v
   | _ => refuse "where-invalid" path
 
 def parseWhere (path : String) : Json → Parse (List Cond)
   | .obj fs => do
-    let css ← fs.mapM fun (name, ops) =>
+    let css ← fs.mapM fun (name, ops) => do
       let p := s!"{path}.{name}"
+      let field ← match Field.ofName name with
+        | some f => pure f
+        | none => refuse "where-invalid" p
       match ops with
       | .obj [] => refuse "where-invalid" p
-      | .obj os => os.mapM fun o => do pure ⟨Field.ofName name, ← parseOp p o⟩
+      | .obj os => os.mapM fun o => do pure ⟨field, ← parseOp field.type p o⟩
       | _ => refuse "where-invalid" p
     pure css.flatten
   | _ => refuse "where-invalid" path
@@ -353,13 +453,18 @@ def Val.toJson : Val → Json
   | .int i => .int i
   | .bool b => .bool b
 
+/-- An argument as written: a time keeps its spelling. -/
+def Arg.toJson : Arg → Json
+  | .val v => v.toJson
+  | .time c => .str c.text
+
 def Op.toJson : Op → String × Json
-  | .is v => ("is", v.toJson)
-  | .not v => ("not", v.toJson)
+  | .is a => ("is", a.toJson)
+  | .not a => ("not", a.toJson)
   | .present => ("present", .bool true)
   | .absent => ("absent", .bool true)
-  | .atLeast i => ("at-least", .int i)
-  | .below i => ("below", .int i)
+  | .atLeast a => ("at-least", a.toJson)
+  | .below a => ("below", a.toJson)
 
 def condsToJson (cs : List Cond) : Json :=
   let names := cs.foldl (fun ns c => if ns.contains c.field.name then ns else ns ++ [c.field.name]) []

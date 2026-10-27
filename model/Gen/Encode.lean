@@ -48,8 +48,11 @@ def jRecord (r : Record) : J :=
   let env := [("id", .str (idText r.id)), ("kind", .str r.kind)] ++
     (if r.observer.isEmpty then [] else [("observer", .str r.observer)]) ++
     [("about", .arr (r.about.map .str))]
-  let rest := [("prev", .arr (r.prev.map (.str ∘ idText))),
-    ("emitted", .str r.emitted.text)] ++
+  let rest := [("prev", .arr (r.prev.map (.str ∘ idText)))] ++
+    (match r.under with
+      | some u => [("under", .str (idText u))]
+      | none => []) ++
+    [("emitted", .str r.emitted.text)] ++
     (match r.occurred with
       | some c => [("occurred", .str c.text)]
       | none => []) ++

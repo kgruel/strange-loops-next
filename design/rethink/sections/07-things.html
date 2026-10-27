@@ -251,7 +251,7 @@ loops emit chapter-mentions characters:='["r:c1"]' ideas:='["r:i9"]' --about r:a
 { "vertex": "chapter", "param": ["chapter"],
   "from": [{ "store": "novel", "about": "$chapter" }],
   "fold": { "facets": { "latest-by": "kind" },
-            "notes":  { "collect": true, "where": { "kind": { "is": "chapter-note" } } } } }
+            "notes":  { "collect": true, "where": { "env.kind": { "is": "chapter-note" } } } } }
 
 # the homelab
 loops emit log --about svc:jellyfin@nas                                           # by the collector

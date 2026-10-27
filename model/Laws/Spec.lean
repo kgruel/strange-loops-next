@@ -6,8 +6,11 @@ import Laws.Things
 # Laws of the spec
 
 * **Operators.** `not` is the complement of `is` and `absent` of `present`;
-  on a number exactly one of `at-least` and `below` holds, and on anything
-  else neither does.
+  on a number, or a time, exactly one of `at-least` and `below` holds.
+  They compare like with like: numbers with numbers, times with times.
+* **Times read as what they say.** A test on a time reads its span, never
+  its spelling; `at-least` and `below` compare starts, and a record without
+  `occurred` passes neither.
 * **Totality.** A test answers for every record whose payload is here; a
   test on the envelope answers for every record.
 * **A `where` map is a set of tests.** Their order never matters.
@@ -27,29 +30,95 @@ open List
 
 /-! ## Operators -/
 
-theorem Op.not_is (v : Val) (xs : List Val) : (Op.not v).test xs = !(Op.is v).test xs := rfl
+theorem Op.not_is (a : Arg) (xs : List Item) : (Op.not a).test xs = !(Op.is a).test xs := rfl
 
-theorem Op.absent_present (xs : List Val) : Op.absent.test xs = !Op.present.test xs := by
+theorem Op.absent_present (xs : List Item) : Op.absent.test xs = !Op.present.test xs := by
   cases xs <;> rfl
 
 theorem Op.atLeast_below (i j : Int) :
-    (Op.atLeast i).test [.int j] = !(Op.below i).test [.int j] := by
-  simp only [Op.test, any_cons, any_nil, Bool.or_false, Val.atLeast, Val.below, ← decide_not]
+    (Op.atLeast (.val (.int i))).test [.val (.int j)] = !(Op.below (.val (.int i))).test [.val (.int j)] := by
+  simp only [Op.test, any_cons, any_nil, Bool.or_false, Item.atLeast, Item.below, ← decide_not]
   simp only [decide_eq_decide]
   omega
 
-/-- `at-least` and `below` hold only for numbers. -/
-theorem Op.ordered_numbers_only (i : Int) {xs : List Val} (h : ∀ v ∈ xs, ∀ j, v ≠ .int j) :
-    (Op.atLeast i).test xs = false ∧ (Op.below i).test xs = false := by
-  simp only [Op.test, any_eq_false]
-  constructor <;> intro v hv <;> cases v <;> simp [Val.atLeast, Val.below] <;> exact absurd rfl (h _ hv _)
+/-- On a time, exactly one of `at-least` and `below` holds. -/
+theorem Op.atLeast_below_time (c : Claim) (s : Span) :
+    (Op.atLeast (.time c)).test [.time s] = !(Op.below (.time c)).test [.time s] := by
+  simp only [Op.test, any_cons, any_nil, Bool.or_false, Item.atLeast, Item.below, ← decide_not]
+  simp only [decide_eq_decide]
+  exact List.not_lt.symm
 
-/-- A test on `about` asks whether the record is about a thing. -/
+/-- Whether a bound and an item are alike: two numbers, or two times. -/
+def Item.like : Arg → Item → Bool
+  | .val (.int _), .val (.int _) => true
+  | .time _, .time _ => true
+  | _, _ => false
+
+/-- `at-least` and `below` compare like with like: on items unlike the bound,
+neither holds. -/
+theorem Op.ordered_like_only (a : Arg) {xs : List Item} (h : ∀ x ∈ xs, Item.like a x = false) :
+    (Op.atLeast a).test xs = false ∧ (Op.below a).test xs = false := by
+  simp only [Op.test, any_eq_false]
+  constructor <;> intro x hx <;> have := h x hx <;>
+    rcases a with (_ | _ | _) | _ <;> rcases x with (_ | _ | _) | _ <;>
+    simp_all [Item.like, Item.atLeast, Item.below]
+
+/-- A test on `env.about` asks whether the record is about a thing. -/
 theorem Cond.about_is (t : String) (r : Record) :
-    Cond.eval ⟨.about, .is (.str t)⟩ r = .ofBool (r.about.contains t) := by
+    Cond.eval ⟨.env .about, .is (.val (.str t))⟩ r = .ofBool (r.about.contains t) := by
   simp only [Cond.eval, Field.read, Op.test]
   congr 1
-  cases h : r.about.contains t <;> simp_all
+  cases h : r.about.contains t <;> simp_all [Arg.matches]
+  intro x hx e
+  exact h (e ▸ hx)
+
+/-! ## Times -/
+
+/-- `at-least` on `occurred` compares starts, and needs an `occurred`. -/
+theorem Cond.occurred_atLeast (c : Claim) (r : Record) :
+    Cond.eval ⟨.env .occurred, .atLeast (.time c)⟩ r = .yes ↔
+      ∃ k, r.occurred = some k ∧ c.span.start ≤ k.span.start := by
+  cases h : r.occurred <;> simp [Cond.eval, Field.read, Op.test, Item.atLeast, h, Tri.ofBool]
+
+/-- `below` on `occurred` compares starts, and needs an `occurred`. -/
+theorem Cond.occurred_below (c : Claim) (r : Record) :
+    Cond.eval ⟨.env .occurred, .below (.time c)⟩ r = .yes ↔
+      ∃ k, r.occurred = some k ∧ k.span.start < c.span.start := by
+  cases h : r.occurred <;> simp [Cond.eval, Field.read, Op.test, Item.below, h, Tri.ofBool]
+
+/-- `is` on `occurred` asks for the same span, however either is spelled. -/
+theorem Cond.occurred_is (c : Claim) (r : Record) :
+    Cond.eval ⟨.env .occurred, .is (.time c)⟩ r = .yes ↔
+      ∃ k, r.occurred = some k ∧ k.span = c.span := by
+  cases h : r.occurred with
+  | none => simp [Cond.eval, Field.read, Op.test, h, Tri.ofBool]
+  | some k =>
+    simp only [Cond.eval, Field.read, h, Option.toList_some, List.map_cons, List.map_nil, Op.test,
+      List.any_cons, List.any_nil, Bool.or_false, Function.comp, Arg.matches, Option.some.injEq,
+      exists_eq_left']
+    unfold Tri.ofBool
+    by_cases e : c.span = k.span
+    · simp [e]
+    · have : (c.span == k.span) = false := by simpa using e
+      simp only [this]
+      exact ⟨fun h => (by cases h), fun h => absurd h.symm e⟩
+
+/-- A record without `occurred` passes neither `at-least` nor `below` on it. -/
+theorem Cond.occurred_missing (a : Arg) {r : Record} (h : r.occurred = none) :
+    Cond.eval ⟨.env .occurred, .atLeast a⟩ r = .no ∧ Cond.eval ⟨.env .occurred, .below a⟩ r = .no := by
+  simp [Cond.eval, Field.read, Op.test, h, Tri.ofBool]
+
+/-- A test on a time reads what it says, not how it is spelled: records whose
+times read alike answer alike. -/
+theorem Cond.time_meaning {f : EnvField} (hf : f.type = .time) (op : Op) {r r' : Record}
+    (ho : r.occurred.map (·.span) = r'.occurred.map (·.span))
+    (he : r.emitted.moment = r'.emitted.moment) :
+    Cond.eval ⟨.env f, op⟩ r = Cond.eval ⟨.env f, op⟩ r' := by
+  cases f <;> simp [EnvField.type] at hf
+  · simp [Cond.eval, Field.read, he]
+  · have : (r.occurred.toList.map (Item.time ∘ (·.span))) = (r'.occurred.toList.map (Item.time ∘ (·.span))) := by
+      cases h1 : r.occurred <;> cases h2 : r'.occurred <;> simp_all
+    simp only [Cond.eval, Field.read, this]
 
 /-! ## Totality -/
 
@@ -61,7 +130,9 @@ theorem Cond.eval_here (c : Cond) {r : Record} (h : r.shown = .here) : c.eval r 
   split
   · exact Tri.ofBool_ne _
   · rename_i hf
-    cases hc : c.field <;> simp [hc, Field.read, h] at hf
+    rcases hc : c.field with f | n
+    · cases f <;> simp [hc, Field.read] at hf
+    · simp [hc, Field.read, h] at hf
 
 /-- A test on the envelope answers for every record. -/
 theorem Cond.eval_envelope (c : Cond) (h : c.field.onEnvelope = true) (r : Record) :
@@ -70,7 +141,9 @@ theorem Cond.eval_envelope (c : Cond) (h : c.field.onEnvelope = true) (r : Recor
   split
   · exact Tri.ofBool_ne _
   · rename_i hf
-    cases hc : c.field <;> simp [hc, Field.read, Field.onEnvelope] at hf h
+    rcases hc : c.field with f | n
+    · cases f <;> simp [hc, Field.read] at hf
+    · simp [hc, Field.onEnvelope] at h
 
 /-! ## `where` maps -/
 
@@ -97,8 +170,10 @@ theorem Cond.eval_view {f : Record → Record} (hf : View f) (c : Cond) (r : Rec
   have he := hf.envelope r
   rcases c with ⟨fld, op⟩
   cases fld with
-  | kind => exact Or.inr (by simp [Cond.eval, Field.read, he.kind])
-  | about => exact Or.inr (by simp [Cond.eval, Field.read, he.about])
+  | env f =>
+    exact Or.inr (by
+      cases f <;> simp [Cond.eval, Field.read, he.kind, he.observer, he.about, he.prev, he.under,
+        he.erases, he.emitted, he.occurred])
   | payload n =>
     rcases hf.hides r with e | e
     · exact Or.inr (by rw [e])

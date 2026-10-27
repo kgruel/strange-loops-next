@@ -21,7 +21,7 @@
             "status": {
               "is": "open"
             },
-            "kind": {
+            "env.kind": {
               "not": "draft"
             }
           }
@@ -47,7 +47,7 @@
             "status": {
               "is": "open"
             },
-            "kind": {
+            "env.kind": {
               "not": "draft"
             }
           }

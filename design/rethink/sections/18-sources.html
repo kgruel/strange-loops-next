@@ -594,5 +594,9 @@
       <p class="who">kyle</p><p>Settle them.</p>
       <p class="who">claude</p><ul><li>Fold ids are now written as layer 0 writes them, and their order is proved to be the digest's byte order; <code>Newer.congr</code> proves the order reads nothing else, and <code>LatestBy.winner_newer</code> that the winner is newer than every other head. Each fixture proves its times read. The tie vectors spell one time two ways, and each wrong rule now fails a vector.</li></ul>
     </div></details>
+    <details class="unfold turn"><summary>112 · <code>where</code> on the envelope</summary><div class="body">
+      <p class="who">kyle</p><p>Merge it, then pick up the 13 work.</p>
+      <p class="who">claude</p><ul><li>PR 13: <code>env.&lt;field&gt;</code> names every envelope field, <code>erases</code> and <code>under</code> included; a bare name is a payload field, so <code>"kind"</code> in a <code>where</code> is now a payload field and every example says <code>env.kind</code>. A name the envelope doesn't have is refused, and so is an argument that doesn't fit its field.</li><li>Times follow content order's rule, meaning over spelling: <code>is "2026-10"</code> matches <code>2026-10-01/2026-10-31</code>, <code>at-least</code> and <code>below</code> compare starts, and a record without <code>occurred</code> passes neither. Proved on the evaluator, and a deliberate break that compared only starts for <code>is</code> got past the first vectors, so a day starting with the month joined them.</li></ul>
+    </div></details>
   </div>
 </section>

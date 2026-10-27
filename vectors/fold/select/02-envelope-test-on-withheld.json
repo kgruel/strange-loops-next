@@ -5,7 +5,7 @@
   "source": "model",
   "input": {
     "where": {
-      "kind": {
+      "env.kind": {
         "is": "decision"
       }
     },

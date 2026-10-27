@@ -1,0 +1,552 @@
+{
+  "vector": "07-numeric-bounds",
+  "layer": "spec/run",
+  "laws": ["spec.set", "where.complements", "where.typed", "result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "estimates",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "mid": {
+          "count": true,
+          "where": {
+            "est": {
+              "at-least": 4,
+              "below": 8
+            }
+          }
+        },
+        "small": {
+          "count": true,
+          "where": {
+            "est": {
+              "below": 4
+            }
+          }
+        },
+        "not-three": {
+          "count": true,
+          "where": {
+            "est": {
+              "not": 3
+            }
+          }
+        },
+        "unblocked": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "absent": true
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "status": "closed",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabea",
+          "kind": "task",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:00Z",
+          "occurred": "2026-10-01T00:03:00Z",
+          "n": 0,
+          "fields": {
+            "est": 4
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabeq",
+          "kind": "task",
+          "about": ["task:5"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:10Z",
+          "occurred": "2026-10-01T00:03:10Z",
+          "n": 0,
+          "fields": {
+            "est": 8
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "status": "closed",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabea",
+          "kind": "task",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:00Z",
+          "occurred": "2026-10-01T00:03:00Z",
+          "n": 0,
+          "fields": {
+            "est": 4
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabeq",
+          "kind": "task",
+          "about": ["task:5"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:10Z",
+          "occurred": "2026-10-01T00:03:10Z",
+          "n": 0,
+          "fields": {
+            "est": 8
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabea",
+          "kind": "task",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:00Z",
+          "occurred": "2026-10-01T00:03:00Z",
+          "n": 0,
+          "fields": {
+            "est": 4
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabeq",
+          "kind": "task",
+          "about": ["task:5"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:10Z",
+          "occurred": "2026-10-01T00:03:10Z",
+          "n": 0,
+          "fields": {
+            "est": 8
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "status": "closed",
+            "est": 3
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabea",
+          "kind": "task",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:00Z",
+          "occurred": "2026-10-01T00:03:00Z",
+          "n": 0,
+          "fields": {
+            "est": 4
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabeq",
+          "kind": "task",
+          "about": ["task:5"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:10Z",
+          "occurred": "2026-10-01T00:03:10Z",
+          "n": 0,
+          "fields": {
+            "est": 8
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "status": "closed",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabea",
+          "kind": "task",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:00Z",
+          "occurred": "2026-10-01T00:03:00Z",
+          "n": 0,
+          "fields": {
+            "est": 4
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabeq",
+          "kind": "task",
+          "about": ["task:5"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:10Z",
+          "occurred": "2026-10-01T00:03:10Z",
+          "n": 0,
+          "fields": {
+            "est": 8
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "status": "closed",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabeq",
+          "kind": "task",
+          "about": ["task:5"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:10Z",
+          "occurred": "2026-10-01T00:03:10Z",
+          "n": 0,
+          "fields": {
+            "est": 8
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "task",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "status": "closed",
+            "est": 3
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "task",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 5,
+            "blocked": true
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabea",
+          "kind": "task",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:03:00Z",
+          "occurred": "2026-10-01T00:03:00Z",
+          "n": 0,
+          "fields": {
+            "est": 4
+          }
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "mid": {
+      "value": 2,
+      "unread": 1
+    },
+    "small": {
+      "value": 2,
+      "unread": 1
+    },
+    "not-three": {
+      "value": 3,
+      "unread": 1
+    },
+    "unblocked": {
+      "value": 4,
+      "unread": 1
+    }
+  }
+}

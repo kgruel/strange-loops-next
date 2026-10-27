@@ -134,13 +134,13 @@ loops emit draft-complete label="draft 2"                                       
 { "vertex": "chapter", "param": ["chapter"],
   "from": [{ "store": "novel", "about": "$chapter" }],
   "fold": { "facets": { "latest-by": "kind", "follow": "prev" },
-            "notes":  { "collect": true, "where": { "kind": { "is": "chapter-note" } } } } }
+            "notes":  { "collect": true, "where": { "env.kind": { "is": "chapter-note" } } } } }
 
 # .loops/vertices/manuscript.json
 { "vertex": "manuscript",
   "from": [{ "store": "novel", "kind": ["chapter-prose", "book-order"] }],
   "fold": { "chapters": { "latest-by": "about", "follow": "prev" },
-            "order":    { "latest": true, "follow": "prev", "where": { "kind": { "is": "book-order" } } } },
+            "order":    { "latest": true, "follow": "prev", "where": { "env.kind": { "is": "book-order" } } } },
   "boundary": [{ "when": "draft-complete" }] }
 
 # .loops/vertices/continuity.json: a lens, never ticks

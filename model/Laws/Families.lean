@@ -180,23 +180,23 @@ theorem View.addressed {f : Record → Record} (hf : View f) {xs : List Record}
   rw [(hf.envelope a).id, (hf.envelope b).id] at e
   rw [hx a ha b hb e]
 
-theorem SameEnvelope.refl (r : Record) : SameEnvelope r r := ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+theorem SameEnvelope.refl (r : Record) : SameEnvelope r r := ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem SameEnvelope.symm {a b : Record} (h : SameEnvelope a b) : SameEnvelope b a :=
-  ⟨h.id.symm, h.kind.symm, h.observer.symm, h.about.symm, h.prev.symm, h.occurred.symm,
+  ⟨h.id.symm, h.kind.symm, h.observer.symm, h.about.symm, h.prev.symm, h.under.symm, h.occurred.symm,
     h.emitted.symm, h.erases.symm⟩
 
 theorem SameEnvelope.trans {a b c : Record} (h : SameEnvelope a b) (h' : SameEnvelope b c) :
     SameEnvelope a c :=
   ⟨h.id.trans h'.id, h.kind.trans h'.kind, h.observer.trans h'.observer, h.about.trans h'.about,
-    h.prev.trans h'.prev, h.occurred.trans h'.occurred, h.emitted.trans h'.emitted,
+    h.prev.trans h'.prev, h.under.trans h'.under, h.occurred.trans h'.occurred, h.emitted.trans h'.emitted,
     h.erases.trans h'.erases⟩
 
 theorem withhold_envelope (r : Record) : SameEnvelope r.withhold r :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem erase_envelope (r : Record) : SameEnvelope r.erase r :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem withholding_view (p : Record → Bool) : View (withholding p) where
   envelope r := by

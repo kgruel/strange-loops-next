@@ -111,8 +111,17 @@ refuses a `prev` naming a record neither in the batch nor in the store
 A spec parses into a closed type: `from` selects by envelope, and `fold`
 names slots, each one fold with an optional `where`. `where` has six
 operators (`is`, `not`, `present`, `absent`, `at-least`, `below`) and three
-answers; a `where` map holds when every test does. `about` is a set, so a
-test on it asks whether a record is about a thing. Accumulating slots select,
+answers; a `where` map holds when every test does. A test names an envelope
+field as `env.` and its name (`env.kind`, `env.observer`, `env.about`,
+`env.prev`, `env.under`, `env.erases`, `env.emitted`, `env.occurred`); any
+other name is a payload field, and `env.` with a name the envelope doesn't
+have is refused. `about`, `prev` and `erases` are sets, so a test on one asks
+whether it holds a value. What a test compares against must fit its field,
+or the spec is refused (`where-invalid`): text for text, a record id for ids,
+a time in `occurred`'s grammar for a time, a number for `at-least` and
+`below` on a payload field. A time is tested by what it reads as: `is` asks
+for the same span however either is spelled, `at-least` and `below` compare
+starts, and a record without `occurred` passes neither. Accumulating slots select,
 then fold. Slots over heads (latest-by, collect) read each thing's state,
 already settled over everything the reader holds; `from` and the envelope
 tests then choose heads, and payload tests filter them. Selecting first
@@ -121,9 +130,10 @@ matches, or is withheld.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below` | `not` is the complement of `is`, `absent` of `present`; on a number exactly one of `at-least` and `below` holds | (none yet) |
-| `where.typed` | `Op.ordered_numbers_only` | `at-least` and `below` hold only for numbers | (none yet) |
-| `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record | every `spec/run` vector |
+| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below`, `Op.atLeast_below_time` | `not` is the complement of `is`, `absent` of `present`; on a number, or a time, exactly one of `at-least` and `below` holds | `spec/run/06`, `07` |
+| `where.typed` | `Op.ordered_like_only` | `at-least` and `below` compare numbers with numbers and times with times, and hold for nothing else; a bound that doesn't fit its field is refused | `spec/run/07`, `spec/parse/23`, `25`, `28` |
+| `where.time` | `Cond.occurred_is`, `Cond.occurred_atLeast`, `Cond.occurred_below`, `Cond.occurred_missing`, `Cond.time_meaning` | a test on a time reads its span, never its spelling: `is` asks for the same span, `at-least` and `below` compare starts, and a record without `occurred` passes neither | `spec/run/06` |
+| `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record, withheld or not | every `spec/run` vector |
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |

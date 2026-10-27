@@ -56,8 +56,9 @@ reader holding everything gets. `expect.max` is as in `fold/heads`.
 
 ## `fold/select`
 
-`input.where` is a test as a spec writes it. A test on the envelope always
-answers; a test on a payload the reader doesn't hold answers unknown.
+`input.where` is a test as a spec writes it, with envelope fields named
+`env.<field>` (`gen` checks it gives what the model runs). A test on the
+envelope always answers; a test on a payload the reader doesn't hold answers unknown.
 `expect.count` and `expect.sum` give the `value` over the selected, readable
 records and how many covered records were `unread`: unknown to the test, or
 selected but needed by the fold and not held. Count needs no payload.
@@ -68,7 +69,8 @@ selected but needed by the fold and not held. Count needs no payload.
 spec in its parsed form (which parses back to itself), or `refused` with the
 `path` of the offending key, per `protocol/laws.md`. Refusals are checked in
 order: an object, known keys, `vertex`, `from` (present and non-empty), then
-each slot.
+each slot. In `where`, `env.<field>` names an envelope field and any other
+name a payload field; a time keeps its spelling in the parsed form.
 
 ## `spec/run`
 
