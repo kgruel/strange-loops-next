@@ -6,24 +6,24 @@
   "input": {
     "forms": [
       {
-        "id": "r:000000a1",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacqq",
         "kind": "note",
         "about": ["person:alice"],
         "value": "",
         "prev": [],
-        "occurred": 1,
-        "emitted": 1,
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
         "n": 7
       },
       {
-        "id": "r:000000a2",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacra",
         "kind": "note",
         "about": ["person:alice"],
         "value": "",
-        "prev": ["r:000000a1"],
-        "occurred": 2,
-        "emitted": 2,
-        "erases": ["r:000000a1"],
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacqq"],
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
+        "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacqq"],
         "n": 0
       }
     ]
@@ -31,19 +31,19 @@
   "expect": {
     "settled": [
       {
-        "id": "r:000000a1",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacqq",
         "shown": "erased"
       },
       {
-        "id": "r:000000a2",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacra",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
       "person:alice": {
-        "heads": ["r:000000a2"],
-        "winner": "r:000000a2",
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacra"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacra",
         "others": []
       }
     },

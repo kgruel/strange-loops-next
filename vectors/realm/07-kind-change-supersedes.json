@@ -6,23 +6,23 @@
   "input": {
     "forms": [
       {
-        "id": "r:00000091",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
         "kind": "task",
         "about": ["task:1"],
         "value": "",
         "prev": [],
-        "occurred": 1,
-        "emitted": 1,
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
         "n": 0
       },
       {
-        "id": "r:00000092",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
         "kind": "task-done",
         "about": ["task:1"],
         "value": "",
-        "prev": ["r:00000091"],
-        "occurred": 2,
-        "emitted": 2,
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"],
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
         "n": 0
       }
     ]
@@ -30,19 +30,19 @@
   "expect": {
     "settled": [
       {
-        "id": "r:00000091",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
         "shown": "here"
       },
       {
-        "id": "r:00000092",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
       "task:1": {
-        "heads": ["r:00000092"],
-        "winner": "r:00000092",
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
         "others": []
       }
     },

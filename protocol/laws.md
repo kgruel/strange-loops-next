@@ -12,7 +12,8 @@ vectors; the model is what the vectors come from.
 | `count.perm` | `Count.perm` | arrival order doesn't change a count | `fold/count/01`, `02` |
 | `count.repeats` | `Count.repeats` | a repeated delivery is counted again, so the store must hand each id over once | `fold/count/03` |
 | `latest-by.set` | `LatestBy.set_decides` | the state depends only on the set of records folded | `fold/latest-by/*` |
-| `latest-by.order` | `LatestBy.perm` | winners follow content order: `prev`, then `occurred`, `emitted`, id | `fold/latest-by/02`, `05`, `06` |
+| `latest-by.order` | `LatestBy.winner_newer` | the winner is a head, newer than every other head: winners follow content order, `prev` first, then the span, `emitted`, id | `fold/latest-by/02`, `05`, `06`, `12`, `13` |
+| content order | `Newer.irrefl`, `Newer.trans`, `Newer.total`, `Newer.congr`, `id_order` (`Laws/Order.lean`) | records order by span (`occurred`'s, or `emitted` as an instant), then `emitted`, then id as digest bytes: a strict total order on distinct ids that reads only those three, never how a time is spelled | `fold/latest-by/05`, `06`, `12`, `13` |
 | `latest-by.repeats` | `LatestBy.repeats` | re-delivering records changes nothing | `fold/latest-by/08` |
 | `latest-by.converge` | `LatestBy.converge` | two places syncing in either direction reach the same state | `fold/latest-by/09` |
 
@@ -54,7 +55,7 @@ the cached state in both, so there is no partial rewind.
 | `acc.late` | `Acc.late` | a late record folds onto the cached state | (follows from `acc.set`) |
 | `heads.set` | `OverHeads.set_decides` | any answer worked out from the heads depends only on the set | `fold/heads/*` |
 | `heads.late` | `OverHeads.late` | a late record folds onto the cached heads | (follows from `heads.set`) |
-| `heads.why` | `Max.cannot_follow_prev` | a bounded state can't follow `prev`: Max can't be kept current from its own state | `fold/heads/01`, `02` |
+| `heads.why` | `Max.cannot_follow_prev` | Max can't follow `prev`: no step from Max's state and the next record keeps the current maximum | `fold/heads/01`, `02` |
 | `view.no-resurrection` | `LatestBy.view`, `LatestBy.view_head_ids`, `LatestBy.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
 | `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
 | `result.unread` | `LatestBy.maxHeads_view` | a result counts the covered records it couldn't read | `fold/view/04`, `fold/select/*` |
@@ -120,8 +121,8 @@ matches, or is withheld.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below` | `not` is the complement of `is`, `absent` of `present`; on a number exactly one of `at-least` and `below` holds | `spec/run/01` |
-| `where.typed` | `Op.ordered_numbers_only` | `at-least` and `below` hold only for numbers | `spec/run/01` |
+| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below` | `not` is the complement of `is`, `absent` of `present`; on a number exactly one of `at-least` and `below` holds | (none yet) |
+| `where.typed` | `Op.ordered_numbers_only` | `at-least` and `below` hold only for numbers | (none yet) |
 | `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record | every `spec/run` vector |
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
@@ -209,11 +210,13 @@ current, trusted or well dated:
 
 ## Simplifications in the model
 
-* Ids are numbers standing for content hashes, written as fixed-width hex
-  (`r:00000011`) so byte order and numeric order agree. Nothing yet connects
-  these records to layer 0's real ones.
+* An id is its 32-byte digest read as a number, most significant byte
+  first, and written as layer 0 writes one (`r:` and base32). The digests
+  are made up: nothing yet connects these records to layer 0's real ones,
+  so nothing yet proves a fold record holds the times its envelope was
+  checked with.
 * The payload is `value`, `n` and named `fields`.
-* In the fold model, `occurred` and `emitted` are still plain numbers. Layer 0
-  reads both as moments (`Loops/Time.lean`, `Loops/Occurred.lean`); moving
-  content order and windows onto spans is next.
+* Fold records carry their times as text with what each reads as (`Stamp`,
+  `Claim`); a record's other envelope fields are as written, not read from
+  an envelope.
 * Text is a list of lines; splitting a file into lines is outside the model.

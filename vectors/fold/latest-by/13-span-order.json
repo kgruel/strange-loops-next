@@ -1,0 +1,185 @@
+{
+  "vector": "13-span-order",
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.order"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v65",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:00Z",
+          "occurred": "2026-10-01T00:00:00Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v66",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:30Z",
+          "occurred": "2026-10",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v67",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:10Z",
+          "occurred": "2026-10-01/..",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v68",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:20Z",
+          "occurred": "2026",
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v66",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:30Z",
+          "occurred": "2026-10",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v67",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:10Z",
+          "occurred": "2026-10-01/..",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v68",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:20Z",
+          "occurred": "2026",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v65",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:00Z",
+          "occurred": "2026-10-01T00:00:00Z",
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v67",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:10Z",
+          "occurred": "2026-10-01/..",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v68",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:20Z",
+          "occurred": "2026",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v65",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:00Z",
+          "occurred": "2026-10-01T00:00:00Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v66",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:30Z",
+          "occurred": "2026-10",
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v68",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:20Z",
+          "occurred": "2026",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v65",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:00Z",
+          "occurred": "2026-10-01T00:00:00Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v66",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:30Z",
+          "occurred": "2026-10",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+          "kind": "decision",
+          "about": ["topic:auth"],
+          "value": "v67",
+          "prev": [],
+          "emitted": "2026-10-01T00:00:10Z",
+          "occurred": "2026-10-01/..",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "topic:auth": {
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
+      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca"]
+    }
+  }
+}

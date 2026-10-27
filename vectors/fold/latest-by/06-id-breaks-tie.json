@@ -7,45 +7,45 @@
     "orders": [
       [
         {
-          "id": "r:00000016",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v22",
           "prev": [],
-          "occurred": 200,
-          "emitted": 210,
+          "emitted": "2026-10-01T00:03:30Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:00000017",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3q",
           "kind": "decision",
           "about": ["topic:auth"],
-          "value": "v23",
+          "value": "v55",
           "prev": [],
-          "occurred": 200,
-          "emitted": 210,
+          "emitted": "2026-10-01T00:03:30.000Z",
+          "occurred": "2026-10-01T01:03:20+01:00",
           "n": 0
         }
       ],
       [
         {
-          "id": "r:00000017",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3q",
           "kind": "decision",
           "about": ["topic:auth"],
-          "value": "v23",
+          "value": "v55",
           "prev": [],
-          "occurred": 200,
-          "emitted": 210,
+          "emitted": "2026-10-01T00:03:30.000Z",
+          "occurred": "2026-10-01T01:03:20+01:00",
           "n": 0
         },
         {
-          "id": "r:00000016",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v22",
           "prev": [],
-          "occurred": 200,
-          "emitted": 210,
+          "emitted": "2026-10-01T00:03:30Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         }
       ]
@@ -53,9 +53,9 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:00000017", "r:00000016"],
-      "winner": "r:00000017",
-      "others": ["r:00000016"]
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3q", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3q",
+      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala"]
     }
   }
 }

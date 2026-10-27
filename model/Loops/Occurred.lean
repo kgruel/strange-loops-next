@@ -29,6 +29,10 @@ structure Span where
   start : Moment
   stop  : Option Moment
   ok    : ∀ e, stop = some e → start ≤ e
+  deriving DecidableEq, Repr
+
+/-- An instant as a span of no length. -/
+def Span.point (m : Moment) : Span := ⟨m, some m, fun _ h => by cases h; exact Std.le_refl m⟩
 
 /-- Stops in order: an open end comes after every closed one. -/
 def StopBefore : Option Moment → Option Moment → Prop
@@ -110,5 +114,37 @@ def spanOf (p : List Char) : Option (List Char) → Option Span
 def occurredSpanOf (cs : List Char) : Option Span := spanOf (halves cs).1 (halves cs).2
 
 def occurredSpan? (s : String) : Option Span := occurredSpanOf s.toList
+
+/-! ## Read times
+
+What a reader holds once an envelope is written: each time's text as the
+observer wrote it, with what it reads as. The text is what the id covers;
+the reading is what the order uses. -/
+
+/-- `emitted`: the text and its moment. -/
+structure Stamp where
+  text   : String
+  moment : Moment
+  ok     : instant? text.toList = some moment
+  deriving DecidableEq, Repr
+
+instance : Inhabited Stamp := ⟨⟨"1970-01-01T00:00:00Z", [0], by decide⟩⟩
+
+def Stamp.of? (s : String) : Option Stamp :=
+  match h : instant? s.toList with
+  | some m => some ⟨s, m, h⟩
+  | none => none
+
+/-- `occurred`: the text and its span. -/
+structure Claim where
+  text : String
+  span : Span
+  ok   : occurredSpan? text = some span
+  deriving DecidableEq, Repr
+
+def Claim.of? (s : String) : Option Claim :=
+  match h : occurredSpan? s with
+  | some sp => some ⟨s, sp, h⟩
+  | none => none
 
 end Loops

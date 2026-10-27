@@ -7,161 +7,161 @@
     "orders": [
       [
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "shown": "withheld"
         },
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
-          "prev": ["r:00000011"],
-          "occurred": 200,
-          "emitted": 200,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "shown": "withheld"
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         },
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
-          "occurred": 300,
-          "emitted": 300,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         }
       ],
       [
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
-          "prev": ["r:00000011"],
-          "occurred": 200,
-          "emitted": 200,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "shown": "withheld"
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         },
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
-          "occurred": 300,
-          "emitted": 300,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "shown": "withheld"
         }
       ],
       [
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         },
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
-          "occurred": 300,
-          "emitted": 300,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "shown": "withheld"
         },
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
-          "prev": ["r:00000011"],
-          "occurred": 200,
-          "emitted": 200,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "shown": "withheld"
         }
       ],
       [
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
-          "occurred": 300,
-          "emitted": 300,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "prev": [],
-          "occurred": 100,
-          "emitted": 100,
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
           "shown": "withheld"
         },
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
-          "prev": ["r:00000011"],
-          "occurred": 200,
-          "emitted": 200,
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
           "shown": "withheld"
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
-          "occurred": 150,
-          "emitted": 150,
+          "emitted": "2026-10-01T00:02:30Z",
+          "occurred": "2026-10-01T00:02:30Z",
           "n": 0
         }
       ]
@@ -170,7 +170,7 @@
   "expect": {
     "heads": [
       {
-        "id": "r:00000014",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
         "shown": "here"
       }
     ],

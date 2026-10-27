@@ -6,33 +6,33 @@
   "input": {
     "forms": [
       {
-        "id": "r:00000081",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq",
         "kind": "note",
         "about": [],
         "value": "",
         "prev": [],
-        "occurred": 1,
-        "emitted": 1,
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
         "n": 0
       },
       {
-        "id": "r:00000082",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacba",
         "kind": "note",
-        "about": ["r:00000081"],
+        "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq"],
         "value": "",
-        "prev": ["r:00000081"],
-        "occurred": 2,
-        "emitted": 2,
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq"],
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
         "n": 0
       },
       {
-        "id": "r:00000083",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbq",
         "kind": "config",
         "about": [],
         "value": "",
         "prev": [],
-        "occurred": 3,
-        "emitted": 3,
+        "emitted": "2026-10-01T00:00:03Z",
+        "occurred": "2026-10-01T00:00:03Z",
         "n": 0
       }
     ]
@@ -40,28 +40,28 @@
   "expect": {
     "settled": [
       {
-        "id": "r:00000081",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq",
         "shown": "here"
       },
       {
-        "id": "r:00000082",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacba",
         "shown": "here"
       },
       {
-        "id": "r:00000083",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbq",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
-      "r:00000081": {
-        "heads": ["r:00000082"],
-        "winner": "r:00000082",
+      "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacba"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacba",
         "others": []
       },
-      "r:00000083": {
-        "heads": ["r:00000083"],
-        "winner": "r:00000083",
+      "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbq": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbq",
         "others": []
       }
     },
