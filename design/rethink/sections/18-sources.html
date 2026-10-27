@@ -589,6 +589,10 @@
       <p class="who">claude</p><ul><li>Next: the fold model's times become real. Where does a record without <code>occurred</code> sort? Proposed: at its <code>emitted</code> instant, the rule windows already use.</li></ul>
       <p class="who">kyle</p><p>A simple rule; go with it.</p>
       <p class="who">claude</p><ul><li>PR 12: fold records hold <code>emitted</code> and <code>occurred</code> as text with what each reads as; content order is span, then <code>emitted</code>, then id, and its four laws keep their statements. Every changed vector kept its expected result. <code>fold/latest-by/05</code> never reached <code>emitted</code>, since its records' <code>occurred</code> differed; it does now.</li></ul>
+      <p class="who">kyle</p><p>Run Astra and Argon before the merge.</p>
+      <p class="who">claude</p><ul><li>Neither found a wrong expected result, checking every order-sensitive vector from the text. But the vectors couldn't tell the rule from three wrong ones: a record without <code>occurred</code> sorting newest, spans compared by spelling, <code>emitted</code> compared as text. A typo in a fixture's time would quietly drop its <code>occurred</code>. And "then id" didn't say how: base32 text and digest bytes sort differently.</li><li>Proposed: ids compare as digest bytes, the rule times follow, meaning over spelling.</li></ul>
+      <p class="who">kyle</p><p>Settle them.</p>
+      <p class="who">claude</p><ul><li>Fold ids are now written as layer 0 writes them, and their order is proved to be the digest's byte order; <code>Newer.congr</code> proves the order reads nothing else, and <code>LatestBy.winner_newer</code> that the winner is newer than every other head. Each fixture proves its times read. The tie vectors spell one time two ways, and each wrong rule now fails a vector.</li></ul>
     </div></details>
   </div>
 </section>

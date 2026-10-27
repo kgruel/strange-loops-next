@@ -150,7 +150,7 @@ def cx.b : Record :=
 def cx.c : Record :=
   { id := 3, kind := "load", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
 
-/-- A bounded state can't follow `prev`. Max holds 9 after `[a, b]` and after
+/-- Max can't follow `prev`. Max holds 9 after `[a, b]` and after
 `[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and
 1 in the other. No step from Max's state can know which. -/
 theorem Max.cannot_follow_prev :
@@ -212,6 +212,22 @@ theorem erase_view : View Record.erase where
 theorem LatestBy.inv_of {xs : List Record} (hx : Addressed xs) :
     LatestBy.Inv (LatestBy.fold .empty xs) xs := by
   simpa using LatestBy.inv_fold xs LatestBy.inv_empty (by simpa using hx)
+
+/-- The winner is a head, and newer than every other head. -/
+theorem LatestBy.winner_newer {xs : List Record} (hx : Addressed xs) {w : Record}
+    (hw : (LatestBy.fold .empty xs).winner = some w) :
+    (w ∈ xs ∧ ¬ ∃ r ∈ xs, w.id ∈ r.prev) ∧ ∀ o ∈ (LatestBy.fold .empty xs).others, Newer w o := by
+  have inv := LatestBy.inv_of hx
+  unfold LatestBy.winner at hw
+  unfold LatestBy.others
+  cases hh : (LatestBy.fold .empty xs).heads with
+  | nil => simp [hh] at hw
+  | cons h t =>
+    simp only [hh, List.head?_cons, Option.some.injEq] at hw
+    subst hw
+    have hsort := hh ▸ inv.heads_sorted
+    rw [List.pairwise_cons] at hsort
+    exact ⟨(inv.heads_mem h).1 (by simp [hh]), fun o ho => hsort.1 o (by simpa using ho)⟩
 
 /-- A view folds to the same `prev` bookkeeping and the same heads, with their
 payloads hidden as the view hides them. -/

@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -17,17 +17,17 @@
           "n": 0
         },
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v18",
-          "prev": ["r:00000011"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
@@ -37,11 +37,11 @@
           "n": 0
         },
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
           "emitted": "2026-10-01T00:05:00Z",
           "occurred": "2026-10-01T00:05:00Z",
           "n": 0
@@ -49,17 +49,17 @@
       ],
       [
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v18",
-          "prev": ["r:00000011"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
@@ -69,17 +69,17 @@
           "n": 0
         },
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
           "emitted": "2026-10-01T00:05:00Z",
           "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -91,7 +91,7 @@
       ],
       [
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
@@ -101,17 +101,17 @@
           "n": 0
         },
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
           "emitted": "2026-10-01T00:05:00Z",
           "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -121,11 +121,11 @@
           "n": 0
         },
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v18",
-          "prev": ["r:00000011"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
@@ -133,17 +133,17 @@
       ],
       [
         {
-          "id": "r:00000014",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v20",
-          "prev": ["r:00000012", "r:00000013"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
           "emitted": "2026-10-01T00:05:00Z",
           "occurred": "2026-10-01T00:05:00Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -153,17 +153,17 @@
           "n": 0
         },
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v18",
-          "prev": ["r:00000011"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
@@ -177,8 +177,8 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:00000014"],
-      "winner": "r:00000014",
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
       "others": []
     }
   }

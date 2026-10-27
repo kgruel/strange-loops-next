@@ -7,17 +7,17 @@
     "orders": [
       [
         {
-          "id": "r:00000012",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v18",
-          "prev": ["r:00000011"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -31,8 +31,8 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:00000012"],
-      "winner": "r:00000012",
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
       "others": []
     }
   }

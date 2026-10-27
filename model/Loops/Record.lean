@@ -1,11 +1,12 @@
+import Loops.Base32
 import Loops.Occurred
 
 /-!
 # Record
 
-The record as the folds see it. An id is a number standing for a content
-hash (rendered as fixed-width hex, so byte order and numeric order agree),
-and the payload is opaque. Times are real: `emitted` is a `Stamp` and
+The record as the folds see it. An id is its 32-byte digest read as a
+number, most significant byte first, so numeric order is the digest's byte
+order; the payload is opaque. Times are real: `emitted` is a `Stamp` and
 `occurred`, when there is one, a `Claim`, each its text with what it reads
 as.
 -/
@@ -50,11 +51,17 @@ structure Record where
   shown    : Shown := .here
   deriving Repr, DecidableEq, Inhabited
 
-/-- An id as text: the model's ids are numbers standing for content hashes,
-written as fixed-width hex so byte order and numeric order agree. -/
-def idText (n : Nat) : String :=
-  let d := Nat.toDigits 16 n
-  "r:" ++ String.ofList (List.replicate (8 - d.length) '0' ++ d)
+/-- The last `k` base-256 digits of `n`, most significant first; the first
+holds whatever is above them. -/
+def digestDigits : Nat → Nat → List Nat
+  | 0, _ => []
+  | k + 1, n => n / 256 ^ k :: digestDigits k (n % 256 ^ k)
+
+/-- An id's digest: its 32 bytes, most significant first. -/
+def idDigest (n : Nat) : List Nat := digestDigits 32 n
+
+/-- An id as text: `r:` and its digest in base32. -/
+def idText (n : Nat) : String := "r:" ++ base32 ((idDigest n).map Nat.toUInt8)
 
 /-- The span content order reads: `occurred`'s, or without one, `emitted` as
 a span of no length. -/
@@ -64,7 +71,7 @@ def Record.span (r : Record) : Span :=
   | none => Span.point r.emitted.moment
 
 /-- Content order, newest first: the span (by start, then end), then
-`emitted`, then id. -/
+`emitted`, then id, the greater digest newer. -/
 def Newer (a b : Record) : Prop :=
   b.span.Before a.span ∨
   (a.span = b.span ∧

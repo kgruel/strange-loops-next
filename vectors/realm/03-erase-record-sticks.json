@@ -6,7 +6,7 @@
   "input": {
     "forms": [
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
         "about": ["host:a"],
         "value": "",
@@ -16,7 +16,7 @@
         "n": 40
       },
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
         "about": ["host:a"],
         "prev": [],
@@ -25,18 +25,18 @@
         "shown": "erased"
       },
       {
-        "id": "r:00000052",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja",
         "kind": "erase",
         "about": [],
         "value": "",
         "prev": [],
         "emitted": "2026-10-01T00:01:50Z",
         "occurred": "2026-10-01T00:01:50Z",
-        "erases": ["r:00000051"],
+        "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
         "n": 0
       },
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
         "about": ["host:a"],
         "value": "",
@@ -50,24 +50,24 @@
   "expect": {
     "settled": [
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "shown": "erased"
       },
       {
-        "id": "r:00000052",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
       "host:a": {
-        "heads": ["r:00000051"],
-        "winner": "r:00000051",
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "others": []
       },
-      "r:00000052": {
-        "heads": ["r:00000052"],
-        "winner": "r:00000052",
+      "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja",
         "others": []
       }
     },

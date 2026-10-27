@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -17,7 +17,7 @@
           "n": 0
         },
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
@@ -29,7 +29,7 @@
       ],
       [
         {
-          "id": "r:00000013",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v19",
@@ -39,7 +39,7 @@
           "n": 0
         },
         {
-          "id": "r:00000011",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
           "about": ["topic:auth"],
           "value": "v17",
@@ -53,9 +53,9 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:00000013", "r:00000011"],
-      "winner": "r:00000013",
-      "others": ["r:00000011"]
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
+      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"]
     }
   }
 }

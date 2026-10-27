@@ -74,9 +74,9 @@ def parseVector (name : String) (j : Json) : Except String J := do
 /-! ## Running -/
 
 def task (id : Nat) (thing : String) (occurred : Nat) (fields : List (String × Val))
-    (prev : List Nat := []) : Record :=
-  { id, kind := "task", about := [thing], value := "", prev, occurred := claimAt occurred,
-    emitted := stampAt occurred, fields }
+    (prev : List Nat := []) (ok : Reads occurred := by decide) : Record :=
+  { id, kind := "task", about := [thing], value := "", prev, occurred := some (claimAt occurred ok),
+    emitted := stampAt occurred ok, fields }
 
 -- task:1 opens, then closes; task:2 is open; task:3 is open but its payload is withheld
 def t1 := task 0x41 "task:1" 100 [("status", .str "open"), ("est", .int 3)]

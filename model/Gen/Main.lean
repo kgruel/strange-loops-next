@@ -33,9 +33,10 @@ def jOutcome : Outcome → J
 /-! ## Records used by the fold cases -/
 
 def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
-    (prev : List Nat := []) (value : String := s!"v{id}") : Record :=
-  { id, kind := "decision", about := [thing], value, prev, occurred := claimAt occurred,
-    emitted := stampAt emitted }
+    (prev : List Nat := []) (value : String := s!"v{id}")
+    (okO : Reads occurred := by decide) (okE : Reads emitted := by decide) : Record :=
+  { id, kind := "decision", about := [thing], value, prev, occurred := some (claimAt occurred okO),
+    emitted := stampAt emitted okE }
 
 def r1 := rec 0x11 "topic:auth" 100
 def r2 := rec 0x12 "topic:auth" 200 (prev := [0x11])
@@ -43,20 +44,28 @@ def r3 := rec 0x13 "topic:auth" 150
 def r4 := rec 0x14 "topic:auth" 300 (prev := [0x12, 0x13])
 def r5 := rec 0x15 "topic:cache" 120
 def r6 := rec 0x16 "topic:auth" 200 (emitted := 210)
-def r7 := rec 0x17 "topic:auth" 200 (emitted := 210)
+-- r6's times, each spelled another way, and a greater digest whose text sorts
+-- first: only the id, read as digest bytes, puts r7 first
+def r7 := { rec 0x37 "topic:auth" 200 (emitted := 210) with
+  occurred := some (claim "2026-10-01T01:03:20+01:00"), emitted := stamp "2026-10-01T00:03:30.000Z" }
 def r8 := rec 0x18 "topic:cache" 400 (prev := [0x99])
--- r6's `occurred`, an earlier `emitted` and a later id: only `emitted` puts r6 first
-def r9 := rec 0x19 "topic:auth" 200 (emitted := 205)
+-- r6's span spelled another way, an earlier `emitted` and a later id: only
+-- `emitted` puts r6 first
+def r9 := { rec 0x19 "topic:auth" 200 (emitted := 205) with
+  occurred := some (claim "2026-10-01T01:03:20+01:00") }
 
--- content order on real times: without `occurred`, the record sits at its
--- `emitted`; at one start, an instant, then a month, then an open span
-def t1 := { rec 0x31 "topic:auth" 300 (emitted := 600) with occurred := claimAt 300 }
-def t2 := { rec 0x32 "topic:auth" 0 (emitted := 420) with occurred := none }
-def t3 := { rec 0x33 "topic:auth" 0 (emitted := 900) with occurred := none }
-def u1 := { rec 0x41 "topic:auth" 0 (emitted := 60) with occurred := Claim.of? "2026-10-01T00:00:00Z" }
-def u2 := { rec 0x42 "topic:auth" 0 (emitted := 30) with occurred := Claim.of? "2026-10" }
-def u3 := { rec 0x43 "topic:auth" 0 (emitted := 10) with occurred := Claim.of? "2026-10-01/.." }
-def u4 := { rec 0x44 "topic:auth" 0 (emitted := 20) with occurred := Claim.of? "2026" }
+-- content order on real times: without `occurred`, a record sits at its
+-- `emitted`, between records with one, whatever its id
+def t1 := rec 0x31 "topic:auth" 500 (emitted := 520)
+def t2 := { rec 0x34 "topic:auth" 0 (emitted := 420) with occurred := none }
+def t3 := rec 0x32 "topic:auth" 300 (emitted := 900)
+def t4 := { rec 0x33 "topic:auth" 0 (emitted := 100) with occurred := none }
+-- at one start, an instant, then a month, then an open span; a year that
+-- starts earlier is oldest, though it ends last
+def u1 := { rec 0x41 "topic:auth" 0 (emitted := 60) with occurred := some (claim "2026-10-01T00:00:00Z") }
+def u2 := { rec 0x42 "topic:auth" 0 (emitted := 30) with occurred := some (claim "2026-10") }
+def u3 := { rec 0x43 "topic:auth" 0 (emitted := 10) with occurred := some (claim "2026-10-01/..") }
+def u4 := { rec 0x44 "topic:auth" 0 (emitted := 20) with occurred := some (claim "2026") }
 
 def n1 := { rec 0x21 "load" 100 with n := 5 }
 def n2 := { rec 0x22 "load" 110 with n := -3 }
@@ -120,7 +129,7 @@ def latestByCases : List FoldCase := [
   ⟨"09-converge", ["latest-by.converge"], [[r1, r3, r5, r2], [r5, r2, r1, r3]]⟩,
   ⟨"10-two-things", ["latest-by.set"], rotations [r1, r5, r3]⟩,
   ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩,
-  ⟨"12-emitted-without-occurred", ["latest-by.order"], rotations [t1, t2, t3]⟩,
+  ⟨"12-emitted-without-occurred", ["latest-by.order"], rotations [t1, t2, t3, t4]⟩,
   ⟨"13-span-order", ["latest-by.order"], rotations [u1, u2, u3, u4]⟩
 ]
 
@@ -280,7 +289,6 @@ def orFail : Except String J → IO J
   | .error e => throw (IO.userError e)
 
 def main (args : List String) : IO UInt32 := do
-  if let .error e := timesCheck then throw (IO.userError e)
   let dir : System.FilePath := args.headD "../vectors"
   for sub in ["fold", "lens", "record", "spec", "batch", "realm", "occurred"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)

@@ -81,7 +81,11 @@ possibly coarse. It is one of:
   before a longer one with the same start, and a span with no end comes
   after any that has one. Content order reads a record's span this way,
   then its `emitted`, then its id; a record without `occurred` is an instant
-  at its `emitted`.
+  at its `emitted`. Ids compare as their 32 digest bytes, unsigned, first
+  byte first, not as text: base32's alphabet doesn't sort as ASCII does.
+  Newest first reverses the whole order, so a later span, then a later
+  `emitted`, then a greater digest comes first. Each compares what it
+  reads as, never how it is spelled.
 * **Moments.** An instant's moment is its whole seconds in UTC, then its
   fraction, compared exactly at any length: trailing zeros don't count
   (`.5` and `.500` are the same moment). `:60` on any minute is the first

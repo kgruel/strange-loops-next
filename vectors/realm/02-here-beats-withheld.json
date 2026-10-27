@@ -6,7 +6,7 @@
   "input": {
     "forms": [
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
         "about": ["host:a"],
         "prev": [],
@@ -15,7 +15,7 @@
         "shown": "withheld"
       },
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
         "about": ["host:a"],
         "value": "",
@@ -25,7 +25,7 @@
         "n": 40
       },
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "kind": "load",
         "about": ["host:a"],
         "prev": [],
@@ -38,15 +38,15 @@
   "expect": {
     "settled": [
       {
-        "id": "r:00000051",
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
       "host:a": {
-        "heads": ["r:00000051"],
-        "winner": "r:00000051",
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
         "others": []
       }
     },

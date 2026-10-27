@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:00000015",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq",
           "kind": "decision",
           "about": ["topic:cache"],
           "value": "v21",
@@ -17,11 +17,11 @@
           "n": 0
         },
         {
-          "id": "r:00000018",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
           "kind": "decision",
           "about": ["topic:cache"],
           "value": "v24",
-          "prev": ["r:00000099"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"],
           "emitted": "2026-10-01T00:06:40Z",
           "occurred": "2026-10-01T00:06:40Z",
           "n": 0
@@ -29,17 +29,17 @@
       ],
       [
         {
-          "id": "r:00000018",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
           "kind": "decision",
           "about": ["topic:cache"],
           "value": "v24",
-          "prev": ["r:00000099"],
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"],
           "emitted": "2026-10-01T00:06:40Z",
           "occurred": "2026-10-01T00:06:40Z",
           "n": 0
         },
         {
-          "id": "r:00000015",
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq",
           "kind": "decision",
           "about": ["topic:cache"],
           "value": "v21",
@@ -53,9 +53,9 @@
   },
   "expect": {
     "topic:cache": {
-      "heads": ["r:00000018", "r:00000015"],
-      "winner": "r:00000018",
-      "others": ["r:00000015"]
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
+      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq"]
     }
   }
 }
