@@ -14,8 +14,8 @@ writer that must agree with it byte for byte.
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS writer for layer 0 |
-| `design/` | the design page's source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `build.mjs` renders it |
-| `out/rethink/` | the design page, written by `node design/build.mjs`, never by hand |
+| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `build.mjs` renders both |
+| `out/rethink/`, `out/grammar/` | the pages, written by `node design/build.mjs`, never by hand |
 
 Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
 `xtask` checking token and surface budgets); `scenarios/` (end-to-end walks),
@@ -48,7 +48,15 @@ one HTML file per tab under `sections/`, the decision ledger as records in
 node design/build.mjs       # writes out/rethink/index.html; commit it with the source
 ```
 
-CI rebuilds it and fails if `out/` differs, as with the vectors. To publish:
+`design/grammar/` is a second page, the protocol's nouns, verbs and layers:
+its words are data (`words.json`, and `walk.json` for the stepped walk), and
+the build refuses a law name that isn't in `protocol/laws.md` or a set of
+refusal codes that differs from the ones the vectors pin. It is written to
+`out/grammar/index.html` by the same command. It loads Motion from a CDN, so
+it is published only on the site (`/strange-loops/grammar/`), with no
+artifact mirror.
+
+CI rebuilds both and fails if `out/` differs, as with the vectors. To publish:
 
 * **The site:** in `projects.gruel.world`, `npm run sync:strange-loops`
   snapshots the committed page (it refuses uncommitted output), then push its
