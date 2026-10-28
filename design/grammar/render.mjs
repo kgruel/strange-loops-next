@@ -130,6 +130,12 @@ function walkOf(root, walk) {
   const label = new Map(recs.map((r, i) => [r.id, walk.records[i].label]));
   if (new Set(label.values()).size !== recs.length) fail("two records share a label");
   const L = (id) => label.get(id) ?? fail(`no record ${id}`);
+  // walk.json says only how to tell the walk; a key for anything else would be silently ignored.
+  const STEP = ["name", "title", "text", "laws", "reader", "settled", "tick", "orders", "lens"];
+  for (const st of walk.steps) for (const k of Object.keys(st))
+    if (!STEP.includes(k)) fail(`step ${st.name} has ${k}; what a step shows of the protocol comes from ${walk.vector}`);
+  for (const r of walk.records) for (const k of Object.keys(r))
+    if (!["label", "col", "row"].includes(k)) fail(`record ${r.label} has ${k}; records come from ${walk.vector}`);
   const names = v.input.steps.map((s) => s.name);
   if (JSON.stringify(names) !== JSON.stringify(walk.steps.map((s) => s.name))) fail(`steps ${walk.steps.map((s) => s.name)} aren't the vector's ${names}`);
   const records = Object.fromEntries(recs.map((r, i) => [L(r.id), {

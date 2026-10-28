@@ -30,6 +30,7 @@ export function renderLaws(root) {
   for (const r of rows) if (!data.laws[r.key]) fail(`no entry in laws.json for ${r.key}`);
   for (const k of Object.keys(data.laws)) if (!keys.has(k)) fail(`laws.json has ${k}, which isn't a row of protocol/laws.md`);
   for (const [k, l] of Object.entries(data.laws)) {
+    for (const f of Object.keys(l)) if (!["shape", "layer", "change", "stays", "says", "scope"].includes(f)) fail(`${k}: unknown key ${f}`);
     if (!data.shapes[l.shape]) fail(`${k}: unknown shape ${l.shape}`);
     if (!layers.includes(l.layer)) fail(`${k}: ${l.layer} isn't a layer on the grammar page`);
     const inv = l.shape === "invariance";
