@@ -68,6 +68,11 @@ read the protocol through `design/protocol.mjs`:
   a vector reference to no file, a law name a vector uses that isn't a law,
   or a proof that rests on a layer above its own.
 
+`node design/mutants.mjs` holds those checks to account: it applies plausible
+wrong edits to a copy of the sources and fails unless the build refuses each
+one, apart from an explicit, shrink-only list of survivors with why. CI runs
+it.
+
 Both load pinned libraries from a CDN (Motion; elkjs for the laws map), so
 they are published only on the site, at `/strange-loops/grammar/` and
 `/strange-loops/laws/`, with no artifact mirror.

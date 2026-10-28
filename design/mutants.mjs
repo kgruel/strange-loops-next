@@ -1,0 +1,94 @@
+// The design build's checks, held to account: each mutant is a plausible wrong edit to what
+// the pages are built from, and the build must refuse it. A mutant that survives fails this
+// script unless it is listed in SURVIVORS with why; a listed survivor that starts failing
+// must leave the list, so the list only shrinks.
+//
+//   node design/mutants.mjs
+//
+// Edits to generated files (vectors/, design/laws/proofs.json) aren't mutants here: CI
+// regenerates those from the model and fails on any difference. No dependencies.
+
+import { cpSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const root = dirname(dirname(fileURLToPath(import.meta.url)));
+
+// Text edits name exactly what they replace; one that no longer applies is a stale mutant.
+const swap = (from, to) => (t) => {
+  if (!t.includes(from)) throw new Error(`stale mutant: no ${JSON.stringify(from.slice(0, 60))}`);
+  return t.replace(from, to);
+};
+const json = (f) => (t) => { const d = JSON.parse(t); f(d); return JSON.stringify(d, null, 2); };
+
+const MUTANTS = [
+  ["a law with no sentence", "design/laws/laws.json", json((d) => { delete d.laws["count.perm"]; })],
+  ["a sentence for no law", "design/laws/laws.json", json((d) => { d.laws["no.such"] = { ...d.laws["count.perm"] }; })],
+  ["an unknown shape", "design/laws/laws.json", json((d) => { d.laws["count.perm"].shape = "circle"; })],
+  ["an unknown layer", "design/laws/laws.json", json((d) => { d.laws["count.perm"].layer = "Attic"; })],
+  ["an unknown key on a law", "design/laws/laws.json", json((d) => { d.laws["count.perm"].premise = "x"; })],
+  ["an invariance without what stays", "design/laws/laws.json", json((d) => { delete d.laws["count.perm"].stays; })],
+  ["a proof resting on a layer above it", "design/laws/laws.json", json((d) => { d.laws["content order"].layer = "Text"; })],
+  ["a stale vectorTags entry", "design/laws/laws.json", json((d) => { d.vectorTags["no.such"] = "x"; })],
+  ["a demo vector that doesn't name its law", "design/laws/laws.json", json((d) => { d.demos[0].vector = "fold/count/03-repeats-counted"; })],
+  ["demo spellings that read as different spans", "design/laws/laws.json", json((d) => { d.demos.find((x) => x.kind === "spans").pick.push(6); })],
+  ["a misspelt theorem", "protocol/laws.md", swap("| `count.perm` | `Count.perm` |", "| `count.perm` | `Count.permz` |")],
+  ["a theorem that lost its backticks", "protocol/laws.md", swap("| `count.perm` | `Count.perm` |", "| `count.perm` | Count.perm |")],
+  ["an ambiguous theorem name", "protocol/laws.md", swap("| `count.perm` | `Count.perm` |", "| `count.perm` | `set_decides` |")],
+  ["a vector that doesn't exist", "protocol/laws.md", swap("`fold/count/03`", "`fold/count/09`")],
+  ["a malformed vector name", "protocol/laws.md", swap("`fold/count/01`", "`fold/count/01-empy`")],
+  ["a stale notTheorems entry", "protocol/laws.md", swap("`writeProblem_none`, `Written`", "`writeProblem_none`")],
+  ["a law name no vector or page may use", "design/grammar/words.json", swap('"laws": ["record.erasure", "record.sets", "write.checked"]', '"laws": ["record.erasure", "no.such"]')],
+  ["a refusal code the page lost", "design/grammar/words.json", swap('"kind-empty", ', "")],
+  ["a matrix verb that isn't a verb", "design/grammar/words.json", swap('"verbs": ["emit", "refuse",', '"verbs": ["emit", "dance",')],
+  ["a walk step claiming its own heads", "design/grammar/walk.json", json((d) => { d.steps[2].heads = ["A"]; })],
+  ["a walk step the vector doesn't have", "design/grammar/walk.json", json((d) => { d.steps[2].name = "fork-twice"; })],
+  ["a walk record the vector doesn't have", "design/grammar/walk.json", json((d) => { d.records.push({ label: "G", col: 5, row: 1 }); })],
+  ["demo orders that aren't one set of records", "vectors/fold/latest-by/02-fork.json", json((d) => { d.input.orders[1][0].prev = [d.input.orders[1][1].id]; })],
+  ["demo spellings that differ in more than a set", "vectors/record/03-sets-are-sets.json", json((d) => { d.input.envs[1].kind = "other"; })],
+  ["a vector naming no law", "vectors/fold/count/02-three.json", json((d) => { d.laws.push("no.such"); })],
+  ["a gap in a cited range", "vectors/record/23-emitted-lowercase.json", null],
+  ["a law with no edges moved to another layer", "design/laws/laws.json", json((d) => { d.laws["record.commit"].layer = "Text"; })],
+];
+
+// What the build can't know, and why.
+const SURVIVORS = {
+  "a law with no edges moved to another layer":
+    "a law's layer is declared, not derived; the proofs constrain it only along their edges, and the page says so",
+};
+
+const work = mkdtempSync(join(tmpdir(), "loops-mutants-"));
+const copy = join(work, "tree");
+for (const d of ["design", "protocol", "vectors", "interop"]) cpSync(join(root, d), join(copy, d), { recursive: true });
+
+const build = () => spawnSync(process.execPath, [join(copy, "design", "build.mjs")], { encoding: "utf8" });
+if (build().status !== 0) throw new Error("the unmutated copy doesn't build");
+
+const bad = [];
+let refused = 0;
+try {
+  for (const [name, file, edit] of MUTANTS) {
+    const path = join(copy, file);
+    const old = readFileSync(path, "utf8");
+    try {
+      if (edit) writeFileSync(path, edit(old)); else unlinkSync(path);
+      const r = build();
+      const survived = r.status === 0;
+      const listed = name in SURVIVORS;
+      if (survived && !listed) bad.push(`survived: ${name}`);
+      if (!survived && listed) bad.push(`now refused, take it off SURVIVORS: ${name}`);
+      if (!survived && !/Error: /.test(r.stderr)) bad.push(`refused without a stated reason: ${name}`);
+      if (!survived) refused++;
+      console.log(`${survived ? "survives" : "refused "}  ${name}${survived ? "" : `: ${(r.stderr.match(/Error: (.*)/) ?? [])[1] ?? ""}`}`);
+    } finally {
+      writeFileSync(path, old);
+    }
+  }
+  for (const s of Object.keys(SURVIVORS)) if (!MUTANTS.some(([n]) => n === s)) bad.push(`SURVIVORS names no mutant: ${s}`);
+} finally {
+  rmSync(work, { recursive: true, force: true });
+}
+console.log(`${refused} of ${MUTANTS.length} refused; ${Object.keys(SURVIVORS).length} listed to survive`);
+if (bad.length) { console.error(bad.join("\n")); process.exit(1); }
