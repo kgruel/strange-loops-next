@@ -248,23 +248,25 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 
 /* the map */
 .map-wrap{display:grid;gap:10px;min-width:0}
-.map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;min-height:200px;position:relative}
-.map-wait{padding:20px}
-.map svg{display:block}
+.map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;position:relative}
+.map svg{display:block;height:auto}
 .map .band{fill:var(--ground);opacity:.55}
 .map .band.alt{opacity:0}
 .map .band-l{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;fill:var(--faint)}
-.map .edge{fill:none;stroke:var(--hair-2);stroke-width:1.2;transition:stroke .2s,opacity .2s}
+.map .edge .line{fill:none;stroke:var(--hair-2);stroke-width:1.2;transition:stroke .2s,opacity .2s}
+.map .edge .hit{fill:none;stroke:transparent;stroke-width:10;cursor:pointer}
 .map .node rect{fill:var(--sheet);stroke:var(--hair-2);stroke-width:1;transition:stroke .2s,opacity .2s}
-.map .node text{font-family:var(--mono);font-size:11px;fill:var(--ink);transition:opacity .2s}
-.map .node{cursor:pointer}
+.map .node text{font-family:var(--mono);font-size:11px;fill:var(--ink)}
+.map .node{cursor:pointer;outline:none}
+.map .node:focus-visible rect{stroke:var(--ink);stroke-width:2}
 .map .node.limit rect{stroke:var(--alert)}
 .map.focus .node,.map.focus .edge{opacity:.18}
 .map.focus .node.on,.map.focus .edge.on{opacity:1}
 .map .node.me rect{stroke:var(--ink);stroke-width:1.8}
-.map .edge.on{stroke:var(--ink)}
-.map .edge.down{stroke:var(--ink)}
-.map .edge.up{stroke:var(--muted);stroke-dasharray:3 3}
+.map .edge.on .line{stroke:var(--ink)}
+.map .edge.up .line{stroke:var(--muted);stroke-dasharray:3 3}
+.map .edge.me .line{stroke-width:2.2}
+.map-note .via{font-family:var(--mono);font-size:12px;color:var(--ink)}
 .map-note{font-size:13.5px;color:var(--muted);min-height:3em}
 .map-note b{color:var(--ink);font-family:var(--mono);font-weight:500;font-size:12.5px}
 
@@ -281,6 +283,30 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .rotor-ctl{display:flex;gap:6px}
 .rotor-ctl button{font:inherit;font-size:12.5px;color:var(--ink);background:var(--ground);border:0;border-radius:8px;padding:5px 10px;box-shadow:inset 0 0 0 1px var(--hair-2);cursor:pointer}
 .rotor-ctl button:hover{background:var(--sheet)}
+
+/* coverage */
+.cov-sum{font-size:13.5px;color:var(--muted)}
+.cov-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;max-height:640px;overflow-y:auto}
+.cov{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+.cov th,.cov td{padding:5px 10px;text-align:center;border-top:1px solid var(--hair);white-space:nowrap}
+.cov thead th{position:sticky;top:0;background:var(--sheet);z-index:2;font-weight:500;font-size:11.5px;color:var(--muted);border-top:0;cursor:help}
+.cov tbody th{text-align:left;font-weight:400;position:sticky;left:0;background:var(--sheet);z-index:1}
+.cov tbody th a{text-decoration:none}
+.cov tbody th code{font-size:11.5px}
+.cov .sh{color:var(--muted);text-align:left}
+.cov .cov-band th{text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground);position:static}
+.cov tbody tr:not(.cov-band):hover td,.cov tbody tr:not(.cov-band):hover th{background:color-mix(in srgb,var(--ground) 50%,var(--sheet))}
+.cov .z{color:var(--faint)}
+.cov .ok{color:var(--ink)}
+.cov .c{font-family:var(--mono);color:var(--muted);cursor:help}
+.cov .off{font-family:var(--mono);color:var(--alert);cursor:help}
+
+/* without the premise */
+.premise{font-size:13px;line-height:1.45}
+.premise span{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:6px}
+.demo .given{font-size:13px;line-height:1.45}
+.answer .said{font-family:var(--mono);font-size:12px;line-height:1.5}
+.answer.moved{box-shadow:inset 0 0 0 1.5px var(--alert)}
 </style>
 </head>
 <body>
@@ -288,7 +314,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   <div class="wrap top-row">
     <p class="mark"><a href="../rethink/">Strange Loops</a><a class="page" href="../grammar/">Grammar</a><a class="page" href="../laws/" aria-current="page">Laws</a></p>
     <nav class="seg" aria-label="Sections">
-      <a href="#shapes">Shapes</a><a href="#try">Try</a><a href="#chain">Chain</a><a href="#map">Map</a><a href="#stop">Limits</a>
+      <a href="#shapes">Shapes</a><a href="#try">Try</a><a href="#coverage">Coverage</a><a href="#chain">Chain</a><a href="#map">Map</a><a href="#stop">Limits</a>
     </nav>
   </div>
 </header>
@@ -336,7 +362,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <p>Each card is a vector the model wrote. Press the button to vary what the law says may vary; the answer underneath is the one the model computed for every variant. Nothing here is computed in your browser, and CI regenerates every vector from the model.</p>
     <p>The last card is a limit: there, the answer does move, and the law says who must account for it.</p>
   </div>
-  <div class="demos">
+  <div class="stack">
+    <div class="demos">
     <article class="demo" id="try-count-perm" data-demo="0">
       <div class="demo-h"><a href="#law-count-perm"><code>count.perm</code></a><span class="chip">Invariance</span></div>
       <p class="demo-s">Change <span class="var">the arrival order</span>, and <span class="inv">the count</span> stays.</p>
@@ -439,6 +466,159 @@ Revisit in Q3.
       <div class="demo-out"><p class="out-l">the count moves</p><div class="answer" data-v="0"><span class="num">3</span></div><div class="answer" data-v="1" hidden><span class="num">6</span></div></div>
       <p class="demo-src">from <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/count/03-repeats-counted.json"><code>vectors/fold/count/03-repeats-counted.json</code></a>, as the model wrote it</p>
     </article>
+    </div>
+    <h3 id="without">Without the premise</h3>
+    <p class="note">Most laws hold only given something: an id names one record, a test answers, a section isn't dropped. Each card asks the model the same question with the premise and without it. Some inputs here are ones the protocol never produces; each card says which.</p>
+    <div class="demos">
+    <article class="demo is-boundary" id="without-result-full" data-demo="b0">
+      <div class="demo-h"><a href="#law-result-full"><code>result.full</code></a><span class="chip">Refinement</span></div>
+      <p class="premise"><span>premise</span> every record is readable to the fold</p>
+      <p class="demo-s">When every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold.</p>
+      <div class="demo-in"><div class="variant" data-v="0"><p class="variant-l">premise holds</p><p class="given">sum of est over a record holding est = 3</p></div><div class="variant" data-v="1" hidden><p class="variant-l">premise removed</p><p class="given">the same record, its payload here but with no est</p></div></div>
+      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>
+      <div class="demo-out"><p class="out-l">what the model gives</p><div class="answer" data-v="0"><span class="said">value 3 · unread 0</span></div><div class="answer moved" data-v="1" hidden><span class="said">value 0 · unread 1</span></div></div>
+      <p class="demo-n">A valid input: a payload can lack a field.</p>
+      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>
+    </article>
+    <article class="demo is-boundary" id="without-where-complements" data-demo="b1">
+      <div class="demo-h"><a href="#law-where-complements"><code>where.complements</code></a><span class="chip">Order</span></div>
+      <p class="premise"><span>premise</span> the test answers</p>
+      <p class="demo-s">Where a test answers, <code>not</code> is the complement of <code>is</code> and <code>absent</code> of <code>present</code>; on a field holding a number or a time, exactly one of <code>at-least</code> and <code>below</code> holds.</p>
+      <div class="demo-in"><div class="variant" data-v="0"><p class="variant-l">premise holds</p><p class="given">is and not "yes" on a record whose value is yes</p></div><div class="variant" data-v="1" hidden><p class="variant-l">premise removed</p><p class="given">the same tests, the payload withheld</p></div></div>
+      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>
+      <div class="demo-out"><p class="out-l">what the model gives</p><div class="answer" data-v="0"><span class="said">is yes · not no</span></div><div class="answer moved" data-v="1" hidden><span class="said">is unknown · not unknown</span></div></div>
+      <p class="demo-n">A valid input: a reader may hold an envelope without its payload.</p>
+      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>
+    </article>
+    <article class="demo is-boundary" id="without-latest-by-set" data-demo="b2">
+      <div class="demo-h"><a href="#law-latest-by-set"><code>latest-by.set</code></a><span class="chip">Invariance</span></div>
+      <p class="premise"><span>premise</span> within one store an id names one record</p>
+      <p class="demo-s">Change <span class="var">how the records arrive, the set kept</span>, and <span class="inv">every thing's state, its heads and winner</span> stays.</p>
+      <div class="demo-in"><div class="variant" data-v="0"><p class="variant-l">premise holds</p><p class="given">records first, second under two ids, in either order</p></div><div class="variant" data-v="1" hidden><p class="variant-l">premise removed</p><p class="given">records first, second under one id: one order, then the other</p></div></div>
+      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>
+      <div class="demo-out"><p class="out-l">what the model gives</p><div class="answer" data-v="0"><span class="said">winner second either way</span></div><div class="answer moved" data-v="1" hidden><span class="said">winner first, then winner second</span></div></div>
+      <p class="demo-n">Impossible in a store: an id is the hash of what the record says.</p>
+      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>
+    </article>
+    <article class="demo is-boundary" id="without-lens-no-op" data-demo="b3">
+      <div class="demo-h"><a href="#law-lens-no-op"><code>lens.no-op</code></a><span class="chip">Round trip</span></div>
+      <p class="premise"><span>premise</span> the base's section ids are distinct</p>
+      <p class="demo-s">Parse an unedited render and there is nothing to apply.</p>
+      <div class="demo-in"><div class="variant" data-v="0"><p class="variant-l">premise holds</p><p class="given">parse an unedited render of two sections</p></div><div class="variant" data-v="1" hidden><p class="variant-l">premise removed</p><p class="given">the same, both sections keyed decision:auth</p></div></div>
+      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>
+      <div class="demo-out"><p class="out-l">what the model gives</p><div class="answer" data-v="0"><span class="said">nothing to apply</span></div><div class="answer moved" data-v="1" hidden><span class="said">accepted decision:auth: Device flow.</span></div></div>
+      <p class="demo-n">Impossible from a state: a lens renders one section per thing.</p>
+      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>
+    </article>
+    <article class="demo is-boundary" id="without-lens-put-get" data-demo="b4">
+      <div class="demo-h"><a href="#law-lens-put-get"><code>lens.put-get</code></a><span class="chip">Round trip</span></div>
+      <p class="premise"><span>premise</span> the edit keeps exactly the base's sections</p>
+      <p class="demo-s">An edit that keeps exactly the base's sections, in the same order, applies exactly.</p>
+      <div class="demo-in"><div class="variant" data-v="0"><p class="variant-l">premise holds</p><p class="given">edit decision:auth, keep decision:cache</p></div><div class="variant" data-v="1" hidden><p class="variant-l">premise removed</p><p class="given">edit decision:auth, drop decision:cache</p></div></div>
+      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>
+      <div class="demo-out"><p class="out-l">what the model gives</p><div class="answer" data-v="0"><span class="said">decision:auth: Passkeys everywhere. · decision:cache: No cache. (the edit, exactly)</span></div><div class="answer moved" data-v="1" hidden><span class="said">decision:auth: Passkeys everywhere. · decision:cache: No cache. (not the edit: the dropped section stays)</span></div></div>
+      <p class="demo-n">A valid input: anyone may delete a section from the text.</p>
+      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>
+    </article>
+    <article class="demo is-boundary" id="without-record-member-order" data-demo="b5">
+      <div class="demo-h"><a href="#law-record-member-order"><code>record.member-order</code></a><span class="chip">Invariance</span></div>
+      <p class="premise"><span>premise</span> member names are distinct</p>
+      <p class="demo-s">Change <span class="var">the order of an object's members, their names distinct</span>, and <span class="inv">its canonical bytes</span> stays.</p>
+      <div class="demo-in"><div class="variant" data-v="0"><p class="variant-l">premise holds</p><p class="given">{"x":1,"y":2}, its members in both orders</p></div><div class="variant" data-v="1" hidden><p class="variant-l">premise removed</p><p class="given">{"x":1,"x":2}, its members in both orders</p></div></div>
+      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>
+      <div class="demo-out"><p class="out-l">what the model gives</p><div class="answer" data-v="0"><span class="said">{"x":1,"y":2} and {"x":1,"y":2}</span></div><div class="answer moved" data-v="1" hidden><span class="said">{"x":1} and {"x":2}</span></div></div>
+      <p class="demo-n">Refused at layer 0 (member-duplicate), so no record holds it.</p>
+      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>
+    </article>
+    </div>
+  </div>
+</section>
+
+<section class="wrap block" id="coverage" aria-labelledby="h-coverage">
+  <div class="side">
+    <h2 id="h-coverage">Coverage</h2>
+    <p>What evidence each law has: theorems Lean checked, vectors <code>laws.md</code> cites, vectors that name the law themselves, whether those two agree, whether the JS writer runs any of them, a demo, and how many laws it rests on and carries.</p>
+    <p>A filled cell says the evidence exists, not that it is complete: a law cited by one vector is pinned at one point.</p>
+  </div>
+  <div class="stack">
+    <p class="cov-sum">63 laws are theorems and 4 hold by construction; for 23, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>
+    <div class="cov-scroll"><table class="cov">
+      <thead><tr><th scope="col">law</th><th scope="col">shape</th><th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th><th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th><th scope="col" title="the JS writer runs at least one of its vectors">JS</th><th scope="col">demo</th><th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>
+      <tbody>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9">Record</th></tr>
+        <tr><th scope="row"><a href="#law-content-order"><code>content order</code></a></th><td class="sh">Order</td><td>5</td><td>4</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/latest-by/05-emitted-breaks-tie, fold/latest-by/06-id-breaks-tie, fold/latest-by/12-emitted-without-occurred, fold/latest-by/13-span-order">−4</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / 5</td></tr>
+        <tr><th scope="row"><a href="#law-batch-meaning"><code>batch.meaning</code></a></th><td class="sh">Exactness</td><td>1</td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-batch-refuse"><code>batch.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>8</td><td>8</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-batch-refuse-order"><code>batch.refuse-order</code></a></th><td class="sh">Invariance</td><td>2</td><td>2</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: batch/15-write-refused, batch/16-refusal-order">−2</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-record-erasure"><code>record.erasure</code></a></th><td class="sh">Invariance</td><td>2</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-record-commit"><code>record.commit</code></a></th><td class="sh">Exactness</td><td>1</td><td><span class="z">–</span></td><td>1</td><td><span class="off" title="naming it, not cited: record/01-minimal">+1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-record-sets"><code>record.sets</code></a></th><td class="sh">Invariance</td><td>2</td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td>1 / 2</td></tr>
+        <tr><th scope="row"><a href="#law-record-member-order"><code>record.member-order</code></a></th><td class="sh">Invariance</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td>1 / 1</td></tr>
+        <tr><th scope="row"><a href="#law-utf-16-order"><code>UTF-16 order</code></a></th><td class="sh">Order</td><td>3</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 2</td></tr>
+        <tr><th scope="row"><a href="#law-record-refuse"><code>record.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>15</td><td>15</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-write-checked"><code>write.checked</code></a></th><td class="sh">Exactness</td><td>1</td><td>28</td><td>2</td><td><span class="off" title="cited, not naming it: record/01-minimal, record/02-full-envelope, record/03-sets-are-sets, record/04-member-order, record/05-unicode, record/06-values, record/07-payload-not-object, record/08-erasure, record/09-leap-second, record/10-proto-member, record/11-erases, record/20-kind-empty, record/21-observer-untyped, record/22-emitted-no-offset, record/23-emitted-lowercase, record/24-emitted-no-such-day, record/25-emitted-bad-offset, record/26-about-untyped, record/27-prev-not-record, record/28-under-not-record, record/29-number-out-of-range, record/30-salt-short, record/31-member-duplicate, record/32-proto-out-of-range, record/33-erases-not-record, record/34-occurred-duration">−26</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-write-member-order"><code>write.member-order</code></a></th><td class="sh">Invariance</td><td>1</td><td>1</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: record/04-member-order">−1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-occurred-span"><code>occurred.span</code></a></th><td class="sh">Exactness</td><td>4</td><td>6</td><td>6</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-occurred-qualifier"><code>occurred.qualifier</code></a></th><td class="sh">Invariance</td><td>3</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-occurred-moment"><code>occurred.moment</code></a></th><td class="sh">Invariance</td><td>4</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-occurred-order"><code>occurred.order</code></a></th><td class="sh">Order</td><td>3</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
+        <tr><th scope="row"><a href="#law-occurred-refuse"><code>occurred.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>2</td><td>1</td><td><span class="off" title="cited, not naming it: record/34-occurred-duration">−1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9">Store</th></tr>
+        <tr><th scope="row"><a href="#law-input-distinct"><code>input.distinct</code></a></th><td class="sh">Exactness</td><td>3</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 3</td></tr>
+        <tr><th scope="row"><a href="#law-input-union"><code>input.union</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9">View</th></tr>
+        <tr><th scope="row"><a href="#law-view-no-resurrection"><code>view.no-resurrection</code></a></th><td class="sh">Invariance</td><td>3</td><td>4</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/view/01-withheld-head-still-supersedes, fold/view/02-erased-head-still-supersedes, fold/view/03-withheld-ancestor, fold/view/04-max-counts-unread-heads">−4</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td>1 / 2</td></tr>
+        <tr><th scope="row"><a href="#law-view-refines"><code>view.refines</code></a></th><td class="sh">Refinement</td><td>1</td><td>1</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/select/01-payload-test-on-withheld">−1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-settle-set"><code>settle.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>3</td><td>4</td><td><span class="off" title="naming it, not cited: realm/09-revision-erases">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-settle-keeps"><code>settle.keeps</code></a></th><td class="sh">Exactness</td><td>1</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-settle-erased"><code>settle.erased</code></a></th><td class="sh">Exactness</td><td>1</td><td>2</td><td>3</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-admit-set"><code>admit.set</code></a></th><td class="sh">Exactness</td><td>2</td><td>1</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: realm/04-cross-thing-prev-refused">−1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
+        <tr><th scope="row"><a href="#law-admit-no-cross"><code>admit.no-cross</code></a></th><td class="sh">Exactness</td><td>1</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-view-no-resurrection-things"><code>view.no-resurrection (things)</code></a></th><td class="sh">Invariance</td><td>3</td><td>5</td><td>6</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / 1</td></tr>
+        <tr><th scope="row"><a href="#law-view-refines-where"><code>view.refines (where)</code></a></th><td class="sh">Refinement</td><td>3</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9">State</th></tr>
+        <tr><th scope="row"><a href="#law-incremental-batch"><code>incremental = batch</code></a></th><td class="sh">Invariance</td><td>2</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 2</td></tr>
+        <tr><th scope="row"><a href="#law-count-perm"><code>count.perm</code></a></th><td class="sh">Invariance</td><td>1</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-count-repeats"><code>count.repeats</code></a></th><td class="sh">Limit</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-latest-by-set"><code>latest-by.set</code></a></th><td class="sh">Invariance</td><td>1</td><td>13</td><td>7</td><td><span class="off" title="cited, not naming it: fold/latest-by/05-emitted-breaks-tie, fold/latest-by/06-id-breaks-tie, fold/latest-by/08-repeats, fold/latest-by/09-converge, fold/latest-by/12-emitted-without-occurred, fold/latest-by/13-span-order">−6</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td>1 / 6</td></tr>
+        <tr><th scope="row"><a href="#law-latest-by-order"><code>latest-by.order</code></a></th><td class="sh">Order</td><td>1</td><td>5</td><td>6</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-latest-by-repeats"><code>latest-by.repeats</code></a></th><td class="sh">Invariance</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / 1</td></tr>
+        <tr><th scope="row"><a href="#law-latest-by-converge"><code>latest-by.converge</code></a></th><td class="sh">Invariance</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-latest-set-latest-repeats"><code>latest.set, latest.repeats</code></a></th><td class="sh">Invariance</td><td>2</td><td>4</td><td>4</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-sum-perm"><code>sum.perm</code></a></th><td class="sh">Invariance</td><td>1</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-sum-repeats"><code>sum.repeats</code></a></th><td class="sh">Limit</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-extrema-set"><code>extrema.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>4</td><td>4</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-acc-set"><code>acc.set</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
+        <tr><th scope="row"><a href="#law-acc-late"><code>acc.late</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-heads-set"><code>heads.set</code></a></th><td class="sh">Invariance</td><td>1</td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / 1</td></tr>
+        <tr><th scope="row"><a href="#law-heads-late"><code>heads.late</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-heads-why"><code>heads.why</code></a></th><td class="sh">Limit</td><td>1</td><td>2</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/heads/01-max-follows-prev, fold/heads/02-superseded-max-leaves">−2</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-result-unread"><code>result.unread</code></a></th><td class="sh">Refinement</td><td>1</td><td>4</td><td>6</td><td><span class="off" title="cited, not naming it: fold/select/03-all-here; naming it, not cited: spec/run/02-withheld-payload, spec/run/03-withheld-successor, spec/run/07-numeric-bounds">−1 +3</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-result-full"><code>result.full</code></a></th><td class="sh">Refinement</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-select-set"><code>select.set</code></a></th><td class="sh">Invariance</td><td>1</td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
+        <tr><th scope="row"><a href="#law-thing-local"><code>thing.local</code></a></th><td class="sh">Invariance</td><td>2</td><td>18</td><td>6</td><td><span class="off" title="cited, not naming it: fold/latest-by/01-one, fold/latest-by/02-fork, fold/latest-by/03-chain, fold/latest-by/04-chain-late, fold/latest-by/05-emitted-breaks-tie, fold/latest-by/06-id-breaks-tie, fold/latest-by/07-merge, fold/latest-by/08-repeats, fold/latest-by/09-converge, fold/latest-by/10-two-things, fold/latest-by/11-dangling-prev, fold/latest-by/12-emitted-without-occurred, fold/latest-by/13-span-order; naming it, not cited: spec/run/05-about-is-a-set">−13 +1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / 1</td></tr>
+        <tr><th scope="row"><a href="#law-where-complements"><code>where.complements</code></a></th><td class="sh">Order</td><td>4</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-where-typed"><code>where.typed</code></a></th><td class="sh">Exactness</td><td>4</td><td>17</td><td>1</td><td><span class="off" title="cited, not naming it: spec/parse/22-env-unknown-field, spec/parse/23-env-text-ordered, spec/parse/24-env-time-not-span, spec/parse/25-env-time-as-number, spec/parse/26-env-id-not-record-id, spec/parse/27-env-text-as-number, spec/parse/28-payload-bound-not-number, spec/parse/29-env-time-is-not-span, spec/parse/30-env-id-ordered, spec/parse/31-present-false, spec/parse/32-env-text-as-bool, spec/parse/33-env-id-as-number, spec/parse/34-env-observer-not-typed, spec/parse/35-env-kind-empty, spec/parse/36-env-about-not-typed, spec/parse/37-payload-is-null">−16</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
+        <tr><th scope="row"><a href="#law-where-fields"><code>where.fields</code></a></th><td class="sh">Exactness</td><td>7</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-where-time"><code>where.time</code></a></th><td class="sh">Invariance</td><td>6</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-where-total"><code>where.total</code></a></th><td class="sh">Exactness</td><td>2</td><td>9</td><td>2</td><td><span class="off" title="cited, not naming it: spec/run/01-tasks, spec/run/02-withheld-payload, spec/run/03-withheld-successor, spec/run/04-kind-change, spec/run/05-about-is-a-set, spec/run/07-numeric-bounds, spec/run/09-from-about-anchor">−7</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-where-set"><code>where.set</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-spec-select"><code>spec.select</code></a></th><td class="sh">Invariance</td><td>2</td><td>9</td><td>1</td><td><span class="off" title="cited, not naming it: spec/run/02-withheld-payload, spec/run/03-withheld-successor, spec/run/04-kind-change, spec/run/05-about-is-a-set, spec/run/06-times, spec/run/07-numeric-bounds, spec/run/08-envelope-fields, spec/run/09-from-about-anchor">−8</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-spec-from-thing"><code>spec.from-thing</code></a></th><td class="sh">Exactness</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-spec-set"><code>spec.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>9</td><td>10</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>5 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-spec-after-supersession"><code>spec.after-supersession</code></a></th><td class="sh">Exactness</td><td>3</td><td>3</td><td>2</td><td><span class="off" title="cited, not naming it: spec/run/03-withheld-successor">−1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>4 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-spec-parse"><code>spec.parse</code></a></th><td class="sh">Round trip</td><td>6</td><td>61</td><td>61</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9">Text</th></tr>
+        <tr><th scope="row"><a href="#law-lens-escaping"><code>lens.escaping</code></a></th><td class="sh">Round trip</td><td>2</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-lens-round-trip"><code>lens.round-trip</code></a></th><td class="sh">Round trip</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / 3</td></tr>
+        <tr><th scope="row"><a href="#law-lens-no-op"><code>lens.no-op</code></a></th><td class="sh">Round trip</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-lens-put-get"><code>lens.put-get</code></a></th><td class="sh">Round trip</td><td>2</td><td>2</td><td>3</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-lens-nothing-dropped"><code>lens.nothing-dropped</code></a></th><td class="sh">Exactness</td><td>2</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a></th><td class="sh">Invariance</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-normal-form"><code>normal form</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-lens-refuse"><code>lens.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+      </tbody>
+    </table></div>
   </div>
 </section>
 
@@ -470,7 +650,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Newer.irrefl</code></summary><p class="thm-m">Laws.Order</p><pre>∀ (a : Record), ¬Newer a a</pre></details><details class="thm"><summary><code>Newer.trans</code></summary><p class="thm-m">Laws.Order</p><pre>∀ {a b c : Record}, Newer a b → Newer b c → Newer a c</pre></details><details class="thm"><summary><code>Newer.total</code></summary><p class="thm-m">Laws.Order</p><pre>∀ (a b : Record), Newer a b ∨ Newer b a ∨ a.id = b.id</pre></details><details class="thm"><summary><code>Newer.congr</code></summary><p class="thm-m">Laws.Order</p><pre>∀ {a a' b b' : Record}, a.span = a'.span → a.emitted.moment = a'.emitted.moment → a.id = a'.id → b.span = b'.span → b.emitted.moment = b'.emitted.moment → b.id = b'.id → (Newer a b ↔ Newer a' b')</pre></details><details class="thm"><summary><code>id_order</code></summary><p class="thm-m">Laws.Order</p><pre>∀ (a b : Nat), idDigest a &lt; idDigest b ↔ a &lt; b</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/05-emitted-breaks-tie.json"><code>fold/latest-by/05-emitted-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/06-id-breaks-tie.json"><code>fold/latest-by/06-id-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/12-emitted-without-occurred.json"><code>fold/latest-by/12-emitted-without-occurred</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/13-span-order.json"><code>fold/latest-by/13-span-order</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-occurred-order"><code>occurred.order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Newer.irrefl → Span.before_irrefl" href="#law-occurred-order"><code>occurred.order</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-latest-by-order"><code>latest-by.order</code></a> <a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a> <a class="lawref" href="#law-spec-after-supersession"><code>spec.after-supersession</code></a> <a class="lawref" href="#law-view-no-resurrection"><code>view.no-resurrection</code></a> <a class="lawref" href="#law-view-no-resurrection-things"><code>view.no-resurrection (things)</code></a></dd>
       </dl>
     </article>
@@ -535,7 +715,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>id_sets</code></summary><p class="thm-m">Laws.Record</p><pre>∀ (H : Hash) {e e' : Env} (commit : String), e.kind = e'.kind → e.observer = e'.observer → e.emitted = e'.emitted → e.occurred = e'.occurred → e.under = e'.under → (∀ (s : String), s ∈ e.about ↔ s ∈ e'.about) → (∀ (s : String), s ∈ e.prev ↔ s ∈ e'.prev) → (∀ (s : String), s ∈ e.erases ↔ s ∈ e'.erases) → idOf H e commit = idOf H e' commit</pre></details><details class="thm"><summary><code>canonSet_eq</code></summary><p class="thm-m">Laws.Record</p><pre>∀ {xs ys : List String}, (∀ (s : String), s ∈ xs ↔ s ∈ ys) → canonSet xs = canonSet ys</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/record/02-full-envelope.json"><code>record/02-full-envelope</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/record/03-sets-are-sets.json"><code>record/03-sets-are-sets</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/record/11-erases.json"><code>record/11-erases</code></a></span></dd>
         <dt>run by</dt><dd>the model, the JS writer</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-utf-16-order"><code>UTF-16 order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via canonSet_eq → utf16_inj" href="#law-utf-16-order"><code>UTF-16 order</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-spec-after-supersession"><code>spec.after-supersession</code></a> <a class="lawref" href="#law-thing-local"><code>thing.local</code></a></dd>
       </dl>
       <p class="law-try"><a href="#try-record-sets">Try to break it</a></p>
@@ -548,9 +728,10 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>canon_member_order</code></summary><p class="thm-m">Laws.Record</p><pre>∀ {kvs kvs' : List (String × Json)}, kvs.Perm kvs' → (List.map (fun x =&gt; x.fst) kvs).Nodup → (Json.obj kvs).canon = (Json.obj kvs').canon</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/record/04-member-order.json"><code>record/04-member-order</code></a></span></dd>
         <dt>run by</dt><dd>the model, the JS writer</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-utf-16-order"><code>UTF-16 order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via canon_member_order → utf16_inj" href="#law-utf-16-order"><code>UTF-16 order</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-write-member-order"><code>write.member-order</code></a></dd>
       </dl>
+      <p class="law-try"><a href="#without-record-member-order">Without its premise</a></p>
     </article>
     <article class="law" id="law-utf-16-order" data-shape="order">
       <div class="law-h"><h4>UTF-16 order</h4><span class="chip">Order</span></div>
@@ -590,7 +771,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Written.commit_member_order</code></summary><p class="thm-m">Laws.Write</p><pre>∀ (H : Hash) (w : Written) {kvs kvs' : List (String × Json)}, w.payload = Json.obj kvs → kvs.Perm kvs' → commitOf H w.salt (Json.obj kvs') = Stored.commit H w.stored</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/record/04-member-order.json"><code>record/04-member-order</code></a></span></dd>
         <dt>run by</dt><dd>the model, the JS writer</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-record-member-order"><code>record.member-order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Written.commit_member_order → canon_member_order" href="#law-record-member-order"><code>record.member-order</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-occurred-span" data-shape="exactness">
@@ -670,7 +851,7 @@ Revisit in Q3.
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>dedup_union</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {xs ys : List Record}, Addressed (xs ++ ys) → (dedup (xs ++ ys)).Perm (dedup (ys ++ xs))</pre></details></dd>
         <dt>pinned by</dt><dd><span>(the read path)</span></dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-input-distinct"><code>input.distinct</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via dedup_union → distinct_dedup" href="#law-input-distinct"><code>input.distinct</code></a></dd>
       </dl>
     </article>
       </div>
@@ -687,7 +868,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>LatestBy.view</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → LatestBy.empty.fold (List.map f xs) = { named := (LatestBy.empty.fold xs).named, heads := List.map f (LatestBy.empty.fold xs).heads }</pre></details><details class="thm"><summary><code>LatestBy.view_head_ids</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → List.map (fun x =&gt; x.id) (LatestBy.empty.fold (List.map f xs)).heads = List.map (fun x =&gt; x.id) (LatestBy.empty.fold xs).heads</pre></details><details class="thm"><summary><code>LatestBy.no_false_resurrection</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → ∀ {r q : Record}, q ∈ xs → r.id ∈ q.prev → ∀ (h : Record), h ∈ (LatestBy.empty.fold (List.map f xs)).heads → h.id ≠ r.id</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/01-withheld-head-still-supersedes.json"><code>fold/view/01-withheld-head-still-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/02-erased-head-still-supersedes.json"><code>fold/view/02-erased-head-still-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/03-withheld-ancestor.json"><code>fold/view/03-withheld-ancestor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/04-max-counts-unread-heads.json"><code>fold/view/04-max-counts-unread-heads</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-content-order"><code>content order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via LatestBy.view → LatestBy.inv_ext → Newer.irrefl" href="#law-content-order"><code>content order</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-result-unread"><code>result.unread</code></a> <a class="lawref" href="#law-view-no-resurrection-things"><code>view.no-resurrection (things)</code></a></dd>
       </dl>
       <p class="law-try"><a href="#try-view-no-resurrection">Try to break it</a></p>
@@ -763,7 +944,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>admit_view</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {f : Record → Record}, View f → ∀ {may : Record → Record → Bool}, EnvOnly may → ∀ (xs : List Record), admit may (List.map f xs) = List.map f (admit may xs)</pre></details><details class="thm"><summary><code>stateIn_view</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {f : Record → Record}, View f → ∀ (t : String) {xs : List Record}, Addressed xs → stateIn t (List.map f xs) = { named := (stateIn t xs).named, heads := List.map f (stateIn t xs).heads }</pre></details><details class="thm"><summary><code>stateIn_no_false_resurrection</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {f : Record → Record}, View f → ∀ {t : String} {xs : List Record}, Addressed xs → ∀ {r q : Record}, q ∈ xs → q.isAbout t = true → r.id ∈ q.prev → ∀ (h : Record), h ∈ (stateIn t (List.map f xs)).heads → h.id ≠ r.id</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/01-withheld-head-still-supersedes.json"><code>fold/view/01-withheld-head-still-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/02-erased-head-still-supersedes.json"><code>fold/view/02-erased-head-still-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/03-withheld-ancestor.json"><code>fold/view/03-withheld-ancestor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/04-max-counts-unread-heads.json"><code>fold/view/04-max-counts-unread-heads</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/03-withheld-successor.json"><code>spec/run/03-withheld-successor</code></a></span><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/scenario/01-decision.json"><code>scenario/01-decision</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-content-order"><code>content order</code></a> <a class="lawref" href="#law-view-no-resurrection"><code>view.no-resurrection</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via stateIn_no_false_resurrection → LatestBy.inv_of → LatestBy.inv_fold → LatestBy.inv_step → Newer.total" href="#law-content-order"><code>content order</code></a> <a class="lawref" title="via stateIn_view → LatestBy.view" href="#law-view-no-resurrection"><code>view.no-resurrection</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-spec-after-supersession"><code>spec.after-supersession</code></a></dd>
       </dl>
     </article>
@@ -824,10 +1005,11 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>LatestBy.set_decides</code></summary><p class="thm-m">Laws.Fold</p><pre>∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → LatestBy.empty.fold xs = LatestBy.empty.fold ys</pre></details></dd>
         <dt>pinned by</dt><dd><details><summary>13 files</summary><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/01-one.json"><code>fold/latest-by/01-one</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/02-fork.json"><code>fold/latest-by/02-fork</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/03-chain.json"><code>fold/latest-by/03-chain</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/04-chain-late.json"><code>fold/latest-by/04-chain-late</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/05-emitted-breaks-tie.json"><code>fold/latest-by/05-emitted-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/06-id-breaks-tie.json"><code>fold/latest-by/06-id-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/07-merge.json"><code>fold/latest-by/07-merge</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/08-repeats.json"><code>fold/latest-by/08-repeats</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/09-converge.json"><code>fold/latest-by/09-converge</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/10-two-things.json"><code>fold/latest-by/10-two-things</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/11-dangling-prev.json"><code>fold/latest-by/11-dangling-prev</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/12-emitted-without-occurred.json"><code>fold/latest-by/12-emitted-without-occurred</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/13-span-order.json"><code>fold/latest-by/13-span-order</code></a></details></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-content-order"><code>content order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via LatestBy.set_decides → LatestBy.inv_ext → Newer.irrefl" href="#law-content-order"><code>content order</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-heads-set"><code>heads.set</code></a> <a class="lawref" href="#law-latest-by-converge"><code>latest-by.converge</code></a> <a class="lawref" href="#law-latest-by-repeats"><code>latest-by.repeats</code></a> <a class="lawref" href="#law-latest-set-latest-repeats"><code>latest.set, latest.repeats</code></a> <a class="lawref" href="#law-spec-set"><code>spec.set</code></a> <a class="lawref" href="#law-thing-local"><code>thing.local</code></a></dd>
       </dl>
       <p class="law-try"><a href="#try-latest-by-set">Try to break it</a></p>
+      <p class="law-try"><a href="#without-latest-by-set">Without its premise</a></p>
     </article>
     <article class="law" id="law-latest-by-order" data-shape="order">
       <div class="law-h"><h4>latest-by.order</h4><span class="chip">Order</span></div>
@@ -837,7 +1019,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>LatestBy.winner_newer</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {xs : List Record}, Addressed xs → ∀ {w : Record}, (LatestBy.empty.fold xs).winner = some w → (w ∈ xs ∧ ¬∃ r, r ∈ xs ∧ w.id ∈ r.prev) ∧ ∀ (o : Record), o ∈ (LatestBy.empty.fold xs).others → Newer w o</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/02-fork.json"><code>fold/latest-by/02-fork</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/05-emitted-breaks-tie.json"><code>fold/latest-by/05-emitted-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/06-id-breaks-tie.json"><code>fold/latest-by/06-id-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/12-emitted-without-occurred.json"><code>fold/latest-by/12-emitted-without-occurred</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/13-span-order.json"><code>fold/latest-by/13-span-order</code></a></span><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/scenario/01-decision.json"><code>scenario/01-decision</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-content-order"><code>content order</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via LatestBy.winner_newer → LatestBy.inv_of → LatestBy.inv_fold → LatestBy.inv_step → Newer.total" href="#law-content-order"><code>content order</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-latest-by-repeats" data-shape="invariance">
@@ -849,7 +1031,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>LatestBy.repeats</code></summary><p class="thm-m">Laws.Fold</p><pre>∀ {xs : List Record}, Addressed xs → LatestBy.empty.fold (xs ++ xs) = LatestBy.empty.fold xs</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/08-repeats.json"><code>fold/latest-by/08-repeats</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via LatestBy.repeats → LatestBy.set_decides" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-latest-set-latest-repeats"><code>latest.set, latest.repeats</code></a></dd>
       </dl>
     </article>
@@ -861,7 +1043,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>LatestBy.converge</code></summary><p class="thm-m">Laws.Fold</p><pre>∀ {xs ys : List Record}, Addressed (xs ++ ys) → (LatestBy.empty.fold xs).fold ys = (LatestBy.empty.fold ys).fold xs</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/09-converge.json"><code>fold/latest-by/09-converge</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-incremental-batch"><code>incremental = batch</code></a> <a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via LatestBy.converge → LatestBy.batch" href="#law-incremental-batch"><code>incremental = batch</code></a> <a class="lawref" title="via LatestBy.converge → LatestBy.perm → LatestBy.set_decides" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-latest-set-latest-repeats" data-shape="invariance">
@@ -872,7 +1054,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Latest.perm</code></summary><p class="thm-m">Laws.Numeric</p><pre>∀ {xs ys : List Record}, Addressed xs → xs.Perm ys → Latest.fold xs = Latest.fold ys</pre></details><details class="thm"><summary><code>Latest.repeats</code></summary><p class="thm-m">Laws.Numeric</p><pre>∀ {xs : List Record}, Addressed xs → Latest.fold (xs ++ xs) = Latest.fold xs</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest/01-chain.json"><code>fold/latest/01-chain</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest/02-fork.json"><code>fold/latest/02-fork</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest/03-merge.json"><code>fold/latest/03-merge</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest/04-repeats.json"><code>fold/latest/04-repeats</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-latest-by-repeats"><code>latest-by.repeats</code></a> <a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Latest.repeats → LatestBy.repeats" href="#law-latest-by-repeats"><code>latest-by.repeats</code></a> <a class="lawref" title="via Latest.perm → LatestBy.perm → LatestBy.set_decides" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-sum-perm" data-shape="invariance">
@@ -922,7 +1104,7 @@ Revisit in Q3.
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Acc.late</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {σ : Type} (f : Acc σ) {xs ys : List Record} (r : Record), Distinct (xs ++ [r]) → Distinct ys → (∀ (q : Record), q ∈ ys ↔ q ∈ xs ∨ q = r) → f.step (f.fold xs) r = f.fold ys</pre></details></dd>
         <dt>pinned by</dt><dd><span>(follows from <code>acc.set</code>)</span></dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-acc-set"><code>acc.set</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Acc.late → Acc.set_decides" href="#law-acc-set"><code>acc.set</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-heads-set" data-shape="invariance">
@@ -933,7 +1115,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>OverHeads.set_decides</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {σ : Sort u_1} (answer : LatestBy → σ) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → OverHeads.fold answer xs = OverHeads.fold answer ys</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/heads/01-max-follows-prev.json"><code>fold/heads/01-max-follows-prev</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/heads/02-superseded-max-leaves.json"><code>fold/heads/02-superseded-max-leaves</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/heads/03-limit-newest-first.json"><code>fold/heads/03-limit-newest-first</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via OverHeads.set_decides → LatestBy.set_decides" href="#law-latest-by-set"><code>latest-by.set</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-heads-late"><code>heads.late</code></a></dd>
       </dl>
     </article>
@@ -944,7 +1126,7 @@ Revisit in Q3.
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>OverHeads.late</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {σ : Sort u_1} (answer : LatestBy → σ) {xs ys : List Record} (r : Record), Addressed (xs ++ [r]) → Addressed ys → (∀ (q : Record), q ∈ ys ↔ q ∈ xs ∨ q = r) → answer ((LatestBy.empty.fold xs).step r) = OverHeads.fold answer ys</pre></details></dd>
         <dt>pinned by</dt><dd><span>(follows from <code>heads.set</code>)</span></dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-heads-set"><code>heads.set</code></a> <a class="lawref" href="#law-incremental-batch"><code>incremental = batch</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via OverHeads.late → OverHeads.set_decides" href="#law-heads-set"><code>heads.set</code></a> <a class="lawref" title="via OverHeads.late → LatestBy.batch" href="#law-incremental-batch"><code>incremental = batch</code></a></dd>
       </dl>
     </article>
     <article class="law is-limit" id="law-heads-why" data-shape="limit">
@@ -966,7 +1148,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>LatestBy.maxHeads_view</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → (OverHeads.fold LatestBy.maxHeads (List.map f xs)).unread = (List.filter (fun h =&gt; (f h).shown != Shown.here) (LatestBy.empty.fold xs).heads).length</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/select/01-payload-test-on-withheld.json"><code>fold/select/01-payload-test-on-withheld</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/select/02-envelope-test-on-withheld.json"><code>fold/select/02-envelope-test-on-withheld</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/select/03-all-here.json"><code>fold/select/03-all-here</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/04-max-counts-unread-heads.json"><code>fold/view/04-max-counts-unread-heads</code></a></span><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/02-withheld-payload.json"><code>spec/run/02-withheld-payload</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/03-withheld-successor.json"><code>spec/run/03-withheld-successor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/07-numeric-bounds.json"><code>spec/run/07-numeric-bounds</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-view-no-resurrection"><code>view.no-resurrection</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via LatestBy.maxHeads_view → LatestBy.view" href="#law-view-no-resurrection"><code>view.no-resurrection</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-result-full" data-shape="refinement">
@@ -979,6 +1161,7 @@ Revisit in Q3.
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/select/03-all-here.json"><code>fold/select/03-all-here</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
       </dl>
+      <p class="law-try"><a href="#without-result-full">Without its premise</a></p>
     </article>
     <article class="law" id="law-select-set" data-shape="invariance">
       <div class="law-h"><h4>select.set</h4><span class="chip">Invariance</span></div>
@@ -999,7 +1182,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>stateIn_local</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {t : String} {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ∧ r.isAbout t = true ↔ r ∈ ys ∧ r.isAbout t = true) → stateIn t xs = stateIn t ys</pre></details><details class="thm"><summary><code>perThing_set_decides</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → perThing xs = perThing ys</pre></details></dd>
         <dt>pinned by</dt><dd><details><summary>18 files</summary><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/01-one.json"><code>fold/latest-by/01-one</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/02-fork.json"><code>fold/latest-by/02-fork</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/03-chain.json"><code>fold/latest-by/03-chain</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/04-chain-late.json"><code>fold/latest-by/04-chain-late</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/05-emitted-breaks-tie.json"><code>fold/latest-by/05-emitted-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/06-id-breaks-tie.json"><code>fold/latest-by/06-id-breaks-tie</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/07-merge.json"><code>fold/latest-by/07-merge</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/08-repeats.json"><code>fold/latest-by/08-repeats</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/09-converge.json"><code>fold/latest-by/09-converge</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/10-two-things.json"><code>fold/latest-by/10-two-things</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/11-dangling-prev.json"><code>fold/latest-by/11-dangling-prev</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/12-emitted-without-occurred.json"><code>fold/latest-by/12-emitted-without-occurred</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/latest-by/13-span-order.json"><code>fold/latest-by/13-span-order</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/realm/04-cross-thing-prev-refused.json"><code>realm/04-cross-thing-prev-refused</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/realm/05-about-is-a-set.json"><code>realm/05-about-is-a-set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/realm/06-about-nothing.json"><code>realm/06-about-nothing</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/realm/07-kind-change-supersedes.json"><code>realm/07-kind-change-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/realm/08-about-nothing-revised-unrelated.json"><code>realm/08-about-nothing-revised-unrelated</code></a></details><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/05-about-is-a-set.json"><code>spec/run/05-about-is-a-set</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a> <a class="lawref" href="#law-record-sets"><code>record.sets</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via stateIn_local → LatestBy.set_decides" href="#law-latest-by-set"><code>latest-by.set</code></a> <a class="lawref" title="via perThing_set_decides → thingsOf_same → canonSet_eq" href="#law-record-sets"><code>record.sets</code></a></dd>
         <dt>carries</dt><dd><a class="lawref" href="#law-spec-set"><code>spec.set</code></a></dd>
       </dl>
     </article>
@@ -1013,6 +1196,7 @@ Revisit in Q3.
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/06-times.json"><code>spec/run/06-times</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/07-numeric-bounds.json"><code>spec/run/07-numeric-bounds</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
       </dl>
+      <p class="law-try"><a href="#without-where-complements">Without its premise</a></p>
     </article>
     <article class="law" id="law-where-typed" data-shape="exactness">
       <div class="law-h"><h4>where.typed</h4><span class="chip">Exactness</span></div>
@@ -1093,7 +1277,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Slot.set_decides</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (s : Slot) (sel : Record → Bool) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → s.run sel xs = s.run sel ys</pre></details><details class="thm"><summary><code>Spec.set_decides</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (sp : Spec) (may : Record → Record → Bool) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → sp.run xs may = sp.run ys may</pre></details></dd>
         <dt>pinned by</dt><dd><details><summary>9 files</summary><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/01-tasks.json"><code>spec/run/01-tasks</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/02-withheld-payload.json"><code>spec/run/02-withheld-payload</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/03-withheld-successor.json"><code>spec/run/03-withheld-successor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/04-kind-change.json"><code>spec/run/04-kind-change</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/05-about-is-a-set.json"><code>spec/run/05-about-is-a-set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/06-times.json"><code>spec/run/06-times</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/07-numeric-bounds.json"><code>spec/run/07-numeric-bounds</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/08-envelope-fields.json"><code>spec/run/08-envelope-fields</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/09-from-about-anchor.json"><code>spec/run/09-from-about-anchor</code></a></details><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/scenario/01-decision.json"><code>scenario/01-decision</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-admit-set"><code>admit.set</code></a> <a class="lawref" href="#law-input-distinct"><code>input.distinct</code></a> <a class="lawref" href="#law-latest-by-set"><code>latest-by.set</code></a> <a class="lawref" href="#law-select-set"><code>select.set</code></a> <a class="lawref" href="#law-thing-local"><code>thing.local</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Spec.set_decides → admit_same" href="#law-admit-set"><code>admit.set</code></a> <a class="lawref" title="via Slot.set_decides → Distinct.addressed" href="#law-input-distinct"><code>input.distinct</code></a> <a class="lawref" title="via Slot.set_decides → collectOf_set_decides → newestFirst_eq → LatestBy.set_decides" href="#law-latest-by-set"><code>latest-by.set</code></a> <a class="lawref" title="via Slot.set_decides → Acc.select_set_decides" href="#law-select-set"><code>select.set</code></a> <a class="lawref" title="via Slot.set_decides → collectOf_set_decides → perThing_set_decides" href="#law-thing-local"><code>thing.local</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-spec-after-supersession" data-shape="exactness">
@@ -1104,7 +1288,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>latestOf_heads</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (sel : Record → Bool) (cs : List Cond) {xs : List Record}, Addressed xs → ∀ {ts : List (String × List (Nat × Shown))} {u : Nat}, latestOf sel cs xs = SlotValue.things ts u → ∀ {t : String} {ps : List (Nat × Shown)}, (t, ps) ∈ ts → ∀ {p : Nat × Shown}, p ∈ ps → ∃ r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = Tri.yes ∧ (r.id, r.shown) = p</pre></details><details class="thm"><summary><code>collectOf_heads</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (sel : Record → Bool) (cs : List Cond) (limit : Option Nat) {xs : List Record}, Addressed xs → ∀ {hs : List (Nat × Shown)} {u : Nat}, collectOf sel cs true limit xs = SlotValue.heads hs u → ∀ {p : Nat × Shown}, p ∈ hs → ∃ t r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = Tri.yes ∧ (r.id, r.shown) = p</pre></details><details class="thm"><summary><code>Spec.view_state</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ {f : Record → Record}, View f → ∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {xs : List Record}, Distinct xs → perThing (admit may (List.map f xs)) = List.map (fun p =&gt; (p.fst, { named := p.snd.named, heads := List.map f p.snd.heads })) (perThing (admit may xs))</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/03-withheld-successor.json"><code>spec/run/03-withheld-successor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/04-kind-change.json"><code>spec/run/04-kind-change</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/08-envelope-fields.json"><code>spec/run/08-envelope-fields</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-content-order"><code>content order</code></a> <a class="lawref" href="#law-input-distinct"><code>input.distinct</code></a> <a class="lawref" href="#law-record-sets"><code>record.sets</code></a> <a class="lawref" href="#law-view-no-resurrection-things"><code>view.no-resurrection (things)</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via latestOf_heads → stateIn_heads → LatestBy.inv_of → LatestBy.inv_fold → LatestBy.inv_step → Newer.total" href="#law-content-order"><code>content order</code></a> <a class="lawref" title="via Spec.view_state → Distinct.addressed" href="#law-input-distinct"><code>input.distinct</code></a> <a class="lawref" title="via Spec.view_state → thingsOf_view → canonSet_eq" href="#law-record-sets"><code>record.sets</code></a> <a class="lawref" title="via Spec.view_state → admit_view" href="#law-view-no-resurrection-things"><code>view.no-resurrection (things)</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-spec-parse" data-shape="round-trip">
@@ -1115,7 +1299,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Spec.ofJson_fits</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ {j : Json} {sp : Spec}, Spec.ofJson j = Except.ok sp → sp.Fits</pre></details><details class="thm"><summary><code>Spec.ofJson_toJson</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ {sp : Spec}, sp.Fits → Spec.ofJson sp.toJson = Except.ok sp</pre></details><details class="thm"><summary><code>Spec.reparse</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ {j : Json} {sp : Spec}, Spec.ofJson j = Except.ok sp → Spec.ofJson sp.toJson = Except.ok sp</pre></details><details class="thm"><summary><code>Spec.parsed_iff</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ (sp : Spec), (∃ j, Spec.ofJson j = Except.ok sp) ↔ sp.Fits</pre></details><details class="thm"><summary><code>Spec.ofJson_repeat</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ {j : Json}, j.keysDistinct = false → ∃ p, Json.repeatAt none j = some p ∧ Spec.ofJson j = refuse "member-duplicate" p</pre></details><details class="thm"><summary><code>Json.repeatAt_none</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ (path : Option String) (j : Json), Json.repeatAt path j = none ↔ j.keysDistinct = true</pre></details></dd>
         <dt>pinned by</dt><dd><details><summary>61 files</summary><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/01-latest-by.json"><code>spec/parse/01-latest-by</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/02-where-and-limit.json"><code>spec/parse/02-where-and-limit</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/03-numeric.json"><code>spec/parse/03-numeric</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/04-envelope-fields.json"><code>spec/parse/04-envelope-fields</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/05-no-fold.json"><code>spec/parse/05-no-fold</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/06-from-about-anchor.json"><code>spec/parse/06-from-about-anchor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/10-not-object.json"><code>spec/parse/10-not-object</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/11-unknown-key.json"><code>spec/parse/11-unknown-key</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/12-vertex-missing.json"><code>spec/parse/12-vertex-missing</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/13-two-fold-types.json"><code>spec/parse/13-two-fold-types</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/14-no-fold-type.json"><code>spec/parse/14-no-fold-type</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/15-regex-refused.json"><code>spec/parse/15-regex-refused</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/16-limit-on-count.json"><code>spec/parse/16-limit-on-count</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/17-follow-on-sum.json"><code>spec/parse/17-follow-on-sum</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/18-from-not-array.json"><code>spec/parse/18-from-not-array</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/19-sum-of-nothing.json"><code>spec/parse/19-sum-of-nothing</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/20-from-missing.json"><code>spec/parse/20-from-missing</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/21-from-empty.json"><code>spec/parse/21-from-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/22-env-unknown-field.json"><code>spec/parse/22-env-unknown-field</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/23-env-text-ordered.json"><code>spec/parse/23-env-text-ordered</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/24-env-time-not-span.json"><code>spec/parse/24-env-time-not-span</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/25-env-time-as-number.json"><code>spec/parse/25-env-time-as-number</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/26-env-id-not-record-id.json"><code>spec/parse/26-env-id-not-record-id</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/27-env-text-as-number.json"><code>spec/parse/27-env-text-as-number</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/28-payload-bound-not-number.json"><code>spec/parse/28-payload-bound-not-number</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/29-env-time-is-not-span.json"><code>spec/parse/29-env-time-is-not-span</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/30-env-id-ordered.json"><code>spec/parse/30-env-id-ordered</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/31-present-false.json"><code>spec/parse/31-present-false</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/32-env-text-as-bool.json"><code>spec/parse/32-env-text-as-bool</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/33-env-id-as-number.json"><code>spec/parse/33-env-id-as-number</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/34-env-observer-not-typed.json"><code>spec/parse/34-env-observer-not-typed</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/35-env-kind-empty.json"><code>spec/parse/35-env-kind-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/36-env-about-not-typed.json"><code>spec/parse/36-env-about-not-typed</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/37-payload-is-null.json"><code>spec/parse/37-payload-is-null</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/38-where-empty.json"><code>spec/parse/38-where-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/39-latest-by-without-follow.json"><code>spec/parse/39-latest-by-without-follow</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/40-repeated-operator.json"><code>spec/parse/40-repeated-operator</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/41-repeated-key.json"><code>spec/parse/41-repeated-key</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/42-slot-errors-in-order.json"><code>spec/parse/42-slot-errors-in-order</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/43-where-errors-in-order.json"><code>spec/parse/43-where-errors-in-order</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/44-from-kind-empty.json"><code>spec/parse/44-from-kind-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/45-from-about-not-typed.json"><code>spec/parse/45-from-about-not-typed</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/46-from-kind-none.json"><code>spec/parse/46-from-kind-none</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/47-vertex-empty.json"><code>spec/parse/47-vertex-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/48-vertex-not-text.json"><code>spec/parse/48-vertex-not-text</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/49-store-empty.json"><code>spec/parse/49-store-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/50-slot-name-empty.json"><code>spec/parse/50-slot-name-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/51-sum-field-empty.json"><code>spec/parse/51-sum-field-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/52-where-field-empty.json"><code>spec/parse/52-where-field-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/53-repeat-depth-first.json"><code>spec/parse/53-repeat-depth-first</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/54-repeat-in-from.json"><code>spec/parse/54-repeat-in-from</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/55-slot-limit-before-argument.json"><code>spec/parse/55-slot-limit-before-argument</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/56-from-errors-in-order.json"><code>spec/parse/56-from-errors-in-order</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/57-from-store-first.json"><code>spec/parse/57-from-store-first</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/58-slot-not-object.json"><code>spec/parse/58-slot-not-object</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/59-slot-unknown-key.json"><code>spec/parse/59-slot-unknown-key</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/60-from-unknown-key.json"><code>spec/parse/60-from-unknown-key</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/61-min-field-empty.json"><code>spec/parse/61-min-field-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/62-max-field-empty.json"><code>spec/parse/62-max-field-empty</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/63-repeat-under-empty-key.json"><code>spec/parse/63-repeat-under-empty-key</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/parse/64-slot-argument-before-where.json"><code>spec/parse/64-slot-argument-before-where</code></a></details></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-where-typed"><code>where.typed</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Spec.ofJson_toJson → Spec.ofObject_toJson → parseSlot_toJson → parseWhere_toJson → parseField_toJson → parseOp_ok_iff" href="#law-where-typed"><code>where.typed</code></a></dd>
       </dl>
     </article>
       </div>
@@ -1135,7 +1319,7 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.escaping</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ (id : Lens.Line) (body : List Lens.Line), Lens.parse (Lens.render [{ id := id, body := body }]) = some [{ id := id, body := body }]</pre></details><details class="thm"><summary><code>Lens.unescape_keeps</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ (l : Lens.Line), Lens.unescape l = l ∨ l = '\\' :: Lens.unescape l ∧ Lens.reserved (Lens.unescape l) = true</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/lens/section/02-escaping.json"><code>lens/section/02-escaping</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/lens/section/10-backslash-kept.json"><code>lens/section/10-backslash-kept</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-lens-round-trip"><code>lens.round-trip</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Lens.escaping → Lens.parse_render" href="#law-lens-round-trip"><code>lens.round-trip</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-lens-round-trip" data-shape="round-trip">
@@ -1159,8 +1343,9 @@ Revisit in Q3.
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.no_op</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ {base : List Lens.Section}, (Lens.ids base).Nodup → Lens.edit base (Lens.render base) = some []</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/lens/section/03-no-op.json"><code>lens/section/03-no-op</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-lens-round-trip"><code>lens.round-trip</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Lens.no_op → Lens.parse_render" href="#law-lens-round-trip"><code>lens.round-trip</code></a></dd>
       </dl>
+      <p class="law-try"><a href="#without-lens-no-op">Without its premise</a></p>
     </article>
     <article class="law" id="law-lens-put-get" data-shape="round-trip">
       <div class="law-h"><h4>lens.put-get</h4><span class="chip">Round trip</span></div>
@@ -1172,6 +1357,7 @@ Revisit in Q3.
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/lens/section/04-edit-body.json"><code>lens/section/04-edit-body</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/lens/section/10-backslash-kept.json"><code>lens/section/10-backslash-kept</code></a></span><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/scenario/01-decision.json"><code>scenario/01-decision</code></a></span></dd>
         <dt>run by</dt><dd>the model</dd>
       </dl>
+      <p class="law-try"><a href="#without-lens-put-get">Without its premise</a></p>
     </article>
     <article class="law" id="law-lens-nothing-dropped" data-shape="exactness">
       <div class="law-h"><h4>lens.nothing-dropped</h4><span class="chip">Exactness</span></div>
@@ -1202,7 +1388,7 @@ Revisit in Q3.
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.normalize_idem</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ {text out : List Lens.Line}, Lens.normalize text = some out → Lens.normalize out = some out</pre></details></dd>
         <dt>pinned by</dt><dd><span>every lens vector</span></dd>
-        <dt>rests on</dt><dd><a class="lawref" href="#law-lens-round-trip"><code>lens.round-trip</code></a></dd>
+        <dt>rests on</dt><dd><a class="lawref" title="via Lens.normalize_idem → Lens.parse_render" href="#law-lens-round-trip"><code>lens.round-trip</code></a></dd>
       </dl>
     </article>
     <article class="law" id="law-lens-refuse" data-shape="exactness">
@@ -1226,10 +1412,86 @@ Revisit in Q3.
     <p>A line from one law down to another says a proof of the first uses a theorem of the second, directly or through lemmas no law names. Lean recorded every one of them; <code>lake exe proofs</code> reads them out of the checked proofs.</p>
     <p>The stack only rests downward: the build fails if a proof ever leans on a layer above its own. A law's layer is declared, not derived; that check is all the proofs say about it.</p>
     <p>A proof by computation (<code>decide</code>) evaluates definitions and uses no theorem, so it draws no line.</p>
-    <p class="hint">Point at or tap a law to follow it.</p>
+    <p class="hint">Point at or tap a law to follow it, or a line to see the theorems that make it. Enter, or a second tap, opens the law's card.</p>
+    <p>The map is laid out when the page is built: the same laws and proofs always draw the same map.</p>
   </div>
   <div class="map-wrap">
-    <div class="map" id="lawmap"><p class="note map-wait">The map is drawn in the browser by elkjs. Without it, every law's card above still lists what it rests on and what it carries.</p></div>
+    <div class="map" id="lawmap">
+<svg viewBox="0 0 773 866" width="100%" style="min-width:657px;max-width:773px" role="group" aria-label="Which laws each law's proof rests on">
+<g class="bands"><rect class="band" x="0" y="7" width="773" height="100"/><text class="band-l" x="14" y="61">Text</text><rect class="band alt" x="0" y="139" width="773" height="268"/><text class="band-l" x="14" y="277">State</text><rect class="band" x="0" y="439" width="773" height="100"/><text class="band-l" x="14" y="493">View</text><rect class="band alt" x="0" y="571" width="773" height="100"/><text class="band-l" x="14" y="625">Store</text><rect class="band" x="0" y="703" width="773" height="156"/><text class="band-l" x="14" y="785">Record</text></g>
+<g class="edges">
+<g class="edge" data-a="law-acc-late" data-b="law-acc-set" data-via="Acc.late → Acc.set_decides"><path class="hit" d="M132.5 174 C132.5 217,129 217,129 260"/><path class="line" d="M132.5 174 C132.5 217,129 217,129 260"/></g>
+<g class="edge" data-a="law-content-order" data-b="law-occurred-order" data-via="Newer.irrefl → Span.before_irrefl"><path class="hit" d="M445.8 738 C445.8 753,445.8 753,445.8 768"/><path class="line" d="M445.8 738 C445.8 753,445.8 753,445.8 768"/></g>
+<g class="edge" data-a="law-heads-late" data-b="law-heads-set" data-via="OverHeads.late → OverHeads.set_decides"><path class="hit" d="M531 230 C531 245,213.5 245,213.5 260"/><path class="line" d="M531 230 C531 245,213.5 245,213.5 260"/></g>
+<g class="edge" data-a="law-heads-late" data-b="law-incremental-batch" data-via="OverHeads.late → LatestBy.batch"><path class="hit" d="M531 230 C531 245,586.5 245,586.5 260"/><path class="line" d="M531 230 C531 245,586.5 245,586.5 260"/></g>
+<g class="edge" data-a="law-heads-set" data-b="law-latest-by-set" data-via="OverHeads.set_decides → LatestBy.set_decides"><path class="hit" d="M213.5 286 C213.5 329,454.6 329,454.6 372"/><path class="line" d="M213.5 286 C213.5 329,454.6 329,454.6 372"/></g>
+<g class="edge" data-a="law-input-union" data-b="law-input-distinct" data-via="dedup_union → distinct_dedup"><path class="hit" d="M591.2 606 C591.2 621,591.2 621,591.2 636"/><path class="line" d="M591.2 606 C591.2 621,591.2 621,591.2 636"/></g>
+<g class="edge" data-a="law-latest-by-converge" data-b="law-incremental-batch" data-via="LatestBy.converge → LatestBy.batch"><path class="hit" d="M406.5 230 C406.5 245,586.5 245,586.5 260"/><path class="line" d="M406.5 230 C406.5 245,586.5 245,586.5 260"/></g>
+<g class="edge" data-a="law-latest-by-converge" data-b="law-latest-by-set" data-via="LatestBy.converge → LatestBy.perm → LatestBy.set_decides"><path class="hit" d="M406.5 230 C406.5 301,454.6 301,454.6 372"/><path class="line" d="M406.5 230 C406.5 301,454.6 301,454.6 372"/></g>
+<g class="edge" data-a="law-latest-by-order" data-b="law-content-order" data-via="LatestBy.winner_newer → LatestBy.inv_of → LatestBy.inv_fold → LatestBy.inv_step → Newer.total"><path class="hit" d="M284.5 174 C284.5 443,445.8 443,445.8 712"/><path class="line" d="M284.5 174 C284.5 443,445.8 443,445.8 712"/></g>
+<g class="edge" data-a="law-latest-by-repeats" data-b="law-latest-by-set" data-via="LatestBy.repeats → LatestBy.set_decides"><path class="hit" d="M331 286 C331 329,454.6 329,454.6 372"/><path class="line" d="M331 286 C331 329,454.6 329,454.6 372"/></g>
+<g class="edge" data-a="law-latest-by-set" data-b="law-content-order" data-via="LatestBy.set_decides → LatestBy.inv_ext → Newer.irrefl"><path class="hit" d="M454.6 398 C454.6 555,445.8 555,445.8 712"/><path class="line" d="M454.6 398 C454.6 555,445.8 555,445.8 712"/></g>
+<g class="edge" data-a="law-latest-set-latest-repeats" data-b="law-latest-by-repeats" data-via="Latest.repeats → LatestBy.repeats"><path class="hit" d="M707.5 174 C707.5 217,331 217,331 260"/><path class="line" d="M707.5 174 C707.5 217,331 217,331 260"/></g>
+<g class="edge" data-a="law-latest-set-latest-repeats" data-b="law-latest-by-set" data-via="Latest.perm → LatestBy.perm → LatestBy.set_decides"><path class="hit" d="M707.5 174 C707.5 273,454.6 273,454.6 372"/><path class="line" d="M707.5 174 C707.5 273,454.6 273,454.6 372"/></g>
+<g class="edge" data-a="law-lens-escaping" data-b="law-lens-round-trip" data-via="Lens.escaping → Lens.parse_render"><path class="hit" d="M501 42 C501 57,606.8 57,606.8 72"/><path class="line" d="M501 42 C501 57,606.8 57,606.8 72"/></g>
+<g class="edge" data-a="law-lens-no-op" data-b="law-lens-round-trip" data-via="Lens.no_op → Lens.parse_render"><path class="hit" d="M609 42 C609 57,606.8 57,606.8 72"/><path class="line" d="M609 42 C609 57,606.8 57,606.8 72"/></g>
+<g class="edge" data-a="law-normal-form" data-b="law-lens-round-trip" data-via="Lens.normalize_idem → Lens.parse_render"><path class="hit" d="M710.5 42 C710.5 57,606.8 57,606.8 72"/><path class="line" d="M710.5 42 C710.5 57,606.8 57,606.8 72"/></g>
+<g class="edge" data-a="law-record-member-order" data-b="law-utf-16-order" data-via="canon_member_order → utf16_inj"><path class="hit" d="M642.5 794 C642.5 809,599.9 809,599.9 824"/><path class="line" d="M642.5 794 C642.5 809,599.9 809,599.9 824"/></g>
+<g class="edge" data-a="law-record-sets" data-b="law-utf-16-order" data-via="canonSet_eq → utf16_inj"><path class="hit" d="M557.3 738 C557.3 781,599.9 781,599.9 824"/><path class="line" d="M557.3 738 C557.3 781,599.9 781,599.9 824"/></g>
+<g class="edge" data-a="law-result-unread" data-b="law-view-no-resurrection" data-via="LatestBy.maxHeads_view → LatestBy.view"><path class="hit" d="M409 174 C409 339,446.2 339,446.2 504"/><path class="line" d="M409 174 C409 339,446.2 339,446.2 504"/></g>
+<g class="edge" data-a="law-spec-after-supersession" data-b="law-content-order" data-via="latestOf_heads → stateIn_heads → LatestBy.inv_of → LatestBy.inv_fold → LatestBy.inv_step → Newer.total"><path class="hit" d="M560 174 C560 443,445.8 443,445.8 712"/><path class="line" d="M560 174 C560 443,445.8 443,445.8 712"/></g>
+<g class="edge" data-a="law-spec-after-supersession" data-b="law-input-distinct" data-via="Spec.view_state → Distinct.addressed"><path class="hit" d="M560 174 C560 405,591.2 405,591.2 636"/><path class="line" d="M560 174 C560 405,591.2 405,591.2 636"/></g>
+<g class="edge" data-a="law-spec-after-supersession" data-b="law-record-sets" data-via="Spec.view_state → thingsOf_view → canonSet_eq"><path class="hit" d="M560 174 C560 443,557.3 443,557.3 712"/><path class="line" d="M560 174 C560 443,557.3 443,557.3 712"/></g>
+<g class="edge" data-a="law-spec-after-supersession" data-b="law-view-no-resurrection-things" data-via="Spec.view_state → admit_view"><path class="hit" d="M560 174 C560 311,483.9 311,483.9 448"/><path class="line" d="M560 174 C560 311,483.9 311,483.9 448"/></g>
+<g class="edge" data-a="law-spec-parse" data-b="law-where-typed" data-via="Spec.ofJson_toJson → Spec.ofObject_toJson → parseSlot_toJson → parseWhere_toJson → parseField_toJson → parseOp_ok_iff"><path class="hit" d="M714 230 C714 273,710.5 273,710.5 316"/><path class="line" d="M714 230 C714 273,710.5 273,710.5 316"/></g>
+<g class="edge" data-a="law-spec-set" data-b="law-admit-set" data-via="Spec.set_decides → admit_same"><path class="hit" d="M622.5 230 C622.5 339,640.9 339,640.9 448"/><path class="line" d="M622.5 230 C622.5 339,640.9 339,640.9 448"/></g>
+<g class="edge" data-a="law-spec-set" data-b="law-input-distinct" data-via="Slot.set_decides → Distinct.addressed"><path class="hit" d="M622.5 230 C622.5 433,591.2 433,591.2 636"/><path class="line" d="M622.5 230 C622.5 433,591.2 433,591.2 636"/></g>
+<g class="edge" data-a="law-spec-set" data-b="law-latest-by-set" data-via="Slot.set_decides → collectOf_set_decides → newestFirst_eq → LatestBy.set_decides"><path class="hit" d="M622.5 230 C622.5 301,454.6 301,454.6 372"/><path class="line" d="M622.5 230 C622.5 301,454.6 301,454.6 372"/></g>
+<g class="edge" data-a="law-spec-set" data-b="law-select-set" data-via="Slot.set_decides → Acc.select_set_decides"><path class="hit" d="M622.5 230 C622.5 245,714 245,714 260"/><path class="line" d="M622.5 230 C622.5 245,714 245,714 260"/></g>
+<g class="edge" data-a="law-spec-set" data-b="law-thing-local" data-via="Slot.set_decides → collectOf_set_decides → perThing_set_decides"><path class="hit" d="M622.5 230 C622.5 245,455.5 245,455.5 260"/><path class="line" d="M622.5 230 C622.5 245,455.5 245,455.5 260"/></g>
+<g class="edge" data-a="law-thing-local" data-b="law-latest-by-set" data-via="stateIn_local → LatestBy.set_decides"><path class="hit" d="M455.5 286 C455.5 329,454.6 329,454.6 372"/><path class="line" d="M455.5 286 C455.5 329,454.6 329,454.6 372"/></g>
+<g class="edge" data-a="law-thing-local" data-b="law-record-sets" data-via="perThing_set_decides → thingsOf_same → canonSet_eq"><path class="hit" d="M455.5 286 C455.5 499,557.3 499,557.3 712"/><path class="line" d="M455.5 286 C455.5 499,557.3 499,557.3 712"/></g>
+<g class="edge" data-a="law-view-no-resurrection" data-b="law-content-order" data-via="LatestBy.view → LatestBy.inv_ext → Newer.irrefl"><path class="hit" d="M446.2 530 C446.2 621,445.8 621,445.8 712"/><path class="line" d="M446.2 530 C446.2 621,445.8 621,445.8 712"/></g>
+<g class="edge" data-a="law-view-no-resurrection-things" data-b="law-content-order" data-via="stateIn_no_false_resurrection → LatestBy.inv_of → LatestBy.inv_fold → LatestBy.inv_step → Newer.total"><path class="hit" d="M483.9 474 C483.9 593,445.8 593,445.8 712"/><path class="line" d="M483.9 474 C483.9 593,445.8 593,445.8 712"/></g>
+<g class="edge" data-a="law-view-no-resurrection-things" data-b="law-view-no-resurrection" data-via="stateIn_view → LatestBy.view"><path class="hit" d="M483.9 474 C483.9 489,446.2 489,446.2 504"/><path class="line" d="M483.9 474 C483.9 489,446.2 489,446.2 504"/></g>
+<g class="edge" data-a="law-write-member-order" data-b="law-record-member-order" data-via="Written.commit_member_order → canon_member_order"><path class="hit" d="M685.3 738 C685.3 753,642.5 753,642.5 768"/><path class="line" d="M685.3 738 C685.3 753,642.5 753,642.5 768"/></g>
+</g>
+<g class="nodes">
+<a class="node" href="#law-acc-late" data-id="law-acc-late" transform="translate(96 148)"><title>acc.late</title><rect width="73" height="26" rx="7"/><text x="10" y="17">acc.late</text></a>
+<a class="node" href="#law-acc-set" data-id="law-acc-set" transform="translate(96 260)"><title>acc.set</title><rect width="66" height="26" rx="7"/><text x="10" y="17">acc.set</text></a>
+<a class="node" href="#law-admit-set" data-id="law-admit-set" transform="translate(601.4 448)"><title>admit.set</title><rect width="79" height="26" rx="7"/><text x="10" y="17">admit.set</text></a>
+<a class="node" href="#law-content-order" data-id="law-content-order" transform="translate(392.8 712)"><title>content order</title><rect width="106" height="26" rx="7"/><text x="10" y="17">content order</text></a>
+<a class="node" href="#law-heads-late" data-id="law-heads-late" transform="translate(488 204)"><title>heads.late</title><rect width="86" height="26" rx="7"/><text x="10" y="17">heads.late</text></a>
+<a class="node" href="#law-heads-set" data-id="law-heads-set" transform="translate(174 260)"><title>heads.set</title><rect width="79" height="26" rx="7"/><text x="10" y="17">heads.set</text></a>
+<a class="node" href="#law-incremental-batch" data-id="law-incremental-batch" transform="translate(514 260)"><title>incremental = batch</title><rect width="145" height="26" rx="7"/><text x="10" y="17">incremental = batch</text></a>
+<a class="node" href="#law-input-distinct" data-id="law-input-distinct" transform="translate(535.2 636)"><title>input.distinct</title><rect width="112" height="26" rx="7"/><text x="10" y="17">input.distinct</text></a>
+<a class="node" href="#law-input-union" data-id="law-input-union" transform="translate(544.7 580)"><title>input.union</title><rect width="93" height="26" rx="7"/><text x="10" y="17">input.union</text></a>
+<a class="node" href="#law-latest-by-converge" data-id="law-latest-by-converge" transform="translate(337 204)"><title>latest-by.converge</title><rect width="139" height="26" rx="7"/><text x="10" y="17">latest-by.converge</text></a>
+<a class="node" href="#law-latest-by-order" data-id="law-latest-by-order" transform="translate(225 148)"><title>latest-by.order</title><rect width="119" height="26" rx="7"/><text x="10" y="17">latest-by.order</text></a>
+<a class="node" href="#law-latest-by-repeats" data-id="law-latest-by-repeats" transform="translate(265 260)"><title>latest-by.repeats</title><rect width="132" height="26" rx="7"/><text x="10" y="17">latest-by.repeats</text></a>
+<a class="node" href="#law-latest-by-set" data-id="law-latest-by-set" transform="translate(401.6 372)"><title>latest-by.set</title><rect width="106" height="26" rx="7"/><text x="10" y="17">latest-by.set</text></a>
+<a class="node" href="#law-latest-set-latest-repeats" data-id="law-latest-set-latest-repeats" transform="translate(658 148)"><title>latest.set …</title><rect width="99" height="26" rx="7"/><text x="10" y="17">latest.set …</text></a>
+<a class="node" href="#law-lens-escaping" data-id="law-lens-escaping" transform="translate(448 16)"><title>lens.escaping</title><rect width="106" height="26" rx="7"/><text x="10" y="17">lens.escaping</text></a>
+<a class="node" href="#law-lens-no-op" data-id="law-lens-no-op" transform="translate(566 16)"><title>lens.no-op</title><rect width="86" height="26" rx="7"/><text x="10" y="17">lens.no-op</text></a>
+<a class="node" href="#law-lens-round-trip" data-id="law-lens-round-trip" transform="translate(547.3 72)"><title>lens.round-trip</title><rect width="119" height="26" rx="7"/><text x="10" y="17">lens.round-trip</text></a>
+<a class="node" href="#law-normal-form" data-id="law-normal-form" transform="translate(664 16)"><title>normal form</title><rect width="93" height="26" rx="7"/><text x="10" y="17">normal form</text></a>
+<a class="node" href="#law-occurred-order" data-id="law-occurred-order" transform="translate(389.8 768)"><title>occurred.order</title><rect width="112" height="26" rx="7"/><text x="10" y="17">occurred.order</text></a>
+<a class="node" href="#law-record-member-order" data-id="law-record-member-order" transform="translate(570 768)"><title>record.member-order</title><rect width="145" height="26" rx="7"/><text x="10" y="17">record.member-order</text></a>
+<a class="node" href="#law-record-sets" data-id="law-record-sets" transform="translate(510.8 712)"><title>record.sets</title><rect width="93" height="26" rx="7"/><text x="10" y="17">record.sets</text></a>
+<a class="node" href="#law-result-unread" data-id="law-result-unread" transform="translate(356 148)"><title>result.unread</title><rect width="106" height="26" rx="7"/><text x="10" y="17">result.unread</text></a>
+<a class="node" href="#law-select-set" data-id="law-select-set" transform="translate(671 260)"><title>select.set</title><rect width="86" height="26" rx="7"/><text x="10" y="17">select.set</text></a>
+<a class="node" href="#law-spec-after-supersession" data-id="law-spec-after-supersession" transform="translate(474 148)"><title>spec.after-supersession</title><rect width="172" height="26" rx="7"/><text x="10" y="17">spec.after-supersession</text></a>
+<a class="node" href="#law-spec-parse" data-id="law-spec-parse" transform="translate(671 204)"><title>spec.parse</title><rect width="86" height="26" rx="7"/><text x="10" y="17">spec.parse</text></a>
+<a class="node" href="#law-spec-set" data-id="law-spec-set" transform="translate(586 204)"><title>spec.set</title><rect width="73" height="26" rx="7"/><text x="10" y="17">spec.set</text></a>
+<a class="node" href="#law-thing-local" data-id="law-thing-local" transform="translate(409 260)"><title>thing.local</title><rect width="93" height="26" rx="7"/><text x="10" y="17">thing.local</text></a>
+<a class="node" href="#law-utf-16-order" data-id="law-utf-16-order" transform="translate(550.4 824)"><title>UTF-16 order</title><rect width="99" height="26" rx="7"/><text x="10" y="17">UTF-16 order</text></a>
+<a class="node" href="#law-view-no-resurrection" data-id="law-view-no-resurrection" transform="translate(370.2 504)"><title>view.no-resurrection</title><rect width="152" height="26" rx="7"/><text x="10" y="17">view.no-resurrection</text></a>
+<a class="node" href="#law-view-no-resurrection-things" data-id="law-view-no-resurrection-things" transform="translate(378.4 448)"><title>view.no-resurrection (things)</title><rect width="211" height="26" rx="7"/><text x="10" y="17">view.no-resurrection (things)</text></a>
+<a class="node" href="#law-where-typed" data-id="law-where-typed" transform="translate(664 316)"><title>where.typed</title><rect width="93" height="26" rx="7"/><text x="10" y="17">where.typed</text></a>
+<a class="node" href="#law-write-member-order" data-id="law-write-member-order" transform="translate(615.8 712)"><title>write.member-order</title><rect width="139" height="26" rx="7"/><text x="10" y="17">write.member-order</text></a>
+</g>
+</svg>
+    </div>
     <p class="map-note" id="map-note" aria-live="polite"></p>
     <p class="note">35 laws stand alone: their proofs use no other law's theorem. <a class="lawref" href="#law-count-perm"><code>count.perm</code></a> <a class="lawref" href="#law-count-repeats"><code>count.repeats</code></a> <a class="lawref" href="#law-sum-perm"><code>sum.perm</code></a> <a class="lawref" href="#law-sum-repeats"><code>sum.repeats</code></a> <a class="lawref" href="#law-extrema-set"><code>extrema.set</code></a> <a class="lawref" href="#law-heads-why"><code>heads.why</code></a> <a class="lawref" href="#law-view-refines"><code>view.refines</code></a> <a class="lawref" href="#law-result-full"><code>result.full</code></a> <a class="lawref" href="#law-settle-set"><code>settle.set</code></a> <a class="lawref" href="#law-settle-keeps"><code>settle.keeps</code></a> <a class="lawref" href="#law-settle-erased"><code>settle.erased</code></a> <a class="lawref" href="#law-admit-no-cross"><code>admit.no-cross</code></a> <a class="lawref" href="#law-where-complements"><code>where.complements</code></a> <a class="lawref" href="#law-where-fields"><code>where.fields</code></a> <a class="lawref" href="#law-where-time"><code>where.time</code></a> <a class="lawref" href="#law-where-total"><code>where.total</code></a> <a class="lawref" href="#law-where-set"><code>where.set</code></a> <a class="lawref" href="#law-view-refines-where"><code>view.refines (where)</code></a> <a class="lawref" href="#law-spec-select"><code>spec.select</code></a> <a class="lawref" href="#law-spec-from-thing"><code>spec.from-thing</code></a> <a class="lawref" href="#law-batch-meaning"><code>batch.meaning</code></a> <a class="lawref" href="#law-batch-refuse"><code>batch.refuse</code></a> <a class="lawref" href="#law-batch-refuse-order"><code>batch.refuse-order</code></a> <a class="lawref" href="#law-lens-put-get"><code>lens.put-get</code></a> <a class="lawref" href="#law-lens-nothing-dropped"><code>lens.nothing-dropped</code></a> <a class="lawref" href="#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a> <a class="lawref" href="#law-lens-refuse"><code>lens.refuse</code></a> <a class="lawref" href="#law-record-erasure"><code>record.erasure</code></a> <a class="lawref" href="#law-record-commit"><code>record.commit</code></a> <a class="lawref" href="#law-record-refuse"><code>record.refuse</code></a> <a class="lawref" href="#law-write-checked"><code>write.checked</code></a> <a class="lawref" href="#law-occurred-span"><code>occurred.span</code></a> <a class="lawref" href="#law-occurred-qualifier"><code>occurred.qualifier</code></a> <a class="lawref" href="#law-occurred-moment"><code>occurred.moment</code></a> <a class="lawref" href="#law-occurred-refuse"><code>occurred.refuse</code></a></p>
   </div>
@@ -1272,13 +1534,12 @@ Revisit in Q3.
 
 <script>
 const ROTOR = [{"change":"folding in parts or all at once","stays":"the state","link":"<a class=\"lawref\" href=\"#law-incremental-batch\"><code>incremental = batch</code></a>"},{"change":"the arrival order","stays":"the count","link":"<a class=\"lawref\" href=\"#law-count-perm\"><code>count.perm</code></a>"},{"change":"how the records arrive, the set kept","stays":"every thing's state, its heads and winner","link":"<a class=\"lawref\" href=\"#law-latest-by-set\"><code>latest-by.set</code></a>"},{"change":"delivering records again","stays":"the state","link":"<a class=\"lawref\" href=\"#law-latest-by-repeats\"><code>latest-by.repeats</code></a>"},{"change":"which way two places sync","stays":"the state both reach","link":"<a class=\"lawref\" href=\"#law-latest-by-converge\"><code>latest-by.converge</code></a>"},{"change":"arrival order and repeats","stays":"Latest's winner","link":"<a class=\"lawref\" href=\"#law-latest-set-latest-repeats\"><code>latest.set, latest.repeats</code></a>"},{"change":"the arrival order","stays":"the sum","link":"<a class=\"lawref\" href=\"#law-sum-perm\"><code>sum.perm</code></a>"},{"change":"arrival order and repeats","stays":"the min and the max","link":"<a class=\"lawref\" href=\"#law-extrema-set\"><code>extrema.set</code></a>"},{"change":"which place is read first","stays":"the union","link":"<a class=\"lawref\" href=\"#law-input-union\"><code>input.union</code></a>"},{"change":"the order, for any step that commutes","stays":"the state","link":"<a class=\"lawref\" href=\"#law-acc-set\"><code>acc.set</code></a>"},{"change":"whether a late record is folded onto the cached state or the whole set refolded","stays":"the new state","link":"<a class=\"lawref\" href=\"#law-acc-late\"><code>acc.late</code></a>"},{"change":"how the records arrive, the set kept","stays":"any answer worked out from the heads","link":"<a class=\"lawref\" href=\"#law-heads-set\"><code>heads.set</code></a>"},{"change":"whether a late record is folded onto the cached heads or the whole set refolded","stays":"any answer worked out from the new heads","link":"<a class=\"lawref\" href=\"#law-heads-late\"><code>heads.late</code></a>"},{"change":"which payloads a reader holds","stays":"the heads, by id","link":"<a class=\"lawref\" href=\"#law-view-no-resurrection\"><code>view.no-resurrection</code></a>"},{"change":"how the records arrive, the set kept","stays":"what is read and what is unread","link":"<a class=\"lawref\" href=\"#law-select-set\"><code>select.set</code></a>"},{"change":"which place holds which form","stays":"what the reader keeps, one record per id","link":"<a class=\"lawref\" href=\"#law-settle-set\"><code>settle.set</code></a>"},{"change":"the records about other things","stays":"this thing's state","link":"<a class=\"lawref\" href=\"#law-thing-local\"><code>thing.local</code></a>"},{"change":"which payloads a reader holds","stays":"which records are admitted, and each thing's heads, by id","link":"<a class=\"lawref\" href=\"#law-view-no-resurrection-things\"><code>view.no-resurrection (things)</code></a>"},{"change":"how a time is spelled, the record's or the test's","stays":"the answer","link":"<a class=\"lawref\" href=\"#law-where-time\"><code>where.time</code></a>"},{"change":"the order of a <code>where</code> map's tests","stays":"its answer","link":"<a class=\"lawref\" href=\"#law-where-set\"><code>where.set</code></a>"},{"change":"which payloads a reader holds","stays":"which records a spec selects","link":"<a class=\"lawref\" href=\"#law-spec-select\"><code>spec.select</code></a>"},{"change":"how the records arrive, the set kept","stays":"every slot of every spec","link":"<a class=\"lawref\" href=\"#law-spec-set\"><code>spec.set</code></a>"},{"change":"the order writing finds its refusals in","stays":"the refusal reported","link":"<a class=\"lawref\" href=\"#law-batch-refuse-order\"><code>batch.refuse-order</code></a>"},{"change":"dropping a section from the text","stays":"the state","link":"<a class=\"lawref\" href=\"#law-lens-absence-not-edit\"><code>lens.absence-not-edit</code></a>"},{"change":"normalizing text that is already normal","stays":"the text","link":"<a class=\"lawref\" href=\"#law-normal-form\"><code>normal form</code></a>"},{"change":"forgetting the payload's opening","stays":"the id","link":"<a class=\"lawref\" href=\"#law-record-erasure\"><code>record.erasure</code></a>"},{"change":"the order of <code>about</code>, <code>prev</code> or <code>erases</code>, and repeats in them","stays":"the id","link":"<a class=\"lawref\" href=\"#law-record-sets\"><code>record.sets</code></a>"},{"change":"the order of an object's members, their names distinct","stays":"its canonical bytes","link":"<a class=\"lawref\" href=\"#law-record-member-order\"><code>record.member-order</code></a>"},{"change":"the order of a written payload's members","stays":"its commitment","link":"<a class=\"lawref\" href=\"#law-write-member-order\"><code>write.member-order</code></a>"},{"change":"a qualifier on a date, <code>?</code>, <code>~</code> or <code>%</code>","stays":"the span","link":"<a class=\"lawref\" href=\"#law-occurred-qualifier\"><code>occurred.qualifier</code></a>"},{"change":"trailing zeros in a fraction of a second","stays":"the moment","link":"<a class=\"lawref\" href=\"#law-occurred-moment\"><code>occurred.moment</code></a>"}];
-const MAP = {"layers":["Text","Tick","State","View","Store","Record"],"nodes":[{"id":"law-incremental-batch","label":"incremental = batch","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">folding in parts or all at once</span>, and <span class=\"inv\">the state</span> stays."},{"id":"law-latest-by-set","label":"latest-by.set","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every thing's state, its heads and winner</span> stays."},{"id":"law-latest-by-order","label":"latest-by.order","layer":"State","shape":"order","sentence":"The winner is a head, a record nothing about its thing names in <code>prev</code>, and newer than every other head by content order: span, then <code>emitted</code>, then id."},{"id":"law-content-order","label":"content order","layer":"Record","shape":"order","sentence":"Any two records with different ids order one way: by span, then <code>emitted</code>, then id. Never by how a time is spelled."},{"id":"law-latest-by-repeats","label":"latest-by.repeats","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">delivering records again</span>, and <span class=\"inv\">the state</span> stays."},{"id":"law-latest-by-converge","label":"latest-by.converge","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">which way two places sync</span>, and <span class=\"inv\">the state both reach</span> stays."},{"id":"law-latest-set-latest-repeats","label":"latest.set …","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">Latest's winner</span> stays."},{"id":"law-input-distinct","label":"input.distinct","layer":"Store","shape":"exactness","sentence":"A fold is handed each id exactly once: the realm's union removes repeats."},{"id":"law-input-union","label":"input.union","layer":"Store","shape":"invariance","sentence":"Change <span class=\"var\">which place is read first</span>, and <span class=\"inv\">the union</span> stays."},{"id":"law-acc-set","label":"acc.set","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">the order, for any step that commutes</span>, and <span class=\"inv\">the state</span> stays."},{"id":"law-acc-late","label":"acc.late","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached state or the whole set refolded</span>, and <span class=\"inv\">the new state</span> stays."},{"id":"law-heads-set","label":"heads.set","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">any answer worked out from the heads</span> stays."},{"id":"law-heads-late","label":"heads.late","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached heads or the whole set refolded</span>, and <span class=\"inv\">any answer worked out from the new heads</span> stays."},{"id":"law-view-no-resurrection","label":"view.no-resurrection","layer":"View","shape":"invariance","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the heads, by id</span> stays."},{"id":"law-result-unread","label":"result.unread","layer":"State","shape":"refinement","sentence":"Max over heads counts the heads whose payload it doesn't hold, instead of guessing at them."},{"id":"law-select-set","label":"select.set","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">what is read and what is unread</span> stays."},{"id":"law-admit-set","label":"admit.set","layer":"View","shape":"exactness","sentence":"A record is refused exactly when it isn't entitled to its <code>prev</code>, and that depends only on the set."},{"id":"law-thing-local","label":"thing.local","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">the records about other things</span>, and <span class=\"inv\">this thing's state</span> stays."},{"id":"law-view-no-resurrection-things","label":"view.no-resurrection","layer":"View","shape":"invariance","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">which records are admitted, and each thing's heads, by id</span> stays."},{"id":"law-where-typed","label":"where.typed","layer":"State","shape":"exactness","sentence":"A test is accepted exactly when its argument fits its field, and renders back as it was written."},{"id":"law-spec-set","label":"spec.set","layer":"State","shape":"invariance","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every slot of every spec</span> stays."},{"id":"law-spec-after-supersession","label":"spec.after-supersession","layer":"State","shape":"exactness","sentence":"A slot over heads returns only heads that <code>from</code> takes and every test holds for: selection never brings back what was superseded."},{"id":"law-spec-parse","label":"spec.parse","layer":"State","shape":"round-trip","sentence":"An accepted spec's parsed form parses back to itself, and the parser gives exactly the specs that fit."},{"id":"law-lens-escaping","label":"lens.escaping","layer":"Text","shape":"round-trip","sentence":"Any body survives rendering and parsing, backslashes and all."},{"id":"law-lens-round-trip","label":"lens.round-trip","layer":"Text","shape":"round-trip","sentence":"Render, then parse, and you get back what you rendered."},{"id":"law-lens-no-op","label":"lens.no-op","layer":"Text","shape":"round-trip","sentence":"Parse an unedited render and there is nothing to apply."},{"id":"law-normal-form","label":"normal form","layer":"Text","shape":"invariance","sentence":"Change <span class=\"var\">normalizing text that is already normal</span>, and <span class=\"inv\">the text</span> stays."},{"id":"law-record-sets","label":"record.sets","layer":"Record","shape":"invariance","sentence":"Change <span class=\"var\">the order of <code>about</code>, <code>prev</code> or <code>erases</code>, and repeats in them</span>, and <span class=\"inv\">the id</span> stays."},{"id":"law-record-member-order","label":"record.member-order","layer":"Record","shape":"invariance","sentence":"Change <span class=\"var\">the order of an object's members, their names distinct</span>, and <span class=\"inv\">its canonical bytes</span> stays."},{"id":"law-utf-16-order","label":"UTF-16 order","layer":"Record","shape":"order","sentence":"Any two distinct strings order one way, by UTF-16 code units."},{"id":"law-write-member-order","label":"write.member-order","layer":"Record","shape":"invariance","sentence":"Change <span class=\"var\">the order of a written payload's members</span>, and <span class=\"inv\">its commitment</span> stays."},{"id":"law-occurred-order","label":"occurred.order","layer":"Record","shape":"order","sentence":"Spans order by start, then end, an open end last: every store orders them the same."}],"edges":[["law-acc-late","law-acc-set"],["law-content-order","law-occurred-order"],["law-heads-late","law-heads-set"],["law-heads-late","law-incremental-batch"],["law-heads-set","law-latest-by-set"],["law-input-union","law-input-distinct"],["law-latest-by-converge","law-incremental-batch"],["law-latest-by-converge","law-latest-by-set"],["law-latest-by-order","law-content-order"],["law-latest-by-repeats","law-latest-by-set"],["law-latest-by-set","law-content-order"],["law-latest-set-latest-repeats","law-latest-by-repeats"],["law-latest-set-latest-repeats","law-latest-by-set"],["law-lens-escaping","law-lens-round-trip"],["law-lens-no-op","law-lens-round-trip"],["law-normal-form","law-lens-round-trip"],["law-record-member-order","law-utf-16-order"],["law-record-sets","law-utf-16-order"],["law-result-unread","law-view-no-resurrection"],["law-spec-after-supersession","law-content-order"],["law-spec-after-supersession","law-input-distinct"],["law-spec-after-supersession","law-record-sets"],["law-spec-after-supersession","law-view-no-resurrection-things"],["law-spec-parse","law-where-typed"],["law-spec-set","law-admit-set"],["law-spec-set","law-input-distinct"],["law-spec-set","law-latest-by-set"],["law-spec-set","law-select-set"],["law-spec-set","law-thing-local"],["law-thing-local","law-latest-by-set"],["law-thing-local","law-record-sets"],["law-view-no-resurrection","law-content-order"],["law-view-no-resurrection-things","law-content-order"],["law-view-no-resurrection-things","law-view-no-resurrection"],["law-write-member-order","law-record-member-order"]]};
+const MAP_NOTES = {"law-incremental-batch":{"label":"incremental = batch","sentence":"Change <span class=\"var\">folding in parts or all at once</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-set":{"label":"latest-by.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every thing's state, its heads and winner</span> stays."},"law-latest-by-order":{"label":"latest-by.order","sentence":"The winner is a head, a record nothing about its thing names in <code>prev</code>, and newer than every other head by content order: span, then <code>emitted</code>, then id."},"law-content-order":{"label":"content order","sentence":"Any two records with different ids order one way: by span, then <code>emitted</code>, then id. Never by how a time is spelled."},"law-latest-by-repeats":{"label":"latest-by.repeats","sentence":"Change <span class=\"var\">delivering records again</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-converge":{"label":"latest-by.converge","sentence":"Change <span class=\"var\">which way two places sync</span>, and <span class=\"inv\">the state both reach</span> stays."},"law-latest-set-latest-repeats":{"label":"latest.set …","sentence":"Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">Latest's winner</span> stays."},"law-input-distinct":{"label":"input.distinct","sentence":"A fold is handed each id exactly once: the realm's union removes repeats."},"law-input-union":{"label":"input.union","sentence":"Change <span class=\"var\">which place is read first</span>, and <span class=\"inv\">the union</span> stays."},"law-acc-set":{"label":"acc.set","sentence":"Change <span class=\"var\">the order, for any step that commutes</span>, and <span class=\"inv\">the state</span> stays."},"law-acc-late":{"label":"acc.late","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached state or the whole set refolded</span>, and <span class=\"inv\">the new state</span> stays."},"law-heads-set":{"label":"heads.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">any answer worked out from the heads</span> stays."},"law-heads-late":{"label":"heads.late","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached heads or the whole set refolded</span>, and <span class=\"inv\">any answer worked out from the new heads</span> stays."},"law-view-no-resurrection":{"label":"view.no-resurrection","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the heads, by id</span> stays."},"law-result-unread":{"label":"result.unread","sentence":"Max over heads counts the heads whose payload it doesn't hold, instead of guessing at them."},"law-select-set":{"label":"select.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">what is read and what is unread</span> stays."},"law-admit-set":{"label":"admit.set","sentence":"A record is refused exactly when it isn't entitled to its <code>prev</code>, and that depends only on the set."},"law-thing-local":{"label":"thing.local","sentence":"Change <span class=\"var\">the records about other things</span>, and <span class=\"inv\">this thing's state</span> stays."},"law-view-no-resurrection-things":{"label":"view.no-resurrection (things)","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">which records are admitted, and each thing's heads, by id</span> stays."},"law-where-typed":{"label":"where.typed","sentence":"A test is accepted exactly when its argument fits its field, and renders back as it was written."},"law-spec-set":{"label":"spec.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every slot of every spec</span> stays."},"law-spec-after-supersession":{"label":"spec.after-supersession","sentence":"A slot over heads returns only heads that <code>from</code> takes and every test holds for: selection never brings back what was superseded."},"law-spec-parse":{"label":"spec.parse","sentence":"An accepted spec's parsed form parses back to itself, and the parser gives exactly the specs that fit."},"law-lens-escaping":{"label":"lens.escaping","sentence":"Any body survives rendering and parsing, backslashes and all."},"law-lens-round-trip":{"label":"lens.round-trip","sentence":"Render, then parse, and you get back what you rendered."},"law-lens-no-op":{"label":"lens.no-op","sentence":"Parse an unedited render and there is nothing to apply."},"law-normal-form":{"label":"normal form","sentence":"Change <span class=\"var\">normalizing text that is already normal</span>, and <span class=\"inv\">the text</span> stays."},"law-record-sets":{"label":"record.sets","sentence":"Change <span class=\"var\">the order of <code>about</code>, <code>prev</code> or <code>erases</code>, and repeats in them</span>, and <span class=\"inv\">the id</span> stays."},"law-record-member-order":{"label":"record.member-order","sentence":"Change <span class=\"var\">the order of an object's members, their names distinct</span>, and <span class=\"inv\">its canonical bytes</span> stays."},"law-utf-16-order":{"label":"UTF-16 order","sentence":"Any two distinct strings order one way, by UTF-16 code units."},"law-write-member-order":{"label":"write.member-order","sentence":"Change <span class=\"var\">the order of a written payload's members</span>, and <span class=\"inv\">its commitment</span> stays."},"law-occurred-order":{"label":"occurred.order","sentence":"Spans order by start, then end, an open end last: every store orders them the same."}};
 </script>
 <script>
-// The laws page's behaviour: the sentence, the demos and the map. Motion supplies the springs
-// and elkjs lays the map out; both are pinned. Without Motion, or with reduced motion, every
-// animation jumps to its end. Without elkjs there is no map, and every law's card still says
-// what it rests on and what it carries.
+// The laws page's behaviour: the sentence, the demos and the map. Motion supplies the springs,
+// pinned; without it, or with reduced motion, every animation jumps to its end. The map is
+// drawn when the page is built, so without scripts it is still there, each law a link to its card.
 (() => {
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const M = !reduced && window.Motion ? window.Motion : null;
@@ -1368,155 +1629,68 @@ const MAP = {"layers":["Text","Tick","State","View","Store","Record"],"nodes":[{
     });
   }
 
-  // The map: laid out by elkjs in bands, one per layer, the top layer first.
-  const ELK_SRC = "https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js";
-  const ELK_SRI = "sha384-KO35c6PFq7tFxAEx6FtATwL9vOBOmCzQYr7GM0iTr3oO22s7Jc9OkclOH4AV7jwK";
+  // The map: drawn when the page was built. Following a law lights everything it rests on,
+  // down, and everything that rests on it, up; a line names the theorems that make it.
   const holder = $("#lawmap"), note = $("#map-note");
-  const loadElk = () => new Promise((ok, no) => {
-    if (window.ELK) return ok(window.ELK);
-    const s = document.createElement("script");
-    s.src = ELK_SRC; s.integrity = ELK_SRI; s.crossOrigin = "anonymous";
-    s.onload = () => (window.ELK ? ok(window.ELK) : no(new Error("no ELK")));
-    s.onerror = no;
-    document.head.appendChild(s);
-  });
-  const svgNS = "http://www.w3.org/2000/svg";
-  const el = (name, attrs = {}, parent) => {
-    const e = document.createElementNS(svgNS, name);
-    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-    if (parent) parent.appendChild(e);
-    return e;
-  };
-  const rounded = (pts, r = 6) => {
-    let d = `M${pts[0].x} ${pts[0].y}`;
-    for (let i = 1; i < pts.length - 1; i++) {
-      const p = pts[i - 1], q = pts[i], n = pts[i + 1];
-      const a = Math.min(r, Math.hypot(q.x - p.x, q.y - p.y) / 2), b = Math.min(r, Math.hypot(n.x - q.x, n.y - q.y) / 2);
-      const ux = Math.sign(q.x - p.x), uy = Math.sign(q.y - p.y), vx = Math.sign(n.x - q.x), vy = Math.sign(n.y - q.y);
-      d += ` L${q.x - ux * a} ${q.y - uy * a} Q${q.x} ${q.y} ${q.x + vx * b} ${q.y + vy * b}`;
-    }
-    const z = pts[pts.length - 1];
-    return d + ` L${z.x} ${z.y}`;
-  };
-
-  async function drawMap() {
-    let ELK;
-    try { ELK = await loadElk(); } catch {
-      holder.innerHTML = '<p class="note map-wait">The map is drawn by elkjs, which didn\'t load. Every law\'s card above still lists what it rests on and what it carries.</p>';
-      return;
-    }
-    await document.fonts.ready;
-    const ctx = document.createElement("canvas").getContext("2d");
-    ctx.font = '11px "JetBrains Mono", ui-monospace, monospace';
-    const layerOf = new Map(MAP.nodes.map((n) => [n.id, n]));
-    const graph = {
-      id: "root",
-      layoutOptions: {
-        // Partitions keep each layer in its own band; ELK honours them across the whole graph
-        // only when it doesn't lay out each connected part on its own.
-        "elk.algorithm": "layered", "elk.direction": "DOWN", "elk.partitioning.activate": "true",
-        "elk.separateConnectedComponents": "false",
-        "elk.edgeRouting": "ORTHOGONAL", "elk.layered.spacing.nodeNodeBetweenLayers": "34",
-        "elk.spacing.nodeNode": "10", "elk.layered.spacing.edgeNodeBetweenLayers": "14",
-        "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF", "elk.padding": "[top=16,left=16,bottom=16,right=16]",
-      },
-      children: MAP.nodes.map((n) => ({
-        id: n.id, width: Math.ceil(ctx.measureText(n.label).width) + 20, height: 26,
-        layoutOptions: { "elk.partitioning.partition": String(MAP.layers.indexOf(n.layer)) },
-      })),
-      edges: MAP.edges.map(([a, b], i) => ({ id: `e${i}`, sources: [a], targets: [b] })),
-    };
-    const out = await new ELK().layout(graph);
-    const LEFT = 92;
-    const W = out.width + LEFT, H = out.height;
-    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "group", "aria-label": "Which laws each law's proof rests on" });
-    const bands = el("g", {}, svg);
-    const pos = new Map(out.children.map((c) => [c.id, c]));
-    MAP.layers.forEach((layer, i) => {
-      const ns = out.children.filter((c) => layerOf.get(c.id).layer === layer);
-      if (!ns.length) return;
-      const y0 = Math.min(...ns.map((c) => c.y)) - 9, y1 = Math.max(...ns.map((c) => c.y + c.height)) + 9;
-      el("rect", { class: `band${i % 2 ? " alt" : ""}`, x: 0, y: y0, width: W, height: y1 - y0, rx: 0 }, bands);
-      const t = el("text", { class: "band-l", x: 14, y: (y0 + y1) / 2 + 4 }, bands);
-      t.textContent = layer;
-    });
-    const gEdges = el("g", { transform: `translate(${LEFT} 0)` }, svg);
-    const gNodes = el("g", { transform: `translate(${LEFT} 0)` }, svg);
-    const edgeEls = out.edges.map((e, i) => {
-      const s = e.sections[0];
-      const pts = [s.startPoint, ...(s.bendPoints ?? []), s.endPoint];
-      const p = el("path", { class: "edge", d: rounded(pts) }, gEdges);
-      p.dataset.a = MAP.edges[i][0]; p.dataset.b = MAP.edges[i][1];
-      return p;
-    });
-    const nodeEls = new Map();
-    for (const n of MAP.nodes) {
-      const c = pos.get(n.id);
-      const g = el("g", { class: `node${n.shape === "limit" ? " limit" : ""}`, transform: `translate(${c.x} ${c.y})`, tabindex: 0, role: "button", "aria-label": `${n.label}: follow it; Enter opens its card` }, gNodes);
-      el("rect", { width: c.width, height: c.height, rx: 7 }, g);
-      const t = el("text", { x: 10, y: 17 }, g);
-      t.textContent = n.label;
-      g.dataset.id = n.id;
-      nodeEls.set(n.id, g);
-    }
-    // Fit the column, down to 85%; past that, the map scrolls sideways.
-    const fit = () => {
-      const scale = Math.min(1, Math.max(0.85, holder.clientWidth / W));
-      svg.setAttribute("width", Math.round(W * scale));
-      svg.setAttribute("height", Math.round(H * scale));
-    };
-    holder.innerHTML = "";
-    holder.appendChild(svg);
-    fit();
-    addEventListener("resize", fit);
-    if (M) {
-      animate(svg, { opacity: [0, 1] }, { duration: 0.4 });
-      [...nodeEls.values()].forEach((g, i) => animate($("rect", g), { opacity: [0, 1] }, { duration: 0.3, delay: 0.004 * i }));
-    }
-
-    // Following a law: everything it rests on, down; everything it carries, up.
-    const down = new Map(), up = new Map();
-    for (const [a, b] of MAP.edges) { (down.get(a) ?? down.set(a, []).get(a)).push(b); (up.get(b) ?? up.set(b, []).get(b)).push(a); }
-    const reach = (start, adj) => {
-      const seen = new Set(), stack = [start];
-      while (stack.length) for (const x of adj.get(stack.pop()) ?? []) if (!seen.has(x)) { seen.add(x); stack.push(x); }
-      return seen;
-    };
-    const focus = (id) => {
-      holder.classList.toggle("focus", Boolean(id));
-      if (!id) { nodeEls.forEach((g) => g.classList.remove("on", "me")); edgeEls.forEach((p) => p.classList.remove("on", "down", "up")); note.textContent = ""; return; }
-      const below = reach(id, down), above = reach(id, up);
-      nodeEls.forEach((g, k) => { g.classList.toggle("on", k === id || below.has(k) || above.has(k)); g.classList.toggle("me", k === id); });
-      edgeEls.forEach((p) => {
-        const d = (p.dataset.a === id || below.has(p.dataset.a)) && below.has(p.dataset.b);
-        const u = (p.dataset.b === id || above.has(p.dataset.b)) && above.has(p.dataset.a);
-        p.classList.toggle("on", d || u); p.classList.toggle("down", d); p.classList.toggle("up", u && !d);
-      });
-      const n = layerOf.get(id);
-      note.innerHTML = `<b>${n.label}</b>: ${n.sentence} Rests on ${below.size} law${below.size === 1 ? "" : "s"}, carries ${above.size}. <a href="#${id}">Its card</a>`;
-    };
-    for (const [id, g] of nodeEls) {
-      g.addEventListener("mouseenter", () => focus(id));
-      g.addEventListener("focus", () => focus(id));
-      g.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter" && e.key !== " ") return;
-        e.preventDefault();
-        focus(id);
-        location.hash = id;
-      });
-      g.addEventListener("click", () => {
-        focus(id);
-        // On a map wider than its column, bring the law to the middle.
-        const r = g.getBoundingClientRect(), h = holder.getBoundingClientRect();
-        holder.scrollBy({ left: r.left + r.width / 2 - (h.left + h.width / 2), behavior: reduced ? "auto" : "smooth" });
-      });
-    }
-    // Leaving with the pointer keeps a law the keyboard chose; leaving with the keyboard clears it.
-    const chosen = () => document.activeElement?.closest?.(".node")?.dataset.id ?? null;
-    svg.addEventListener("mouseleave", () => focus(chosen()));
-    svg.addEventListener("focusout", (e) => { if (!svg.contains(e.relatedTarget)) focus(null); });
+  const nodeEls = new Map($$(".node", holder).map((g) => [g.dataset.id, g]));
+  const edgeEls = $$(".edge", holder);
+  const down = new Map(), up = new Map();
+  for (const p of edgeEls) {
+    const { a, b } = p.dataset;
+    (down.get(a) ?? down.set(a, []).get(a)).push(b);
+    (up.get(b) ?? up.set(b, []).get(b)).push(a);
   }
-  new IntersectionObserver(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); drawMap(); } }, { rootMargin: "600px 0px" }).observe(holder);
+  const reach = (start, adj) => {
+    const seen = new Set(), stack = [start];
+    while (stack.length) for (const x of adj.get(stack.pop()) ?? []) if (!seen.has(x)) { seen.add(x); stack.push(x); }
+    return seen;
+  };
+  const clear = () => {
+    holder.classList.remove("focus");
+    nodeEls.forEach((g) => g.classList.remove("on", "me"));
+    edgeEls.forEach((p) => p.classList.remove("on", "down", "up", "me"));
+    note.textContent = "";
+  };
+  const focus = (id) => {
+    if (!id) return clear();
+    holder.classList.add("focus");
+    const below = reach(id, down), above = reach(id, up);
+    nodeEls.forEach((g, k) => { g.classList.toggle("on", k === id || below.has(k) || above.has(k)); g.classList.toggle("me", k === id); });
+    edgeEls.forEach((p) => {
+      const d = (p.dataset.a === id || below.has(p.dataset.a)) && below.has(p.dataset.b);
+      const u = (p.dataset.b === id || above.has(p.dataset.b)) && above.has(p.dataset.a);
+      p.classList.toggle("on", d || u); p.classList.toggle("down", d); p.classList.toggle("up", u && !d); p.classList.remove("me");
+    });
+    const n = MAP_NOTES[id];
+    note.innerHTML = `<b>${n.label}</b>: ${n.sentence} Rests on ${below.size} law${below.size === 1 ? "" : "s"}, carries ${above.size}. <a href="#${id}">Its card</a>`;
+  };
+  const showEdge = (p) => {
+    holder.classList.add("focus");
+    const { a, b, via } = p.dataset;
+    nodeEls.forEach((g, k) => { g.classList.toggle("on", k === a || k === b); g.classList.remove("me"); });
+    edgeEls.forEach((q) => { q.classList.toggle("on", q === p); q.classList.toggle("me", q === p); q.classList.remove("down", "up"); });
+    note.innerHTML = `<b>${MAP_NOTES[a].label}</b> rests on <b>${MAP_NOTES[b].label}</b>: <span class="via">${via}</span>`;
+  };
+  // A mouse follows a law by pointing and opens its card with a click; a touch has no
+  // pointing, so its first tap follows the law and a second opens the card; Enter opens it.
+  let touched = null, touch = false;
+  for (const [id, g] of nodeEls) {
+    g.addEventListener("pointerdown", (e) => { touch = e.pointerType === "touch"; });
+    g.addEventListener("mouseenter", () => focus(id));
+    g.addEventListener("focus", () => focus(id));
+    g.addEventListener("click", (e) => {
+      if (touch && touched !== id) { e.preventDefault(); touched = id; focus(id); }
+    });
+  }
+  for (const p of edgeEls) {
+    p.addEventListener("mouseenter", () => showEdge(p));
+    p.addEventListener("click", () => showEdge(p));
+  }
+  // Leaving with the pointer keeps a law the keyboard chose; leaving with the keyboard clears it.
+  const svg = $("svg", holder);
+  const chosen = () => document.activeElement?.closest?.(".node")?.dataset.id ?? null;
+  svg.addEventListener("mouseleave", () => focus(chosen()));
+  svg.addEventListener("focusout", (e) => { if (!svg.contains(e.relatedTarget)) focus(null); });
 
   if (location.hash) flash(location.hash.slice(1));
 })();

@@ -5,7 +5,7 @@
 //
 //   node design/mutants.mjs
 //
-// Edits to generated files (vectors/, design/laws/proofs.json) aren't mutants here: CI
+// Edits to generated files (vectors/, design/laws/proofs.json, boundaries.json) aren't mutants here: CI
 // regenerates those from the model and fails on any difference. No dependencies.
 
 import { cpSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
@@ -50,6 +50,7 @@ const MUTANTS = [
   ["demo spellings that differ in more than a set", "vectors/record/03-sets-are-sets.json", json((d) => { d.input.envs[1].kind = "other"; })],
   ["a vector naming no law", "vectors/fold/count/02-three.json", json((d) => { d.laws.push("no.such"); })],
   ["a gap in a cited range", "vectors/record/23-emitted-lowercase.json", null],
+  ["a demo's law renamed away from its vector", "design/laws/laws.json", json((d) => { d.demos[1].law = "latest-by.repeats"; })],
   ["a law with no edges moved to another layer", "design/laws/laws.json", json((d) => { d.laws["record.commit"].layer = "Text"; })],
 ];
 

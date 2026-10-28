@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { documentOf, fill, header } from "../page.mjs";
 import { inline, lawEdges, lawTable, proofs, resolveTheorem, resolveVectors, slug, vectorFiles } from "../protocol.mjs";
+import { layoutMap } from "./layout.mjs";
 
 const REPO = "https://github.com/kgruel/strange-loops-next/blob/main";
 const NUMBER = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
@@ -84,6 +85,7 @@ export function renderLaws(root) {
   const upward = edges.filter(([a, b]) => depth(b) < depth(a));
   if (upward.length) fail(`a proof rests on a law above it: ${upward.map(([a, b]) => `${a} → ${b}`).join(", ")}`);
   const restsOn = new Map(rows.map((r) => [r.key, []])), carries = new Map(rows.map((r) => [r.key, []]));
+  const via = new Map(edges.map(([a, b, v]) => [`${a}\u0000${b}`, v.map((t) => t.replace(/^Loops\./, "")).join(" → ")]));
   for (const [a, b] of edges) { restsOn.get(a).push(b); carries.get(b).push(a); }
 
   // Sentences.
@@ -212,6 +214,27 @@ export function renderLaws(root) {
     `      <p class="demo-src">from <a href="${REPO}/vectors/${d.vector}.json"><code>vectors/${d.vector}.json</code></a>, as the model wrote it</p>\n` +
     `    </article>\n`).join("");
 
+  // Without the premise: the model's answer with a law's premise and without it, written by
+  // lake exe boundaries, which checks the first keeps the law and the second differs.
+  const bounds = JSON.parse(read("boundaries.json")).cases;
+  const boundCards = bounds.map((c, i) => {
+    const row = rows.find((r) => r.names.includes(c.law)) ?? fail(`boundaries: no law ${c.law}`);
+    const l = data.laws[row.key];
+    const side = (x) => ({ html: `<p class="given">${esc(x.given)}</p>`, answer: `<span class="said">${esc(x.answer)}</span>` });
+    const vs = [side(c.holds), side(c.removed)];
+    return `    <article class="demo is-boundary" id="without-${slug(c.law)}" data-demo="b${i}">\n` +
+      `      <div class="demo-h"><a href="#${anchor(row.key)}"><code>${esc(c.law)}</code></a><span class="chip">${data.shapes[l.shape].name}</span></div>\n` +
+      `      <p class="premise"><span>premise</span> ${esc(c.premise)}</p>\n` +
+      `      <p class="demo-s">${sentence(l)}</p>\n` +
+      `      <div class="demo-in">${vs.map((x, j) => `<div class="variant" data-v="${j}"${j ? " hidden" : ""}><p class="variant-l">${j ? "premise removed" : "premise holds"}</p>${x.html}</div>`).join("")}</div>\n` +
+      `      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>\n` +
+      `      <div class="demo-out"><p class="out-l">what the model gives</p>${vs.map((x, j) => `<div class="answer${j ? " moved" : ""}" data-v="${j}"${j ? " hidden" : ""}>${x.answer}</div>`).join("")}</div>\n` +
+      `      <p class="demo-n">${esc(c.input[0].toUpperCase() + c.input.slice(1))}.</p>\n` +
+      `      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>\n` +
+      `    </article>\n`;
+  }).join("");
+  const boundOf = new Map(bounds.map((c) => [rows.find((r) => r.names.includes(c.law)).key, c]));
+
   const demoOf = new Map(demos.map((d) => [d.key, d]));
   // A Vectors cell says more than its file names when words are left once the names are gone.
   const words = (cell) => /[a-z]/i.test(cell.replace(/`[^`]*`/g, ""));
@@ -238,10 +261,12 @@ export function renderLaws(root) {
       `        <dt>pinned by</dt><dd>${words(r.vectors) || !listed.length ? `<span>${inline(r.vectors)}</span>` : ""}${listed.length ? (many ? `<details><summary>${listed.length} files</summary>${fileLinks(listed)}</details>` : `<span class="files">${fileLinks(listed)}</span>`) : ""}` +
       (extra.length ? `<span class="files also">also naming it: ${fileLinks(extra)}</span>` : "") + `</dd>\n` +
       (impl.length ? `        <dt>run by</dt><dd>${impl.map((i) => i.name).join(", ")}</dd>\n` : "") +
-      (restsOn.get(r.key).length ? `        <dt>rests on</dt><dd>${restsOn.get(r.key).map(lawLink).join(" ")}</dd>\n` : "") +
+      (restsOn.get(r.key).length ? `        <dt>rests on</dt><dd>${restsOn.get(r.key).map((b) =>
+        lawLink(b).replace('<a class="lawref"', `<a class="lawref" title="via ${esc(via.get(`${r.key}\u0000${b}`))}"`)).join(" ")}</dd>\n` : "") +
       (carries.get(r.key).length ? `        <dt>carries</dt><dd>${carries.get(r.key).map(lawLink).join(" ")}</dd>\n` : "") +
       `      </dl>\n` +
       (demoOf.has(r.key) ? `      <p class="law-try"><a href="#try-${slug(demoOf.get(r.key).law)}">Try to break it</a></p>\n` : "") +
+      (boundOf.has(r.key) ? `      <p class="law-try"><a href="#without-${slug(boundOf.get(r.key).law)}">Without its premise</a></p>\n` : "") +
       `    </article>\n`;
   };
   const byLayer = [...layers].reverse().map((layer) => {
@@ -251,16 +276,50 @@ export function renderLaws(root) {
       `    </div>\n`;
   }).join("");
 
+  // Coverage: what evidence each law has. A filled cell says the evidence exists, not that
+  // it is complete.
+  const dash = '<span class="z">–</span>';
+  const n = (k) => (k ? String(k) : dash);
+  let disagree = 0;
+  const coverRows = [...layers].reverse().map((layer) => {
+    const rs = rows.filter((r) => data.laws[r.key].layer === layer);
+    if (!rs.length) return "";
+    return `        <tr class="cov-band"><th scope="rowgroup" colspan="9">${layer}</th></tr>\n` + rs.map((r) => {
+      const listed = cited.get(r.key), named = naming.get(r.key);
+      const unnamed = listed.filter((x) => !named.includes(x)), uncited = named.filter((x) => !listed.includes(x));
+      const agree = !listed.length && !named.length ? dash
+        : !unnamed.length && !uncited.length ? '<span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span>'
+        : (disagree++, `<span class="off" title="${esc([unnamed.length ? `cited, not naming it: ${unnamed.join(", ")}` : "", uncited.length ? `naming it, not cited: ${uncited.join(", ")}` : ""].filter(Boolean).join("; "))}">${unnamed.length ? `−${unnamed.length}` : ""}${unnamed.length && uncited.length ? " " : ""}${uncited.length ? `+${uncited.length}` : ""}</span>`);
+      const js = runBy([...listed, ...named]).some((i) => i.checker) ? '<span class="ok">✓</span>' : dash;
+      const proved = resolved.get(r.key).length ? n(resolved.get(r.key).length) : r.byConstruction ? '<span class="c" title="by construction">c</span>' : dash;
+      return `        <tr><th scope="row"><a href="#${anchor(r.key)}"><code>${esc(r.key)}</code></a></th>` +
+        `<td class="sh">${data.shapes[data.laws[r.key].shape].name}</td><td>${proved}</td><td>${n(listed.length)}</td><td>${n(named.length)}</td>` +
+        `<td>${agree}</td><td>${js}</td><td>${demoOf.has(r.key) ? '<span class="ok">✓</span>' : dash}</td>` +
+        `<td>${n(restsOn.get(r.key).length)} / ${n(carries.get(r.key).length)}</td></tr>\n`;
+    }).join("");
+  }).join("");
+  const byTheorem = rows.filter((r) => resolved.get(r.key).length).length;
+  const byConstructionCount = rows.filter((r) => !resolved.get(r.key).length && r.byConstruction).length;
+  const coverage = `    <p class="cov-sum">${byTheorem} laws are theorems and ${byConstructionCount} hold by construction; ` +
+    `for ${disagree}, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>\n` +
+    `    <div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
+    `<th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th>` +
+    `<th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th>` +
+    `<th scope="col" title="the JS writer runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
+    `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div>\n`;
+
   const connected = new Set(edges.flat());
   const alone = rows.filter((r) => !connected.has(r.key));
   const mapData = {
     layers,
     nodes: rows.filter((r) => connected.has(r.key)).map((r) => ({
-      id: anchor(r.key), label: r.names[0] + (r.names.length > 1 ? " …" : ""), layer: data.laws[r.key].layer,
+      id: anchor(r.key), label: r.names.length > 1 ? `${r.names[0]} …` : r.key, layer: data.laws[r.key].layer,
       shape: data.laws[r.key].shape, sentence: sentence(data.laws[r.key]),
     })),
-    edges: edges.map(([a, b]) => [anchor(a), anchor(b)]),
+    edges: edges.map(([a, b, via]) => [anchor(a), anchor(b), via]),
   };
+  const mapSvg = layoutMap(mapData);
+  const mapNotes = Object.fromEntries(mapData.nodes.map((n) => [n.id, { label: n.label, sentence: n.sentence }]));
   const aloneNote = `    <p class="note">${alone.length} laws stand alone: their proofs use no other law's theorem. ${alone.map((r) => lawLink(r.key)).join(" ")}</p>\n`;
 
   const limits = rows.filter((r) => data.laws[r.key].shape === "limit").map((r) =>
@@ -271,10 +330,10 @@ export function renderLaws(root) {
       : `      <div class="row"><div class="row-v"><p>${inline(b)}</p></div></div>\n`;
   }).join("");
 
-  const top = header("laws", [["shapes", "Shapes"], ["try", "Try"], ["chain", "Chain"], ["map", "Map"], ["stop", "Limits"]]);
+  const top = header("laws", [["shapes", "Shapes"], ["try", "Try"], ["coverage", "Coverage"], ["chain", "Chain"], ["map", "Map"], ["stop", "Limits"]]);
   let body = read("page.html");
   for (const [name, value] of Object.entries({
-    header: top, lede, opening, shapes, bar, demos: demoCards, chain, laws: byLayer, "alone": aloneNote,
+    header: top, lede, opening, shapes, bar, demos: demoCards, boundaries: boundCards, chain, laws: byLayer, "alone": aloneNote, map: mapSvg, coverage,
     limits, "no-promise": bullets("What these laws don't promise"), simplifications: bullets("Simplifications in the model"),
   })) body = fill(body, name, value);
 
@@ -283,7 +342,7 @@ export function renderLaws(root) {
     head: read("head.html"),
     css: read("styles.css"),
     body,
-    scripts: [`const ROTOR = ${JSON.stringify(rotor)};\nconst MAP = ${JSON.stringify(mapData)};\n`, read("app.js")],
+    scripts: [`const ROTOR = ${JSON.stringify(rotor)};\nconst MAP_NOTES = ${JSON.stringify(mapNotes)};\n`, read("app.js")],
   });
 }
 

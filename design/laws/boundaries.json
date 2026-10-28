@@ -1,0 +1,82 @@
+{
+  "cases": [
+    {
+      "law": "result.full",
+      "premise": "every record is readable to the fold",
+      "input": "a valid input: a payload can lack a field",
+      "holds": {
+        "given": "sum of est over a record holding est = 3",
+        "answer": "value 3 · unread 0"
+      },
+      "removed": {
+        "given": "the same record, its payload here but with no est",
+        "answer": "value 0 · unread 1"
+      }
+    },
+    {
+      "law": "where.complements",
+      "premise": "the test answers",
+      "input": "a valid input: a reader may hold an envelope without its payload",
+      "holds": {
+        "given": "is and not \"yes\" on a record whose value is yes",
+        "answer": "is yes · not no"
+      },
+      "removed": {
+        "given": "the same tests, the payload withheld",
+        "answer": "is unknown · not unknown"
+      }
+    },
+    {
+      "law": "latest-by.set",
+      "premise": "within one store an id names one record",
+      "input": "impossible in a store: an id is the hash of what the record says",
+      "holds": {
+        "given": "records first, second under two ids, in either order",
+        "answer": "winner second either way"
+      },
+      "removed": {
+        "given": "records first, second under one id: one order, then the other",
+        "answer": "winner first, then winner second"
+      }
+    },
+    {
+      "law": "lens.no-op",
+      "premise": "the base's section ids are distinct",
+      "input": "impossible from a state: a lens renders one section per thing",
+      "holds": {
+        "given": "parse an unedited render of two sections",
+        "answer": "nothing to apply"
+      },
+      "removed": {
+        "given": "the same, both sections keyed decision:auth",
+        "answer": "accepted decision:auth: Device flow."
+      }
+    },
+    {
+      "law": "lens.put-get",
+      "premise": "the edit keeps exactly the base's sections",
+      "input": "a valid input: anyone may delete a section from the text",
+      "holds": {
+        "given": "edit decision:auth, keep decision:cache",
+        "answer": "decision:auth: Passkeys everywhere. · decision:cache: No cache. (the edit, exactly)"
+      },
+      "removed": {
+        "given": "edit decision:auth, drop decision:cache",
+        "answer": "decision:auth: Passkeys everywhere. · decision:cache: No cache. (not the edit: the dropped section stays)"
+      }
+    },
+    {
+      "law": "record.member-order",
+      "premise": "member names are distinct",
+      "input": "refused at layer 0 (member-duplicate), so no record holds it",
+      "holds": {
+        "given": "{\"x\":1,\"y\":2}, its members in both orders",
+        "answer": "{\"x\":1,\"y\":2} and {\"x\":1,\"y\":2}"
+      },
+      "removed": {
+        "given": "{\"x\":1,\"x\":2}, its members in both orders",
+        "answer": "{\"x\":1} and {\"x\":2}"
+      }
+    }
+  ]
+}

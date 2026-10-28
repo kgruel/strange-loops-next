@@ -117,23 +117,25 @@
 
 /* the map */
 .map-wrap{display:grid;gap:10px;min-width:0}
-.map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;min-height:200px;position:relative}
-.map-wait{padding:20px}
-.map svg{display:block}
+.map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;position:relative}
+.map svg{display:block;height:auto}
 .map .band{fill:var(--ground);opacity:.55}
 .map .band.alt{opacity:0}
 .map .band-l{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;fill:var(--faint)}
-.map .edge{fill:none;stroke:var(--hair-2);stroke-width:1.2;transition:stroke .2s,opacity .2s}
+.map .edge .line{fill:none;stroke:var(--hair-2);stroke-width:1.2;transition:stroke .2s,opacity .2s}
+.map .edge .hit{fill:none;stroke:transparent;stroke-width:10;cursor:pointer}
 .map .node rect{fill:var(--sheet);stroke:var(--hair-2);stroke-width:1;transition:stroke .2s,opacity .2s}
-.map .node text{font-family:var(--mono);font-size:11px;fill:var(--ink);transition:opacity .2s}
-.map .node{cursor:pointer}
+.map .node text{font-family:var(--mono);font-size:11px;fill:var(--ink)}
+.map .node{cursor:pointer;outline:none}
+.map .node:focus-visible rect{stroke:var(--ink);stroke-width:2}
 .map .node.limit rect{stroke:var(--alert)}
 .map.focus .node,.map.focus .edge{opacity:.18}
 .map.focus .node.on,.map.focus .edge.on{opacity:1}
 .map .node.me rect{stroke:var(--ink);stroke-width:1.8}
-.map .edge.on{stroke:var(--ink)}
-.map .edge.down{stroke:var(--ink)}
-.map .edge.up{stroke:var(--muted);stroke-dasharray:3 3}
+.map .edge.on .line{stroke:var(--ink)}
+.map .edge.up .line{stroke:var(--muted);stroke-dasharray:3 3}
+.map .edge.me .line{stroke-width:2.2}
+.map-note .via{font-family:var(--mono);font-size:12px;color:var(--ink)}
 .map-note{font-size:13.5px;color:var(--muted);min-height:3em}
 .map-note b{color:var(--ink);font-family:var(--mono);font-weight:500;font-size:12.5px}
 
@@ -150,3 +152,27 @@
 .rotor-ctl{display:flex;gap:6px}
 .rotor-ctl button{font:inherit;font-size:12.5px;color:var(--ink);background:var(--ground);border:0;border-radius:8px;padding:5px 10px;box-shadow:inset 0 0 0 1px var(--hair-2);cursor:pointer}
 .rotor-ctl button:hover{background:var(--sheet)}
+
+/* coverage */
+.cov-sum{font-size:13.5px;color:var(--muted)}
+.cov-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;max-height:640px;overflow-y:auto}
+.cov{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+.cov th,.cov td{padding:5px 10px;text-align:center;border-top:1px solid var(--hair);white-space:nowrap}
+.cov thead th{position:sticky;top:0;background:var(--sheet);z-index:2;font-weight:500;font-size:11.5px;color:var(--muted);border-top:0;cursor:help}
+.cov tbody th{text-align:left;font-weight:400;position:sticky;left:0;background:var(--sheet);z-index:1}
+.cov tbody th a{text-decoration:none}
+.cov tbody th code{font-size:11.5px}
+.cov .sh{color:var(--muted);text-align:left}
+.cov .cov-band th{text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground);position:static}
+.cov tbody tr:not(.cov-band):hover td,.cov tbody tr:not(.cov-band):hover th{background:color-mix(in srgb,var(--ground) 50%,var(--sheet))}
+.cov .z{color:var(--faint)}
+.cov .ok{color:var(--ink)}
+.cov .c{font-family:var(--mono);color:var(--muted);cursor:help}
+.cov .off{font-family:var(--mono);color:var(--alert);cursor:help}
+
+/* without the premise */
+.premise{font-size:13px;line-height:1.45}
+.premise span{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:6px}
+.demo .given{font-size:13px;line-height:1.45}
+.answer .said{font-family:var(--mono);font-size:12px;line-height:1.5}
+.answer.moved{box-shadow:inset 0 0 0 1.5px var(--alert)}

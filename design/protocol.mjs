@@ -138,25 +138,34 @@ export function resolveTheorem(name, graph) {
 }
 
 // Law to law: a proof of one law's theorem uses a theorem of another, directly or through
-// lemmas no law names. That is all an edge says.
+// theorems no law names. That is all an edge says. Each edge carries one chain of theorems
+// that makes it so, `via`, from the first law's theorem to the second's: the shortest, found
+// breadth first over uses in the order proofs.json lists them.
 export function lawEdges(rows, graph, resolved) {
   const owner = new Map();
   for (const r of rows) for (const t of resolved.get(r.key)) {
     if (!owner.has(t)) owner.set(t, new Set());
     owner.get(t).add(r.key);
   }
-  const edges = new Set();
+  const edges = new Map();
   for (const r of rows) {
-    const start = new Set(resolved.get(r.key));
-    const stack = [...start], seen = new Set(start);
-    while (stack.length) {
-      for (const u of graph[stack.pop()].uses) {
-        if (seen.has(u)) continue;
-        seen.add(u);
-        if (owner.has(u)) { for (const o of owner.get(u)) if (o !== r.key) edges.add(`${r.key}\u0000${o}`); }
-        else if (graph[u]) stack.push(u);
+    const start = resolved.get(r.key);
+    const parent = new Map(start.map((t) => [t, null]));
+    const queue = [...start];
+    const chain = (u) => { const c = []; for (let x = u; x !== null; x = parent.get(x)) c.unshift(x); return c; };
+    for (let i = 0; i < queue.length; i++) {
+      const t = queue[i];
+      for (const u of graph[t].uses) {
+        if (parent.has(u)) continue;
+        parent.set(u, t);
+        if (owner.has(u)) {
+          for (const o of owner.get(u)) {
+            const k = `${r.key}\u0000${o}`;
+            if (o !== r.key && !edges.has(k)) edges.set(k, chain(u));
+          }
+        } else if (graph[u]) queue.push(u);
       }
     }
   }
-  return [...edges].sort().map((e) => e.split("\u0000"));
+  return [...edges.keys()].sort().map((k) => [...k.split("\u0000"), edges.get(k)]);
 }

@@ -21,3 +21,7 @@ name = "proofs"
 root = "Gen.Proofs"
 supportInterpreter = true
 extraDepTargets = ["Laws"]
+
+[[lean_exe]]
+name = "boundaries"
+root = "Gen.Boundaries"

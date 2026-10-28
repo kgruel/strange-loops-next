@@ -29,11 +29,13 @@ lake build --wfail          # every proof checks; a `sorry` fails the build
 lake exe gen ../vectors     # rewrite the vectors from the model
 git diff --exit-code ../vectors
 lake exe proofs ../design/laws/proofs.json   # which theorems each proof uses
-git diff --exit-code ../design/laws/proofs.json
+lake exe boundaries ../design/laws/boundaries.json   # laws without their premises
+git diff --exit-code ../design/laws
 ```
 
-CI runs the same steps. The vectors are a pure render of the model, and the
-proof graph of the proofs: editing either by hand fails CI. Then:
+CI runs the same steps. The vectors and the premise cases are a pure render
+of the model, and the proof graph of the proofs: editing any of them by hand
+fails CI. Then:
 
 ```sh
 node interop/js/check.mjs vectors   # the JS writer passes every vector
@@ -63,7 +65,12 @@ read the protocol through `design/protocol.mjs`:
   prove it (each with its statement as Lean prints it), the vectors that pin
   it, and the laws its proof rests on. That last join is
   `design/laws/proofs.json`, written by `lake exe proofs` from the checked
-  proofs; CI regenerates it as it does the vectors. The build
+  proofs; CI regenerates it as it does the vectors. `lake exe boundaries` writes
+  `design/laws/boundaries.json`: some laws asked with their premise and
+  without it, the model checking that the premise matters. These aren't
+  vectors, since several of their inputs are ones the protocol never
+  produces. The map is laid out when the page is built
+  (`design/laws/layout.mjs`). The build
   fails on a law without a sentence, a theorem name that resolves to nothing,
   a vector reference to no file, a law name a vector uses that isn't a law,
   or a proof that rests on a layer above its own.
@@ -73,7 +80,7 @@ wrong edits to a copy of the sources and fails unless the build refuses each
 one, apart from an explicit, shrink-only list of survivors with why. CI runs
 it.
 
-Both load pinned libraries from a CDN (Motion; elkjs for the laws map), so
+Both load a pinned library from a CDN (Motion), so
 they are published only on the site, at `/strange-loops/grammar/` and
 `/strange-loops/laws/`, with no artifact mirror.
 
