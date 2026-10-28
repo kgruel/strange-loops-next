@@ -275,10 +275,13 @@ theorem Source.takes_view {f : Record → Record} (hf : View f) (s : Source) (r 
   simp [Source.takes, he.kind, ha]
 
 /-- `from` reads `about` by thing: an entry naming a thing takes exactly the
-records about it, and a record about nothing is about its own id. -/
+records about it, and a record about nothing is about its own id and
+nothing else. -/
 theorem Source.takes_about (store t : String) (r : Record) :
-    (Source.mk store [] (some t)).takes r = r.isAbout t := by
-  simp [Source.takes]
+    (Source.mk store [] (some t)).takes r =
+      if r.about.isEmpty then t == idText r.id else r.about.contains t := by
+  by_cases h : r.about.isEmpty <;>
+    simp [Source.takes, Record.isAbout, Record.things, h, eq_comm] <;> rfl
 
 theorem Spec.takes_view {f : Record → Record} (hf : View f) (sp : Spec) (r : Record) :
     sp.takes (f r) = sp.takes r := by

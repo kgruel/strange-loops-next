@@ -137,14 +137,16 @@ would bring back a record whose successor is of another kind, no longer
 matches, or is withheld. Collect without `follow` takes every selected
 record, superseded or not.
 
-The parser accepts exactly the specs that fit (`Spec.Fits`): a vertex, at
+The specs the parser gives are exactly those that fit (`Spec.Fits`): a vertex, at
 least one source, slots named once, no empty name or kind, every `where`
 naming each field once with at least one test, no operator twice, and every
 argument what layer 0 would accept in its field. Every spec that fits has a
 written form that parses back to it, so an accepted spec's parsed form
 parses back to itself. A spec with a repeated key is refused, at the path
-the search in `Json.repeatAt` gives. The order of the other checks, and each
-refusal's code and path, are pinned by the vectors rather than proved.
+the search in `Json.repeatAt` gives. These say what the parser gives, not
+which JSON it accepts: a stricter parser would satisfy them too. Which JSON
+is accepted, the order of the checks, and each refusal's code and path are
+pinned by the vectors rather than proved.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
@@ -156,10 +158,10 @@ refusal's code and path, are pinned by the vectors rather than proved.
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
-| `spec.from-thing` | `Source.takes_about` | `from`'s `about` takes exactly the records about the thing, a record about nothing being about its own id | `spec/run/09` |
+| `spec.from-thing` | `Source.takes_about` | `from`'s `about` takes exactly the records about the thing, and a record about nothing is about its own id and nothing else | `spec/run/09` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
 | `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads, records no record about their thing has superseded, and only those `from` takes and every test holds for, so selection never brings back what was superseded; under a view each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
-| `spec.parse` | `Spec.ofJson_fits`, `Spec.ofJson_toJson`, `Spec.reparse`, `Spec.accepts_iff`, `Spec.ofJson_repeat`, `Json.repeatAt_none` | the parser accepts exactly the specs that fit, so none runs without a source; an accepted spec's parsed form parses back to itself; a spec with a repeated key is refused, at the path `Json.repeatAt` gives, and one without is never refused for repeating | `spec/parse/*` |
+| `spec.parse` | `Spec.ofJson_fits`, `Spec.ofJson_toJson`, `Spec.reparse`, `Spec.parsed_iff`, `Spec.ofJson_repeat`, `Json.repeatAt_none` | the specs the parser gives are exactly those that fit, so none runs without a source; an accepted spec's parsed form parses back to itself; a spec with a repeated key is refused, at the path `Json.repeatAt` gives, and one without is never refused for repeating | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
 

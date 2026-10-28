@@ -138,5 +138,7 @@ These are the only codes.
 `fold`, every slot with its fold type, `follow` when it follows (always on
 latest-by), `limit` when given, and `where` as written, a time keeping its
 spelling. Carried keys and `note` are dropped. The parsed form of an
-accepted spec parses back to itself, and the parser accepts exactly the
-specs that have a written form (`spec.parse` in [`laws.md`](laws.md)).
+accepted spec parses back to itself, and the specs the parser gives are
+exactly those that fit (`spec.parse` in [`laws.md`](laws.md)). That is a law
+about what the parser gives; which JSON it accepts is this page, pinned by
+the vectors.

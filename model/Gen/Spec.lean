@@ -120,6 +120,8 @@ def parseCases : List (String × Json) := [
   ("50-slot-name-empty", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
     ("fold", o [("", o [("count", .bool true)])])]),
   ("51-sum-field-empty", slotOf (o [("sum", s "")])),
+  ("61-min-field-empty", slotOf (o [("min", s "")])),
+  ("62-max-field-empty", slotOf (o [("max", s "")])),
   ("52-where-field-empty", slotOf (o [("count", .bool true), ("where", o [("", o [("present", .bool true)])])])),
   -- the repeat found first, depth first in member order: the slot's, though
   -- `vertex` was written first and repeats after it
@@ -135,7 +137,11 @@ def parseCases : List (String × Json) := [
   ("57-from-store-first", fromOf (o [("kind", a []), ("store", s "")])),
   ("58-slot-not-object", slotOf (.int 5)),
   ("59-slot-unknown-key", slotOf (o [("count", .bool true), ("order", s "newest")])),
-  ("60-from-unknown-key", fromOf (o [("store", s "."), ("as", s "x")]))
+  ("60-from-unknown-key", fromOf (o [("store", s "."), ("as", s "x")])),
+  -- a repeat under an empty key: its path starts with the empty key
+  ("63-repeat-under-empty-key", o [("", o [("x", .int 1), ("x", .int 2)]), ("vertex", s "x"),
+    ("from", a [o [("store", s ".")]])]),
+  ("64-slot-argument-before-where", slotOf (o [("count", .bool false), ("where", o [])]))
 ]
 
 def jRefusal (r : Refusal) : J := .obj [("refused", .str r.code), ("path", .str r.path)]

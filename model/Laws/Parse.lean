@@ -15,7 +15,12 @@ import Loops.Spec
   test, no operator twice, and every test fitting.
 * **What fits has a written form.** A spec that fits renders to JSON that
   parses back to it, so an accepted spec's parsed form parses back to
-  itself, and a spec is accepted exactly when it fits.
+  itself, and the specs the parser gives are exactly those that fit.
+
+These say what the parser gives, not which JSON it accepts: a stricter
+parser, refusing a spec without `fold` say, would satisfy them too. Which
+JSON is accepted, and each refusal's code and path, are pinned by the
+vectors.
 -/
 
 namespace Loops
@@ -698,8 +703,8 @@ theorem Spec.reparse {j : Json} {sp : Spec} (h : Spec.ofJson j = .ok sp) :
     Spec.ofJson sp.toJson = .ok sp :=
   Spec.ofJson_toJson (Spec.ofJson_fits h)
 
-/-- The parser accepts exactly the specs that fit. -/
-theorem Spec.accepts_iff (sp : Spec) : (∃ j, Spec.ofJson j = .ok sp) ↔ sp.Fits :=
+/-- The specs the parser gives are exactly those that fit. -/
+theorem Spec.parsed_iff (sp : Spec) : (∃ j, Spec.ofJson j = .ok sp) ↔ sp.Fits :=
   ⟨fun ⟨_, h⟩ => Spec.ofJson_fits h, fun h => ⟨_, Spec.ofJson_toJson h⟩⟩
 
 end Loops
