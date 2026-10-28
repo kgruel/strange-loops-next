@@ -72,7 +72,11 @@ read the protocol through `design/protocol.mjs`:
   `design/laws/boundaries.json`: some laws asked with their premise and
   without it, the model checking that the premise matters. These aren't
   vectors, since several of their inputs are ones the protocol never
-  produces. The build
+  produces. Each is a card on the laws page, on its law's Try card when the
+  law has a demo and on a card of its own when not, and the build refuses a
+  case no card shows. A Try card letters its records A, B, C by when they were
+  written (`shapes.mjs` draws the card's figure, one per shape), and keeps a
+  trail of the answer the model gave to each variant shown. The build
   fails on a law without a sentence, a theorem name that resolves to nothing,
   a vector reference to no file, a law name a vector uses that isn't a law,
   or a proof that rests on a layer above its own.

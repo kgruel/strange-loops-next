@@ -134,6 +134,21 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:560px){.top-row{flex-wrap:wrap;row-gap:4px;padding-block:10px 8px}.seg{width:100%;margin-right:0;margin-left:-10px}}
 
+/* a record, as the grammar page's walk and the laws page's cards both draw it: a sheet with its
+   letter, when it was written, its value and what it says of itself */
+.rec{background:var(--sheet);border-radius:10px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:8px 9px;display:grid;gap:3px;font-size:12px;min-width:0;transition:box-shadow .3s,background .3s,opacity .3s}
+.rec .rid{display:flex;justify-content:space-between;gap:4px;font-family:var(--mono);font-size:11.5px;font-weight:500}
+.rec .rid span{color:var(--faint);font-weight:400}
+.rec .who{color:var(--muted);font-size:11px}
+.rec .val{font-size:12px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rec .tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--faint)}
+.rec.super{box-shadow:var(--lift-1),0 0 0 1px var(--hair);opacity:.72}
+.rec.head{box-shadow:var(--lift-3),0 0 0 1.5px var(--ink)}
+.rec.fork{box-shadow:var(--lift-3),0 0 0 1.5px var(--alert)}
+.rec.fork .tag{color:var(--alert)}
+.rec .val.erased,.rec .val.withheld{font-family:var(--mono);font-size:11px;color:var(--faint);font-style:normal}
+.rec .val.erased{color:var(--alert)}
+
 /* The grammar page, on the register in design/register.css. */
 /* the sentence */
 .sentence-sheet{display:grid;gap:18px}
@@ -215,18 +230,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .edges path{fill:none;stroke:var(--hair-2);stroke-width:1.5}
 .edges path.erase{stroke:var(--alert);stroke-dasharray:4 4;stroke-width:1.3}
-.rec{position:relative;z-index:1;justify-self:center;width:min(100%,116px);background:var(--sheet);border-radius:10px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:8px 9px;display:grid;gap:3px;font-size:12px;min-width:0;transition:box-shadow .3s,background .3s,opacity .3s}
-.rec .rid{display:flex;justify-content:space-between;gap:4px;font-family:var(--mono);font-size:11.5px;font-weight:500}
-.rec .rid span{color:var(--faint);font-weight:400}
-.rec .who{color:var(--muted);font-size:11px}
-.rec .val{font-size:12px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.rec .tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--faint)}
-.rec.super{box-shadow:var(--lift-1),0 0 0 1px var(--hair);opacity:.72}
-.rec.head{box-shadow:var(--lift-3),0 0 0 1.5px var(--ink)}
-.rec.fork{box-shadow:var(--lift-3),0 0 0 1.5px var(--alert)}
-.rec.fork .tag{color:var(--alert)}
-.rec .val.erased,.rec .val.withheld{font-family:var(--mono);font-size:11px;color:var(--faint);font-style:normal}
-.rec .val.erased{color:var(--alert)}
+/* the record chip itself is in design/register.css; here it sits on the walk's grid */
+.dag .rec{position:relative;z-index:1;justify-self:center;width:min(100%,116px)}
 @media (max-width:640px){.dag{gap:10px 8px}.rec{padding:6px}.rec .who,.rec .val{display:none}.rec .rid span{display:none}}
 
 .panes{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}

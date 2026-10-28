@@ -48,6 +48,7 @@ const MUTANTS = [
   ["a walk record the vector doesn't have", "design/grammar/walk.json", json((d) => { d.records.push({ label: "G", col: 5, row: 1 }); })],
   ["demo orders that aren't one set of records", "vectors/fold/latest-by/02-fork.json", json((d) => { d.input.orders[1][0].prev = [d.input.orders[1][1].id]; })],
   ["demo spellings that differ in more than a set", "vectors/record/03-sets-are-sets.json", json((d) => { d.input.envs[1].kind = "other"; })],
+  ["demo records in a zone that doesn't sort as time", "vectors/fold/count/02-three.json", json((d) => { for (const o of d.input.orders) for (const r of o) if (r.emitted.endsWith("00:01:40Z")) r.emitted = "2026-10-01T00:01:40+01:00"; })],
   ["a vector naming no law", "vectors/fold/count/02-three.json", json((d) => { d.laws.push("no.such"); })],
   ["a gap in a cited range", "vectors/record/23-emitted-lowercase.json", null],
   ["a demo's law renamed away from its vector", "design/laws/laws.json", json((d) => { d.demos[1].law = "latest-by.repeats"; })],
@@ -55,6 +56,7 @@ const MUTANTS = [
   ["a law with no question", "design/laws/laws.json", json((d) => { delete d.laws["count.perm"].question; })],
   ["an unknown question key", "design/laws/laws.json", json((d) => { d.laws["count.perm"].question = "attic"; })],
   ["a question no law answers", "design/laws/laws.json", json((d) => { d.questions["no-such"] = "What if nobody asks?"; })],
+  ["a premise case that no card shows", "design/laws/render.mjs", swap("else alone.push(c);", "else if (c.law === \"\") alone.push(c);")],
   ["a link to a law's evidence that lands nowhere", "design/evidence/render.mjs", swap('" id="${anchor(r.key)}" data-shape', '" id="card-${slug(r.key)}" data-shape')],
 ];
 
