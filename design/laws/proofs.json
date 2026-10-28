@@ -1,0 +1,1057 @@
+{"theorems":
+ {"Loops.writeProblem_none": {"uses": [], "module": "Loops.Stored"},
+  "Loops.writeProblem_codes":
+  {"uses": ["Loops.Env.problem_codes"], "module": "Laws.Write"},
+  "Loops.withholding_view":
+  {"uses": ["Loops.SameEnvelope.refl", "Loops.withhold_envelope"],
+   "module": "Laws.Families"},
+  "Loops.withhold_envelope": {"uses": [], "module": "Laws.Families"},
+  "Loops.withhold_congr": {"uses": [], "module": "Laws.Things"},
+  "Loops.utf16_inj_list": {"uses": [], "module": "Laws.Record"},
+  "Loops.utf16_inj":
+  {"uses": ["Loops.utf16_inj_list"], "module": "Laws.Record"},
+  "Loops.utf16Char_cons":
+  {"uses": ["Loops.char_valid"], "module": "Laws.Record"},
+  "Loops.things_view":
+  {"uses":
+   ["Loops.SameEnvelope.about", "Loops.SameEnvelope.id", "Loops.View.envelope"],
+   "module": "Laws.Things"},
+  "Loops.thingsOf_view":
+  {"uses": ["Loops.canonSet_eq", "Loops.things_view"], "module": "Laws.Things"},
+  "Loops.thingsOf_same":
+  {"uses": ["Loops.canonSet_eq"], "module": "Laws.Things"},
+  "Loops.takeWhile_slash": {"uses": [], "module": "Laws.Time"},
+  "Loops.takeWhile_digit": {"uses": [], "module": "Laws.Time"},
+  "Loops.tail_digits":
+  {"uses": ["Loops.digit_lt", "Loops.takeWhile_digit"], "module": "Laws.Time"},
+  "Loops.subst_congr": {"uses": [], "module": "Laws.Batch"},
+  "Loops.substEnv_congr":
+  {"uses": ["Loops.subst_congr"], "module": "Laws.Batch"},
+  "Loops.subst.eq_def": {"uses": [], "module": "Laws.Batch"},
+  "Loops.stripped_tail": {"uses": [], "module": "Laws.Time"},
+  "Loops.stripped_of_digits":
+  {"uses": ["Loops.stripZeros_last", "Loops.stripZeros_sub"],
+   "module": "Laws.Time"},
+  "Loops.stripZeros_sub": {"uses": [], "module": "Laws.Time"},
+  "Loops.stripZeros_replicate_zero":
+  {"uses": ["Loops.stripZeros_append_zero"], "module": "Laws.Time"},
+  "Loops.stripZeros_last": {"uses": [], "module": "Laws.Time"},
+  "Loops.stripZeros_append_zero": {"uses": [], "module": "Laws.Time"},
+  "Loops.stopBefore_trichotomy": {"uses": [], "module": "Laws.Time"},
+  "Loops.stopBefore_trans": {"uses": [], "module": "Laws.Time"},
+  "Loops.stopBefore_irrefl": {"uses": [], "module": "Laws.Time"},
+  "Loops.stateIn_view":
+  {"uses": ["Loops.LatestBy.view", "Loops.isAbout_view"],
+   "module": "Laws.Things"},
+  "Loops.stateIn_no_false_resurrection":
+  {"uses":
+   ["Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.inv_of",
+    "Loops.SameEnvelope.id",
+    "Loops.View.envelope",
+    "Loops.stateIn_view"],
+   "module": "Laws.Things"},
+  "Loops.stateIn_local":
+  {"uses": ["Loops.LatestBy.set_decides"], "module": "Laws.Things"},
+  "Loops.stateIn_heads":
+  {"uses":
+   ["Loops.Addressed.filter",
+    "Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.inv_of"],
+   "module": "Laws.Spec"},
+  "Loops.sorted_insertRec":
+  {"uses": ["Loops.Newer.trans", "Loops.mem_insertRec"], "module": "Laws.Fold"},
+  "Loops.sorted_insertIds":
+  {"uses": ["Loops.sorted_insertId"], "module": "Laws.Fold"},
+  "Loops.sorted_insertId":
+  {"uses": ["Loops.mem_insertId"], "module": "Laws.Fold"},
+  "Loops.sorted_insertBy":
+  {"uses": ["Loops.lexLt_total", "Loops.lexLt_trans", "Loops.mem_insertBy"],
+   "module": "Laws.Record"},
+  "Loops.sortBy_sorted": {"uses": ["Loops.sortBy_go"], "module": "Laws.Record"},
+  "Loops.sortBy_go":
+  {"uses":
+   ["Loops.mem_insertBy",
+    "Loops.mem_insertBy_of_mem",
+    "Loops.mem_insertBy_self",
+    "Loops.sorted_insertBy"],
+   "module": "Laws.Record"},
+  "Loops.sortBy_ext":
+  {"uses": ["Loops.lexLt_asymm", "Loops.lexLt_irrefl", "Loops.sortBy_sorted"],
+   "module": "Laws.Record"},
+  "Loops.slotTests_fits":
+  {"uses": ["Loops.Except.pure_eq_ok", "Loops.parseWhere_fits"],
+   "module": "Laws.Parse"},
+  "Loops.slotLimit_pos":
+  {"uses": ["Loops.Except.pure_eq_ok", "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.shares_view": {"uses": ["Loops.things_view"], "module": "Laws.Things"},
+  "Loops.settle_keeps": {"uses": ["Loops.mem_idsOf"], "module": "Laws.Things"},
+  "Loops.settle_erased": {"uses": ["Loops.pick_id"], "module": "Laws.Things"},
+  "Loops.settle_eq":
+  {"uses": ["Loops.baseForm_eq", "Loops.erasedIn_eq", "Loops.idsOf_ext"],
+   "module": "Laws.Things"},
+  "Loops.settle_distinct":
+  {"uses": ["Loops.idsOf_sorted", "Loops.pick_id"], "module": "Laws.Things"},
+  "Loops.refuse_ne_ok": {"uses": [], "module": "Laws.Parse"},
+  "Loops.refusalOf_none": {"uses": [], "module": "Laws.Things"},
+  "Loops.qualifier_not_slash": {"uses": [], "module": "Laws.Time"},
+  "Loops.qualifier_ignored":
+  {"uses": ["Loops.point_date", "Loops.point_qualified"],
+   "module": "Laws.Time"},
+  "Loops.pow10_pos": {"uses": [], "module": "Laws.Time"},
+  "Loops.point_qualified": {"uses": [], "module": "Laws.Time"},
+  "Loops.point_le": {"uses": ["Loops.date_lt"], "module": "Laws.Time"},
+  "Loops.point_date": {"uses": [], "module": "Laws.Time"},
+  "Loops.point_canonical":
+  {"uses": ["Loops.instant_canonical"], "module": "Laws.Time"},
+  "Loops.pick_id":
+  {"uses": ["Loops.SameEnvelope.id", "Loops.baseForm_mem"],
+   "module": "Laws.Things"},
+  "Loops.perm_of_same":
+  {"uses": ["Loops.Distinct.nodup"], "module": "Laws.Families"},
+  "Loops.perThing_set_decides":
+  {"uses": ["Loops.stateIn_local", "Loops.thingsOf_same"],
+   "module": "Laws.Things"},
+  "Loops.payTest_unlinked": {"uses": [], "module": "Laws.Spec"},
+  "Loops.parseWhere_toJson":
+  {"uses": ["Loops.mapM_map_ok", "Loops.parseField_toJson"],
+   "module": "Laws.Parse"},
+  "Loops.parseWhere_fits":
+  {"uses":
+   ["Loops.Json.keysDistinct_obj",
+    "Loops.mapM_ok_map",
+    "Loops.mapM_ok_mem",
+    "Loops.mapM_ok_ne_nil",
+    "Loops.parseField_fits",
+    "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.parseSource_toJson":
+  {"uses": ["Loops.parseKinds_toJson"], "module": "Laws.Parse"},
+  "Loops.parseSource_fits":
+  {"uses":
+   ["Loops.Except.bind_eq_ok",
+    "Loops.Except.pure_eq_ok",
+    "Loops.parseKinds_fits",
+    "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.parseSlot_toJson":
+  {"uses": ["Loops.parseWhere_toJson"], "module": "Laws.Parse"},
+  "Loops.parseSlot_fits":
+  {"uses":
+   ["Loops.Except.bind_eq_ok",
+    "Loops.Except.pure_eq_ok",
+    "Loops.foldType_fits",
+    "Loops.lookup_distinct",
+    "Loops.refuse_ne_ok",
+    "Loops.slotLimit_pos",
+    "Loops.slotTests_fits"],
+   "module": "Laws.Parse"},
+  "Loops.parseOps_fits":
+  {"uses":
+   ["Loops.Json.keysDistinct_obj",
+    "Loops.mapM_ok_map",
+    "Loops.mapM_ok_mem",
+    "Loops.parseOp_ok_iff"],
+   "module": "Laws.Parse"},
+  "Loops.parseOp_ok_iff":
+  {"uses": ["Loops.parseArg_ok_iff", "Loops.parseBound_ok_iff"],
+   "module": "Laws.Parse"},
+  "Loops.parseKinds_toJson":
+  {"uses": ["Loops.mapM_map_ok"], "module": "Laws.Parse"},
+  "Loops.parseKinds_fits":
+  {"uses":
+   ["Loops.Except.pure_eq_ok", "Loops.mapM_ok_mem", "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.parseField_toJson":
+  {"uses":
+   ["Loops.Field.ofName_name", "Loops.mapM_map_ok", "Loops.parseOp_ok_iff"],
+   "module": "Laws.Parse"},
+  "Loops.parseField_fits":
+  {"uses":
+   ["Loops.Except.bind_eq_ok",
+    "Loops.Except.pure_eq_ok",
+    "Loops.Field.ofName_some",
+    "Loops.mapM_ok_ne_nil",
+    "Loops.parseOps_fits",
+    "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.parseBound_ok_iff":
+  {"uses": ["Loops.parseArg_ok_iff"], "module": "Laws.Parse"},
+  "Loops.parseArg_ok_iff":
+  {"uses": ["Loops.Claim.of?_text"], "module": "Laws.Parse"},
+  "Loops.opening_checks": {"uses": [], "module": "Laws.Record"},
+  "Loops.occurred_qualified_start":
+  {"uses":
+   ["Loops.halves_append",
+    "Loops.qualifier_ignored",
+    "Loops.qualifier_not_slash"],
+   "module": "Laws.Time"},
+  "Loops.occurred_qualified_end":
+  {"uses":
+   ["Loops.halves_append",
+    "Loops.qualifier_ignored",
+    "Loops.qualifier_not_slash"],
+   "module": "Laws.Time"},
+  "Loops.occurred_qualified":
+  {"uses":
+   ["Loops.halves_of_not_mem",
+    "Loops.qualifier_ignored",
+    "Loops.qualifier_not_slash"],
+   "module": "Laws.Time"},
+  "Loops.occurred_point":
+  {"uses": ["Loops.halves_of_not_mem", "Loops.point_le"],
+   "module": "Laws.Time"},
+  "Loops.occurred_open":
+  {"uses": ["Loops.halves_append"], "module": "Laws.Time"},
+  "Loops.occurred_interval":
+  {"uses": ["Loops.halves_append", "Loops.point_le"], "module": "Laws.Time"},
+  "Loops.newestFirst_eq":
+  {"uses": ["Loops.Addressed.unlinked", "Loops.LatestBy.set_decides"],
+   "module": "Laws.Spec"},
+  "Loops.moment_lt_iff_scaled":
+  {"uses":
+   ["Loops.fracScaled_bounds", "Loops.frac_lt_iff_scaled", "Loops.pow10_pos"],
+   "module": "Laws.Time"},
+  "Loops.mem_sortBy": {"uses": ["Loops.sortBy_go"], "module": "Laws.Record"},
+  "Loops.mem_perThing": {"uses": [], "module": "Laws.Spec"},
+  "Loops.mem_newestFirst":
+  {"uses":
+   ["Loops.Addressed.unlinked",
+    "Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.inv_of"],
+   "module": "Laws.Spec"},
+  "Loops.mem_limitTo": {"uses": [], "module": "Laws.Spec"},
+  "Loops.mem_insertRec": {"uses": [], "module": "Laws.Fold"},
+  "Loops.mem_insertIds":
+  {"uses": ["Loops.mem_insertId"], "module": "Laws.Fold"},
+  "Loops.mem_insertId": {"uses": [], "module": "Laws.Fold"},
+  "Loops.mem_insertBy_self": {"uses": [], "module": "Laws.Record"},
+  "Loops.mem_insertBy_of_mem": {"uses": [], "module": "Laws.Record"},
+  "Loops.mem_insertBy": {"uses": [], "module": "Laws.Record"},
+  "Loops.mem_idsOf":
+  {"uses": ["Loops.idsOf_eq", "Loops.mem_insertIds"], "module": "Laws.Things"},
+  "Loops.mem_dedup_sub": {"uses": [], "module": "Laws.Families"},
+  "Loops.mem_dedup": {"uses": [], "module": "Laws.Families"},
+  "Loops.mem_admit": {"uses": [], "module": "Laws.Things"},
+  "Loops.mapM_ok_ne_nil":
+  {"uses": ["Loops.mapM_ok_map"], "module": "Laws.Parse"},
+  "Loops.mapM_ok_mem": {"uses": [], "module": "Laws.Parse"},
+  "Loops.mapM_ok_map": {"uses": [], "module": "Laws.Parse"},
+  "Loops.mapM_map_ok": {"uses": [], "module": "Laws.Parse"},
+  "Loops.lt_iff_div_mod": {"uses": [], "module": "Laws.Order"},
+  "Loops.lookup_mem": {"uses": [], "module": "Laws.Parse"},
+  "Loops.lookup_distinct":
+  {"uses": ["Loops.Json.keysDistinct_obj", "Loops.lookup_mem"],
+   "module": "Laws.Parse"},
+  "Loops.lexLt_trans": {"uses": [], "module": "Laws.Record"},
+  "Loops.lexLt_total": {"uses": [], "module": "Laws.Record"},
+  "Loops.lexLt_irrefl": {"uses": [], "module": "Laws.Record"},
+  "Loops.lexLt_asymm":
+  {"uses": ["Loops.lexLt_irrefl", "Loops.lexLt_trans"],
+   "module": "Laws.Record"},
+  "Loops.lexLt.eq_def": {"uses": [], "module": "Laws.Record"},
+  "Loops.latestOf_set_decides":
+  {"uses": ["Loops.perThing_set_decides"], "module": "Laws.Spec"},
+  "Loops.latestOf_heads":
+  {"uses":
+   ["Loops.SlotValue.things.injEq",
+    "Loops.chosen_payTest_yes",
+    "Loops.mem_perThing",
+    "Loops.stateIn_heads"],
+   "module": "Laws.Spec"},
+  "Loops.keysDistinct_obj": {"uses": [], "module": "Laws.Write"},
+  "Loops.isAbout_view":
+  {"uses": ["Loops.things_view"], "module": "Laws.Things"},
+  "Loops.instant_canonical":
+  {"uses": ["Loops.stripped_of_digits", "Loops.tail_digits"],
+   "module": "Laws.Time"},
+  "Loops.insertRec.eq_def": {"uses": [], "module": "Laws.Fold"},
+  "Loops.insertId.eq_def": {"uses": [], "module": "Laws.Fold"},
+  "Loops.insertBy.eq_def": {"uses": [], "module": "Laws.Record"},
+  "Loops.idsOf_sorted":
+  {"uses": ["Loops.idsOf_eq", "Loops.sorted_insertIds"],
+   "module": "Laws.Things"},
+  "Loops.idsOf_ext":
+  {"uses": ["Loops.idsOf_sorted", "Loops.mem_idsOf"], "module": "Laws.Things"},
+  "Loops.idsOf_eq": {"uses": [], "module": "Laws.Things"},
+  "Loops.id_sets": {"uses": ["Loops.canonSet_eq"], "module": "Laws.Record"},
+  "Loops.id_order": {"uses": ["Loops.digestDigits_lt"], "module": "Laws.Order"},
+  "Loops.halves_of_not_mem":
+  {"uses": ["Loops.dropWhile_slash", "Loops.takeWhile_slash"],
+   "module": "Laws.Time"},
+  "Loops.halves_append": {"uses": [], "module": "Laws.Time"},
+  "Loops.frac_lt_iff_scaled": {"uses": [], "module": "Laws.Time"},
+  "Loops.fracScaled_bounds": {"uses": [], "module": "Laws.Time"},
+  "Loops.fracScaled.eq_def": {"uses": [], "module": "Laws.Time"},
+  "Loops.foldType_fits":
+  {"uses":
+   ["Loops.Except.map_eq_ok",
+    "Loops.Except.pure_eq_ok",
+    "Loops.fieldArg_ok",
+    "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.firstRefusal_set": {"uses": [], "module": "Laws.Write"},
+  "Loops.fieldArg_ok":
+  {"uses": ["Loops.Except.pure_eq_ok", "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.erasedIn_eq": {"uses": [], "module": "Laws.Things"},
+  "Loops.erase_view":
+  {"uses": ["Loops.erase_envelope"], "module": "Laws.Families"},
+  "Loops.erase_keeps_id": {"uses": [], "module": "Laws.Record"},
+  "Loops.erase_idem": {"uses": [], "module": "Laws.Record"},
+  "Loops.erase_envelope": {"uses": [], "module": "Laws.Families"},
+  "Loops.eq_of_mem_of_nodup_map": {"uses": [], "module": "Laws.Record"},
+  "Loops.env_sets": {"uses": ["Loops.canonSet_eq"], "module": "Laws.Record"},
+  "Loops.entitled_view":
+  {"uses":
+   ["Loops.SameEnvelope.id",
+    "Loops.SameEnvelope.prev",
+    "Loops.View.envelope",
+    "Loops.shares_view"],
+   "module": "Laws.Things"},
+  "Loops.entitled_congr": {"uses": [], "module": "Laws.Things"},
+  "Loops.dropWhile_slash": {"uses": [], "module": "Laws.Time"},
+  "Loops.distinct_dedup": {"uses": [], "module": "Laws.Families"},
+  "Loops.digit_lt": {"uses": [], "module": "Laws.Time"},
+  "Loops.digestDigits_lt":
+  {"uses": ["Loops.lt_iff_div_mod"], "module": "Laws.Order"},
+  "Loops.digestDigits.eq_def": {"uses": [], "module": "Laws.Order"},
+  "Loops.dedup_union":
+  {"uses": ["Loops.distinct_dedup", "Loops.mem_dedup", "Loops.perm_of_same"],
+   "module": "Laws.Families"},
+  "Loops.dedup.eq_def": {"uses": [], "module": "Laws.Families"},
+  "Loops.daysIn_pos": {"uses": [], "module": "Laws.Time"},
+  "Loops.dayNumber_year_lt": {"uses": [], "module": "Laws.Time"},
+  "Loops.date_lt": {"uses": ["Loops.dateDays_lt"], "module": "Laws.Time"},
+  "Loops.dateDays_lt":
+  {"uses": ["Loops.dayNumber_year_lt", "Loops.daysIn_pos"],
+   "module": "Laws.Time"},
+  "Loops.collectOf_set_decides":
+  {"uses":
+   ["Loops.Addressed.filter",
+    "Loops.newestFirst_eq",
+    "Loops.perThing_set_decides"],
+   "module": "Laws.Spec"},
+  "Loops.collectOf_heads":
+  {"uses":
+   ["Loops.Addressed.sub",
+    "Loops.SlotValue.heads.injEq",
+    "Loops.chosen_payTest_yes",
+    "Loops.mem_limitTo",
+    "Loops.mem_newestFirst",
+    "Loops.mem_perThing",
+    "Loops.payTest_unlinked",
+    "Loops.stateIn_heads"],
+   "module": "Laws.Spec"},
+  "Loops.chosen_payTest_yes":
+  {"uses": ["Loops.Cond.all_eq_yes"], "module": "Laws.Spec"},
+  "Loops.char_valid": {"uses": [], "module": "Laws.Record"},
+  "Loops.canon_member_order":
+  {"uses":
+   ["Loops.canonMembers_eq",
+    "Loops.eq_of_mem_of_nodup_map",
+    "Loops.mem_sortBy",
+    "Loops.sortBy_ext",
+    "Loops.utf16_inj"],
+   "module": "Laws.Record"},
+  "Loops.canonSet_eq":
+  {"uses": ["Loops.mem_sortBy", "Loops.sortBy_ext", "Loops.utf16_inj"],
+   "module": "Laws.Record"},
+  "Loops.canonMembers_eq": {"uses": [], "module": "Laws.Record"},
+  "Loops.baseForm_mem":
+  {"uses": ["Loops.SameEnvelope.refl", "Loops.withhold_envelope"],
+   "module": "Laws.Things"},
+  "Loops.baseForm_eq":
+  {"uses": ["Loops.withhold_congr"], "module": "Laws.Things"},
+  "Loops.admit_view":
+  {"uses": ["Loops.entitled_view"], "module": "Laws.Things"},
+  "Loops.admit_same":
+  {"uses": ["Loops.entitled_congr", "Loops.mem_admit"],
+   "module": "Laws.Things"},
+  "Loops.admit_no_cross":
+  {"uses": ["Loops.mem_admit"], "module": "Laws.Things"},
+  "Loops.admit_distinct":
+  {"uses": ["Loops.Distinct.filter"], "module": "Laws.Things"},
+  "Loops.Written.ok": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Written.mk.sizeOf_spec": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Written.mk.injEq":
+  {"uses": ["Loops.Written.mk.inj"], "module": "Loops.Stored"},
+  "Loops.Written.mk.inj": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Written.commit_member_order":
+  {"uses":
+   ["Loops.Writable.members",
+    "Loops.Written.ok",
+    "Loops.canon_member_order",
+    "Loops.keysDistinct_obj"],
+   "module": "Laws.Write"},
+  "Loops.Writable.salt": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Writable.range": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Writable.members": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Writable.env": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Where.payload.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Where.payload.injEq":
+  {"uses": ["Loops.Where.payload.inj"], "module": "Loops.Families"},
+  "Loops.Where.payload.inj": {"uses": [], "module": "Loops.Families"},
+  "Loops.Where.eval_view":
+  {"uses": ["Loops.View.envelope", "Loops.View.hides"],
+   "module": "Laws.Families"},
+  "Loops.Where.eval_here": {"uses": [], "module": "Laws.Families"},
+  "Loops.Where.envelope.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Where.envelope.injEq":
+  {"uses": ["Loops.Where.envelope.inj"], "module": "Loops.Families"},
+  "Loops.Where.envelope.inj": {"uses": [], "module": "Loops.Families"},
+  "Loops.Where.envelope.congr_simp": {"uses": [], "module": "Laws.Families"},
+  "Loops.View.newer":
+  {"uses":
+   ["Loops.SameEnvelope.emitted",
+    "Loops.SameEnvelope.id",
+    "Loops.SameEnvelope.occurred",
+    "Loops.View.envelope"],
+   "module": "Laws.Families"},
+  "Loops.View.hides": {"uses": [], "module": "Loops.Record"},
+  "Loops.View.envelope": {"uses": [], "module": "Loops.Record"},
+  "Loops.View.addressed":
+  {"uses": ["Loops.SameEnvelope.id", "Loops.View.envelope"],
+   "module": "Laws.Families"},
+  "Loops.Val.str.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.Val.str.injEq":
+  {"uses": ["Loops.Val.str.inj"], "module": "Loops.Record"},
+  "Loops.Val.str.inj": {"uses": [], "module": "Loops.Record"},
+  "Loops.Val.int.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.Val.int.injEq":
+  {"uses": ["Loops.Val.int.inj"], "module": "Loops.Record"},
+  "Loops.Val.int.inj": {"uses": [], "module": "Loops.Record"},
+  "Loops.Val.bool.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.Val.bool.injEq":
+  {"uses": ["Loops.Val.bool.inj"], "module": "Loops.Record"},
+  "Loops.Val.bool.inj": {"uses": [], "module": "Loops.Record"},
+  "Loops.Tri.yes.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Tri.unknown.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Tri.ofNat_ctorIdx": {"uses": [], "module": "Loops.Families"},
+  "Loops.Tri.ofBool_ne": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Tri.no.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Tri.and_refines": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Tri.and_left_comm": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Tri.and_eq_yes": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Tests.toJson_distinct":
+  {"uses": ["Loops.Json.keysDistinct_obj", "Loops.Op.toJson_distinct"],
+   "module": "Laws.Parse"},
+  "Loops.Sum.repeats":
+  {"uses": ["Loops.Sum.batch", "Loops.Sum.fold_eq"], "module": "Laws.Numeric"},
+  "Loops.Sum.perm": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Sum.fold_eq": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Sum.batch": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Sum.acc_fold": {"uses": [], "module": "Laws.Families"},
+  "Loops.Stored.mk.sizeOf_spec": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Stored.mk.injEq":
+  {"uses": ["Loops.Stored.mk.inj"], "module": "Loops.Stored"},
+  "Loops.Stored.mk.inj": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Stamp.ok": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Stamp.mk.sizeOf_spec": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Stamp.mk.injEq":
+  {"uses": ["Loops.Stamp.mk.inj"], "module": "Loops.Occurred"},
+  "Loops.Stamp.mk.inj": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Spec.view_state":
+  {"uses":
+   ["Loops.Distinct.addressed",
+    "Loops.admit_distinct",
+    "Loops.admit_view",
+    "Loops.stateIn_view",
+    "Loops.thingsOf_view"],
+   "module": "Laws.Spec"},
+  "Loops.Spec.toJson_distinct":
+  {"uses":
+   ["Loops.Json.keysDistinct_arr",
+    "Loops.Json.keysDistinct_obj",
+    "Loops.Slot.toJson_distinct",
+    "Loops.Source.toJson_distinct"],
+   "module": "Laws.Parse"},
+  "Loops.Spec.takes_view":
+  {"uses": ["Loops.Source.takes_view"], "module": "Laws.Spec"},
+  "Loops.Spec.set_decides":
+  {"uses":
+   ["Loops.Slot.set_decides", "Loops.admit_distinct", "Loops.admit_same"],
+   "module": "Laws.Spec"},
+  "Loops.Spec.select_view":
+  {"uses": ["Loops.Spec.takes_view"], "module": "Laws.Spec"},
+  "Loops.Spec.reparse":
+  {"uses": ["Loops.Spec.ofJson_fits", "Loops.Spec.ofJson_toJson"],
+   "module": "Laws.Parse"},
+  "Loops.Spec.parsed_iff":
+  {"uses": ["Loops.Spec.ofJson_fits", "Loops.Spec.ofJson_toJson"],
+   "module": "Laws.Parse"},
+  "Loops.Spec.ofObject_toJson":
+  {"uses":
+   ["Loops.mapM_map_ok", "Loops.parseSlot_toJson", "Loops.parseSource_toJson"],
+   "module": "Laws.Parse"},
+  "Loops.Spec.ofJson_toJson":
+  {"uses": ["Loops.Spec.ofObject_toJson", "Loops.Spec.toJson_distinct"],
+   "module": "Laws.Parse"},
+  "Loops.Spec.ofJson_repeat":
+  {"uses": ["Loops.Json.repeatAt_none"], "module": "Laws.Parse"},
+  "Loops.Spec.ofJson_fits":
+  {"uses":
+   ["Loops.Except.bind_eq_ok",
+    "Loops.Except.pure_eq_ok",
+    "Loops.Json.keysDistinct_obj",
+    "Loops.lookup_distinct",
+    "Loops.mapM_ok_map",
+    "Loops.mapM_ok_mem",
+    "Loops.mapM_ok_ne_nil",
+    "Loops.parseSlot_fits",
+    "Loops.parseSource_fits",
+    "Loops.refuse_ne_ok"],
+   "module": "Laws.Parse"},
+  "Loops.Spec.mk.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Spec.mk.injEq":
+  {"uses": ["Loops.Spec.mk.inj"], "module": "Loops.Spec"},
+  "Loops.Spec.mk.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Span.ok": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Span.mk.sizeOf_spec": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Span.mk.injEq":
+  {"uses": ["Loops.Span.mk.inj"], "module": "Loops.Occurred"},
+  "Loops.Span.mk.inj": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Span.mk.congr_simp": {"uses": [], "module": "Laws.Time"},
+  "Loops.Span.ext": {"uses": [], "module": "Laws.Time"},
+  "Loops.Span.before_trans":
+  {"uses": ["Loops.stopBefore_trans"], "module": "Laws.Time"},
+  "Loops.Span.before_total":
+  {"uses": ["Loops.Span.ext", "Loops.stopBefore_trichotomy"],
+   "module": "Laws.Time"},
+  "Loops.Span.before_irrefl":
+  {"uses": ["Loops.stopBefore_irrefl"], "module": "Laws.Time"},
+  "Loops.Source.toJson_distinct":
+  {"uses": ["Loops.Json.keysDistinct_arr", "Loops.Json.keysDistinct_obj"],
+   "module": "Laws.Parse"},
+  "Loops.Source.takes_view":
+  {"uses":
+   ["Loops.SameEnvelope.kind", "Loops.View.envelope", "Loops.isAbout_view"],
+   "module": "Laws.Spec"},
+  "Loops.Source.takes_about": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Source.mk.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Source.mk.injEq":
+  {"uses": ["Loops.Source.mk.inj"], "module": "Loops.Spec"},
+  "Loops.Source.mk.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.things.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.things.injEq":
+  {"uses": ["Loops.SlotValue.things.inj"], "module": "Loops.Spec"},
+  "Loops.SlotValue.things.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.opt.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.opt.injEq":
+  {"uses": ["Loops.SlotValue.opt.inj"], "module": "Loops.Spec"},
+  "Loops.SlotValue.opt.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.nat.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.nat.injEq":
+  {"uses": ["Loops.SlotValue.nat.inj"], "module": "Loops.Spec"},
+  "Loops.SlotValue.nat.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.int.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.int.injEq":
+  {"uses": ["Loops.SlotValue.int.inj"], "module": "Loops.Spec"},
+  "Loops.SlotValue.int.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.heads.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.SlotValue.heads.injEq":
+  {"uses": ["Loops.SlotValue.heads.inj"], "module": "Loops.Spec"},
+  "Loops.SlotValue.heads.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Slot.toJson_distinct":
+  {"uses": ["Loops.Json.keysDistinct_obj", "Loops.Tests.toJson_distinct"],
+   "module": "Laws.Parse"},
+  "Loops.Slot.set_decides":
+  {"uses":
+   ["Loops.Acc.select_set_decides",
+    "Loops.Distinct.addressed",
+    "Loops.collectOf_set_decides",
+    "Loops.latestOf_set_decides"],
+   "module": "Laws.Spec"},
+  "Loops.Slot.mk.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Slot.mk.injEq":
+  {"uses": ["Loops.Slot.mk.inj"], "module": "Loops.Spec"},
+  "Loops.Slot.mk.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Shown.withheld.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.Shown.ofNat_ctorIdx": {"uses": [], "module": "Loops.Record"},
+  "Loops.Shown.here.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.Shown.erased.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.under": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.trans":
+  {"uses":
+   ["Loops.SameEnvelope.about",
+    "Loops.SameEnvelope.emitted",
+    "Loops.SameEnvelope.erases",
+    "Loops.SameEnvelope.id",
+    "Loops.SameEnvelope.kind",
+    "Loops.SameEnvelope.observer",
+    "Loops.SameEnvelope.occurred",
+    "Loops.SameEnvelope.prev",
+    "Loops.SameEnvelope.under"],
+   "module": "Laws.Families"},
+  "Loops.SameEnvelope.symm":
+  {"uses":
+   ["Loops.SameEnvelope.about",
+    "Loops.SameEnvelope.emitted",
+    "Loops.SameEnvelope.erases",
+    "Loops.SameEnvelope.id",
+    "Loops.SameEnvelope.kind",
+    "Loops.SameEnvelope.observer",
+    "Loops.SameEnvelope.occurred",
+    "Loops.SameEnvelope.prev",
+    "Loops.SameEnvelope.under"],
+   "module": "Laws.Families"},
+  "Loops.SameEnvelope.refl": {"uses": [], "module": "Laws.Families"},
+  "Loops.SameEnvelope.prev": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.occurred": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.observer": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.kind": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.id": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.erases": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.emitted": {"uses": [], "module": "Loops.Record"},
+  "Loops.SameEnvelope.about": {"uses": [], "module": "Loops.Record"},
+  "Loops.Result.mk.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Result.mk.injEq":
+  {"uses": ["Loops.Result.mk.inj"], "module": "Loops.Families"},
+  "Loops.Result.mk.inj": {"uses": [], "module": "Loops.Families"},
+  "Loops.Refusal.mk.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Refusal.mk.injEq":
+  {"uses": ["Loops.Refusal.mk.inj"], "module": "Loops.Spec"},
+  "Loops.Refusal.mk.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Record.mk.sizeOf_spec": {"uses": [], "module": "Loops.Record"},
+  "Loops.Record.mk.injEq":
+  {"uses": ["Loops.Record.mk.inj"], "module": "Loops.Record"},
+  "Loops.Record.mk.inj": {"uses": [], "module": "Loops.Record"},
+  "Loops.OverHeads.set_decides":
+  {"uses": ["Loops.LatestBy.set_decides"], "module": "Laws.Families"},
+  "Loops.OverHeads.late":
+  {"uses": ["Loops.LatestBy.batch", "Loops.OverHeads.set_decides"],
+   "module": "Laws.Families"},
+  "Loops.Option.orElse_eq_none": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Op.toJson_distinct":
+  {"uses": ["Loops.Arg.toJson_distinct"], "module": "Laws.Parse"},
+  "Loops.Op.time_arg_meaning": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Op.present.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.ordered_like_only": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Op.not_is": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Op.not.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.not.injEq": {"uses": ["Loops.Op.not.inj"], "module": "Loops.Spec"},
+  "Loops.Op.not.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.is.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.is.injEq": {"uses": ["Loops.Op.is.inj"], "module": "Loops.Spec"},
+  "Loops.Op.is.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.below.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.below.injEq":
+  {"uses": ["Loops.Op.below.inj"], "module": "Loops.Spec"},
+  "Loops.Op.below.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.atLeast_below_time": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Op.atLeast_below": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Op.atLeast.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.atLeast.injEq":
+  {"uses": ["Loops.Op.atLeast.inj"], "module": "Loops.Spec"},
+  "Loops.Op.atLeast.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Op.absent_present": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Op.absent.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Newer.trans":
+  {"uses": ["Loops.Span.before_trans"], "module": "Laws.Order"},
+  "Loops.Newer.total":
+  {"uses": ["Loops.Span.before_total"], "module": "Laws.Order"},
+  "Loops.Newer.irrefl":
+  {"uses": ["Loops.Span.before_irrefl"], "module": "Laws.Order"},
+  "Loops.Newer.congr": {"uses": [], "module": "Laws.Order"},
+  "Loops.Newer.asymm":
+  {"uses": ["Loops.Newer.irrefl", "Loops.Newer.trans"], "module": "Laws.Order"},
+  "Loops.Min.set_decides":
+  {"uses": ["Loops.Max.set_decides", "Loops.Min.neg_max"],
+   "module": "Laws.Numeric"},
+  "Loops.Min.neg_max": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Min.batch": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Min.acc_fold": {"uses": [], "module": "Laws.Families"},
+  "Loops.Meaning.unique":
+  {"uses":
+   ["Loops.Meaning.given", "Loops.Meaning.only", "Loops.substEnv_congr"],
+   "module": "Laws.Batch"},
+  "Loops.Meaning.only": {"uses": [], "module": "Loops.Batch"},
+  "Loops.Meaning.given": {"uses": [], "module": "Loops.Batch"},
+  "Loops.Max.set_decides":
+  {"uses": ["Loops.Max.fold_eq"], "module": "Laws.Numeric"},
+  "Loops.Max.fold_some": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Max.fold_eq":
+  {"uses": ["Loops.Max.fold_some"], "module": "Laws.Numeric"},
+  "Loops.Max.cannot_follow_prev": {"uses": [], "module": "Laws.Families"},
+  "Loops.Max.batch": {"uses": [], "module": "Laws.Numeric"},
+  "Loops.Max.acc_fold": {"uses": [], "module": "Laws.Families"},
+  "Loops.Lens.unescape_keeps": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.unescape_escape": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.put_get_text":
+  {"uses": ["Loops.Lens.put_get"], "module": "Laws.Lens"},
+  "Loops.Lens.put_get":
+  {"uses": ["Loops.Lens.apply_diff", "Loops.Lens.map_pick"],
+   "module": "Laws.Lens"},
+  "Loops.Lens.parse_render_go":
+  {"uses": ["Loops.Lens.parse_body"], "module": "Laws.Lens"},
+  "Loops.Lens.parse_render":
+  {"uses": ["Loops.Lens.parse_render_go"], "module": "Laws.Lens"},
+  "Loops.Lens.parse_body":
+  {"uses":
+   ["Loops.Lens.escape_ne_fence",
+    "Loops.Lens.escape_take",
+    "Loops.Lens.unescape_escape"],
+   "module": "Laws.Lens"},
+  "Loops.Lens.parseGo.eq_def": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.nothing_dropped": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.normalize_idem":
+  {"uses": ["Loops.Lens.parse_render"], "module": "Laws.Lens"},
+  "Loops.Lens.no_op":
+  {"uses": ["Loops.Lens.diff_self", "Loops.Lens.parse_render"],
+   "module": "Laws.Lens"},
+  "Loops.Lens.map_pick":
+  {"uses": ["Loops.Lens.lookup_cons_ne"], "module": "Laws.Lens"},
+  "Loops.Lens.lookup_of_mem": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.lookup_eq_none": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.lookup_cons_ne": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.lookup.eq_def": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.escaping":
+  {"uses": ["Loops.Lens.parse_render"], "module": "Laws.Lens"},
+  "Loops.Lens.escape_take": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.escape_ne_fence":
+  {"uses": ["Loops.Lens.escape_take"], "module": "Laws.Lens"},
+  "Loops.Lens.diff_self":
+  {"uses": ["Loops.Lens.lookup_of_mem"], "module": "Laws.Lens"},
+  "Loops.Lens.apply_diff":
+  {"uses":
+   ["Loops.Lens.acceptedBody_absent",
+    "Loops.Lens.acceptedBody_append",
+    "Loops.Lens.acceptedBody_edited",
+    "Loops.Lens.lookup_of_mem"],
+   "module": "Laws.Lens"},
+  "Loops.Lens.acceptedBody_edited":
+  {"uses": ["Loops.Lens.lookup_cons_ne", "Loops.Lens.lookup_eq_none"],
+   "module": "Laws.Lens"},
+  "Loops.Lens.acceptedBody_append":
+  {"uses": ["Loops.Lens.acceptedBody.eq_def"], "module": "Laws.Lens"},
+  "Loops.Lens.acceptedBody_absent":
+  {"uses": ["Loops.Lens.acceptedBody.eq_def"], "module": "Laws.Lens"},
+  "Loops.Lens.acceptedBody.eq_def": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.absence_reported": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.absence_not_edit": {"uses": [], "module": "Laws.Lens"},
+  "Loops.Lens.St.top.sizeOf_spec": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.St.inside.sizeOf_spec": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.St.inside.injEq":
+  {"uses": ["Loops.Lens.St.inside.inj"], "module": "Loops.Lens"},
+  "Loops.Lens.St.inside.inj": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Section.mk.sizeOf_spec": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Section.mk.injEq":
+  {"uses": ["Loops.Lens.Section.mk.inj"], "module": "Loops.Lens"},
+  "Loops.Lens.Section.mk.inj": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.unknown.sizeOf_spec":
+  {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.unknown.injEq":
+  {"uses": ["Loops.Lens.Outcome.unknown.inj"], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.unknown.inj": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.accepted.sizeOf_spec":
+  {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.accepted.injEq":
+  {"uses": ["Loops.Lens.Outcome.accepted.inj"], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.accepted.inj": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.absent.sizeOf_spec": {"uses": [], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.absent.injEq":
+  {"uses": ["Loops.Lens.Outcome.absent.inj"], "module": "Loops.Lens"},
+  "Loops.Lens.Outcome.absent.inj": {"uses": [], "module": "Loops.Lens"},
+  "Loops.LatestBy.winner_newer":
+  {"uses":
+   ["Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.Inv.heads_sorted",
+    "Loops.LatestBy.inv_of"],
+   "module": "Laws.Families"},
+  "Loops.LatestBy.view_head_ids":
+  {"uses":
+   ["Loops.LatestBy.view", "Loops.SameEnvelope.id", "Loops.View.envelope"],
+   "module": "Laws.Families"},
+  "Loops.LatestBy.view":
+  {"uses":
+   ["Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.Inv.heads_sorted",
+    "Loops.LatestBy.Inv.named_mem",
+    "Loops.LatestBy.Inv.named_sorted",
+    "Loops.LatestBy.inv_ext",
+    "Loops.LatestBy.inv_of",
+    "Loops.SameEnvelope.id",
+    "Loops.SameEnvelope.prev",
+    "Loops.View.addressed",
+    "Loops.View.envelope",
+    "Loops.View.newer"],
+   "module": "Laws.Families"},
+  "Loops.LatestBy.set_decides":
+  {"uses":
+   ["Loops.LatestBy.inv_empty",
+    "Loops.LatestBy.inv_ext",
+    "Loops.LatestBy.inv_fold"],
+   "module": "Laws.Fold"},
+  "Loops.LatestBy.repeats":
+  {"uses": ["Loops.LatestBy.set_decides"], "module": "Laws.Fold"},
+  "Loops.LatestBy.perm":
+  {"uses": ["Loops.LatestBy.set_decides"], "module": "Laws.Fold"},
+  "Loops.LatestBy.no_false_resurrection":
+  {"uses":
+   ["Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.inv_of",
+    "Loops.LatestBy.view",
+    "Loops.SameEnvelope.id",
+    "Loops.View.envelope"],
+   "module": "Laws.Families"},
+  "Loops.LatestBy.mk.sizeOf_spec": {"uses": [], "module": "Loops.Fold"},
+  "Loops.LatestBy.mk.injEq":
+  {"uses": ["Loops.LatestBy.mk.inj"], "module": "Loops.Fold"},
+  "Loops.LatestBy.mk.inj": {"uses": [], "module": "Loops.Fold"},
+  "Loops.LatestBy.maxHeads_view":
+  {"uses": ["Loops.LatestBy.view"], "module": "Laws.Families"},
+  "Loops.LatestBy.inv_step":
+  {"uses":
+   ["Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.Inv.heads_sorted",
+    "Loops.LatestBy.Inv.named_mem",
+    "Loops.LatestBy.Inv.named_sorted",
+    "Loops.Newer.total",
+    "Loops.mem_insertIds",
+    "Loops.mem_insertRec",
+    "Loops.sorted_insertIds",
+    "Loops.sorted_insertRec"],
+   "module": "Laws.Fold"},
+  "Loops.LatestBy.inv_of":
+  {"uses": ["Loops.LatestBy.inv_empty", "Loops.LatestBy.inv_fold"],
+   "module": "Laws.Families"},
+  "Loops.LatestBy.inv_fold":
+  {"uses": ["Loops.LatestBy.inv_step"], "module": "Laws.Fold"},
+  "Loops.LatestBy.inv_ext":
+  {"uses":
+   ["Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.Inv.heads_sorted",
+    "Loops.LatestBy.Inv.named_mem",
+    "Loops.LatestBy.Inv.named_sorted",
+    "Loops.Newer.asymm",
+    "Loops.Newer.irrefl"],
+   "module": "Laws.Fold"},
+  "Loops.LatestBy.inv_empty": {"uses": [], "module": "Laws.Fold"},
+  "Loops.LatestBy.converge":
+  {"uses": ["Loops.LatestBy.batch", "Loops.LatestBy.perm"],
+   "module": "Laws.Fold"},
+  "Loops.LatestBy.batch": {"uses": [], "module": "Laws.Fold"},
+  "Loops.LatestBy.Inv.named_sorted": {"uses": [], "module": "Laws.Fold"},
+  "Loops.LatestBy.Inv.named_mem": {"uses": [], "module": "Laws.Fold"},
+  "Loops.LatestBy.Inv.heads_sorted": {"uses": [], "module": "Laws.Fold"},
+  "Loops.LatestBy.Inv.heads_mem": {"uses": [], "module": "Laws.Fold"},
+  "Loops.Latest.repeats":
+  {"uses": ["Loops.LatestBy.repeats"], "module": "Laws.Numeric"},
+  "Loops.Latest.perm":
+  {"uses": ["Loops.LatestBy.perm"], "module": "Laws.Numeric"},
+  "Loops.Json.str.sizeOf_spec": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.str.injEq":
+  {"uses": ["Loops.Json.str.inj"], "module": "Loops.Json"},
+  "Loops.Json.str.inj": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.repeatMember_none": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.repeatMember.eq_def":
+  {"uses": ["Loops.Json.brecOn_2.eq"], "module": "Laws.Parse"},
+  "Loops.Json.repeatIn_none": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.repeatIn.eq_def":
+  {"uses": ["Loops.Json.brecOn_1.eq"], "module": "Laws.Parse"},
+  "Loops.Json.repeatAt_none": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.repeatAt.eq_def":
+  {"uses": ["Loops.Json.brecOn.eq"], "module": "Laws.Parse"},
+  "Loops.Json.obj.sizeOf_spec": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.obj.injEq":
+  {"uses": ["Loops.Json.obj.inj"], "module": "Loops.Json"},
+  "Loops.Json.obj.inj": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.null.sizeOf_spec": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.membersDistinct_iff": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.membersDistinct.eq_def":
+  {"uses": ["Loops.Json.brecOn_2.eq"], "module": "Laws.Parse"},
+  "Loops.Json.keysDistinct_str": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.keysDistinct_obj":
+  {"uses": ["Loops.Json.membersDistinct_iff"], "module": "Laws.Parse"},
+  "Loops.Json.keysDistinct_int": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.keysDistinct_bool": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.keysDistinct_arr":
+  {"uses": ["Loops.Json.allDistinct_iff"], "module": "Laws.Parse"},
+  "Loops.Json.keysDistinct.eq_def":
+  {"uses": ["Loops.Json.brecOn.eq"], "module": "Laws.Parse"},
+  "Loops.Json.int.sizeOf_spec": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.int.injEq":
+  {"uses": ["Loops.Json.int.inj"], "module": "Loops.Json"},
+  "Loops.Json.int.inj": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.canonMembers.eq_def":
+  {"uses": ["Loops.Json.brecOn_2.eq"], "module": "Laws.Record"},
+  "Loops.Json.canon.eq_def":
+  {"uses": ["Loops.Json.brecOn.eq"], "module": "Laws.Record"},
+  "Loops.Json.brecOn_3.eq": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.brecOn_2.eq": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.brecOn_1.eq": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.brecOn.eq": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.bool.sizeOf_spec": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.bool.injEq":
+  {"uses": ["Loops.Json.bool.inj"], "module": "Loops.Json"},
+  "Loops.Json.bool.inj": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.arr.sizeOf_spec": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.arr.injEq":
+  {"uses": ["Loops.Json.arr.inj"], "module": "Loops.Json"},
+  "Loops.Json.arr.inj": {"uses": [], "module": "Loops.Json"},
+  "Loops.Json.allDistinct_iff": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Json.allDistinct.eq_def":
+  {"uses": ["Loops.Json.brecOn_1.eq"], "module": "Laws.Parse"},
+  "Loops.Item.val.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Item.val.injEq":
+  {"uses": ["Loops.Item.val.inj"], "module": "Loops.Spec"},
+  "Loops.Item.val.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Item.time.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Item.time.injEq":
+  {"uses": ["Loops.Item.time.inj"], "module": "Loops.Spec"},
+  "Loops.Item.time.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.sum.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.sum.injEq":
+  {"uses": ["Loops.FoldType.sum.inj"], "module": "Loops.Spec"},
+  "Loops.FoldType.sum.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.min.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.min.injEq":
+  {"uses": ["Loops.FoldType.min.inj"], "module": "Loops.Spec"},
+  "Loops.FoldType.min.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.max.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.max.injEq":
+  {"uses": ["Loops.FoldType.max.inj"], "module": "Loops.Spec"},
+  "Loops.FoldType.max.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.latestBy.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.count.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.collect.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FoldType.collect.injEq":
+  {"uses": ["Loops.FoldType.collect.inj"], "module": "Loops.Spec"},
+  "Loops.FoldType.collect.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FieldType.time.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FieldType.text.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FieldType.refs.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FieldType.payload.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FieldType.ofNat_ctorIdx": {"uses": [], "module": "Loops.Spec"},
+  "Loops.FieldType.ids.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Field.payload.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Field.payload.injEq":
+  {"uses": ["Loops.Field.payload.inj"], "module": "Loops.Spec"},
+  "Loops.Field.payload.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Field.ofName_some": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Field.ofName_name": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Field.env.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Field.env.injEq":
+  {"uses": ["Loops.Field.env.inj"], "module": "Loops.Spec"},
+  "Loops.Field.env.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Except.pure_eq_ok": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Except.map_eq_ok": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Except.bind_eq_ok": {"uses": [], "module": "Laws.Parse"},
+  "Loops.EnvField.under.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.prev.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.ofNat_ctorIdx": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.occurred.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.observer.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.kind.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.erases.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.emitted.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.EnvField.about.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Env.problem_codes": {"uses": [], "module": "Laws.Write"},
+  "Loops.Env.mk.sizeOf_spec": {"uses": [], "module": "Loops.Envelope"},
+  "Loops.Env.mk.injEq":
+  {"uses": ["Loops.Env.mk.inj"], "module": "Loops.Envelope"},
+  "Loops.Env.mk.inj": {"uses": [], "module": "Loops.Envelope"},
+  "Loops.Draft.mk.sizeOf_spec": {"uses": [], "module": "Loops.Batch"},
+  "Loops.Draft.mk.injEq":
+  {"uses": ["Loops.Draft.mk.inj"], "module": "Loops.Batch"},
+  "Loops.Draft.mk.inj": {"uses": [], "module": "Loops.Batch"},
+  "Loops.Distinct.nodup": {"uses": [], "module": "Laws.Families"},
+  "Loops.Distinct.filter": {"uses": [], "module": "Laws.Things"},
+  "Loops.Distinct.addressed": {"uses": [], "module": "Laws.Families"},
+  "Loops.Count.repeats":
+  {"uses": ["Loops.Count.fold_eq"], "module": "Laws.Fold"},
+  "Loops.Count.perm": {"uses": ["Loops.Count.fold_eq"], "module": "Laws.Fold"},
+  "Loops.Count.fold_eq": {"uses": [], "module": "Laws.Fold"},
+  "Loops.Count.batch": {"uses": [], "module": "Laws.Fold"},
+  "Loops.Count.acc_fold": {"uses": [], "module": "Laws.Families"},
+  "Loops.Cond.time_meaning": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.text_is":
+  {"uses": ["Loops.Val.str.injEq"], "module": "Laws.Spec"},
+  "Loops.Cond.set_present": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.occurred_missing": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.occurred_is": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.occurred_below": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.occurred_atLeast": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.mk.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Cond.mk.injEq":
+  {"uses": ["Loops.Cond.mk.inj"], "module": "Loops.Spec"},
+  "Loops.Cond.mk.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Cond.id_is": {"uses": ["Loops.Cond.about_is"], "module": "Laws.Spec"},
+  "Loops.Cond.eval_view":
+  {"uses":
+   ["Loops.SameEnvelope.about",
+    "Loops.SameEnvelope.emitted",
+    "Loops.SameEnvelope.erases",
+    "Loops.SameEnvelope.kind",
+    "Loops.SameEnvelope.observer",
+    "Loops.SameEnvelope.occurred",
+    "Loops.SameEnvelope.prev",
+    "Loops.SameEnvelope.under",
+    "Loops.View.envelope",
+    "Loops.View.hides"],
+   "module": "Laws.Spec"},
+  "Loops.Cond.eval_here":
+  {"uses": ["Loops.Tri.ofBool_ne"], "module": "Laws.Spec"},
+  "Loops.Cond.eval_envelope":
+  {"uses": ["Loops.Tri.ofBool_ne"], "module": "Laws.Spec"},
+  "Loops.Cond.emitted_is": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.emitted_below": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.emitted_atLeast": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Cond.all_view":
+  {"uses": ["Loops.Cond.eval_view", "Loops.Tri.and_refines"],
+   "module": "Laws.Spec"},
+  "Loops.Cond.all_perm":
+  {"uses": ["Loops.Tri.and_left_comm"], "module": "Laws.Spec"},
+  "Loops.Cond.all_eq_yes":
+  {"uses": ["Loops.Tri.and_eq_yes"], "module": "Laws.Spec"},
+  "Loops.Cond.all_envelope_view":
+  {"uses": ["Loops.Cond.eval_envelope", "Loops.Cond.eval_view"],
+   "module": "Laws.Spec"},
+  "Loops.Cond.about_is":
+  {"uses": ["Loops.Val.str.injEq"], "module": "Laws.Spec"},
+  "Loops.Claim.ok": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Claim.of?_text": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Claim.mk.sizeOf_spec": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Claim.mk.injEq":
+  {"uses": ["Loops.Claim.mk.inj"], "module": "Loops.Occurred"},
+  "Loops.Claim.mk.inj": {"uses": [], "module": "Loops.Occurred"},
+  "Loops.Claim.mk.congr_simp": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Body.opening.sizeOf_spec": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Body.opening.injEq":
+  {"uses": ["Loops.Body.opening.inj"], "module": "Loops.Stored"},
+  "Loops.Body.opening.inj": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Body.erased.sizeOf_spec": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Body.erased.injEq":
+  {"uses": ["Loops.Body.erased.inj"], "module": "Loops.Stored"},
+  "Loops.Body.erased.inj": {"uses": [], "module": "Loops.Stored"},
+  "Loops.Arg.val.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Arg.val.injEq":
+  {"uses": ["Loops.Arg.val.inj"], "module": "Loops.Spec"},
+  "Loops.Arg.val.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Arg.toJson_distinct": {"uses": [], "module": "Laws.Parse"},
+  "Loops.Arg.time.sizeOf_spec": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Arg.time.injEq":
+  {"uses": ["Loops.Arg.time.inj"], "module": "Loops.Spec"},
+  "Loops.Arg.time.inj": {"uses": [], "module": "Loops.Spec"},
+  "Loops.Addressed.unlinked": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Addressed.sub": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Addressed.filter": {"uses": [], "module": "Laws.Spec"},
+  "Loops.Acc.set_decides":
+  {"uses": ["Loops.Acc.perm", "Loops.perm_of_same"], "module": "Laws.Families"},
+  "Loops.Acc.select_set_decides":
+  {"uses": ["Loops.Acc.perm", "Loops.perm_of_same"], "module": "Laws.Families"},
+  "Loops.Acc.select_here":
+  {"uses": ["Loops.Acc.select_full", "Loops.Where.eval_here"],
+   "module": "Laws.Families"},
+  "Loops.Acc.select_full":
+  {"uses": ["Loops.Result.mk.injEq"], "module": "Laws.Families"},
+  "Loops.Acc.perm": {"uses": ["Loops.Acc.comm"], "module": "Laws.Families"},
+  "Loops.Acc.mk.sizeOf_spec": {"uses": [], "module": "Loops.Families"},
+  "Loops.Acc.mk.injEq":
+  {"uses": ["Loops.Acc.mk.inj"], "module": "Loops.Families"},
+  "Loops.Acc.mk.inj": {"uses": [], "module": "Loops.Families"},
+  "Loops.Acc.late":
+  {"uses": ["Loops.Acc.set_decides"], "module": "Laws.Families"},
+  "Loops.Acc.comm": {"uses": [], "module": "Loops.Families"},
+  "List.lookup.eq_def": {"uses": [], "module": "Laws.Parse"}}}

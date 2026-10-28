@@ -64,8 +64,11 @@ h3{font-size:15.5px}
 /* top */
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--ground) 86%,transparent);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px)}
 .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:12px}
-.mark{font-weight:600;font-size:14px;white-space:nowrap}
+.mark{font-weight:600;font-size:14px;white-space:nowrap;display:flex;gap:10px;align-items:baseline}
 .mark a{text-decoration:none}
+.mark .page{font-weight:500;color:var(--muted)}
+.mark .page[aria-current="page"]{color:var(--ink)}
+.mark .page:hover{color:var(--ink)}
 .seg{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-right:-6px}
 .seg::-webkit-scrollbar{display:none}
 .seg a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;padding:5px 10px;border-radius:8px;transition:background .2s,color .2s}
@@ -94,21 +97,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 
 .sheet{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-3),0 0 0 1px var(--hair);padding:22px}
 
-/* the sentence */
-.sentence-sheet{display:grid;gap:18px}
-.sentence{font-size:19px;line-height:2.5;letter-spacing:-.005em}
-.sentence .w{position:relative;display:inline;padding:3px 2px;border-radius:6px;cursor:default;transition:background .18s}
-.sentence .w code{white-space:nowrap;font-size:.8em;background:var(--sunk);padding:2px 5px;border-radius:5px}
-.sentence .role{position:absolute;left:2px;top:-1.15em;font-family:var(--mono);font-size:10.5px;line-height:1;color:var(--faint);white-space:nowrap;pointer-events:none;transition:color .18s}
-.sentence .w.hot{background:var(--sunk)}
-.sentence .w.hot .role{color:var(--ink)}
-.sentence .w.body{color:var(--muted)}
-.env{margin:0;padding:14px 16px;border-radius:10px;background:var(--ground);line-height:1.7;overflow-x:auto;font-size:12.5px;color:var(--muted)}
-.env span{display:inline-block;border-radius:4px;padding:0 3px;margin:0 -3px;transition:background .18s,color .18s}
-.env span.hot{background:var(--sheet);color:var(--ink);box-shadow:0 0 0 1px var(--hair)}
-.caption{font-size:13px;color:var(--muted)}
-
-/* nouns */
+/* cards: one concept each */
 .cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 .card{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:16px 16px 14px;display:grid;gap:10px;align-content:start;transition:box-shadow .25s,transform .25s}
 .card:hover{box-shadow:var(--lift-3),0 0 0 1px var(--hair)}
@@ -125,10 +114,6 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .laws code{font-size:11px;color:var(--muted);background:var(--ground);padding:2px 6px;border-radius:5px;transition:color .15s}
 .laws a:hover code{color:var(--ink)}
 
-/* verbs */
-.stack{display:grid;gap:12px;align-content:start}
-.stack h3{margin-top:14px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
-.stack h3:first-child{margin-top:0}
 .rows{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair)}
 .row{display:grid;grid-template-columns:130px minmax(0,1fr);gap:4px 16px;padding:12px 16px;border-top:1px solid var(--hair)}
 .row:first-child{border-top:0}
@@ -139,6 +124,29 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .row.is-settled .row-k b{color:var(--muted)}
 .made{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 @media (max-width:560px){.row{grid-template-columns:1fr}}
+.foot{padding-block:64px 48px;font-size:12.5px;color:var(--faint)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:560px){.top-row{flex-wrap:wrap;row-gap:4px;padding-block:10px 8px}.seg{width:100%;margin-right:0;margin-left:-10px}}
+
+/* The grammar page, on the register in design/register.css. */
+/* the sentence */
+.sentence-sheet{display:grid;gap:18px}
+.sentence{font-size:19px;line-height:2.5;letter-spacing:-.005em}
+.sentence .w{position:relative;display:inline;padding:3px 2px;border-radius:6px;cursor:default;transition:background .18s}
+.sentence .w code{white-space:nowrap;font-size:.8em;background:var(--sunk);padding:2px 5px;border-radius:5px}
+.sentence .role{position:absolute;left:2px;top:-1.15em;font-family:var(--mono);font-size:10.5px;line-height:1;color:var(--faint);white-space:nowrap;pointer-events:none;transition:color .18s}
+.sentence .w.hot{background:var(--sunk)}
+.sentence .w.hot .role{color:var(--ink)}
+.sentence .w.body{color:var(--muted)}
+.env{margin:0;padding:14px 16px;border-radius:10px;background:var(--ground);line-height:1.7;overflow-x:auto;font-size:12.5px;color:var(--muted)}
+.env span{display:inline-block;border-radius:4px;padding:0 3px;margin:0 -3px;transition:background .18s,color .18s}
+.env span.hot{background:var(--sheet);color:var(--ink);box-shadow:0 0 0 1px var(--hair)}
+.caption{font-size:13px;color:var(--muted)}
+
+/* verbs */
+.stack{display:grid;gap:12px;align-content:start}
+.stack h3{margin-top:14px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+.stack h3:first-child{margin-top:0}
 #provenance .row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
 @media (max-width:560px){#provenance .row{grid-template-columns:1fr}}
 
@@ -249,11 +257,10 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .matrix .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ink);transition:transform .2s}
 .matrix td.on:hover .dot,.matrix td.on.hot .dot{transform:scale(1.5)}
 .matrix td.col-hot,.matrix th.col-hot{background:color-mix(in srgb,var(--ground) 60%,var(--sheet))}
-.matrix .cell-t,.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.matrix .cell-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .matrix-note{font-size:13.5px;color:var(--muted);min-height:1.5em}
 .matrix-note b{color:var(--ink);font-family:var(--mono);font-weight:500}
 
-.foot{padding-block:64px 48px;font-size:12.5px;color:var(--faint)}
 
 /* Narrow screens: the steps become a row above the stage, and the step's words follow it,
    so a tap and its result are on screen together. */
@@ -272,7 +279,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <body>
 <header class="top">
   <div class="wrap top-row">
-    <p class="mark"><a href="../rethink/">Strange Loops</a></p>
+    <p class="mark"><a href="../rethink/">Strange Loops</a><a class="page" href="../grammar/" aria-current="page">Grammar</a><a class="page" href="../laws/">Laws</a></p>
     <nav class="seg" aria-label="Sections">
       <a href="#nouns">Nouns</a><a href="#verbs">Verbs</a><a href="#layers">Layers</a><a href="#walk">Walk</a><a href="#matrix">Matrix</a>
     </nav>
@@ -336,7 +343,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>An envelope the core reads, a payload it never interprets, a signature. Named by <code>r:</code> and a hash of the envelope and the payload's commitment.</dd>
         <dt>Principle</dt><dd>Change any field and it is another record, with another id. Erase its payload and the id, the signature and every record citing it still hold.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>record.erasure</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>record.sets</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>write.checked</code></a></p>
+      <p class="laws"><a href="../laws/#law-record-erasure"><code>record.erasure</code></a> <a href="../laws/#law-record-sets"><code>record.sets</code></a> <a href="../laws/#law-write-checked"><code>write.checked</code></a></p>
     </article>
     <article class="card" id="noun-observer">
       <div class="card-h"><h3>observer</h3><span class="chip proved">proved</span></div>
@@ -346,7 +353,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>Principle</dt><dd>Nothing a record says is true; it is said, by its observer. Two observers disagreeing is two records, both kept.</dd>
       </dl>
       <p class="pending">Keys checked at read, and standing, arrive in step 3.</p>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>record.refuse</code></a></p>
+      <p class="laws"><a href="../laws/#law-record-refuse"><code>record.refuse</code></a></p>
     </article>
     <article class="card" id="noun-thing">
       <div class="card-h"><h3>thing</h3><span class="chip proved">proved</span></div>
@@ -355,7 +362,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>A typed reference, <code>prefix:value</code>, in a record's <code>about</code>. A record about nothing anchors a thing named by its own id.</dd>
         <dt>Principle</dt><dd>Revise a thing's record and the revision is its head. Revise one record twice and the thing has two heads, a fork, until a record names both.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>thing.local</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>admit.no-cross</code></a></p>
+      <p class="laws"><a href="../laws/#law-thing-local"><code>thing.local</code></a> <a href="../laws/#law-admit-no-cross"><code>admit.no-cross</code></a></p>
     </article>
     <article class="card" id="noun-store">
       <div class="card-h"><h3>store</h3><span class="chip proved">proved</span></div>
@@ -364,7 +371,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>A set of records, kept in places, each record one canonical line.</dd>
         <dt>Principle</dt><dd>A store is a set. Read its places in any order and a reader settles the same records, one per id.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>input.union</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>settle.set</code></a></p>
+      <p class="laws"><a href="../laws/#law-input-union"><code>input.union</code></a> <a href="../laws/#law-settle-set"><code>settle.set</code></a></p>
     </article>
     <article class="card" id="noun-view">
       <div class="card-h"><h3>view</h3><span class="chip proved">proved</span></div>
@@ -373,7 +380,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>What one reader holds: each record with its payload, withheld, or erased. Envelopes are always held.</dd>
         <dt>Principle</dt><dd>A view folds to the same heads as a reader holding everything. What it can't read it counts as unread, never guesses.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>view.no-resurrection</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>result.unread</code></a></p>
+      <p class="laws"><a href="../laws/#law-view-no-resurrection-things"><code>view.no-resurrection</code></a> <a href="../laws/#law-result-unread"><code>result.unread</code></a></p>
     </article>
     <article class="card" id="noun-spec">
       <div class="card-h"><h3>spec</h3><span class="chip proved">proved</span></div>
@@ -382,7 +389,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd><code>vertex</code>, the sources in <code>from</code>, the slots in <code>fold</code>.</dd>
         <dt>Principle</dt><dd>An accepted spec's parsed form parses back to itself. A refused one names the first rule it breaks, and where.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.parse</code></a></p>
+      <p class="laws"><a href="../laws/#law-spec-parse"><code>spec.parse</code></a></p>
     </article>
     <article class="card" id="noun-source">
       <div class="card-h"><h3>source</h3><span class="chip proved">proved</span></div>
@@ -391,7 +398,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>A <code>store</code>, then optionally the <code>kind</code>s and the thing it is <code>about</code>.</dd>
         <dt>Principle</dt><dd>A source takes a record when its kind is listed and it is about the thing. A view selects exactly the same records.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.select</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.from-thing</code></a></p>
+      <p class="laws"><a href="../laws/#law-spec-select"><code>spec.select</code></a> <a href="../laws/#law-spec-from-thing"><code>spec.from-thing</code></a></p>
     </article>
     <article class="card" id="noun-slot">
       <div class="card-h"><h3>slot</h3><span class="chip proved">proved</span></div>
@@ -400,7 +407,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>A name, one fold, and optionally <code>where</code>, <code>follow</code> and <code>limit</code>.</dd>
         <dt>Principle</dt><dd>The same set of records gives every slot of every spec the same value. A slot over heads never brings back a superseded record.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.after-supersession</code></a></p>
+      <p class="laws"><a href="../laws/#law-spec-set"><code>spec.set</code></a> <a href="../laws/#law-spec-after-supersession"><code>spec.after-supersession</code></a></p>
     </article>
     <article class="card" id="noun-fold">
       <div class="card-h"><h3>fold</h3><span class="chip proved">proved</span></div>
@@ -409,7 +416,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>State</dt><dd>One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code> and <code>collect</code>, over heads.</dd>
         <dt>Principle</dt><dd>The set decides. Arrival order, late records and two-way syncs never change the answer.</dd>
       </dl>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>acc.set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>heads.set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>latest-by.converge</code></a></p>
+      <p class="laws"><a href="../laws/#law-acc-set"><code>acc.set</code></a> <a href="../laws/#law-heads-set"><code>heads.set</code></a> <a href="../laws/#law-latest-by-converge"><code>latest-by.converge</code></a></p>
     </article>
     <article class="card" id="noun-vertex">
       <div class="card-h"><h3>vertex</h3><span class="chip proved">proved</span></div>
@@ -419,7 +426,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>Principle</dt><dd>Run it on the same set and it gives the same slots, each with how many records it couldn't read.</dd>
       </dl>
       <p class="pending">Naming a vertex by its spec's hash, and when it ticks, are settled, not built.</p>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>result.unread</code></a></p>
+      <p class="laws"><a href="../laws/#law-spec-set"><code>spec.set</code></a> <a href="../laws/#law-result-unread"><code>result.unread</code></a></p>
     </article>
     <article class="card is-settled" id="noun-tick">
       <div class="card-h"><h3>tick</h3><span class="chip settled">settled</span></div>
@@ -437,7 +444,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>Principle</dt><dd>Parse a render and you get back what was rendered. A dropped section changes nothing: absence is never an edit.</dd>
       </dl>
       <p class="pending">Keyed sections are proved; applying edits as records is settled.</p>
-      <p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>lens.round-trip</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>lens.absence-not-edit</code></a></p>
+      <p class="laws"><a href="../laws/#law-lens-round-trip"><code>lens.round-trip</code></a> <a href="../laws/#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a></p>
     </article>
     <article class="card is-settled" id="noun-grant">
       <div class="card-h"><h3>grant</h3><span class="chip settled">settled</span></div>
@@ -459,27 +466,27 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   <div class="stack">
     <h3>Write</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>emit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write a record: checked, signed, appended. Nothing else enters a store.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>write.checked</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>emit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write a record: checked, signed, appended. Nothing else enters a store.</p><p class="laws"><a href="../laws/#law-write-checked"><code>write.checked</code></a></p></div></div>
       <div class="row is-settled"><div class="row-k"><b>tick</b><span class="chip settled">settled</span></div><div class="row-v"><p>Fix a vertex's result at a boundary, as a value anyone can recompute.</p></div></div>
     </div>
     <h3>Any layer</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>refuse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Say no, with a code from a closed set and the path of what broke the rule. Never guess.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>record.refuse</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>batch.refuse-order</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>refuse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Say no, with a code from a closed set and the path of what broke the rule. Never guess.</p><p class="laws"><a href="../laws/#law-record-refuse"><code>record.refuse</code></a> <a href="../laws/#law-batch-refuse-order"><code>batch.refuse-order</code></a></p></div></div>
     </div>
     <h3>Read</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>settle</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn the forms a reader's places hold into one record per id, payload kept unless erased.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>settle.keeps</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>settle.erased</code></a></p></div></div>
-      <div class="row"><div class="row-k"><b>admit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Refuse records not entitled to their <code>prev</code>. Standing joins it in step 3.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>admit.set</code></a></p></div></div>
-      <div class="row"><div class="row-k"><b>take</b><span class="chip proved">proved</span></div><div class="row-v"><p>A source takes the records its store, kinds and thing choose.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>spec.select</code></a></p></div></div>
-      <div class="row"><div class="row-k"><b>test</b><span class="chip proved">proved</span></div><div class="row-v"><p>A <code>where</code> test answers yes, no, or, on a payload the reader lacks, unknown.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>where.total</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>view.refines</code></a></p></div></div>
-      <div class="row"><div class="row-k"><b>fold</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn what was taken into a slot's value.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>acc.set</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>heads.set</code></a></p></div></div>
-      <div class="row"><div class="row-k"><b>follow</b><span class="chip proved">proved</span></div><div class="row-v"><p>Walk <code>prev</code> within a thing to its heads: what nothing about it replaces.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>latest-by.order</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>thing.local</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>settle</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn the forms a reader's places hold into one record per id, payload kept unless erased.</p><p class="laws"><a href="../laws/#law-settle-keeps"><code>settle.keeps</code></a> <a href="../laws/#law-settle-erased"><code>settle.erased</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>admit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Refuse records not entitled to their <code>prev</code>. Standing joins it in step 3.</p><p class="laws"><a href="../laws/#law-admit-set"><code>admit.set</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>take</b><span class="chip proved">proved</span></div><div class="row-v"><p>A source takes the records its store, kinds and thing choose.</p><p class="laws"><a href="../laws/#law-spec-select"><code>spec.select</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>test</b><span class="chip proved">proved</span></div><div class="row-v"><p>A <code>where</code> test answers yes, no, or, on a payload the reader lacks, unknown.</p><p class="laws"><a href="../laws/#law-where-total"><code>where.total</code></a> <a href="../laws/#law-view-refines-where"><code>view.refines</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>fold</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn what was taken into a slot's value.</p><p class="laws"><a href="../laws/#law-acc-set"><code>acc.set</code></a> <a href="../laws/#law-heads-set"><code>heads.set</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>follow</b><span class="chip proved">proved</span></div><div class="row-v"><p>Walk <code>prev</code> within a thing to its heads: what nothing about it replaces.</p><p class="laws"><a href="../laws/#law-latest-by-order"><code>latest-by.order</code></a> <a href="../laws/#law-thing-local"><code>thing.local</code></a></p></div></div>
     </div>
     <h3>Text</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>render</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write state as text for an audience.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>lens.escaping</code></a></p></div></div>
-      <div class="row"><div class="row-k"><b>parse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Read edited text back, refusing what it can't read.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>lens.round-trip</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>lens.refuse</code></a></p></div></div>
-      <div class="row is-settled"><div class="row-k"><b>apply</b><span class="chip settled">settled</span></div><div class="row-v"><p>Turn the edits a parse found into records, emitted together.</p><p class="laws"><a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/laws.md"><code>lens.put-get</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>render</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write state as text for an audience.</p><p class="laws"><a href="../laws/#law-lens-escaping"><code>lens.escaping</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>parse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Read edited text back, refusing what it can't read.</p><p class="laws"><a href="../laws/#law-lens-round-trip"><code>lens.round-trip</code></a> <a href="../laws/#law-lens-refuse"><code>lens.refuse</code></a></p></div></div>
+      <div class="row is-settled"><div class="row-k"><b>apply</b><span class="chip settled">settled</span></div><div class="row-v"><p>Turn the edits a parse found into records, emitted together.</p><p class="laws"><a href="../laws/#law-lens-put-get"><code>lens.put-get</code></a></p></div></div>
     </div>
     <h3>Constructions</h3>
     <div class="rows">
@@ -619,11 +626,12 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 </main>
 
 <footer class="wrap foot">
-  <p>Built from <code>design/grammar/</code> by <code>node design/build.mjs</code>. Law names link to <code>protocol/laws.md</code>.</p>
+  <p>Built from <code>design/grammar/</code> by <code>node design/build.mjs</code>. Law names link to their place on <a href="../laws/">the laws page</a>.</p>
 </footer>
 
 <script>
 const WALK = {"records":{"A":{"who":"ada","at":"09:00","col":1,"row":2,"body":"Device flow. Client secret: 9f3c…","prev":[]},"B":{"who":"ada","at":"09:10","col":2,"row":1,"body":"Device flow; revisit in Q3.","prev":["A"]},"C":{"who":"bo","at":"09:12","col":2,"row":3,"body":"Use passkeys.","prev":["A"]},"M":{"who":"ada","at":"09:30","col":3,"row":2,"body":"Passkeys; device flow on TVs.","prev":["B","C"]},"E":{"who":"ada","at":"09:40","col":4,"row":2,"body":"Passkeys; device flow on TVs.","prev":["M"],"erases":["A"]},"F":{"who":"bo","at":"10:05","col":5,"row":2,"body":"Passkeys everywhere.","prev":["E"]}},"steps":[{"title":"Emit","text":"Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.","laws":["write.checked"],"shown":["A"],"heads":["A"],"count":1},{"title":"Revise","text":"Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.","laws":["admit.no-cross"],"shown":["A","B"],"heads":["B"],"count":2},{"title":"Fork","text":"Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.","laws":["latest-by.order"],"shown":["A","B","C"],"heads":["C","B"],"count":3},{"title":"Merge","text":"Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.","laws":["heads.set"],"shown":["A","B","C","M"],"heads":["M"],"count":4},{"title":"Erase","text":"A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.","laws":["record.erasure","settle.erased"],"shown":["A","B","C","M","E"],"erased":["A"],"heads":["E"],"count":5},{"title":"Any order","text":"Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.","laws":["latest-by.set","input.union"],"shown":["A","B","C","M","E"],"erased":["A"],"heads":["E"],"count":5,"orders":[["E","C","A","M","B"],["B","M","E","A","C"],["C","A","B","E","M"]]},{"title":"Less in view","text":"Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's value is unread, and the result says so instead of guessing; the count, needing no payload, is still five.","laws":["view.no-resurrection","result.unread"],"reader":"cy","shown":["A","B","C","M","E"],"erased":["A"],"withheld":["E"],"heads":["E"],"count":5},{"title":"Tick","text":"At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet.","laws":[],"settled":true,"shown":["A","B","C","M","E"],"erased":["A"],"heads":["E"],"count":5,"tick":{"covers":["A","B","C","M","E"]}},{"title":"Back to text","text":"A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.","laws":["lens.round-trip","lens.put-get"],"shown":["A","B","C","M","E","F"],"erased":["A"],"heads":["F"],"count":6,"lens":{"before":["::: decision:auth","Passkeys; device flow on TVs.",":::"],"after":["::: decision:auth","Passkeys everywhere.",":::"],"outcome":"accepted <code>decision:auth</code> → emit F, <code>prev: [E]</code>"}}]};
+const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-no-cross","latest-by.order":"law-latest-by-order","heads.set":"law-heads-set","record.erasure":"law-record-erasure","settle.erased":"law-settle-erased","latest-by.set":"law-latest-by-set","input.union":"law-input-union","view.no-resurrection":"law-view-no-resurrection-things","result.unread":"law-result-unread","lens.round-trip":"law-lens-round-trip","lens.put-get":"law-lens-put-get"};
 </script>
 <script>
 // The grammar page's behaviour: the sentence, the layer stack, the walk and the matrix.
@@ -822,7 +830,7 @@ const WALK = {"records":{"A":{"who":"ada","at":"09:00","col":1,"row":2,"body":"D
   }
 
   function words(s) {
-    const laws = s.laws.map((l) => `<code>${l}</code>`).join(" ");
+    const laws = s.laws.map((l) => `<a href="../laws/#${LAW_AT[l]}"><code>${l}</code></a>`).join(" ");
     stepText.innerHTML = `${s.settled ? '<span class="chip settled">settled</span>' : ""}<p>${s.text}</p>` +
       (laws ? `<p class="laws">${laws}</p>` : "") + (s.orders ? '<p class="arrival" id="arrival"></p>' : "");
     animate(stepText, { opacity: [0, 1], transform: ["translateY(4px)", "translateY(0px)"] }, spring(300, 30));

@@ -194,7 +194,7 @@
   }
 
   function words(s) {
-    const laws = s.laws.map((l) => `<code>${l}</code>`).join(" ");
+    const laws = s.laws.map((l) => `<a href="../laws/#${LAW_AT[l]}"><code>${l}</code></a>`).join(" ");
     stepText.innerHTML = `${s.settled ? '<span class="chip settled">settled</span>' : ""}<p>${s.text}</p>` +
       (laws ? `<p class="laws">${laws}</p>` : "") + (s.orders ? '<p class="arrival" id="arrival"></p>' : "");
     animate(stepText, { opacity: [0, 1], transform: ["translateY(4px)", "translateY(0px)"] }, spring(300, 30));
