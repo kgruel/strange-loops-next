@@ -22,7 +22,8 @@
           }
         }
       }
-    }
+    },
+    "spec_text": "{\"vertex\":\"x\",\"from\":[{\"store\":\".\"}],\"fold\":{\"c\":{\"count\":true,\"where\":{\"env.kind\":{\"is\":\"task\",\"is\":\"note\"}}}}}"
   },
   "expect": {
     "refused": "member-duplicate",

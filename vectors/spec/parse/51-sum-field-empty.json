@@ -1,0 +1,25 @@
+{
+  "vector": "51-sum-field-empty",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "sum": ""
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "fold-argument",
+    "path": "fold.c.sum"
+  }
+}

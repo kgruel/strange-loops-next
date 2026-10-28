@@ -1,0 +1,25 @@
+{
+  "vector": "50-slot-name-empty",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "fold-invalid",
+    "path": "fold."
+  }
+}

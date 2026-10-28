@@ -209,8 +209,9 @@ def jSum (r : Result Int) : J := .obj [("value", .int r.value), ("unread", .num 
 def jCount (r : Result Nat) : J := .obj [("value", .num r.value), ("unread", .num r.unread)]
 
 def selectVector (c : SelectCase) : Except String J := do
+  if !c.test.keysDistinct then throw s!"fold/select/{c.name}: its test repeats a key"
   let cs ← match parseWhere "where" c.test with
-    | .ok cs => pure cs
+    | .ok ts => pure ts.conds
     | .error r => throw s!"fold/select/{c.name}: its test is refused ({r.code})"
   for r in c.records do
     if Cond.all cs r != c.w.eval r then

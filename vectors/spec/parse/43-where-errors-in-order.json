@@ -15,11 +15,11 @@
         "c": {
           "count": true,
           "where": {
-            "env.id": {
-              "present": true
-            },
             "x": {
               "matches": "."
+            },
+            "env.id": {
+              "present": true
             }
           }
         }
@@ -28,6 +28,6 @@
   },
   "expect": {
     "refused": "where-invalid",
-    "path": "fold.c.where.env.id"
+    "path": "fold.c.where.x"
   }
 }

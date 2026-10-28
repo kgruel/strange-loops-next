@@ -67,14 +67,14 @@ field as a number.
 
 ## `spec/parse`
 
-`input.spec` is a vertex's spec as JSON. `expect` is either `parsed`, the
-spec in its parsed form (which parses back to itself), or `refused` with the
-`path` of the offending key, per `protocol/laws.md`. Refusals are checked in
-order: no key repeated in any object (`member-duplicate`, at the repeat), an
-object, known keys, `vertex`, `from` (present and non-empty), then each slot
-as `protocol/laws.md` orders it. In `where`, `env.<field>` names an envelope
-field and any other name a payload field; an argument must be what layer 0
-accepts in its field; a time keeps its spelling in the parsed form.
+`input.spec` is a vertex's spec as JSON. A spec that repeats a key also
+comes as `input.spec_text`, the spec as written: read that one, since a JSON
+parser may keep only one of the repeats. `expect` is either `parsed`, the
+spec in its parsed form (which parses back to itself), or `refused` with a
+code and the `path` of what broke the rule. `protocol/spec.md` is the
+grammar, the parsed form and the order the refusals are checked in; several
+vectors break more than one rule, so that only that order gives the code
+and path expected.
 
 ## `spec/run`
 

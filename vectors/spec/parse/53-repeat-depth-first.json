@@ -1,0 +1,28 @@
+{
+  "vector": "53-repeat-depth-first",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "fold": {
+        "c": {
+          "count": true,
+          "count": true
+        }
+      },
+      "vertex": "y",
+      "from": [
+        {
+          "store": "."
+        }
+      ]
+    },
+    "spec_text": "{\"vertex\":\"x\",\"fold\":{\"c\":{\"count\":true,\"count\":true}},\"vertex\":\"y\",\"from\":[{\"store\":\".\"}]}"
+  },
+  "expect": {
+    "refused": "member-duplicate",
+    "path": "fold.c.count"
+  }
+}

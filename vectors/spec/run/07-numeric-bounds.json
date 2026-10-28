@@ -38,6 +38,9 @@
             }
           }
         },
+        "total": {
+          "sum": "est"
+        },
         "unblocked": {
           "count": true,
           "where": {
@@ -763,6 +766,10 @@
     "not-three": {
       "value": 4,
       "unread": 1
+    },
+    "total": {
+      "value": 23,
+      "unread": 2
     },
     "unblocked": {
       "value": 5,

@@ -4,6 +4,7 @@ import Laws.Record
 import Laws.Numeric
 import Laws.Families
 import Laws.Spec
+import Laws.Parse
 import Laws.Batch
 import Laws.Write
 import Laws.Time

@@ -63,6 +63,8 @@ def parseCases : List (String × Json) := [
       ("env.emitted", o [("at-least", s "2026-10-01T00:00:00Z")]),
       ("env.occurred", o [("at-least", s "2026-10"), ("below", s "2026-11-01T01:00:00+01:00"),
         ("not", s "2026-10-01/2026-10-31")])])])])]),
+  ("05-no-fold", o [("vertex", s "x"), ("from", a [o [("store", s ".")]])]),
+  ("06-from-about-anchor", fromOf (o [("about", s (idText 0x71)), ("store", s "."), ("kind", a [s "note"])])),
   ("10-not-object", a [s "vertex"]),
   ("11-unknown-key", o [("vertex", s "x"), ("query", s "select *")]),
   ("12-vertex-missing", o [("fold", o [])]),
@@ -104,12 +106,36 @@ def parseCases : List (String × Json) := [
   ("41-repeated-key", o [("vertex", s "x"), ("vertex", s "y"), ("from", a [o [("store", s ".")]])]),
   -- a slot is checked in order: keys, one fold type, follow, limit, the
   -- fold's argument, then where, its fields in the order written
-  ("42-slot-errors-in-order", slotOf (o [("count", .bool false), ("follow", s "next"),
+  ("42-slot-errors-in-order", slotOf (o [("count", .bool false), ("limit", .int 0), ("follow", s "next"),
     ("where", o [("x", o [("matches", s ".")])])])),
+  -- written order, which isn't sorted order
   ("43-where-errors-in-order", slotOf (o [("count", .bool true),
-    ("where", o [("env.id", o [("present", .bool true)]), ("x", o [("matches", s ".")])])])),
+    ("where", o [("x", o [("matches", s ".")]), ("env.id", o [("present", .bool true)])])])),
   ("44-from-kind-empty", fromOf (o [("store", s "."), ("kind", a [s ""])])),
-  ("45-from-about-not-typed", fromOf (o [("store", s "."), ("about", s "loops")]))
+  ("45-from-about-not-typed", fromOf (o [("store", s "."), ("about", s "loops")])),
+  ("46-from-kind-none", fromOf (o [("store", s "."), ("kind", a [])])),
+  ("47-vertex-empty", o [("vertex", s ""), ("from", a [o [("store", s ".")]])]),
+  ("48-vertex-not-text", o [("vertex", .int 5), ("from", a [o [("store", s ".")]])]),
+  ("49-store-empty", fromOf (o [("store", s "")])),
+  ("50-slot-name-empty", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
+    ("fold", o [("", o [("count", .bool true)])])]),
+  ("51-sum-field-empty", slotOf (o [("sum", s "")])),
+  ("52-where-field-empty", slotOf (o [("count", .bool true), ("where", o [("", o [("present", .bool true)])])])),
+  -- the repeat found first, depth first in member order: the slot's, though
+  -- `vertex` was written first and repeats after it
+  ("53-repeat-depth-first", o [("vertex", s "x"),
+    ("fold", o [("c", o [("count", .bool true), ("count", .bool true)])]),
+    ("vertex", s "y"), ("from", a [o [("store", s ".")]])]),
+  -- inside an array element, and before every other check
+  ("54-repeat-in-from", o [("vertex", s "x"), ("from", a [o [("store", s "."), ("store", s ".")]]),
+    ("query", s "select *")]),
+  ("55-slot-limit-before-argument", slotOf (o [("count", .bool false), ("limit", .int 0)])),
+  -- `from` checks store, kind, then about, however they are written
+  ("56-from-errors-in-order", fromOf (o [("about", s "loops"), ("kind", a [s ""]), ("store", s ".")])),
+  ("57-from-store-first", fromOf (o [("kind", a []), ("store", s "")])),
+  ("58-slot-not-object", slotOf (.int 5)),
+  ("59-slot-unknown-key", slotOf (o [("count", .bool true), ("order", s "newest")])),
+  ("60-from-unknown-key", fromOf (o [("store", s "."), ("as", s "x")]))
 ]
 
 def jRefusal (r : Refusal) : J := .obj [("refused", .str r.code), ("path", .str r.path)]
@@ -123,7 +149,10 @@ def parseVector (name : String) (j : Json) : Except String J := do
       | .error _ => throw s!"spec/parse/{name}: its parsed form is refused"
       pure (.obj [("parsed", Records.ofJson sp.toJson)])
     | .error r => pure (jRefusal r)
-  return vector name "spec/parse" ["spec.parse"] (.obj [("spec", Records.ofJson j)]) expect
+  -- a spec that repeats a key also comes as written, since a JSON parser
+  -- may keep only one of the repeats
+  let text := if j.keysDistinct then [] else [("spec_text", J.str (Records.rawText j))]
+  return vector name "spec/parse" ["spec.parse"] (.obj ([("spec", Records.ofJson j)] ++ text)) expect
 
 /-! ## Running -/
 
@@ -175,6 +204,7 @@ def boundSpec : Json := o [("vertex", s "estimates"),
     ("mid", o [("count", .bool true), ("where", o [("est", o [("at-least", .int 4), ("below", .int 8)])])]),
     ("small", o [("count", .bool true), ("where", o [("est", o [("below", .int 4)])])]),
     ("not-three", o [("count", .bool true), ("where", o [("est", o [("not", .int 3)])])]),
+    ("total", o [("sum", s "est")]),
     ("unblocked", o [("count", .bool true), ("where", o [("blocked", o [("absent", .bool true)])])])])]
 
 -- every envelope field, tested on records by several observers: a revision
@@ -229,6 +259,19 @@ def taskSpec : Json := o [("vertex", s "tasks"),
     ("est", o [("sum", s "est")]),
     ("blocked", o [("count", .bool true), ("where", o [("blocked", o [("present", .bool true)])])])])]
 
+-- a record about nothing anchors the thing named by its id: `from` takes it
+-- and its revision, while `env.about` reads only what each envelope says
+def x1 : Record := { said 0x71 "sl:alice" [] 100 with kind := "note" }
+def x2 : Record := { said 0x72 "sl:bob" [idText 0x71] 200 with kind := "note", prev := [0x71] }
+def x3 : Record := { said 0x73 "sl:bob" ["task:1"] 300 with kind := "note" }
+
+def anchorSpec : Json := o [("vertex", s "anchored"),
+  ("from", a [o [("store", s "."), ("about", s (idText 0x71))]]),
+  ("fold", o [
+    ("all", o [("collect", .bool true)]),
+    ("current", o [("latest-by", s "about"), ("follow", s "prev")]),
+    ("says-about", o [("collect", .bool true), ("where", o [("env.about", o [("is", s (idText 0x71))])])])])]
+
 structure RunCase where
   name : String
   laws : List String
@@ -250,7 +293,8 @@ def runCases : List RunCase := [
     [t1, t2, t3, t4, task 0x48 "task:4" 180 [("est", .int 4)], task 0x49 "task:5" 190 [("est", .int 8)],
       task 0x4a "task:6" 195 [("est", .str "5")]]⟩,
   ⟨"08-envelope-fields", ["spec.set", "where.fields", "where.time", "where.total",
-      "spec.after-supersession"], envSpec, [a1, a2, a3, a4, a5, a6]⟩
+      "spec.after-supersession"], envSpec, [a1, a2, a3, a4, a5, a6]⟩,
+  ⟨"09-from-about-anchor", ["spec.set", "spec.from-thing", "where.fields"], anchorSpec, [x1, x2, x3]⟩
 ]
 
 def jShownIds (hs : List (Nat × Shown)) : J :=

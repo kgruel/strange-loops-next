@@ -1,0 +1,167 @@
+{
+  "vector": "09-from-about-anchor",
+  "layer": "spec/run",
+  "laws": ["spec.set", "spec.from-thing", "where.fields"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "anchored",
+      "from": [
+        {
+          "store": ".",
+          "about": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"
+        }
+      ],
+      "fold": {
+        "all": {
+          "collect": true
+        },
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        },
+        "says-about": {
+          "collect": true,
+          "where": {
+            "env.about": {
+              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "kind": "note",
+          "observer": "sl:alice",
+          "about": [],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "kind": "note",
+          "observer": "sl:bob",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabzq",
+          "kind": "note",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "kind": "note",
+          "observer": "sl:bob",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabzq",
+          "kind": "note",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "kind": "note",
+          "observer": "sl:alice",
+          "about": [],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabzq",
+          "kind": "note",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "kind": "note",
+          "observer": "sl:alice",
+          "about": [],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "kind": "note",
+          "observer": "sl:bob",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "all": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "current": {
+      "things": {
+        "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+            "shown": "here"
+          }
+        ]
+      },
+      "unread": 0
+    },
+    "says-about": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    }
+  }
+}

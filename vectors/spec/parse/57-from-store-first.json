@@ -1,0 +1,26 @@
+{
+  "vector": "57-from-store-first",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "kind": [],
+          "store": ""
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "from-invalid",
+    "path": "from.store"
+  }
+}

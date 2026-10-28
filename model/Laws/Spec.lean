@@ -9,13 +9,11 @@ import Laws.Things
   on a number, or a time, exactly one of `at-least` and `below` holds.
   They compare like with like: numbers with numbers, times with times.
 * **Each field reads as what it holds.** `kind` and `observer` as their
-  text, a set as its members, `emitted` as its own instant.
+  text, a set as its members, `emitted` as its own instant. `from` reads
+  `about` by thing: a record about nothing is about its own id.
 * **Times read as what they say.** A test on a time reads its span, never
   its spelling, the record's or the argument's; `at-least` and `below`
   compare starts, and a record without `occurred` passes neither.
-* **Parsing accepts exactly what fits.** A test is accepted when its
-  argument is what layer 0 would accept in its field, and it renders back to
-  what was written; a spec with a repeated key is refused where it repeats.
 * **Totality.** A test answers for every record whose payload is here; a
   test on the envelope answers for every record.
 * **A `where` map is a set of tests.** Their order never matters.
@@ -25,8 +23,9 @@ import Laws.Things
 * **The set decides, for every spec.** Every slot gives the same value for
   the same set of records.
 * **Selection comes after supersession.** Slots over heads return only
-  heads: records no record about their thing has superseded. Under a view,
-  each thing's state is the full reader's with payloads hidden.
+  heads, records no record about their thing has superseded, and only heads
+  that `from` takes and every test of `where` holds for. Under a view, each
+  thing's state is the full reader's with payloads hidden.
 -/
 
 namespace Loops
@@ -99,6 +98,17 @@ theorem Cond.about_is (t : String) (r : Record) :
   cases h : r.about.contains t <;> simp_all [Arg.matches]
   intro x hx e
   exact h (e ▸ hx)
+
+/-- `is` on `prev`, `under` or `erases` asks whether the set holds the id. -/
+theorem Cond.id_is (i : String) (r : Record) :
+    Cond.eval ⟨.env .prev, .is (.val (.str i))⟩ r = .ofBool ((r.prev.map idText).contains i) ∧
+    Cond.eval ⟨.env .under, .is (.val (.str i))⟩ r = .ofBool ((r.under.toList.map idText).contains i) ∧
+    Cond.eval ⟨.env .erases, .is (.val (.str i))⟩ r = .ofBool ((r.erases.map idText).contains i) := by
+  have h1 := Cond.about_is i { r with about := r.prev.map idText }
+  have h2 := Cond.about_is i { r with about := r.under.toList.map idText }
+  have h3 := Cond.about_is i { r with about := r.erases.map idText }
+  simp only [Cond.eval, Field.read, map_map] at h1 h2 h3 ⊢
+  exact ⟨h1, h2, h3⟩
 
 /-- `is` on `emitted` asks whether the bound is the instant it was stamped. -/
 theorem Cond.emitted_is (c : Claim) (r : Record) :
@@ -261,7 +271,14 @@ theorem Cond.all_envelope_view {f : Record → Record} (hf : View f) {cs : List 
 theorem Source.takes_view {f : Record → Record} (hf : View f) (s : Source) (r : Record) :
     s.takes (f r) = s.takes r := by
   have he := hf.envelope r
-  simp [Source.takes, he.kind, he.about]
+  have ha : (f r).isAbout = r.isAbout := funext (isAbout_view hf r)
+  simp [Source.takes, he.kind, ha]
+
+/-- `from` reads `about` by thing: an entry naming a thing takes exactly the
+records about it, and a record about nothing is about its own id. -/
+theorem Source.takes_about (store t : String) (r : Record) :
+    (Source.mk store [] (some t)).takes r = r.isAbout t := by
+  simp [Source.takes]
 
 theorem Spec.takes_view {f : Record → Record} (hf : View f) (sp : Spec) (r : Record) :
     sp.takes (f r) = sp.takes r := by
@@ -337,173 +354,6 @@ theorem Spec.set_decides (sp : Spec) (may : Record → Record → Bool) {xs ys :
   exact map_congr_left fun s _ => by
     rw [s.set_decides sp.takes (admit_distinct may hx) (admit_distinct may hy) (admit_same may h)]
 
-/-! ## Parsing -/
-
-/-- What layer 0 would accept in a field of this type, as a test's argument. -/
-def Arg.Fits : FieldType → Arg → Prop
-  | .text, .val (.str s) => s.isEmpty = false
-  | .refs, .val (.str s) => typedRef s = true
-  | .ids, .val (.str s) => recordId s = true
-  | .time, .time c => Claim.of? c.text = some c
-  | .payload, .val _ => True
-  | _, _ => False
-
-/-- A bound: a time on a time, a number on a payload field. -/
-def Arg.Bounds : FieldType → Arg → Prop
-  | .time, .time c => Claim.of? c.text = some c
-  | .payload, .val (.int _) => True
-  | _, _ => False
-
-def Op.Fits (ty : FieldType) : Op → Prop
-  | .is a | .not a => a.Fits ty
-  | .present | .absent => True
-  | .atLeast a | .below a => a.Bounds ty
-
-theorem Claim.of?_text {s : String} {c : Claim} (h : Claim.of? s = some c) : c.text = s := by
-  unfold Claim.of? at h
-  split at h <;> simp at h
-  cases h; rfl
-
-theorem parseArg_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) :
-    parseArg ty path j = .ok a ↔ a.Fits ty ∧ a.toJson = j := by
-  constructor
-  · intro h
-    cases j with
-    | str s =>
-      cases ty <;> simp only [parseArg, refuse, pure, Except.pure] at h
-      · split at h
-        · cases h
-        · rename_i hr; cases h; exact ⟨by simpa [Arg.Fits] using hr, rfl⟩
-      · split at h
-        · rename_i hr; cases h; exact ⟨hr, rfl⟩
-        · cases h
-      · split at h
-        · rename_i hr; cases h; exact ⟨hr, rfl⟩
-        · cases h
-      · split at h
-        · rename_i c hc; cases h
-          exact ⟨by simpa [Arg.Fits, Claim.of?_text hc] using hc, by simp [Arg.toJson, Claim.of?_text hc]⟩
-        · cases h
-      · cases h; exact ⟨trivial, rfl⟩
-    | int i =>
-      simp only [parseArg, refuse, pure, Except.pure] at h
-      split at h
-      · rename_i hty; cases h; subst hty; exact ⟨trivial, rfl⟩
-      · cases h
-    | bool b =>
-      simp only [parseArg, refuse, pure, Except.pure] at h
-      split at h
-      · rename_i hty; cases h; subst hty; exact ⟨trivial, rfl⟩
-      · cases h
-    | _ => cases h
-  · rintro ⟨hf, rfl⟩
-    rcases a with (_ | _ | _) | c <;> cases ty <;>
-      simp_all [Arg.Fits, Arg.toJson, Val.toJson, parseArg, pure, Except.pure]
-
-theorem parseBound_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) :
-    parseBound ty path j = .ok a ↔ a.Bounds ty ∧ a.toJson = j := by
-  constructor
-  · intro h
-    cases j with
-    | int i =>
-      simp only [parseBound, refuse, pure, Except.pure] at h
-      split at h
-      · rename_i hty; cases h; subst hty; exact ⟨trivial, rfl⟩
-      · cases h
-    | str s =>
-      simp only [parseBound, refuse] at h
-      split at h
-      · rename_i hty; subst hty
-        obtain ⟨hf, hj⟩ := (parseArg_ok_iff .time path (.str s) a).1 h
-        rcases a with _ | c
-        · simp [Arg.Fits] at hf
-        · exact ⟨hf, hj⟩
-      · cases h
-    | _ => cases h
-  · rintro ⟨hf, rfl⟩
-    rcases a with (_ | _ | _) | c <;> cases ty <;>
-      simp only [Arg.Bounds, Arg.toJson, Val.toJson, parseBound, pure, Except.pure, ↓reduceIte] at hf ⊢
-    exact (parseArg_ok_iff .time path (.str c.text) (.time c)).2 ⟨hf, rfl⟩
-
-/-- A test is accepted exactly when its argument fits its field, and it
-renders back to what was written. -/
-theorem parseOp_ok_iff (ty : FieldType) (path : String) (kv : String × Json) (op : Op) :
-    parseOp ty path kv = .ok op ↔ op.Fits ty ∧ op.toJson = kv := by
-  constructor
-  · intro h
-    unfold parseOp at h
-    split at h
-    all_goals first
-      | (cases h; exact ⟨trivial, rfl⟩)
-      | cases h
-      | (rename_i v
-         simp only [Functor.map, Except.map] at h
-         split at h
-         · cases h
-         · rename_i a ha; cases h
-           first
-             | (obtain ⟨hf, hj⟩ := (parseArg_ok_iff ty path v a).1 ha
-                exact ⟨hf, by simp [Op.toJson, hj]⟩)
-             | (obtain ⟨hf, hj⟩ := (parseBound_ok_iff ty path v a).1 ha
-                exact ⟨hf, by simp [Op.toJson, hj]⟩))
-  · rintro ⟨hf, rfl⟩
-    cases op <;> simp only [Op.Fits, Op.toJson, parseOp, pure, Except.pure, Functor.map, Except.map] at hf ⊢
-    · rw [(parseArg_ok_iff ty path _ _).2 ⟨hf, rfl⟩]
-    · rw [(parseArg_ok_iff ty path _ _).2 ⟨hf, rfl⟩]
-    · rw [(parseBound_ok_iff ty path _ _).2 ⟨hf, rfl⟩]
-    · rw [(parseBound_ok_iff ty path _ _).2 ⟨hf, rfl⟩]
-
-theorem Option.orElse_eq_none {α : Type} {a : Option α} {b : Unit → Option α} :
-    a.orElse b = none ↔ a = none ∧ b () = none := by
-  cases a <;> simp [Option.orElse]
-
-mutual
-theorem Json.repeatAt_none (path : String) : (j : Json) → (j.repeatAt path = none ↔ j.keysDistinct = true)
-  | .arr xs => by simp only [Json.repeatAt, Json.keysDistinct]; exact Json.repeatIn_none path xs
-  | .obj kvs => by
-    simp only [Json.repeatAt, Json.keysDistinct, Bool.and_eq_true, decide_eq_true_eq]
-    rw [Json.repeatMember_none path [] kvs]
-    simp
-  | .null | .bool _ | .int _ | .str _ => by simp [Json.repeatAt, Json.keysDistinct]
-
-theorem Json.repeatIn_none (path : String) : (xs : List Json) →
-    (Json.repeatIn path xs = none ↔ Json.allDistinct xs = true)
-  | [] => by simp [Json.repeatIn, Json.allDistinct]
-  | x :: xs => by
-    simp only [Json.repeatIn, Json.allDistinct, Option.orElse_eq_none, Bool.and_eq_true]
-    rw [Json.repeatAt_none path x, Json.repeatIn_none path xs]
-
-theorem Json.repeatMember_none (path : String) (seen : List String) : (kvs : List (String × Json)) →
-    (Json.repeatMember path seen kvs = none ↔
-      (∀ k ∈ kvs.map (·.1), k ∉ seen) ∧ (kvs.map (·.1)).Nodup ∧ Json.membersDistinct kvs = true)
-  | [] => by simp [Json.repeatMember, Json.membersDistinct]
-  | (k, v) :: kvs => by
-    simp only [Json.repeatMember, Json.membersDistinct, Bool.and_eq_true, map_cons, mem_cons,
-      forall_eq_or_imp, nodup_cons]
-    by_cases hk : seen.contains k = true
-    · simp only [hk, ↓reduceIte, reduceCtorEq, false_iff]
-      intro ⟨⟨h, _⟩, _⟩
-      exact h (by simpa using hk)
-    · simp only [hk, Bool.false_eq_true, ↓reduceIte, Option.orElse_eq_none]
-      rw [Json.repeatAt_none, Json.repeatMember_none path (k :: seen) kvs]
-      simp only [Bool.not_eq_true, List.contains_eq_any_beq, any_eq_false, beq_iff_eq] at hk
-      simp only [mem_map, mem_cons, not_or, forall_exists_index, and_imp]
-      have hk' : k ∉ seen := fun h => hk k h rfl
-      constructor
-      · rintro ⟨hv, hr, hn, hm⟩
-        exact ⟨⟨hk', fun a x hx e => (hr a x hx e).2⟩,
-          ⟨fun ⟨x, hx, e⟩ => (hr k x hx e).1 rfl, hn⟩, hv, hm⟩
-      · rintro ⟨⟨-, hs⟩, ⟨hnk, hn⟩, hv, hm⟩
-        exact ⟨hv, fun a x hx e => ⟨fun ha => hnk ⟨x, hx, e.trans ha⟩, hs a x hx e⟩, hn, hm⟩
-end
-
-/-- A spec with a repeated key is refused at the first repeat, as layer 0 refuses a payload. -/
-theorem Spec.ofJson_repeat {j : Json} (h : j.keysDistinct = false) :
-    ∃ p, j.repeatAt "" = some p ∧ Spec.ofJson j = refuse "member-duplicate" p := by
-  cases e : j.repeatAt "" with
-  | none => simp [(Json.repeatAt_none "" j).1 e] at h
-  | some p => exact ⟨p, rfl, by simp [Spec.ofJson, h, e]⟩
-
 /-! ## Selection after supersession -/
 
 /-- What a spec's heads read under a view: every thing's state is the full
@@ -536,13 +386,39 @@ theorem mem_perThing {xs : List Record} {t : String} {s : LatestBy} (h : (t, s) 
   obtain ⟨_, _, e⟩ := mem_map.1 h
   cases e; rfl
 
-/-- Latest-by returns only heads: every record it gives for a thing is one
-no record about that thing has superseded. -/
+theorem Tri.and_eq_yes {a b : Tri} : a.and b = .yes ↔ a = .yes ∧ b = .yes := by
+  cases a <;> cases b <;> decide
+
+theorem Cond.all_eq_yes {cs : List Cond} {r : Record} :
+    Cond.all cs r = .yes ↔ ∀ c ∈ cs, c.eval r = .yes := by
+  induction cs with
+  | nil => simp [Cond.all]
+  | cons c cs ih =>
+    unfold Cond.all at ih ⊢
+    simp only [foldr_cons, Tri.and_eq_yes, ih, mem_cons, forall_eq_or_imp]
+
+/-- A head a slot keeps is one `from` takes and every test holds for. -/
+theorem chosen_payTest_yes {sel : Record → Bool} {cs : List Cond} {r : Record} :
+    (chosen sel cs r = true ∧ (payTest cs r == .yes) = true) ↔
+      sel r = true ∧ Cond.all cs r = .yes := by
+  simp only [chosen, payTest, Bool.and_eq_true, beq_iff_eq, Cond.all_eq_yes, mem_filter]
+  constructor
+  · rintro ⟨⟨hs, he⟩, hp⟩
+    refine ⟨hs, fun c hc => ?_⟩
+    by_cases h : c.field.onEnvelope = true
+    · exact he c ⟨hc, h⟩
+    · exact hp c ⟨hc, by simp [h]⟩
+  · rintro ⟨hs, hall⟩
+    exact ⟨⟨hs, fun c ⟨hc, _⟩ => hall c hc⟩, fun c ⟨hc, _⟩ => hall c hc⟩
+
+/-- Latest-by returns only heads, and only those it was asked for: every
+record it gives for a thing is one no record about that thing has
+superseded, that `from` takes, and that every test holds for. -/
 theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Record}
     (hx : Addressed xs) {ts : List (String × List (Nat × Shown))} {u : Nat}
     (h : latestOf sel cs xs = .things ts u) {t : String} {ps : List (Nat × Shown)}
     (ht : (t, ps) ∈ ts) {p : Nat × Shown} (hp : p ∈ ps) :
-    ∃ r, HeadOf xs t r ∧ (r.id, r.shown) = p := by
+    ∃ r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = .yes ∧ (r.id, r.shown) = p := by
   unfold latestOf at h
   simp only [SlotValue.things.injEq] at h
   obtain ⟨rfl, -⟩ := h
@@ -556,8 +432,29 @@ theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Recor
     simp only [Option.some.injEq, Prod.mk.injEq] at he
     obtain ⟨rfl, rfl⟩ := he
     obtain ⟨k, hk, rfl⟩ := mem_map.1 hp
-    have hk' := (mem_filter.1 (mem_filter.1 hk).1).1
-    exact ⟨k, stateIn_heads hx (mem_perThing hs' ▸ hk'), rfl⟩
+    obtain ⟨hk1, hpay⟩ := mem_filter.1 hk
+    obtain ⟨hk0, hch⟩ := mem_filter.1 hk1
+    obtain ⟨hsel, hcond⟩ := chosen_payTest_yes.1 ⟨hch, hpay⟩
+    exact ⟨k, stateIn_heads hx (mem_perThing hs' ▸ hk0), hsel, hcond, rfl⟩
+
+theorem payTest_unlinked (cs : List Cond) (r : Record) :
+    payTest cs r.unlinked = payTest cs r := by
+  unfold payTest Cond.all
+  generalize hds : cs.filter (!·.field.onEnvelope) = ds
+  have h : ∀ c ∈ ds, c.eval r.unlinked = c.eval r := by
+    intro c hc
+    rw [← hds] at hc
+    have hne : c.field.onEnvelope = false := by simpa using (mem_filter.1 hc).2
+    rcases c with ⟨f, op⟩
+    cases f with
+    | env _ => simp [Field.onEnvelope] at hne
+    | payload n => rfl
+  clear hds
+  induction ds with
+  | nil => rfl
+  | cons c ds ih =>
+    simp only [foldr_cons]
+    rw [h c mem_cons_self, ih fun d hd => h d (mem_cons_of_mem _ hd)]
 
 theorem Addressed.sub {xs ys : List Record} (hx : Addressed xs) (h : ∀ r ∈ ys, r ∈ xs) :
     Addressed ys := fun a ha b hb => hx a (h a ha) b (h b hb)
@@ -575,24 +472,28 @@ theorem mem_newestFirst {xs : List Record} (hx : Addressed xs) {r : Record}
   obtain ⟨q, hq, e⟩ := mem_map.1 hm
   exact ⟨q, hq, e.symm⟩
 
-/-- Collect following `prev` returns only heads: each record it gives is one
-no record about its thing has superseded. -/
+/-- Collect following `prev` returns only heads, and only those it was asked
+for: each record it gives is one no record about its thing has superseded,
+that `from` takes, and that every test holds for. -/
 theorem collectOf_heads (sel : Record → Bool) (cs : List Cond) (limit : Option Nat)
     {xs : List Record} (hx : Addressed xs) {hs : List (Nat × Shown)} {u : Nat}
     (h : collectOf sel cs true limit xs = .heads hs u) {p : Nat × Shown} (hp : p ∈ hs) :
-    ∃ t r, HeadOf xs t r ∧ (r.id, r.shown) = p := by
+    ∃ t r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = .yes ∧ (r.id, r.shown) = p := by
   unfold collectOf at h
   simp only [↓reduceIte, SlotValue.heads.injEq] at h
   obtain ⟨rfl, -⟩ := h
   obtain ⟨k, hk, rfl⟩ := mem_map.1 hp
-  have hk := (mem_filter.1 (mem_limitTo hk)).1
+  obtain ⟨hk, hpay⟩ := mem_filter.1 (mem_limitTo hk)
   have hpool : ∀ r ∈ (perThing xs).flatMap (·.2.heads), ∃ t, HeadOf xs t r := by
     intro r hr
     obtain ⟨⟨t, s⟩, hts, hr⟩ := mem_flatMap.1 hr
     exact ⟨t, stateIn_heads hx (mem_perThing hts ▸ hr)⟩
   obtain ⟨q, hq, rfl⟩ := mem_newestFirst
     (hx.sub fun r hr => (hpool r (mem_filter.1 hr).1).choose_spec.1) hk
-  obtain ⟨t, ht⟩ := hpool q (mem_filter.1 hq).1
-  exact ⟨t, q, ht, rfl⟩
+  obtain ⟨hq0, hch⟩ := mem_filter.1 hq
+  rw [payTest_unlinked] at hpay
+  obtain ⟨hsel, hcond⟩ := chosen_payTest_yes.1 ⟨hch, hpay⟩
+  obtain ⟨t, ht⟩ := hpool q hq0
+  exact ⟨t, q, ht, hsel, hcond, rfl⟩
 
 end Loops

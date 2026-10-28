@@ -12,7 +12,8 @@
           "store": "."
         }
       ]
-    }
+    },
+    "spec_text": "{\"vertex\":\"x\",\"vertex\":\"y\",\"from\":[{\"store\":\".\"}]}"
   },
   "expect": {
     "refused": "member-duplicate",
