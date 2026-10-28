@@ -71,10 +71,12 @@ export function renderLaws(root) {
     if (!usedTags.has(t)) fail(`vectorTags: no vector names ${t}; take it off the list`);
   }
 
-  // Who runs each vector.
+  // Who runs each vector. A checker claiming every directory ("*") holds itself to it: check.mjs
+  // fails on a vectors/ directory no family reads, and CI runs it.
   for (const impl of data.implementations) if (impl.checker) {
     const text = readFileSync(join(root, impl.checker), "utf8");
-    for (const d of impl.dirs) if (!text.includes(`join(dir, "${d}")`)) fail(`${impl.checker} doesn't read vectors/${d}`);
+    if (impl.dirs === "*" && !text.includes("no checker reads")) fail(`${impl.checker} claims every vector but doesn't refuse an unread directory`);
+    if (impl.dirs !== "*") for (const d of impl.dirs) if (!text.includes(`join(dir, "${d}")`)) fail(`${impl.checker} doesn't read vectors/${d}`);
   }
   const runBy = (paths) => data.implementations.filter((i) => paths.some((p) => i.dirs === "*" || i.dirs.includes(p.split("/")[0])));
 
@@ -305,7 +307,7 @@ export function renderLaws(root) {
     `    <div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
     `<th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th>` +
     `<th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th>` +
-    `<th scope="col" title="the JS writer runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
+    `<th scope="col" title="the JS implementation runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
     `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div>\n`;
 
   const connected = new Set(edges.flat());

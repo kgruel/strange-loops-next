@@ -1,6 +1,6 @@
 name = "model"
 version = "0.1.0"
-defaultTargets = ["Loops", "Laws", "gen"]
+defaultTargets = ["Loops", "Laws", "gen", "run"]
 
 [[lean_lib]]
 name = "Loops"
@@ -10,11 +10,15 @@ name = "Laws"
 
 [[lean_lib]]
 name = "Gen"
-roots = ["Gen.Json", "Gen.Sha2", "Gen.Ed25519", "Gen.Records", "Gen.Encode", "Gen.Spec", "Gen.Batch", "Gen.Realm", "Gen.Occurred", "Gen.Scenario"]
+roots = ["Gen.Json", "Gen.Sha2", "Gen.Ed25519", "Gen.Records", "Gen.Encode", "Gen.Spec", "Gen.Batch", "Gen.Realm", "Gen.Occurred", "Gen.Scenario", "Gen.Read"]
 
 [[lean_exe]]
 name = "gen"
 root = "Gen.Main"
+
+[[lean_exe]]
+name = "run"
+root = "Gen.Run"
 
 [[lean_exe]]
 name = "proofs"
