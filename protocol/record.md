@@ -151,8 +151,9 @@ After erasure the opening is replaced by the commitment:
 ## Not yet
 
 * Windows, which hold the records whose span starts in them (start
-  included, end excluded), arrive with ticks; `where` tests on `env.`
-  fields, comparing a time by its start, arrive next.
+  included, end excluded), arrive with ticks. A `where` test on
+  `env.occurred` compares starts too, but a record without `occurred`
+  passes neither bound, where a window places it at its `emitted`.
 * Key bindings, presence keys and admission arrive with standing (step 3).
 * Lone UTF-16 surrogates in strings are invalid JSON for RFC 8785, and
   decoders disagree on them: some replace them, JavaScript keeps them.

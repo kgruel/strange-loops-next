@@ -1,5 +1,6 @@
 import Loops.Things
 import Loops.Json
+import Loops.Envelope
 
 /-!
 # The spec, as data
@@ -9,16 +10,33 @@ by what their envelopes carry, and `fold` names slots, each one fold from
 the closed vocabulary with an optional `where`.
 
 * **`where`** has six operators: `is`, `not`, `present`, `absent`,
-  `at-least`, `below`. A test on `kind` or `about` reads the envelope and
-  always answers; a test on a payload field answers unknown when the payload
-  is missing. A `where` map holds when every test does (Kleene's and).
+  `at-least`, `below`. `env.<field>` names an envelope field, and a test on
+  one always answers; any other name is a payload field, and a test on it
+  answers unknown when the payload is missing. A `where` map holds when
+  every test does (Kleene's and).
+* **Times** (`env.emitted`, `env.occurred`) are tested by what they read as:
+  `is` asks for the same span, however it is spelled, and `at-least` and
+  `below` compare starts. A record without `occurred` passes neither.
 * **Accumulating slots** (count, sum, min, max) select, then fold.
 * **Slots over heads** (latest-by, collect) read each thing's state, which
   supersession has already settled over everything the reader holds
   (`Loops.Things`); `from` and the envelope tests then choose heads, and the
   payload tests filter them. Selecting first would bring back a record whose
   successor is of another kind, or no longer matches, or is withheld.
-* `about` is a set, so a test on it asks whether the record is about a thing.
+* **`from` chooses by thing.** `"about": "t"` takes the records about `t`,
+  so `"about": "r:X"` takes X, the record about nothing that anchors it, as
+  well as its revisions. `env.about` tests the field as written, which holds
+  nothing on that record.
+* `about`, `prev`, `under` and `erases` are sets, so a test on one asks
+  whether it holds a value, and `present` whether it holds any.
+* **Arguments** must be what layer 0 would accept in their field, since
+  nothing else can match; a payload field takes text, a number or a boolean.
+* **The spec is explicit.** No key repeats; no name, field or kind is
+  empty; a `from` entry that writes `kind` names at least one, a `where`
+  names at least one field, and latest-by writes `"follow": "prev"`;
+  collect without it takes every selected record, superseded or not.
+
+`protocol/spec.md` is the grammar this parser implements.
 
 Step 2 accepts these keys. `ticks`, `boundary` and the other spec keys are
 recognized and carried, not yet evaluated; `as`, `by`, `order`, `set` and
@@ -29,34 +47,98 @@ namespace Loops
 
 /-! ## `where` -/
 
-/-- Where a field lives. `kind` and `about` are on the envelope; any other
-name is a payload field. -/
-inductive Field where
+/-- An envelope field, named in `where` as `env.<name>`. -/
+inductive EnvField where
   | kind
+  | observer
   | about
+  | prev
+  | under
+  | erases
+  | emitted
+  | occurred
+  deriving Repr, DecidableEq
+
+def EnvField.all : List EnvField := [.kind, .observer, .about, .prev, .under, .erases, .emitted, .occurred]
+
+def EnvField.name : EnvField → String
+  | .kind => "kind"
+  | .observer => "observer"
+  | .about => "about"
+  | .prev => "prev"
+  | .under => "under"
+  | .erases => "erases"
+  | .emitted => "emitted"
+  | .occurred => "occurred"
+
+/-- What a field holds, which decides what a test on it may compare against:
+only what layer 0 would accept in that field, since nothing else can match. -/
+inductive FieldType where
+  /-- Text that isn't empty: `kind`. -/
+  | text
+  /-- Typed references, `prefix:value`: `observer`, `about`. -/
+  | refs
+  /-- Record ids: `prev`, `under`, `erases`. -/
+  | ids
+  /-- Times: `emitted`, `occurred`. -/
+  | time
+  /-- A payload field: text, a number or a boolean. -/
+  | payload
+  deriving Repr, DecidableEq
+
+def EnvField.type : EnvField → FieldType
+  | .kind => .text
+  | .observer | .about => .refs
+  | .prev | .under | .erases => .ids
+  | .emitted | .occurred => .time
+
+/-- Where a field lives: on the envelope, or in the payload. -/
+inductive Field where
+  | env (f : EnvField)
   | payload (name : String)
   deriving Repr, DecidableEq
 
-def Field.ofName (s : String) : Field :=
-  if s = "kind" then .kind else if s = "about" then .about else .payload s
+def envPrefix : String := "env."
+
+/-- A field by its name in `where`; `none` for the empty name, `env.` and a
+name the envelope doesn't have. -/
+def Field.ofName (s : String) : Option Field :=
+  if s.isEmpty then none
+  else if envPrefix.isPrefixOf s then (EnvField.all.find? (envPrefix ++ ·.name == s)).map .env
+  else some (.payload s)
 
 def Field.name : Field → String
-  | .kind => "kind"
-  | .about => "about"
+  | .env f => envPrefix ++ f.name
   | .payload s => s
 
 def Field.onEnvelope : Field → Bool
+  | .env _ => true
   | .payload _ => false
-  | _ => true
 
-/-- The closed set of operators. -/
+def Field.type : Field → FieldType
+  | .env f => f.type
+  | .payload _ => .payload
+
+/-- One thing a field holds, as a test reads it: a value, or a time as its span. -/
+inductive Item where
+  | val (v : Val)
+  | time (s : Span)
+  deriving Repr, DecidableEq
+
+/-- What a test compares against: a value, or a time as written with the span it reads as. -/
+inductive Arg where
+  | val (v : Val)
+  | time (c : Claim)
+  deriving Repr, DecidableEq
+
+/-- The closed set of operators. `at-least` and `below` take a number or a time. -/
 inductive Op where
-  | is (v : Val)
-  | not (v : Val)
+  | is (a : Arg)
+  | not (a : Arg)
   | present
   | absent
-  | atLeast (i : Int)
-  | below (i : Int)
+  | atLeast (a : Arg)
+  | below (a : Arg)
   deriving Repr, DecidableEq
 
 structure Cond where
@@ -64,31 +146,49 @@ structure Cond where
   op : Op
   deriving Repr, DecidableEq
 
-/-- The values a field holds for this reader (none, one, or a set, as for
-`about`), or `none` when its payload is missing. -/
-def Field.read : Field → Record → Option (List Val)
-  | .kind, r => some [.str r.kind]
-  | .about, r => some (r.about.map .str)
-  | .payload f, r => if r.shown = .here then some (r.get f).toList else none
+/-- The items a field holds for this reader (none, one, or a set, as for
+`about`), or `none` when its payload is missing. Ids read as their text, which
+has one spelling per id; times read as spans, `emitted` as an instant. -/
+def Field.read : Field → Record → Option (List Item)
+  | .env .kind, r => some [.val (.str r.kind)]
+  | .env .observer, r => some [.val (.str r.observer)]
+  | .env .about, r => some (r.about.map (.val ∘ .str))
+  | .env .prev, r => some (r.prev.map (.val ∘ .str ∘ idText))
+  | .env .under, r => some (r.under.toList.map (.val ∘ .str ∘ idText))
+  | .env .erases, r => some (r.erases.map (.val ∘ .str ∘ idText))
+  | .env .emitted, r => some [.time (Span.point r.emitted.moment)]
+  | .env .occurred, r => some (r.occurred.toList.map (.time ∘ (·.span)))
+  | .payload f, r => if r.shown = .here then some ((r.get f).toList.map .val) else none
 
-def Val.atLeast (i : Int) : Val → Bool
-  | .int j => decide (i ≤ j)
-  | _ => false
+/-- Whether an item is what the argument names: the same value, or the same span. -/
+def Arg.matches : Arg → Item → Bool
+  | .val v, .val w => v == w
+  | .time c, .time s => c.span == s
+  | _, _ => false
 
-def Val.below (i : Int) : Val → Bool
-  | .int j => decide (j < i)
-  | _ => false
+/-- Whether an item is at least the bound: numbers by value, times by start. -/
+def Item.atLeast : Arg → Item → Bool
+  | .val (.int i), .val (.int j) => decide (i ≤ j)
+  | .time c, .time s => decide (c.span.start ≤ s.start)
+  | _, _ => false
 
-/-- An operator on what a field holds. `is` asks whether a value is among
-them and `not` is its complement; `absent` is the complement of `present`;
-`at-least` and `below` hold only for numbers. -/
-def Op.test : Op → List Val → Bool
-  | .is v, xs => xs.contains v
-  | .not v, xs => !xs.contains v
+/-- Whether an item is below the bound: numbers by value, times by start. -/
+def Item.below : Arg → Item → Bool
+  | .val (.int i), .val (.int j) => decide (j < i)
+  | .time c, .time s => decide (s.start < c.span.start)
+  | _, _ => false
+
+/-- An operator on what a field holds. `is` asks whether an item is the
+argument and `not` is its complement; `absent` is the complement of
+`present`; `at-least` and `below` compare numbers with numbers and times with
+times, and hold for nothing else. -/
+def Op.test : Op → List Item → Bool
+  | .is a, xs => xs.any a.matches
+  | .not a, xs => !xs.any a.matches
   | .present, xs => !xs.isEmpty
   | .absent, xs => xs.isEmpty
-  | .atLeast i, xs => xs.any (Val.atLeast i)
-  | .below i, xs => xs.any (Val.below i)
+  | .atLeast a, xs => xs.any (Item.atLeast a)
+  | .below a, xs => xs.any (Item.below a)
 
 def Cond.eval (c : Cond) (r : Record) : Tri :=
   match c.field.read r with
@@ -122,10 +222,15 @@ inductive FoldType where
   | collect (follow : Bool) (limit : Option Nat)
   deriving Repr, DecidableEq
 
+/-- A `where` map as written: each field with its tests. -/
+abbrev Tests := List (Field × List Op)
+
+def Tests.conds (ts : Tests) : List Cond := ts.flatMap fun (f, os) => os.map (Cond.mk f)
+
 structure Slot where
   name : String
   type : FoldType
-  cond : List Cond := []
+  tests : Tests := []
   deriving Repr, DecidableEq
 
 /-- What a slot holds. Heads carry what the reader holds of each. -/
@@ -179,14 +284,15 @@ def collectOf (sel : Record → Bool) (cs : List Cond) (follow : Bool) (limit : 
 
 /-- Accumulating slots select with `from` and `where`, then fold. -/
 def Slot.run (s : Slot) (sel : Record → Bool) (xs : List Record) : SlotValue :=
-  let ev := fun r => if sel r then Cond.all s.cond r else Tri.no
+  let cs := s.tests.conds
+  let ev := fun r => if sel r then Cond.all cs r else Tri.no
   match s.type with
   | .count => .nat (Count.acc.select ev xs)
   | .sum f => .int ((Sum.on f).select ev xs)
   | .min f => .opt ((Min.on f).select ev xs)
   | .max f => .opt ((Max.on f).select ev xs)
-  | .latestBy => latestOf sel s.cond xs
-  | .collect follow limit => collectOf sel s.cond follow limit xs
+  | .latestBy => latestOf sel cs xs
+  | .collect follow limit => collectOf sel cs follow limit xs
 
 /-! ## The spec -/
 
@@ -204,9 +310,10 @@ structure Spec where
   slots : List Slot := []
   deriving Repr, DecidableEq
 
-/-- Selection reads only the envelope. -/
+/-- Selection reads only the envelope: the kind, and the thing, which for a
+record about nothing is its own id. -/
 def Source.takes (s : Source) (r : Record) : Bool :=
-  (s.kinds.isEmpty || s.kinds.contains r.kind) && s.about.all r.about.contains
+  (s.kinds.isEmpty || s.kinds.contains r.kind) && s.about.all r.isAbout
 
 def Spec.takes (sp : Spec) (r : Record) : Bool := sp.sources.any (·.takes r)
 
@@ -232,30 +339,60 @@ abbrev Parse := Except Refusal
 
 def refuse {α : Type} (code path : String) : Parse α := throw ⟨code, path⟩
 
-def parseVal (path : String) : Json → Parse Val
-  | .str s => pure (.str s)
-  | .int i => pure (.int i)
-  | .bool b => pure (.bool b)
+/-- What a test on a field of this type may compare against, by layer 0's
+own checks: text that isn't empty for `kind`, a typed reference for
+`observer` and `about`, a record id for ids, a time in `occurred`'s grammar
+for times; text, a number or a boolean for a payload field. -/
+def parseArg (ty : FieldType) (path : String) : Json → Parse Arg
+  | .str s => match ty with
+    | .payload => pure (.val (.str s))
+    | .text => if s.isEmpty then refuse "where-invalid" path else pure (.val (.str s))
+    | .refs => if typedRef s then pure (.val (.str s)) else refuse "where-invalid" path
+    | .ids => if recordId s then pure (.val (.str s)) else refuse "where-invalid" path
+    | .time => match Claim.of? s with
+      | some c => pure (.time c)
+      | none => refuse "where-invalid" path
+  | .int i => if ty = .payload then pure (.val (.int i)) else refuse "where-invalid" path
+  | .bool b => if ty = .payload then pure (.val (.bool b)) else refuse "where-invalid" path
   | _ => refuse "where-invalid" path
 
-def parseOp (path : String) : String × Json → Parse Op
-  | ("is", v) => .is <$> parseVal path v
-  | ("not", v) => .not <$> parseVal path v
+/-- A bound for `at-least` or `below`: a number on a payload field, a time on a time. -/
+def parseBound (ty : FieldType) (path : String) : Json → Parse Arg
+  | .int i => if ty = .payload then pure (.val (.int i)) else refuse "where-invalid" path
+  | .str s => if ty = .time then parseArg ty path (.str s) else refuse "where-invalid" path
+  | _ => refuse "where-invalid" path
+
+def parseOp (ty : FieldType) (path : String) : String × Json → Parse Op
+  | ("is", v) => .is <$> parseArg ty path v
+  | ("not", v) => .not <$> parseArg ty path v
   | ("present", .bool true) => pure .present
   | ("absent", .bool true) => pure .absent
-  | ("at-least", .int i) => pure (.atLeast i)
-  | ("below", .int i) => pure (.below i)
+  | ("at-least", v) => .atLeast <$> parseBound ty path v
+  | ("below", v) => .below <$> parseBound ty path v
   | _ => refuse "where-invalid" path
 
-def parseWhere (path : String) : Json → Parse (List Cond)
-  | .obj fs => do
-    let css ← fs.mapM fun (name, ops) =>
-      let p := s!"{path}.{name}"
-      match ops with
-      | .obj [] => refuse "where-invalid" p
-      | .obj os => os.mapM fun o => do pure ⟨Field.ofName name, ← parseOp p o⟩
-      | _ => refuse "where-invalid" p
-    pure css.flatten
+/-- Spec paths: a member's key after its object's path, joined by `.`; a
+member of the spec itself is its key alone. -/
+def memberPath : Option String → String → String
+  | none, k => k
+  | some p, k => s!"{p}.{k}"
+
+/-- One field of a `where` map, with at least one test. -/
+def parseField (path : String) : String × Json → Parse (Field × List Op)
+  | (name, ops) => do
+    let p := memberPath (some path) name
+    let field ← match Field.ofName name with
+      | some f => pure f
+      | none => refuse "where-invalid" p
+    match ops with
+    | .obj [] => refuse "where-invalid" p
+    | .obj os => do pure (field, ← os.mapM (parseOp field.type p))
+    | _ => refuse "where-invalid" p
+
+/-- A `where` map: at least one field, in the order written. -/
+def parseWhere (path : String) : Json → Parse Tests
+  | .obj [] => refuse "where-invalid" path
+  | .obj fs => fs.mapM (parseField path)
   | _ => refuse "where-invalid" path
 
 def foldTypes : List String := ["count", "sum", "min", "max", "latest-by", "collect"]
@@ -265,86 +402,157 @@ def specKeys : List String :=
   ["vertex", "note", "from", "fold", "ticks", "order", "resolve", "window", "boundary",
     "param", "covers", "into", "bundle"]
 
-def checkKeys (allowed : List String) (path : String) (kvs : List (String × Json)) :
+def checkKeys (allowed : List String) (path : Option String) (kvs : List (String × Json)) :
     Parse Unit :=
   match kvs.find? (!allowed.contains ·.1) with
-  | some (k, _) => refuse "unknown-key" (if path = "" then k else s!"{path}.{k}")
+  | some (k, _) => refuse "unknown-key" (memberPath path k)
   | none => pure ()
 
-def parseSlot (name : String) : Json → Parse Slot
-  | .obj kvs => do
-    let path := s!"fold.{name}"
-    checkKeys slotKeys path kvs
-    let (t, arg) ← match kvs.filter (foldTypes.contains ·.1) with
-      | [p] => pure p
-      | _ => refuse "fold-type" path
-    let follow ← match kvs.lookup "follow" with
-      | none => pure false
-      | some (.str "prev") =>
-        if t = "collect" || t = "latest-by" then pure true
-        else refuse "follow-invalid" s!"{path}.follow"
-      | some _ => refuse "follow-invalid" s!"{path}.follow"
-    let limit ← match kvs.lookup "limit" with
-      | none => pure none
-      | some (.int i) =>
-        if t = "collect" && i > 0 then pure (some i.toNat)
-        else refuse "limit-invalid" s!"{path}.limit"
-      | some _ => refuse "limit-invalid" s!"{path}.limit"
-    let type ← match t, arg with
-      | "count", .bool true => pure FoldType.count
-      | "sum", .str f => pure (.sum f)
-      | "min", .str f => pure (.min f)
-      | "max", .str f => pure (.max f)
-      | "latest-by", .str "about" => pure .latestBy
-      | "collect", .bool true => pure (.collect follow limit)
-      | _, _ => refuse "fold-argument" s!"{path}.{t}"
-    let cond ← match kvs.lookup "where" with
-      | none => pure []
-      | some w => parseWhere s!"{path}.where" w
-    pure ⟨name, type, cond⟩
-  | _ => refuse "fold-invalid" s!"fold.{name}"
+/-- The payload field a numeric fold reads: a name that isn't empty. -/
+def fieldArg (path : String) : Json → Parse String
+  | .str f => if f.isEmpty then refuse "fold-argument" path else pure f
+  | _ => refuse "fold-argument" path
 
+/-- A slot names exactly one fold type. -/
+def slotType (path : String) (kvs : List (String × Json)) : Parse (String × Json) :=
+  match kvs.filter (foldTypes.contains ·.1) with
+  | [p] => pure p
+  | _ => refuse "fold-type" path
+
+/-- `follow`: `"prev"`, on collect or latest-by, and always written on latest-by. -/
+def slotFollow (path t : String) : Option Json → Parse Bool
+  | none => if t = "latest-by" then refuse "follow-missing" s!"{path}.follow" else pure false
+  | some (.str "prev") =>
+    if t = "collect" || t = "latest-by" then pure true
+    else refuse "follow-invalid" s!"{path}.follow"
+  | some _ => refuse "follow-invalid" s!"{path}.follow"
+
+/-- `limit`: a positive whole number, on collect only. -/
+def slotLimit (path t : String) : Option Json → Parse (Option Nat)
+  | none => pure none
+  | some (.int i) =>
+    if t = "collect" && i > 0 then pure (some i.toNat)
+    else refuse "limit-invalid" s!"{path}.limit"
+  | some _ => refuse "limit-invalid" s!"{path}.limit"
+
+/-- The fold type with its argument. -/
+def foldType (path t : String) (follow : Bool) (limit : Option Nat) (arg : Json) : Parse FoldType :=
+  let p := s!"{path}.{t}"
+  match t, arg with
+  | "count", .bool true => pure .count
+  | "sum", f => FoldType.sum <$> fieldArg p f
+  | "min", f => FoldType.min <$> fieldArg p f
+  | "max", f => FoldType.max <$> fieldArg p f
+  | "latest-by", .str "about" => pure .latestBy
+  | "collect", .bool true => pure (.collect follow limit)
+  | _, _ => refuse "fold-argument" p
+
+def slotTests (path : String) : Option Json → Parse Tests
+  | none => pure []
+  | some w => parseWhere s!"{path}.where" w
+
+/-- A slot: checked in order, its name, keys, one fold type, `follow`,
+`limit`, the fold type's argument, then `where`. -/
+def parseSlot (name : String) (j : Json) : Parse Slot :=
+  let path := memberPath (some "fold") name
+  if name.isEmpty then refuse "fold-invalid" path else
+  match j with
+  | .obj kvs => do
+    checkKeys slotKeys (some path) kvs
+    let (t, arg) ← slotType path kvs
+    let follow ← slotFollow path t (kvs.lookup "follow")
+    let limit ← slotLimit path t (kvs.lookup "limit")
+    let type ← foldType path t follow limit arg
+    let tests ← slotTests path (kvs.lookup "where")
+    pure ⟨name, type, tests⟩
+  | _ => refuse "fold-invalid" path
+
+/-- Kinds `from` takes: at least one, each text that isn't empty, as layer 0
+requires of `kind`. -/
 def parseKinds (path : String) : Json → Parse (List String)
+  | .arr [] => refuse "from-invalid" path
   | .arr ks => ks.mapM fun
-    | .str k => pure k
+    | .str k => if k.isEmpty then refuse "from-invalid" path else pure k
     | _ => refuse "from-invalid" path
   | _ => refuse "from-invalid" path
 
+def sourceStore : Option Json → Parse String
+  | some (.str s) => if s.isEmpty then refuse "from-invalid" "from.store" else pure s
+  | _ => refuse "from-invalid" "from.store"
+
+def sourceKinds : Option Json → Parse (List String)
+  | none => pure []
+  | some j => parseKinds "from.kind" j
+
+def sourceAbout : Option Json → Parse (Option String)
+  | none => pure none
+  | some (.str a) => if typedRef a then pure (some a) else refuse "from-invalid" "from.about"
+  | some _ => refuse "from-invalid" "from.about"
+
+/-- One entry of `from`: checked in a fixed order, keys, `store`, `kind`,
+then `about`, however it is written. -/
 def parseSource : Json → Parse Source
   | .obj kvs => do
-    checkKeys sourceKeys "from" kvs
-    let store ← match kvs.lookup "store" with
-      | some (.str s) => pure s
-      | _ => refuse "from-invalid" "from.store"
-    let kinds ← match kvs.lookup "kind" with
-      | none => pure []
-      | some j => parseKinds "from.kind" j
-    let about ← match kvs.lookup "about" with
-      | none => pure none
-      | some (.str a) => pure (some a)
-      | some _ => refuse "from-invalid" "from.about"
+    checkKeys sourceKeys (some "from") kvs
+    let store ← sourceStore (kvs.lookup "store")
+    let kinds ← sourceKinds (kvs.lookup "kind")
+    let about ← sourceAbout (kvs.lookup "about")
     pure ⟨store, kinds, about⟩
   | _ => refuse "from-invalid" "from"
 
-/-- Parse a spec. Checked in order: an object, known keys, `vertex`, `from`,
-then each slot of `fold`. A spec reads at least one source: one with no
-`from`, or an empty one, is refused (`from-missing`), never run empty. -/
-def Spec.ofJson : Json → Parse Spec
+mutual
+/-- Where a key first repeats in its object, depth first in member order:
+the repeat's path. Array elements share their array's path, as spec paths
+have no indexes. -/
+def Json.repeatAt (path : Option String) : Json → Option String
+  | .arr xs => Json.repeatIn path xs
+  | .obj kvs => Json.repeatMember path [] kvs
+  | _ => none
+
+def Json.repeatIn (path : Option String) : List Json → Option String
+  | [] => none
+  | x :: xs => (x.repeatAt path).orElse fun _ => Json.repeatIn path xs
+
+def Json.repeatMember (path : Option String) (seen : List String) :
+    List (String × Json) → Option String
+  | [] => none
+  | (k, v) :: kvs =>
+    if seen.contains k then some (memberPath path k)
+    else (v.repeatAt (some (memberPath path k))).orElse fun _ => Json.repeatMember path (k :: seen) kvs
+end
+
+def specVertex : Option Json → Parse String
+  | none => refuse "vertex-missing" "vertex"
+  | some (.str v) => if v.isEmpty then refuse "vertex-invalid" "vertex" else pure v
+  | some _ => refuse "vertex-invalid" "vertex"
+
+def specSources : Option Json → Parse (List Source)
+  | none | some (.arr []) => refuse "from-missing" "from"
+  | some (.arr xs) => xs.mapM parseSource
+  | some _ => refuse "from-invalid" "from"
+
+def specSlots : Option Json → Parse (List Slot)
+  | none => pure []
+  | some (.obj fs) => fs.mapM fun p => parseSlot p.1 p.2
+  | some _ => refuse "fold-invalid" "fold"
+
+/-- A spec whose keys are distinct. -/
+def Spec.ofObject : Json → Parse Spec
   | .obj kvs => do
-    checkKeys specKeys "" kvs
-    let vertex ← match kvs.lookup "vertex" with
-      | some (.str v) => pure v
-      | _ => refuse "vertex-missing" "vertex"
-    let sources ← match kvs.lookup "from" with
-      | none | some (.arr []) => refuse "from-missing" "from"
-      | some (.arr xs) => xs.mapM parseSource
-      | some _ => refuse "from-invalid" "from"
-    let slots ← match kvs.lookup "fold" with
-      | none => pure []
-      | some (.obj fs) => fs.mapM fun (n, j) => parseSlot n j
-      | some _ => refuse "fold-invalid" "fold"
+    checkKeys specKeys none kvs
+    let vertex ← specVertex (kvs.lookup "vertex")
+    let sources ← specSources (kvs.lookup "from")
+    let slots ← specSlots (kvs.lookup "fold")
     pure ⟨vertex, sources, slots⟩
   | _ => refuse "spec-not-object" ""
+
+/-- Parse a spec. Checked in order: no key repeats in any object
+(`member-duplicate`, layer 0's rule, at the first repeat), an object, known
+keys, `vertex`, `from`, then each slot of `fold`. A spec reads at least one
+source: one with no `from`, or an empty one, is refused (`from-missing`),
+never run empty. -/
+def Spec.ofJson (j : Json) : Parse Spec :=
+  if !j.keysDistinct then refuse "member-duplicate" ((j.repeatAt none).getD "") else Spec.ofObject j
 
 /-! ## Back to JSON: the parsed form, as the vectors show it -/
 
@@ -353,17 +561,21 @@ def Val.toJson : Val → Json
   | .int i => .int i
   | .bool b => .bool b
 
+/-- An argument as written: a time keeps its spelling. -/
+def Arg.toJson : Arg → Json
+  | .val v => v.toJson
+  | .time c => .str c.text
+
 def Op.toJson : Op → String × Json
-  | .is v => ("is", v.toJson)
-  | .not v => ("not", v.toJson)
+  | .is a => ("is", a.toJson)
+  | .not a => ("not", a.toJson)
   | .present => ("present", .bool true)
   | .absent => ("absent", .bool true)
-  | .atLeast i => ("at-least", .int i)
-  | .below i => ("below", .int i)
+  | .atLeast a => ("at-least", a.toJson)
+  | .below a => ("below", a.toJson)
 
-def condsToJson (cs : List Cond) : Json :=
-  let names := cs.foldl (fun ns c => if ns.contains c.field.name then ns else ns ++ [c.field.name]) []
-  .obj (names.map fun n => (n, .obj ((cs.filter (·.field.name == n)).map (·.op.toJson))))
+/-- A `where` map as written. -/
+def Tests.toJson (ts : Tests) : Json := .obj (ts.map fun (f, os) => (f.name, .obj (os.map Op.toJson)))
 
 def Slot.toJson (s : Slot) : String × Json :=
   let type : List (String × Json) := match s.type with
@@ -377,7 +589,7 @@ def Slot.toJson (s : Slot) : String × Json :=
         (match limit with
           | some k => [("limit", .int k)]
           | none => [])
-  (s.name, .obj (type ++ if s.cond.isEmpty then [] else [("where", condsToJson s.cond)]))
+  (s.name, .obj (type ++ if s.tests.isEmpty then [] else [("where", s.tests.toJson)]))
 
 def Source.toJson (s : Source) : Json :=
   .obj ([("store", .str s.store)] ++

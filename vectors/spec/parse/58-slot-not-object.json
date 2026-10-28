@@ -1,0 +1,23 @@
+{
+  "vector": "58-slot-not-object",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": 5
+      }
+    }
+  },
+  "expect": {
+    "refused": "fold-invalid",
+    "path": "fold.c"
+  }
+}

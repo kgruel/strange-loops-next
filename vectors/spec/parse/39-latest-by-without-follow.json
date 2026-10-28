@@ -1,0 +1,25 @@
+{
+  "vector": "39-latest-by-without-follow",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "latest-by": "about"
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "follow-missing",
+    "path": "fold.c.follow"
+  }
+}

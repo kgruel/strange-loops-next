@@ -106,30 +106,62 @@ Writing checks `prev` too: you can only replace what you hold. `emit`
 refuses a `prev` naming a record neither in the batch nor in the store
 (`prev-unknown`) or one about other things (`prev-unrelated`).
 
-## The spec (`model/Laws/Spec.lean`)
+## The spec (`model/Laws/Spec.lean`, `model/Laws/Parse.lean`)
 
-A spec parses into a closed type: `from` selects by envelope, and `fold`
-names slots, each one fold with an optional `where`. `where` has six
-operators (`is`, `not`, `present`, `absent`, `at-least`, `below`) and three
-answers; a `where` map holds when every test does. `about` is a set, so a
-test on it asks whether a record is about a thing. Accumulating slots select,
-then fold. Slots over heads (latest-by, collect) read each thing's state,
+[`spec.md`](spec.md) is the grammar: the keys, what each test may compare
+against, and the refusals in the order they are checked. These are its laws.
+
+`where` has six operators (`is`, `not`, `present`, `absent`, `at-least`,
+`below`) and three answers; a `where` map holds when every test does. A test
+on `env.<field>` reads the envelope as written, so it always answers; a test
+on a payload field answers unknown when the reader doesn't hold the payload.
+A record about nothing has an empty `env.about`, though it anchors a thing
+named by its own id. `about`, `prev`, `under` and `erases` are sets (`under`
+of at most one): `is` asks whether the set holds the value, `not` whether it
+doesn't, and `present` whether it holds anything. A time is tested by what
+it reads as: `is` asks for the same span however either is spelled,
+`at-least` and `below` compare starts, and a record without `occurred`
+passes neither.
+
+`from` chooses by thing: `"about": "t"` takes the records about `t`, and a
+record about nothing is about its own id, so `"about": "r:X"` takes X and
+its revisions.
+
+Accumulating slots select, then fold; a numeric fold (sum, min, max) counts
+a selected record as unread when its payload isn't held or lacks the field
+as a number (text that reads as one is not a number). Slots over heads
+(latest-by, and collect with `"follow": "prev"`) read each thing's state,
 already settled over everything the reader holds; `from` and the envelope
 tests then choose heads, and payload tests filter them. Selecting first
 would bring back a record whose successor is of another kind, no longer
-matches, or is withheld.
+matches, or is withheld. Collect without `follow` takes every selected
+record, superseded or not.
+
+The specs the parser gives are exactly those that fit (`Spec.Fits`): a vertex, at
+least one source, slots named once, no empty name or kind, every `where`
+naming each field once with at least one test, no operator twice, and every
+argument what layer 0 would accept in its field. Every spec that fits has a
+written form that parses back to it, so an accepted spec's parsed form
+parses back to itself. A spec with a repeated key is refused, at the path
+the search in `Json.repeatAt` gives. These say what the parser gives, not
+which JSON it accepts: a stricter parser would satisfy them too. Which JSON
+is accepted, the order of the checks, and each refusal's code and path are
+pinned by the vectors rather than proved.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below` | `not` is the complement of `is`, `absent` of `present`; on a number exactly one of `at-least` and `below` holds | (none yet) |
-| `where.typed` | `Op.ordered_numbers_only` | `at-least` and `below` hold only for numbers | (none yet) |
-| `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record | every `spec/run` vector |
+| `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below`, `Op.atLeast_below_time` | `not` is the complement of `is`, `absent` of `present`; on a number, or a time, exactly one of `at-least` and `below` holds | `spec/run/06`, `07` |
+| `where.typed` | `Op.ordered_like_only`, `parseOp_ok_iff`, `parseArg_ok_iff`, `parseBound_ok_iff` | `at-least` and `below` compare numbers with numbers and times with times, and hold for nothing else; a test is accepted exactly when its argument fits its field (`Op.Fits`), and renders back to what was written | `spec/run/07`, `spec/parse/22`–`37` |
+| `where.fields` | `Cond.text_is`, `Cond.about_is`, `Cond.id_is`, `Cond.set_present`, `Cond.emitted_is`, `Cond.emitted_atLeast`, `Cond.emitted_below` | each envelope field reads as what it holds: `kind` and `observer` as their text, a set as its members (`is`) and whether it holds any (`present`), `emitted` as its own instant | `spec/run/08`, `09` |
+| `where.time` | `Cond.occurred_is`, `Cond.occurred_atLeast`, `Cond.occurred_below`, `Cond.occurred_missing`, `Cond.time_meaning`, `Op.time_arg_meaning` | a test on a time reads its span, never its spelling, the record's or the argument's: `is` asks for the same span, `at-least` and `below` compare starts, and a record without `occurred` passes neither | `spec/run/06`, `08` |
+| `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record, withheld or not | every `spec/run` vector |
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
+| `spec.from-thing` | `Source.takes_about` | `from`'s `about` takes exactly the records about the thing, and a record about nothing is about its own id and nothing else | `spec/run/09` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
-| `spec.after-supersession` | `Spec.view_state` | slots over heads read each thing's state, which under a view is the full reader's with payloads hidden; selection never brings back what was superseded | `spec/run/03`, `04` |
-| `spec.parse` | (checked by `gen`) | the parsed form parses back to itself; refusals name a closed code and a path; a spec with no source is refused (`from-missing`), never run empty | `spec/parse/*` |
+| `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads, records no record about their thing has superseded, and only those `from` takes and every test holds for, so selection never brings back what was superseded; under a view each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
+| `spec.parse` | `Spec.ofJson_fits`, `Spec.ofJson_toJson`, `Spec.reparse`, `Spec.parsed_iff`, `Spec.ofJson_repeat`, `Json.repeatAt_none` | the specs the parser gives are exactly those that fit, so none runs without a source; an accepted spec's parsed form parses back to itself; a spec with a repeated key is refused, at the path `Json.repeatAt` gives, and one without is never refused for repeating | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
 

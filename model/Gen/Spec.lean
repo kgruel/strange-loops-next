@@ -21,6 +21,19 @@ def a (xs : List Json) : Json := .arr xs
 
 /-! ## Parsing -/
 
+/-- A spec counting what one `where` test chooses. -/
+def whereOn (field : String) (test : String × Json) : Json :=
+  o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
+    ("fold", o [("c", o [("count", .bool true), ("where", o [(field, o [test])])])])]
+
+/-- A spec with one slot, as written. -/
+def slotOf (slot : Json) : Json :=
+  o [("vertex", s "x"), ("from", a [o [("store", s ".")]]), ("fold", o [("c", slot)])]
+
+/-- A spec counting from one source, as written. -/
+def fromOf (source : Json) : Json :=
+  o [("vertex", s "x"), ("from", a [source]), ("fold", o [("c", o [("count", .bool true)])])]
+
 def parseCases : List (String × Json) := [
   ("01-latest-by", o [("vertex", s "decisions"),
     ("note", s "Decisions from notes; the latest per topic."),
@@ -31,13 +44,27 @@ def parseCases : List (String × Json) := [
   ("02-where-and-limit", o [("vertex", s "open-tasks"),
     ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
     ("fold", o [("recent", o [("collect", .bool true), ("follow", s "prev"), ("limit", .int 5),
-      ("where", o [("status", o [("is", s "open")]), ("kind", o [("not", s "draft")])])])])]),
+      ("where", o [("status", o [("is", s "open")]), ("env.kind", o [("not", s "draft")])])])])]),
   ("03-numeric", o [("vertex", s "estimates"),
     ("from", a [o [("store", s "."), ("kind", a [s "task"]), ("about", s "proj:loops")]]),
     ("fold", o [("tasks", o [("count", .bool true)]),
       ("total", o [("sum", s "est")]),
       ("largest", o [("max", s "est"), ("where", o [("est", o [("at-least", .int 1), ("below", .int 100)])])]),
       ("flagged", o [("count", .bool true), ("where", o [("blocked", o [("present", .bool true)])])])])]),
+  ("04-envelope-fields", o [("vertex", s "events"),
+    ("from", a [o [("store", s ".")]]),
+    ("fold", o [("these", o [("count", .bool true), ("where", o [
+      ("env.kind", o [("is", s "event")]),
+      ("env.observer", o [("not", s "sl:bot")]),
+      ("env.about", o [("is", s "proj:loops")]),
+      ("env.prev", o [("is", s (idText 0x41))]),
+      ("env.under", o [("absent", .bool true)]),
+      ("env.erases", o [("absent", .bool true)]),
+      ("env.emitted", o [("at-least", s "2026-10-01T00:00:00Z")]),
+      ("env.occurred", o [("at-least", s "2026-10"), ("below", s "2026-11-01T01:00:00+01:00"),
+        ("not", s "2026-10-01/2026-10-31")])])])])]),
+  ("05-no-fold", o [("vertex", s "x"), ("from", a [o [("store", s ".")]])]),
+  ("06-from-about-anchor", fromOf (o [("about", s (idText 0x71)), ("store", s "."), ("kind", a [s "note"])])),
   ("10-not-object", a [s "vertex"]),
   ("11-unknown-key", o [("vertex", s "x"), ("query", s "select *")]),
   ("12-vertex-missing", o [("fold", o [])]),
@@ -55,7 +82,66 @@ def parseCases : List (String × Json) := [
   ("19-sum-of-nothing", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
     ("fold", o [("t", o [("sum", .bool true)])])]),
   ("20-from-missing", o [("vertex", s "x"), ("fold", o [("c", o [("count", .bool true)])])]),
-  ("21-from-empty", o [("vertex", s "x"), ("from", a []), ("fold", o [("c", o [("count", .bool true)])])])
+  ("21-from-empty", o [("vertex", s "x"), ("from", a []), ("fold", o [("c", o [("count", .bool true)])])]),
+  ("22-env-unknown-field", whereOn "env.id" ("present", .bool true)),
+  ("23-env-text-ordered", whereOn "env.kind" ("at-least", s "a")),
+  ("24-env-time-not-span", whereOn "env.occurred" ("at-least", s "2026-13")),
+  ("25-env-time-as-number", whereOn "env.occurred" ("at-least", .int 2026)),
+  ("26-env-id-not-record-id", whereOn "env.prev" ("is", s "r:x")),
+  ("27-env-text-as-number", whereOn "env.kind" ("is", .int 5)),
+  ("28-payload-bound-not-number", whereOn "est" ("at-least", s "5")),
+  ("29-env-time-is-not-span", whereOn "env.occurred" ("is", s "2026-13")),
+  ("30-env-id-ordered", whereOn "env.under" ("below", s (idText 0x41))),
+  ("31-present-false", whereOn "blocked" ("present", .bool false)),
+  ("32-env-text-as-bool", whereOn "env.kind" ("not", .bool true)),
+  ("33-env-id-as-number", whereOn "env.prev" ("is", .int 5)),
+  ("34-env-observer-not-typed", whereOn "env.observer" ("is", s "alice")),
+  ("35-env-kind-empty", whereOn "env.kind" ("is", s "")),
+  ("36-env-about-not-typed", whereOn "env.about" ("not", s "loops")),
+  ("37-payload-is-null", whereOn "status" ("is", .null)),
+  ("38-where-empty", slotOf (o [("count", .bool true), ("where", o [])])),
+  ("39-latest-by-without-follow", slotOf (o [("latest-by", s "about")])),
+  ("40-repeated-operator", slotOf (o [("count", .bool true),
+    ("where", o [("env.kind", o [("is", s "task"), ("is", s "note")])])])),
+  ("41-repeated-key", o [("vertex", s "x"), ("vertex", s "y"), ("from", a [o [("store", s ".")]])]),
+  -- a slot is checked in order: keys, one fold type, follow, limit, the
+  -- fold's argument, then where, its fields in the order written
+  ("42-slot-errors-in-order", slotOf (o [("count", .bool false), ("limit", .int 0), ("follow", s "next"),
+    ("where", o [("x", o [("matches", s ".")])])])),
+  -- written order, which isn't sorted order
+  ("43-where-errors-in-order", slotOf (o [("count", .bool true),
+    ("where", o [("x", o [("matches", s ".")]), ("env.id", o [("present", .bool true)])])])),
+  ("44-from-kind-empty", fromOf (o [("store", s "."), ("kind", a [s ""])])),
+  ("45-from-about-not-typed", fromOf (o [("store", s "."), ("about", s "loops")])),
+  ("46-from-kind-none", fromOf (o [("store", s "."), ("kind", a [])])),
+  ("47-vertex-empty", o [("vertex", s ""), ("from", a [o [("store", s ".")]])]),
+  ("48-vertex-not-text", o [("vertex", .int 5), ("from", a [o [("store", s ".")]])]),
+  ("49-store-empty", fromOf (o [("store", s "")])),
+  ("50-slot-name-empty", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
+    ("fold", o [("", o [("count", .bool true)])])]),
+  ("51-sum-field-empty", slotOf (o [("sum", s "")])),
+  ("61-min-field-empty", slotOf (o [("min", s "")])),
+  ("62-max-field-empty", slotOf (o [("max", s "")])),
+  ("52-where-field-empty", slotOf (o [("count", .bool true), ("where", o [("", o [("present", .bool true)])])])),
+  -- the repeat found first, depth first in member order: the slot's, though
+  -- `vertex` was written first and repeats after it
+  ("53-repeat-depth-first", o [("vertex", s "x"),
+    ("fold", o [("c", o [("count", .bool true), ("count", .bool true)])]),
+    ("vertex", s "y"), ("from", a [o [("store", s ".")]])]),
+  -- inside an array element, and before every other check
+  ("54-repeat-in-from", o [("vertex", s "x"), ("from", a [o [("store", s "."), ("store", s ".")]]),
+    ("query", s "select *")]),
+  ("55-slot-limit-before-argument", slotOf (o [("count", .bool false), ("limit", .int 0)])),
+  -- `from` checks store, kind, then about, however they are written
+  ("56-from-errors-in-order", fromOf (o [("about", s "loops"), ("kind", a [s ""]), ("store", s ".")])),
+  ("57-from-store-first", fromOf (o [("kind", a []), ("store", s "")])),
+  ("58-slot-not-object", slotOf (.int 5)),
+  ("59-slot-unknown-key", slotOf (o [("count", .bool true), ("order", s "newest")])),
+  ("60-from-unknown-key", fromOf (o [("store", s "."), ("as", s "x")])),
+  -- a repeat under an empty key: its path starts with the empty key
+  ("63-repeat-under-empty-key", o [("", o [("x", .int 1), ("x", .int 2)]), ("vertex", s "x"),
+    ("from", a [o [("store", s ".")]])]),
+  ("64-slot-argument-before-where", slotOf (o [("count", .bool false), ("where", o [])]))
 ]
 
 def jRefusal (r : Refusal) : J := .obj [("refused", .str r.code), ("path", .str r.path)]
@@ -69,13 +155,16 @@ def parseVector (name : String) (j : Json) : Except String J := do
       | .error _ => throw s!"spec/parse/{name}: its parsed form is refused"
       pure (.obj [("parsed", Records.ofJson sp.toJson)])
     | .error r => pure (jRefusal r)
-  return vector name "spec/parse" ["spec.parse"] (.obj [("spec", Records.ofJson j)]) expect
+  -- a spec that repeats a key also comes as written, since a JSON parser
+  -- may keep only one of the repeats
+  let text := if j.keysDistinct then [] else [("spec_text", J.str (Records.rawText j))]
+  return vector name "spec/parse" ["spec.parse"] (.obj ([("spec", Records.ofJson j)] ++ text)) expect
 
 /-! ## Running -/
 
 def task (id : Nat) (thing : String) (occurred : Nat) (fields : List (String × Val))
     (prev : List Nat := []) (ok : Reads occurred := by decide) : Record :=
-  { id, kind := "task", about := [thing], value := "", prev, occurred := some (claimAt occurred ok),
+  { id, kind := "task", observer := "sl:kyle", about := [thing], value := "", prev, occurred := some (claimAt occurred ok),
     emitted := stampAt occurred ok, fields }
 
 -- task:1 opens, then closes; task:2 is open; task:3 is open but its payload is withheld
@@ -84,6 +173,84 @@ def t2 := task 0x42 "task:1" 200 [("status", .str "closed"), ("est", .int 3)] (p
 def t3 := task 0x43 "task:2" 150 [("status", .str "open"), ("est", .int 5), ("blocked", .bool true)]
 def t4 := (task 0x44 "task:3" 160 [("status", .str "open"), ("est", .int 8)]).withhold
 def n1 : Record := { task 0x45 "task:2" 170 [] with kind := "note" }
+
+-- events with every kind of `occurred`: a month and the same span spelled
+-- as days, a day that starts with them, an instant, an open span, one in
+-- September, one without, and one withheld, whose envelope tests still answer
+def ev (id : Nat) (occurred : Option Claim) (emitted : Nat) (ok : Reads emitted := by decide) : Record :=
+  { id, kind := "event", observer := "sl:kyle", about := [s!"event:{id}"], value := "", prev := [], occurred,
+    emitted := stampAt emitted ok }
+
+def e1 := ev 0x51 (some (claim "2026-10")) 100
+def e2 := ev 0x52 (some (claimAt 300)) 300
+def e3 := ev 0x53 (some (claim "2026-10-01/2026-10-31")) 110
+def e4 := ev 0x54 none 200
+def e5 := ev 0x55 (some (claim "2026-09")) 120
+def e6 := (ev 0x56 (some (claimAt 600)) 600).withhold
+def e7 := ev 0x57 (some (claim "2026-10-01T00:02:00Z/..")) 130
+def e8 := ev 0x58 (some (claim "2026-10-01")) 140
+
+def timeSpec : Json := o [("vertex", s "events"),
+  ("from", a [o [("store", s "."), ("kind", a [s "event"])]]),
+  ("fold", o [
+    ("october", o [("count", .bool true),
+      ("where", o [("env.occurred", o [("at-least", s "2026-10"), ("below", s "2026-11")])])]),
+    ("the-month", o [("collect", .bool true), ("where", o [("env.occurred", o [("is", s "2026-10")])])]),
+    ("not-the-month", o [("count", .bool true), ("where", o [("env.occurred", o [("not", s "2026-10")])])]),
+    ("before-five", o [("count", .bool true),
+      ("where", o [("env.occurred", o [("below", s "2026-10-01T00:05:00Z")])])]),
+    ("undated", o [("collect", .bool true), ("where", o [("env.occurred", o [("absent", .bool true)])])]),
+    ("emitted-late", o [("collect", .bool true),
+      ("where", o [("env.emitted", o [("at-least", s "2026-10-01T01:03:00+01:00")])])])])]
+
+-- numeric bounds and complements on a payload field
+def boundSpec : Json := o [("vertex", s "estimates"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
+  ("fold", o [
+    ("mid", o [("count", .bool true), ("where", o [("est", o [("at-least", .int 4), ("below", .int 8)])])]),
+    ("small", o [("count", .bool true), ("where", o [("est", o [("below", .int 4)])])]),
+    ("not-three", o [("count", .bool true), ("where", o [("est", o [("not", .int 3)])])]),
+    ("total", o [("sum", s "est")]),
+    ("unblocked", o [("count", .bool true), ("where", o [("blocked", o [("absent", .bool true)])])])])]
+
+-- every envelope field, tested on records by several observers: a revision
+-- by someone else, a record about two things (erased by another), one acting
+-- under a grant, and one about nothing, dated a month before it was stamped
+-- and withheld; payload `kind` differs from `env.kind`
+def said (id : Nat) (observer : String) (about : List String) (t : Nat)
+    (ok : Reads t := by decide) : Record :=
+  { id, kind := "task", observer, about, value := "", prev := [], emitted := stampAt t ok }
+
+def a1 : Record := { said 0x61 "sl:alice" ["task:1"] 100 with fields := [("kind", .str "chore")] }
+def a2 : Record := { said 0x62 "sl:bob" ["task:1"] 200 with prev := [0x61], fields := [("kind", .str "bug")] }
+def a3 : Record := (said 0x63 "sl:alice" ["task:2", "proj:loops"] 300).erase
+def a4 : Record := { said 0x64 "sl:carol" ["task:3"] 400 with under := some 0x99, erases := [0x63] }
+def a5 : Record := { said 0x65 "sl:alice" [] 500 with occurred := some (claim "2026-09") }.withhold
+def a6 : Record := { said 0x66 "sl:bob" ["task:4"] 150 with kind := "chore" }
+
+def envSpec : Json := o [("vertex", s "envelopes"),
+  ("from", a [o [("store", s ".")]]),
+  ("fold", o [
+    ("by-alice", o [("collect", .bool true), ("where", o [("env.observer", o [("is", s "sl:alice")])])]),
+    ("not-alice", o [("count", .bool true), ("where", o [("env.observer", o [("not", s "sl:alice")])])]),
+    ("loops", o [("collect", .bool true), ("where", o [("env.about", o [("is", s "proj:loops")])])]),
+    ("not-task-2", o [("collect", .bool true), ("where", o [("env.about", o [("not", s "task:2")])])]),
+    ("about-nothing", o [("collect", .bool true), ("where", o [("env.about", o [("absent", .bool true)])])]),
+    ("revisions", o [("collect", .bool true), ("where", o [("env.prev", o [("present", .bool true)])])]),
+    ("revises-first", o [("count", .bool true), ("where", o [("env.prev", o [("is", s (idText 0x61))])])]),
+    ("granted", o [("collect", .bool true), ("where", o [("env.under", o [("is", s (idText 0x99))])])]),
+    ("ungranted", o [("count", .bool true), ("where", o [("env.under", o [("absent", .bool true)])])]),
+    ("erasing", o [("collect", .bool true), ("where", o [("env.erases", o [("is", s (idText 0x63))])])]),
+    ("chores", o [("collect", .bool true), ("where", o [("kind", o [("is", s "chore")])])]),
+    ("chore-kind", o [("collect", .bool true), ("where", o [("env.kind", o [("is", s "chore")])])]),
+    ("emitted-since", o [("collect", .bool true),
+      ("where", o [("env.emitted", o [("at-least", s "2026-10-01T00:04:00Z")])])]),
+    ("emitted-is", o [("count", .bool true),
+      ("where", o [("env.emitted", o [("is", s "2026-10-01T01:01:40+01:00")])])]),
+    ("alice-current", o [("latest-by", s "about"), ("follow", s "prev"),
+      ("where", o [("env.observer", o [("is", s "sl:alice")])])]),
+    ("alice-heads", o [("collect", .bool true), ("follow", s "prev"),
+      ("where", o [("env.observer", o [("is", s "sl:alice")])])])])]
 
 def taskSpec : Json := o [("vertex", s "tasks"),
   ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
@@ -97,6 +264,19 @@ def taskSpec : Json := o [("vertex", s "tasks"),
     ("open-observations", o [("count", .bool true), ("where", o [("status", o [("is", s "open")])])]),
     ("est", o [("sum", s "est")]),
     ("blocked", o [("count", .bool true), ("where", o [("blocked", o [("present", .bool true)])])])])]
+
+-- a record about nothing anchors the thing named by its id: `from` takes it
+-- and its revision, while `env.about` reads only what each envelope says
+def x1 : Record := { said 0x71 "sl:alice" [] 100 with kind := "note" }
+def x2 : Record := { said 0x72 "sl:bob" [idText 0x71] 200 with kind := "note", prev := [0x71] }
+def x3 : Record := { said 0x73 "sl:bob" ["task:1"] 300 with kind := "note" }
+
+def anchorSpec : Json := o [("vertex", s "anchored"),
+  ("from", a [o [("store", s "."), ("about", s (idText 0x71))]]),
+  ("fold", o [
+    ("all", o [("collect", .bool true)]),
+    ("current", o [("latest-by", s "about"), ("follow", s "prev")]),
+    ("says-about", o [("collect", .bool true), ("where", o [("env.about", o [("is", s (idText 0x71))])])])])]
 
 structure RunCase where
   name : String
@@ -112,7 +292,15 @@ def runCases : List RunCase := [
   ⟨"04-kind-change", ["spec.set", "spec.after-supersession"], taskSpec,
     [t1, { task 0x46 "task:1" 300 [] (prev := [0x41]) with kind := "task-done" }, t3]⟩,
   ⟨"05-about-is-a-set", ["spec.set", "thing.local"], taskSpec,
-    [{ t3 with about := ["task:2", "task:9"] }, task 0x47 "task:2" 400 [("status", .str "closed")] (prev := [0x43])]⟩
+    [{ t3 with about := ["task:2", "task:9"] }, task 0x47 "task:2" 400 [("status", .str "closed")] (prev := [0x43])]⟩,
+  ⟨"06-times", ["spec.set", "where.time", "where.complements", "where.total"], timeSpec,
+    [e1, e2, e3, e4, e5, e6, e7, e8]⟩,
+  ⟨"07-numeric-bounds", ["spec.set", "where.complements", "where.typed", "result.unread"], boundSpec,
+    [t1, t2, t3, t4, task 0x48 "task:4" 180 [("est", .int 4)], task 0x49 "task:5" 190 [("est", .int 8)],
+      task 0x4a "task:6" 195 [("est", .str "5")]]⟩,
+  ⟨"08-envelope-fields", ["spec.set", "where.fields", "where.time", "where.total",
+      "spec.after-supersession"], envSpec, [a1, a2, a3, a4, a5, a6]⟩,
+  ⟨"09-from-about-anchor", ["spec.set", "spec.from-thing", "where.fields"], anchorSpec, [x1, x2, x3]⟩
 ]
 
 def jShownIds (hs : List (Nat × Shown)) : J :=

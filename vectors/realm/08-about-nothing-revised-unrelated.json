@@ -8,6 +8,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq",
         "kind": "note",
+        "observer": "sl:kyle",
         "about": [],
         "value": "",
         "prev": [],
@@ -18,6 +19,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacca",
         "kind": "note",
+        "observer": "sl:kyle",
         "about": [],
         "value": "",
         "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq"],

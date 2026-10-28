@@ -35,7 +35,7 @@ def jOutcome : Outcome → J
 def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
     (prev : List Nat := []) (value : String := s!"v{id}")
     (okO : Reads occurred := by decide) (okE : Reads emitted := by decide) : Record :=
-  { id, kind := "decision", about := [thing], value, prev, occurred := some (claimAt occurred okO),
+  { id, kind := "decision", observer := "sl:kyle", about := [thing], value, prev, occurred := some (claimAt occurred okO),
     emitted := stampAt emitted okE }
 
 def r1 := rec 0x11 "topic:auth" 100
@@ -188,8 +188,9 @@ structure SelectCase where
   name : String
   laws : List String
   records : List Record
-  /-- The test as a spec writes it, and as the model runs it. -/
-  test : J
+  /-- The test as a spec writes it, and as the model runs it; gen checks the
+  two agree on every record. -/
+  test : Json
   w : Where
 
 def selectCases : List SelectCase := [
@@ -198,7 +199,7 @@ def selectCases : List SelectCase := [
     .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩,
   ⟨"02-envelope-test-on-withheld", ["result.unread", "select.set"],
     [n1, n2, n3.withhold],
-    .obj [("kind", .obj [("is", .str "decision")])],
+    .obj [("env.kind", .obj [("is", .str "decision")])],
     .envelope (·.kind == "decision") fun _ _ h => by rw [h.kind]⟩,
   ⟨"03-all-here", ["result.full", "select.set"], [n1, n2, n3],
     .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩
@@ -208,6 +209,13 @@ def jSum (r : Result Int) : J := .obj [("value", .int r.value), ("unread", .num 
 def jCount (r : Result Nat) : J := .obj [("value", .num r.value), ("unread", .num r.unread)]
 
 def selectVector (c : SelectCase) : Except String J := do
+  if !c.test.keysDistinct then throw s!"fold/select/{c.name}: its test repeats a key"
+  let cs ← match parseWhere "where" c.test with
+    | .ok ts => pure ts.conds
+    | .error r => throw s!"fold/select/{c.name}: its test is refused ({r.code})"
+  for r in c.records do
+    if Cond.all cs r != c.w.eval r then
+      throw s!"fold/select/{c.name}: the test as written and as run disagree on {idText r.id}"
   let orders := rotations c.records
   let results := orders.map fun o =>
     J.obj [("count", jCount (Count.acc.select c.w.eval o)), ("sum", jSum (Sum.acc.select c.w.eval o))]
@@ -215,7 +223,7 @@ def selectVector (c : SelectCase) : Except String J := do
   if !(results.all (·.render 0 == first.render 0)) then
     throw s!"fold/select/{c.name}: arrival orders disagree"
   return vector c.name "fold/select" c.laws
-    (.obj [("where", c.test), ("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
+    (.obj [("where", Records.ofJson c.test), ("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
 
 def foldVector (layer : String) (c : FoldCase) (result : List Record → J) : Except String J := do
   let results := c.orders.map result

@@ -1,0 +1,92 @@
+{
+  "vector": "04-envelope-fields",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "events",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "these": {
+          "count": true,
+          "where": {
+            "env.kind": {
+              "is": "event"
+            },
+            "env.observer": {
+              "not": "sl:bot"
+            },
+            "env.about": {
+              "is": "proj:loops"
+            },
+            "env.prev": {
+              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"
+            },
+            "env.under": {
+              "absent": true
+            },
+            "env.erases": {
+              "absent": true
+            },
+            "env.emitted": {
+              "at-least": "2026-10-01T00:00:00Z"
+            },
+            "env.occurred": {
+              "at-least": "2026-10",
+              "below": "2026-11-01T01:00:00+01:00",
+              "not": "2026-10-01/2026-10-31"
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "parsed": {
+      "vertex": "events",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "these": {
+          "count": true,
+          "where": {
+            "env.kind": {
+              "is": "event"
+            },
+            "env.observer": {
+              "not": "sl:bot"
+            },
+            "env.about": {
+              "is": "proj:loops"
+            },
+            "env.prev": {
+              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"
+            },
+            "env.under": {
+              "absent": true
+            },
+            "env.erases": {
+              "absent": true
+            },
+            "env.emitted": {
+              "at-least": "2026-10-01T00:00:00Z"
+            },
+            "env.occurred": {
+              "at-least": "2026-10",
+              "below": "2026-11-01T01:00:00+01:00",
+              "not": "2026-10-01/2026-10-31"
+            }
+          }
+        }
+      }
+    }
+  }
+}

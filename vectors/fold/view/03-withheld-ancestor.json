@@ -9,6 +9,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": [],
           "emitted": "2026-10-01T00:01:40Z",
@@ -18,6 +19,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
@@ -27,6 +29,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
@@ -37,6 +40,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v20",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
@@ -49,6 +53,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
@@ -58,6 +63,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
@@ -68,6 +74,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v20",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
@@ -78,6 +85,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": [],
           "emitted": "2026-10-01T00:01:40Z",
@@ -89,6 +97,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],
@@ -99,6 +108,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v20",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
@@ -109,6 +119,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": [],
           "emitted": "2026-10-01T00:01:40Z",
@@ -118,6 +129,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
@@ -129,6 +141,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaka",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v20",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq"],
@@ -139,6 +152,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": [],
           "emitted": "2026-10-01T00:01:40Z",
@@ -148,6 +162,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaja",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
           "emitted": "2026-10-01T00:03:20Z",
@@ -157,6 +172,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v19",
           "prev": [],

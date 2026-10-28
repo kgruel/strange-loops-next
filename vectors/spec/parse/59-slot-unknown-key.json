@@ -1,0 +1,26 @@
+{
+  "vector": "59-slot-unknown-key",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "order": "newest"
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "unknown-key",
+    "path": "fold.c.order"
+  }
+}

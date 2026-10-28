@@ -1,0 +1,25 @@
+{
+  "vector": "63-repeat-under-empty-key",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "": {
+        "x": 1,
+        "x": 2
+      },
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ]
+    },
+    "spec_text": "{\"\":{\"x\":1,\"x\":2},\"vertex\":\"x\",\"from\":[{\"store\":\".\"}]}"
+  },
+  "expect": {
+    "refused": "member-duplicate",
+    "path": ".x"
+  }
+}

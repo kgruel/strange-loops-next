@@ -144,11 +144,11 @@ theorem OverHeads.late {σ} (answer : LatestBy → σ) {xs ys : List Record} (r 
 /-! ## Why there are two families -/
 
 def cx.a : Record :=
-  { id := 1, kind := "load", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
+  { id := 1, kind := "load", observer := "sl:x", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
 def cx.b : Record :=
-  { id := 2, kind := "load", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
+  { id := 2, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
 def cx.c : Record :=
-  { id := 3, kind := "load", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
+  { id := 3, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
 
 /-- Max can't follow `prev`. Max holds 9 after `[a, b]` and after
 `[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and
@@ -180,23 +180,23 @@ theorem View.addressed {f : Record → Record} (hf : View f) {xs : List Record}
   rw [(hf.envelope a).id, (hf.envelope b).id] at e
   rw [hx a ha b hb e]
 
-theorem SameEnvelope.refl (r : Record) : SameEnvelope r r := ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+theorem SameEnvelope.refl (r : Record) : SameEnvelope r r := ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem SameEnvelope.symm {a b : Record} (h : SameEnvelope a b) : SameEnvelope b a :=
-  ⟨h.id.symm, h.kind.symm, h.observer.symm, h.about.symm, h.prev.symm, h.occurred.symm,
+  ⟨h.id.symm, h.kind.symm, h.observer.symm, h.about.symm, h.prev.symm, h.under.symm, h.occurred.symm,
     h.emitted.symm, h.erases.symm⟩
 
 theorem SameEnvelope.trans {a b c : Record} (h : SameEnvelope a b) (h' : SameEnvelope b c) :
     SameEnvelope a c :=
   ⟨h.id.trans h'.id, h.kind.trans h'.kind, h.observer.trans h'.observer, h.about.trans h'.about,
-    h.prev.trans h'.prev, h.occurred.trans h'.occurred, h.emitted.trans h'.emitted,
+    h.prev.trans h'.prev, h.under.trans h'.under, h.occurred.trans h'.occurred, h.emitted.trans h'.emitted,
     h.erases.trans h'.erases⟩
 
 theorem withhold_envelope (r : Record) : SameEnvelope r.withhold r :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem erase_envelope (r : Record) : SameEnvelope r.erase r :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem withholding_view (p : Record → Bool) : View (withholding p) where
   envelope r := by

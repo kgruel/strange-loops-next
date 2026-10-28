@@ -44,7 +44,7 @@
   "ticks": ["review"],
   "into": "notes",
   "order": "occurred",
-  "fold": { "by-topic": { "latest-by": "topic" } },
+  "fold": { "by-topic": { "latest-by": "topic", "follow": "prev" } },
   "boundary": [{ "when": "release" }]
 }</pre>
   <div class="tbl"><table>
@@ -187,9 +187,9 @@
   ],
   "order": "occurred",
   "fold": {
-    "attention": { "sum": "dwell", "by": "about", "where": { "kind": { "is": "attention" } } },
-    "marked":    { "count": true,  "by": "about", "where": { "kind": { "is": "marked" } } },
-    "available": { "collect": true, "set": true, "by": "about", "where": { "kind": { "is": "available" } } }
+    "attention": { "sum": "dwell", "by": "about", "where": { "env.kind": { "is": "attention" } } },
+    "marked":    { "count": true,  "by": "about", "where": { "env.kind": { "is": "marked" } } },
+    "available": { "collect": true, "set": true, "by": "about", "where": { "env.kind": { "is": "available" } } }
   },
   "boundary": [{ "every": "day", "axis": "occurred" }],
   "into": "digest"

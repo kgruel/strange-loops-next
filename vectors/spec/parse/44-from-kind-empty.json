@@ -1,0 +1,26 @@
+{
+  "vector": "44-from-kind-empty",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": ".",
+          "kind": [""]
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "from-invalid",
+    "path": "from.kind"
+  }
+}

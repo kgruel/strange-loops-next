@@ -63,6 +63,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -77,6 +78,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -91,6 +93,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -106,6 +109,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:3"],
           "prev": [],
           "emitted": "2026-10-01T00:02:40Z",
@@ -115,6 +119,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcq",
           "kind": "note",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -127,6 +132,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -141,6 +147,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -156,6 +163,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:3"],
           "prev": [],
           "emitted": "2026-10-01T00:02:40Z",
@@ -165,6 +173,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcq",
           "kind": "note",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -175,6 +184,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -191,6 +201,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -206,6 +217,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:3"],
           "prev": [],
           "emitted": "2026-10-01T00:02:40Z",
@@ -215,6 +227,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcq",
           "kind": "note",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -225,6 +238,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -239,6 +253,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -255,6 +270,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:3"],
           "prev": [],
           "emitted": "2026-10-01T00:02:40Z",
@@ -264,6 +280,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcq",
           "kind": "note",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -274,6 +291,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -288,6 +306,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -302,6 +321,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -319,6 +339,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabcq",
           "kind": "note",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -329,6 +350,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": [],
@@ -343,6 +365,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabba",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:1"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"],
@@ -357,6 +380,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": [],
@@ -372,6 +396,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:3"],
           "prev": [],
           "emitted": "2026-10-01T00:02:40Z",

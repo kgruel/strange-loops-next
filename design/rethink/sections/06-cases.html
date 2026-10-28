@@ -32,7 +32,7 @@
 { "vertex": "manuscript",
   "from": [{ "store": "novel", "kind": ["scene"] }],
   "order": { "field": "chapter" },
-  "fold": { "scenes": { "latest-by": "id" } },
+  "fold": { "scenes": { "latest-by": "id", "follow": "prev" } },
   "boundary": [{ "when": "draft-complete" }],
   "into": "novel" }
 

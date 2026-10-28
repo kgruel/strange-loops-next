@@ -1,0 +1,22 @@
+{
+  "vector": "41-repeated-key",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "vertex": "y",
+      "from": [
+        {
+          "store": "."
+        }
+      ]
+    },
+    "spec_text": "{\"vertex\":\"x\",\"vertex\":\"y\",\"from\":[{\"store\":\".\"}]}"
+  },
+  "expect": {
+    "refused": "member-duplicate",
+    "path": "vertex"
+  }
+}

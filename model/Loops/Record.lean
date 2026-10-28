@@ -32,11 +32,13 @@ structure Record where
   id       : Nat
   kind     : String
   /-- Who says so. -/
-  observer : String := ""
+  observer : String
   /-- The things this record is about: a set. -/
   about    : List String := []
   value    : String
   prev     : List Nat
+  /-- The grant this record acts on, if any. -/
+  under    : Option Nat := none
   /-- The claimed past, if the observer gave one. -/
   occurred : Option Claim := none
   /-- The observer's now. -/
@@ -94,6 +96,7 @@ structure SameEnvelope (a b : Record) : Prop where
   observer : a.observer = b.observer
   about : a.about = b.about
   prev : a.prev = b.prev
+  under : a.under = b.under
   occurred : a.occurred = b.occurred
   emitted : a.emitted = b.emitted
   erases : a.erases = b.erases

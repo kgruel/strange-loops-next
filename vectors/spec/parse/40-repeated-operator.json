@@ -1,0 +1,32 @@
+{
+  "vector": "40-repeated-operator",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "env.kind": {
+              "is": "task",
+              "is": "note"
+            }
+          }
+        }
+      }
+    },
+    "spec_text": "{\"vertex\":\"x\",\"from\":[{\"store\":\".\"}],\"fold\":{\"c\":{\"count\":true,\"where\":{\"env.kind\":{\"is\":\"task\",\"is\":\"note\"}}}}}"
+  },
+  "expect": {
+    "refused": "member-duplicate",
+    "path": "fold.c.where.env.kind.is"
+  }
+}

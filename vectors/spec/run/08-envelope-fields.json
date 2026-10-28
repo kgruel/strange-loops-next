@@ -1,0 +1,740 @@
+{
+  "vector": "08-envelope-fields",
+  "layer": "spec/run",
+  "laws": ["spec.set", "where.fields", "where.time", "where.total", "spec.after-supersession"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "envelopes",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "by-alice": {
+          "collect": true,
+          "where": {
+            "env.observer": {
+              "is": "sl:alice"
+            }
+          }
+        },
+        "not-alice": {
+          "count": true,
+          "where": {
+            "env.observer": {
+              "not": "sl:alice"
+            }
+          }
+        },
+        "loops": {
+          "collect": true,
+          "where": {
+            "env.about": {
+              "is": "proj:loops"
+            }
+          }
+        },
+        "not-task-2": {
+          "collect": true,
+          "where": {
+            "env.about": {
+              "not": "task:2"
+            }
+          }
+        },
+        "about-nothing": {
+          "collect": true,
+          "where": {
+            "env.about": {
+              "absent": true
+            }
+          }
+        },
+        "revisions": {
+          "collect": true,
+          "where": {
+            "env.prev": {
+              "present": true
+            }
+          }
+        },
+        "revises-first": {
+          "count": true,
+          "where": {
+            "env.prev": {
+              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"
+            }
+          }
+        },
+        "granted": {
+          "collect": true,
+          "where": {
+            "env.under": {
+              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"
+            }
+          }
+        },
+        "ungranted": {
+          "count": true,
+          "where": {
+            "env.under": {
+              "absent": true
+            }
+          }
+        },
+        "erasing": {
+          "collect": true,
+          "where": {
+            "env.erases": {
+              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"
+            }
+          }
+        },
+        "chores": {
+          "collect": true,
+          "where": {
+            "kind": {
+              "is": "chore"
+            }
+          }
+        },
+        "chore-kind": {
+          "collect": true,
+          "where": {
+            "env.kind": {
+              "is": "chore"
+            }
+          }
+        },
+        "emitted-since": {
+          "collect": true,
+          "where": {
+            "env.emitted": {
+              "at-least": "2026-10-01T00:04:00Z"
+            }
+          }
+        },
+        "emitted-is": {
+          "count": true,
+          "where": {
+            "env.emitted": {
+              "is": "2026-10-01T01:01:40+01:00"
+            }
+          }
+        },
+        "alice-current": {
+          "latest-by": "about",
+          "follow": "prev",
+          "where": {
+            "env.observer": {
+              "is": "sl:alice"
+            }
+          }
+        },
+        "alice-heads": {
+          "collect": true,
+          "follow": "prev",
+          "where": {
+            "env.observer": {
+              "is": "sl:alice"
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "kind": "chore"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "kind": "task",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "kind": "bug"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:2", "proj:loops"],
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "kind": "task",
+          "observer": "sl:carol",
+          "about": ["task:3"],
+          "value": "",
+          "prev": [],
+          "under": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq",
+          "emitted": "2026-10-01T00:06:40Z",
+          "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"],
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": [],
+          "prev": [],
+          "emitted": "2026-10-01T00:08:20Z",
+          "occurred": "2026-09",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "kind": "chore",
+          "observer": "sl:bob",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "kind": "task",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "kind": "bug"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:2", "proj:loops"],
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "kind": "task",
+          "observer": "sl:carol",
+          "about": ["task:3"],
+          "value": "",
+          "prev": [],
+          "under": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq",
+          "emitted": "2026-10-01T00:06:40Z",
+          "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"],
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": [],
+          "prev": [],
+          "emitted": "2026-10-01T00:08:20Z",
+          "occurred": "2026-09",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "kind": "chore",
+          "observer": "sl:bob",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "kind": "chore"
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:2", "proj:loops"],
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "kind": "task",
+          "observer": "sl:carol",
+          "about": ["task:3"],
+          "value": "",
+          "prev": [],
+          "under": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq",
+          "emitted": "2026-10-01T00:06:40Z",
+          "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"],
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": [],
+          "prev": [],
+          "emitted": "2026-10-01T00:08:20Z",
+          "occurred": "2026-09",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "kind": "chore",
+          "observer": "sl:bob",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "kind": "chore"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "kind": "task",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "kind": "bug"
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "kind": "task",
+          "observer": "sl:carol",
+          "about": ["task:3"],
+          "value": "",
+          "prev": [],
+          "under": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq",
+          "emitted": "2026-10-01T00:06:40Z",
+          "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"],
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": [],
+          "prev": [],
+          "emitted": "2026-10-01T00:08:20Z",
+          "occurred": "2026-09",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "kind": "chore",
+          "observer": "sl:bob",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "kind": "chore"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "kind": "task",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "kind": "bug"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:2", "proj:loops"],
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "shown": "erased"
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": [],
+          "prev": [],
+          "emitted": "2026-10-01T00:08:20Z",
+          "occurred": "2026-09",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "kind": "chore",
+          "observer": "sl:bob",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "kind": "chore"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "kind": "task",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "kind": "bug"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:2", "proj:loops"],
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "kind": "task",
+          "observer": "sl:carol",
+          "about": ["task:3"],
+          "value": "",
+          "prev": [],
+          "under": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq",
+          "emitted": "2026-10-01T00:06:40Z",
+          "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"],
+          "n": 0
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "kind": "chore",
+          "observer": "sl:bob",
+          "about": ["task:4"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:02:30Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "kind": "chore"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "kind": "task",
+          "observer": "sl:bob",
+          "about": ["task:1"],
+          "value": "",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "n": 0,
+          "fields": {
+            "kind": "bug"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": ["task:2", "proj:loops"],
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "kind": "task",
+          "observer": "sl:carol",
+          "about": ["task:3"],
+          "value": "",
+          "prev": [],
+          "under": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq",
+          "emitted": "2026-10-01T00:06:40Z",
+          "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq"],
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "kind": "task",
+          "observer": "sl:alice",
+          "about": [],
+          "prev": [],
+          "emitted": "2026-10-01T00:08:20Z",
+          "occurred": "2026-09",
+          "shown": "withheld"
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "by-alice": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "shown": "withheld"
+        }
+      ],
+      "unread": 0
+    },
+    "not-alice": {
+      "value": 3,
+      "unread": 0
+    },
+    "loops": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "shown": "erased"
+        }
+      ],
+      "unread": 0
+    },
+    "not-task-2": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "shown": "withheld"
+        }
+      ],
+      "unread": 0
+    },
+    "about-nothing": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "shown": "withheld"
+        }
+      ],
+      "unread": 0
+    },
+    "revisions": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "revises-first": {
+      "value": 1,
+      "unread": 0
+    },
+    "granted": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "ungranted": {
+      "value": 5,
+      "unread": 0
+    },
+    "erasing": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "chores": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
+          "shown": "here"
+        }
+      ],
+      "unread": 2
+    },
+    "chore-kind": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabta",
+          "shown": "here"
+        }
+      ],
+      "unread": 0
+    },
+    "emitted-since": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsa",
+          "shown": "here"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "shown": "withheld"
+        }
+      ],
+      "unread": 0
+    },
+    "emitted-is": {
+      "value": 1,
+      "unread": 0
+    },
+    "alice-current": {
+      "things": {
+        "proj:loops": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+            "shown": "erased"
+          }
+        ],
+        "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+            "shown": "withheld"
+          }
+        ],
+        "task:2": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+            "shown": "erased"
+          }
+        ]
+      },
+      "unread": 0
+    },
+    "alice-heads": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabrq",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabsq",
+          "shown": "withheld"
+        }
+      ],
+      "unread": 0
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "vector": "45-from-about-not-typed",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": ".",
+          "about": "loops"
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "from-invalid",
+    "path": "from.about"
+  }
+}

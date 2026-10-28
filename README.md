@@ -12,7 +12,7 @@ writer that must agree with it byte for byte.
 |---|---|
 | `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), and `gen`, which writes the vectors |
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
-| `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
+| `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS writer for layer 0 |
 | `design/` | the design page's source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `build.mjs` renders it |
 | `out/rethink/` | the design page, written by `node design/build.mjs`, never by hand |

@@ -1,0 +1,27 @@
+{
+  "vector": "56-from-errors-in-order",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "about": "loops",
+          "kind": [""],
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "from-invalid",
+    "path": "from.kind"
+  }
+}

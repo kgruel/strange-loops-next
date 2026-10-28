@@ -78,7 +78,7 @@ loops emit same-as --about r:h1 --about org:willowcreek-mgmt.example            
 { "vertex": "identity",
   "note": "The latest stance per pair.",
   "from": [{ "store": "root", "kind": ["same-as", "dispute"] }],
-  "fold": { "pairs": { "latest-by": "about" } } }
+  "fold": { "pairs": { "latest-by": "about", "follow": "prev" } } }
 
 { "vertex": "salience",
   "note": "Who touched each thing; a witness tick each morning.",
@@ -134,13 +134,13 @@ loops emit draft-complete label="draft 2"                                       
 { "vertex": "chapter", "param": ["chapter"],
   "from": [{ "store": "novel", "about": "$chapter" }],
   "fold": { "facets": { "latest-by": "kind", "follow": "prev" },
-            "notes":  { "collect": true, "where": { "kind": { "is": "chapter-note" } } } } }
+            "notes":  { "collect": true, "where": { "env.kind": { "is": "chapter-note" } } } } }
 
 # .loops/vertices/manuscript.json
 { "vertex": "manuscript",
   "from": [{ "store": "novel", "kind": ["chapter-prose", "book-order"] }],
   "fold": { "chapters": { "latest-by": "about", "follow": "prev" },
-            "order":    { "latest": true, "follow": "prev", "where": { "kind": { "is": "book-order" } } } },
+            "order":    { "latest": true, "follow": "prev", "where": { "env.kind": { "is": "book-order" } } } },
   "boundary": [{ "when": "draft-complete" }] }
 
 # .loops/vertices/continuity.json: a lens, never ticks
@@ -306,7 +306,7 @@ loops emit redaction --erases r:n9                                     # sl:dire
     <li><b>Collectors split like stores do.</b> Parse specs are shareable and a store can carry them; source bindings and credentials stay in <code>places.json</code> beside the place they write. A parse spec is an ordinary kind: collectors read it, the core doesn't.</li>
     <li><b>Natural-key rules are declarations</b> (<code>natural "org" normalize=…</code>), and a <code>same-as</code> between an anchor and a natural key joins minted and natural identity.</li>
     <li><b>Relative windows need tick syntax:</b> <code>"window": {"occurred": "last 30d"}</code> in the spec, a concrete span on the tick.</li>
-    <li><b><code>"follow": "prev"</code> appears on every facet fold.</b> It should probably be the default wherever records carry <code>prev</code>.</li>
+    <li><b><code>"follow": "prev"</code> appears on every facet fold.</b> It should probably be the default wherever records carry <code>prev</code>. <b>Settled in PR 13:</b> it stays written. Latest-by without it is refused (<code>follow-missing</code>), so every spec says whether it reads heads or history.</li>
     <li><b>Corrected in version 12:</b> this example used a SKOS <code>match</code> kind. Identity is <code>same-as</code> and <code>dispute</code>; the director's knowledge is a dispute plus a note about both components.</li>
     <li><b>Reference-only tick payloads paid off:</b> erasing the note in the team store changed nothing in any tick.</li>
   </ul>

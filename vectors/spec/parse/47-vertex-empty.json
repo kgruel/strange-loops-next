@@ -1,0 +1,20 @@
+{
+  "vector": "47-vertex-empty",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "",
+      "from": [
+        {
+          "store": "."
+        }
+      ]
+    }
+  },
+  "expect": {
+    "refused": "vertex-invalid",
+    "path": "vertex"
+  }
+}

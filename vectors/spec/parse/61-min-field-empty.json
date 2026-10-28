@@ -1,0 +1,25 @@
+{
+  "vector": "61-min-field-empty",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "min": ""
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "fold-argument",
+    "path": "fold.c.min"
+  }
+}

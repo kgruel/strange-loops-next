@@ -1,0 +1,23 @@
+{
+  "vector": "54-repeat-in-from",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": ".",
+          "store": "."
+        }
+      ],
+      "query": "select *"
+    },
+    "spec_text": "{\"vertex\":\"x\",\"from\":[{\"store\":\".\",\"store\":\".\"}],\"query\":\"select *\"}"
+  },
+  "expect": {
+    "refused": "member-duplicate",
+    "path": "from.store"
+  }
+}

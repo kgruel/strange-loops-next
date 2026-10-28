@@ -9,6 +9,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:cache"],
           "value": "v21",
           "prev": [],
@@ -19,6 +20,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:cache"],
           "value": "v24",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"],
@@ -31,6 +33,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:cache"],
           "value": "v24",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"],
@@ -41,6 +44,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq",
           "kind": "decision",
+          "observer": "sl:kyle",
           "about": ["topic:cache"],
           "value": "v21",
           "prev": [],

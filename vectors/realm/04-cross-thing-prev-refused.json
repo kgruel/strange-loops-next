@@ -8,6 +8,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq",
         "kind": "facet",
+        "observer": "sl:kyle",
         "about": ["thing:A"],
         "value": "",
         "prev": [],
@@ -18,6 +19,7 @@
       {
         "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabra",
         "kind": "facet",
+        "observer": "sl:kyle",
         "about": ["thing:B"],
         "value": "",
         "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabqq"],

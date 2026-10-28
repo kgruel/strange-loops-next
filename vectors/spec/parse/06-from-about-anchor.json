@@ -1,0 +1,40 @@
+{
+  "vector": "06-from-about-anchor",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "about": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "store": ".",
+          "kind": ["note"]
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  },
+  "expect": {
+    "parsed": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["note"],
+          "about": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    }
+  }
+}

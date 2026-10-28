@@ -63,6 +63,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2", "task:9"],
           "value": "",
           "prev": [],
@@ -78,6 +79,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabdq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq"],
@@ -93,6 +95,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabdq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2"],
           "value": "",
           "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq"],
@@ -106,6 +109,7 @@
         {
           "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbq",
           "kind": "task",
+          "observer": "sl:kyle",
           "about": ["task:2", "task:9"],
           "value": "",
           "prev": [],
