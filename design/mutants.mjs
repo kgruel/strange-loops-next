@@ -57,6 +57,8 @@ const MUTANTS = [
   ["an unknown question key", "design/laws/laws.json", json((d) => { d.laws["count.perm"].question = "attic"; })],
   ["a question no law answers", "design/laws/laws.json", json((d) => { d.questions["no-such"] = "What if nobody asks?"; })],
   ["a premise case that no card shows", "design/laws/render.mjs", swap("else alone.push(c);", "else if (c.law === \"\") alone.push(c);")],
+  ["a note under a question nobody asks", "design/laws/laws.json", json((d) => { d.questionNotes["no-such"] = "x"; })],
+  ["a card quoting a README sentence that changed", "vectors/README.md", swap("reader holding everything gets", "reader holding anything gets")],
   ["a link to a law's evidence that lands nowhere", "design/evidence/render.mjs", swap('" id="${anchor(r.key)}" data-shape', '" id="card-${slug(r.key)}" data-shape')],
 ];
 

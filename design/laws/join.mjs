@@ -48,6 +48,7 @@ export function joinLaws(root) {
     if (!l.question) fail(`${k}: no question; every law answers one of laws.json's questions`);
     if (!data.questions[l.question]) fail(`${k}: ${l.question} isn't one of laws.json's questions`);
   }
+  for (const q of Object.keys(data.questionNotes)) if (!data.questions[q]) fail(`questionNotes: ${q} isn't one of laws.json's questions`);
   const asked = new Set(Object.values(data.laws).map((l) => l.question));
   for (const q of Object.keys(data.questions)) if (!asked.has(q)) fail(`question ${q}: no law answers it; take it off the list`);
 

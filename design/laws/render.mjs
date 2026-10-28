@@ -69,7 +69,10 @@ export function renderLaws(root) {
       const a = answerOf(d.vector, v.expect, label);
       out.variants = os.map((o, i) => ({ label: `order ${i + 1} of ${os.length}`, key: `order ${i + 1}`, html: order(label, o), said: a.said }));
       out.answer = a.html;
-      out.done = `Same ${d.stays} for all ${os.length} orders the vector holds.`;
+      out.done = d.done ? d.done.replace("{n}", `all ${os.length}`) : `Same ${d.stays} for all ${os.length} orders the vector holds.`;
+      if (d.note) out.note = d.note;
+      // A quoted sentence is in the file it is quoted from, word for word.
+      if (d.quote && !readFileSync(join(root, d.quote.file), "utf8").replace(/\s+/g, " ").includes(d.quote.text)) fail(`demo ${d.law}: ${d.quote.file} no longer says "${d.quote.text}"`);
     } else if (d.kind === "repeats") {
       const a = files.get(d.against) ?? fail(`demo ${d.law}: no vector ${d.against}`);
       const ids = (vv) => [...new Set(vv.input.orders[0].map((r) => r.id))].sort();
@@ -213,7 +216,7 @@ export function renderLaws(root) {
   const qOrder = (r) => questions.findIndex(([q]) => q === law(r.key).question);
   const shapeCount = (s) => rows.filter((r) => law(r.key).shape === s).length;
 
-  const lede = `  <p class="lede">${rows.length} laws, each a theorem Lean checks on every build, or a rule held by construction. ` +
+  const lede = `  <p class="lede">${rows.length} laws, each a theorem Lean checks on every build, or a rule held by construction, or, where its card says so, partly pinned by vectors instead of proved. ` +
     `They are grouped here by the question they answer, in plain sentences. ` +
     `What proves each one, the vectors that pin it and what its proof rests on are on <a href="../evidence/">the evidence page</a>.</p>\n`;
 
@@ -268,8 +271,8 @@ export function renderLaws(root) {
     return `<section class="wrap block q" id="q-${q}" aria-labelledby="h-q-${q}">\n` +
       `  <div class="side">\n    <p class="q-k">Question ${i + 1} of ${questions.length}</p>\n    <h2 id="h-q-${q}">${text}</h2>\n` +
       `    <p class="q-tally"><span>${rs.length} law${rs.length === 1 ? "" : "s"}:</span>${tally}</p>\n  </div>\n` +
-      `  <div class="stack">\n    <ol class="q-laws">\n${rs.map(entry).join("")}    </ol>\n` +
-      (ds.length || bs.length ? `    <h3>Try to break it</h3>\n    <p class="note">Each card is a vector the model wrote. The button varies what the law lets vary, and the trail keeps the answer the model gave for each variant shown. Where a law has a premise, a second button takes it away and adds what the model says then; some of those inputs are ones the protocol never produces, and each says which. Nothing is computed in your browser.</p>\n` +
+      `  <div class="stack">\n` + (data.questionNotes[q] ? `    <p class="note q-note">${data.questionNotes[q]}</p>\n` : "") + `    <ol class="q-laws">\n${rs.map(entry).join("")}    </ol>\n` +
+      (ds.length || bs.length ? `    <h3>Try to break it</h3>\n    <p class="note">Each card is the model's own output: a vector it wrote, or, for a premise, a case <code>lake exe boundaries</code> writes. With scripts on, a button varies what the law lets vary, and the trail keeps the answer the model gave for each variant shown. Where a law has a premise, a second button takes it away and adds what the model says then; some of those inputs are ones the protocol doesn't produce, and each says whether it is one. Without scripts, a card lists every variant and every answer. Nothing is computed in your browser.</p>\n` +
         `    <div class="demos">\n${ds.map(([d, i]) => demoCard(d, i)).join("")}${bs.map(boundCard).join("")}    </div>\n` : "") +
       `  </div>\n</section>\n`;
   };

@@ -29,7 +29,7 @@
     {
       "law": "latest-by.set",
       "premise": "within one store an id names one record",
-      "input": "impossible in a store: an id is the hash of what the record says",
+      "input": "needs a hash collision: an id is the hash of what the record says",
       "holds": {
         "given": "records first, second under two ids, in either order",
         "answer": "winner second either way"
@@ -42,7 +42,7 @@
     {
       "law": "lens.no-op",
       "premise": "the base's section ids are distinct",
-      "input": "impossible from a state: a lens renders one section per thing",
+      "input": "not produced when each thing is rendered once",
       "holds": {
         "given": "parse an unedited render of two sections",
         "answer": "nothing to apply"

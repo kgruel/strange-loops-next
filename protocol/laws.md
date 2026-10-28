@@ -223,8 +223,8 @@ FIPS 180-4 and RFC 8032 values before it writes anything.
 
 ## What these laws don't promise
 
-Every law is about a given set of records. None says the set is complete,
-current, trusted or well dated:
+The laws about folds, views and specs are each about a given set of
+records. None says the set is complete, current, trusted or well dated:
 
 * **Absence isn't visible.** A reader that hasn't synced a successor sees
   the record it replaces as current, and can't count what it doesn't know

@@ -1,8 +1,8 @@
 // A picture for each of the six shapes in laws.json, whose form is its meaning: lanes that
-// meet in one state, a loop that comes back to its start, a staircase that never steps into
-// a wrong answer, a strip whose ties are broken in turn, a gate with two bins, and a boundary
-// in the limit colour with who accounts for it. A reader learns six forms once and reads every
-// law with them.
+// meet in one state, a loop that comes back to its start, a staircase down in what is held
+// whose answers stay, turn unknown or count what they could not read, a strip whose ties are
+// broken in turn, a gate with two bins, and a boundary in the limit colour with who accounts
+// for it. A reader learns six forms once and reads every law with them.
 //
 // shapeFigure(shape, law?) returns an inline SVG string, worked out when the page is built.
 // Deterministic: the same shape and law always give the same bytes. Given a law (an entry of
@@ -131,11 +131,14 @@ const pill = (cx, cy, text, { cls = "sg-pill", m = "" } = {}) => {
 
 // What an invariance's lanes vary, read from the words of its `change`, first rule that
 // matches. Each draws only what its words say; words no rule knows are drawn as the same
-// records in other forms (A, A′), which every invariance is.
+// records in other forms (A, A′), which every invariance is. A change inside one record or one
+// text (an object's members, a set field's order and repeats, a payload's opening, a section
+// dropped from the text) varies a form, not which records arrive or are held, so it comes first.
 const LANES = [
+  [/member|erases|opening|drop/, "forms"],
   [/repeat|again/, "repeats"],
   [/in parts|refold|cached/, "parts"],
-  [/payloads a reader holds|opening|drop|which form/, "hidden"],
+  [/payloads a reader holds|which form/, "hidden"],
   [/other things/, "others"],
   [/order|arriv|first|sync|which way/, "orders"],
 ];
@@ -237,13 +240,27 @@ function roundTrip(law) {
 // ---- refinement: a staircase of less in view --------------------------------------------------
 
 // The answers each step gives. A law that counts what it can't read instead of guessing
-// (result.unread, result.full) says how many are unread; any other says yes, yes, unknown.
+// (result.unread) says how many are unread; any other says yes, yes, unknown. A law that says
+// nothing is unread (result.full) draws no step with less in: see `full`.
 const ANSWERS = {
   answer: { steps: ["yes", "yes", "unknown"], wrong: "no" },
   unread: { steps: ["0 unread", "1 unread", "2 unread"], wrong: "guess" },
 };
 
+// What result.full states and no more: every record answered and readable, none unread. One
+// step, with everything held; no withheld records and no wrong answer to strike out.
+function full(law) {
+  const head0 = words(12, 20, law.says, { width: W - 24, lines: 3, cls: "sg-t sg-ink" });
+  const ty = 26 + head0.lines * 16 + 42, py = ty + 50, cx = 12 + 39;
+  let out = head0.svg + cap(12, ty - 34, "every record answered and readable");
+  ["A", "B", "C"].forEach((r, j) => out += rec(12 + j * 28, ty - 27, r, { m: mv("in", 0.05 * j) }));
+  out += wire(`M${cx},${ty + 4}V${py - 14}`, "sg-wire", mv("draw", 0.2));
+  out += pill(cx, py, "0 unread", { m: mv("pop", 0.4) });
+  return { h: py + 24, body: out, title: `Refinement: ${plain(law.says)}` };
+}
+
 function refinement(law) {
+  if (law && /nothing is unread/.test(plain(law.says))) return full(law);
   const a = law && /unread|instead of guessing/.test(plain(law.says)) ? ANSWERS.unread : ANSWERS.answer;
   const cols = [12, 104, 196], cw = 88;
   const held = [["A", "B", "C"], ["A", "B?", "C"], ["A?", "B", "C?"]];
@@ -272,7 +289,7 @@ function refinement(law) {
   out += `<text class="sg-cap" x="${wx}" y="${py + 32}" text-anchor="middle">never</text>`;
   const title = law
     ? `Refinement: ${plain(law.says)}`
-    : "Refinement: with less in, an answer stays or becomes unknown; it never turns wrong.";
+    : "Refinement: with less in, an answer stays, becomes unknown, or says how much it could not read.";
   return { h: py + 42, body: out, title };
 }
 
@@ -395,7 +412,7 @@ function exactness(law) {
   out += "</g>";
   out += ghost([[118, gy], [gx + 3, gy], [ax + 30, gy]], 0.5);
   out += ghost([[118, gy], [gx - 8, gy + 6], [gx - 8, ry + 20]], 0.8);
-  const title = law ? `Exactness: ${plain(law.says)}` : "Exactness: accepted exactly when it fits; anything else is refused with a reason.";
+  const title = law ? `Exactness: ${plain(law.says)}` : "Exactness: accepted exactly when it fits; where the law refuses, it says what it refuses with.";
   return { h: ry + rh + 10, body: out, title };
 }
 
@@ -443,7 +460,7 @@ function limit(law) {
   out += ghost([[lx, ly], [lx + 40, ly + 10], [wallX, dnM], [bx + 10, dnM]], 0.85);
   // A repeat meets the boundary and goes no further: the store hands each id over once.
   if (p.repeats) out += ghost([[lx, ly], [lx + 40, ly + 10], [wallX - 6, dnM]], 1.05, "is-stopped");
-  const title = law ? `Limit: ${plain(law.says)}` : "Limit: this one moves, and here is who accounts for it.";
+  const title = law ? `Limit: ${plain(law.says)}` : "Limit: this one moves, or can't be done here, and here is who accounts for it.";
   return { h: py + 20 + (party.lines - 1) * SIZE * 1.3 + 10, body: out, title };
 }
 
