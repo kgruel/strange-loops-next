@@ -10,15 +10,15 @@ writer that must agree with it byte for byte.
 
 | Path | Holds |
 |---|---|
-| `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), and `gen`, which writes the vectors |
+| `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), `gen`, which writes the vectors, and `proofs`, which writes the proof graph the laws page draws |
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS writer for layer 0 |
-| `design/` | the design page's source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `build.mjs` renders it |
-| `out/rethink/` | the design page, written by `node design/build.mjs`, never by hand |
+| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences and the proof graph; `build.mjs` renders all three |
+| `out/rethink/`, `out/grammar/`, `out/laws/` | the pages, written by `node design/build.mjs`, never by hand |
 
 Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
-`xtask` checking token and surface budgets); `scenarios/` (end-to-end walks),
+`xtask` checking token and surface budgets); more end-to-end scenarios (`vectors/scenario/` holds the first),
 `.loops/` (this repo's own decision store).
 
 ## Checking
@@ -28,10 +28,14 @@ cd model
 lake build --wfail          # every proof checks; a `sorry` fails the build
 lake exe gen ../vectors     # rewrite the vectors from the model
 git diff --exit-code ../vectors
+lake exe proofs ../design/laws/proofs.json   # which theorems each proof uses
+lake exe boundaries ../design/laws/boundaries.json   # laws without their premises
+git diff --exit-code ../design/laws
 ```
 
-CI runs the same three steps. The vectors are a pure render of the model:
-editing one by hand fails CI. Then:
+CI runs the same steps. The vectors and the premise cases are a pure render
+of the model, and the proof graph of the proofs: editing any of them by hand
+fails CI. Then:
 
 ```sh
 node interop/js/check.mjs vectors   # the JS writer passes every vector
@@ -48,7 +52,39 @@ one HTML file per tab under `sections/`, the decision ledger as records in
 node design/build.mjs       # writes out/rethink/index.html; commit it with the source
 ```
 
-CI rebuilds it and fails if `out/` differs, as with the vectors. To publish:
+Two more pages share a shell (`design/page.mjs`, `design/register.css`) and
+read the protocol through `design/protocol.mjs`:
+
+* `design/grammar/`: the protocol's nouns, verbs and layers. Its words are
+  data (`words.json`); the build refuses a law name that isn't in
+  `protocol/laws.md`, or a set of refusal codes that differs from the ones the
+  vectors pin. Its walk is `vectors/scenario/01-decision`, which the model
+  writes; `walk.json` holds only its narration and layout.
+* `design/laws/`: every law as a sentence and one of six shapes
+  (`laws.json`), joined to its row in `protocol/laws.md`, the theorems that
+  prove it (each with its statement as Lean prints it), the vectors that pin
+  it, and the laws its proof rests on. That last join is
+  `design/laws/proofs.json`, written by `lake exe proofs` from the checked
+  proofs; CI regenerates it as it does the vectors. `lake exe boundaries` writes
+  `design/laws/boundaries.json`: some laws asked with their premise and
+  without it, the model checking that the premise matters. These aren't
+  vectors, since several of their inputs are ones the protocol never
+  produces. The map is laid out when the page is built
+  (`design/laws/layout.mjs`). The build
+  fails on a law without a sentence, a theorem name that resolves to nothing,
+  a vector reference to no file, a law name a vector uses that isn't a law,
+  or a proof that rests on a layer above its own.
+
+`node design/mutants.mjs` holds those checks to account: it applies plausible
+wrong edits to a copy of the sources and fails unless the build refuses each
+one, apart from an explicit, shrink-only list of survivors with why. CI runs
+it.
+
+Both load a pinned library from a CDN (Motion), so
+they are published only on the site, at `/strange-loops/grammar/` and
+`/strange-loops/laws/`, with no artifact mirror.
+
+CI rebuilds every page and fails if `out/` differs, as with the vectors. To publish:
 
 * **The site:** in `projects.gruel.world`, `npm run sync:strange-loops`
   snapshots the committed page (it refuses uncommitted output), then push its

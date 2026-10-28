@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Strange Loops Grammar</title>
+<script>document.documentElement.classList.add("js")</script>
+<meta name="description" content="The protocol's nouns, verbs and layers, and a walk through them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/motion@12.23.12/dist/motion.js" integrity="sha384-L8F6MBCtza31dSRnyAsxhtWvL4lBh6NwQ27N+T2yd16CGe7UKTa7EVaTDmAP5Wv/" crossorigin="anonymous"></script>
+<style>
+/* The register: a warm grey table, white sheets resting on it, height shown by shadow and
+   hairline. One colour only, for what is erased or in conflict. */
+:root{
+  --ground:#EBEAE6; --sunk:#E3E2DD; --sheet:#FFFFFF; --ink:#1D1D1B; --muted:#5A5954; --faint:#63625C;
+  --hair:rgba(29,29,27,.09); --hair-2:rgba(29,29,27,.16);
+  --alert:#B23A16; --alert-soft:rgba(178,58,22,.10);
+  --lift-1:0 1px 2px rgba(40,38,30,.06);
+  --lift-2:0 1px 2px rgba(40,38,30,.06),0 4px 12px rgba(40,38,30,.06);
+  --lift-3:0 2px 4px rgba(40,38,30,.06),0 12px 28px rgba(40,38,30,.09);
+  --lift-4:0 4px 8px rgba(40,38,30,.07),0 22px 48px rgba(40,38,30,.13);
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#8E8C86;
+  --hair:rgba(236,235,231,.08); --hair-2:rgba(236,235,231,.16);
+  --alert:#F0784F; --alert-soft:rgba(240,120,79,.14);
+  --lift-1:0 1px 2px rgba(0,0,0,.4);
+  --lift-2:0 1px 2px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.3);
+  --lift-3:0 2px 4px rgba(0,0,0,.4),0 12px 28px rgba(0,0,0,.4);
+  --lift-4:0 4px 8px rgba(0,0,0,.45),0 22px 48px rgba(0,0,0,.5);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#8E8C86;
+  --hair:rgba(236,235,231,.08); --hair-2:rgba(236,235,231,.16);
+  --alert:#F0784F; --alert-soft:rgba(240,120,79,.14);
+  --lift-1:0 1px 2px rgba(0,0,0,.4);
+  --lift-2:0 1px 2px rgba(0,0,0,.4),0 4px 12px rgba(0,0,0,.3);
+  --lift-3:0 2px 4px rgba(0,0,0,.4),0 12px 28px rgba(0,0,0,.4);
+  --lift-4:0 4px 8px rgba(0,0,0,.45),0 22px 48px rgba(0,0,0,.5);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.55;-webkit-text-size-adjust:100%;font-feature-settings:"cv11","ss01"}
+a{color:inherit;text-decoration-color:var(--hair-2);text-underline-offset:3px}
+a:hover{text-decoration-color:currentColor}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
+code,.mono,pre{font-family:var(--mono);font-size:.86em}
+code{overflow-wrap:anywhere}
+p{margin:0}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.015em;text-wrap:balance}
+h1{font-size:clamp(30px,5vw,40px);line-height:1.1}
+h2{font-size:21px;line-height:1.25}
+h3{font-size:15.5px}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px))}
+
+/* top */
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--ground) 86%,transparent);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px)}
+.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:12px}
+.mark{font-weight:600;font-size:14px;white-space:nowrap;display:flex;gap:10px;align-items:baseline}
+.mark a{text-decoration:none}
+.mark .page{font-weight:500;color:var(--muted)}
+.mark .page[aria-current="page"]{color:var(--ink)}
+.mark .page:hover{color:var(--ink)}
+.seg{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-right:-6px}
+.seg::-webkit-scrollbar{display:none}
+.seg a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;padding:5px 10px;border-radius:8px;transition:background .2s,color .2s}
+.seg a:hover{color:var(--ink)}
+.seg a[aria-current="true"]{background:var(--sunk);color:var(--ink);box-shadow:inset 0 0 0 1px var(--hair)}
+
+.intro{padding-block:44px 8px;display:grid;gap:14px}
+.lede{font-size:17px;line-height:1.55;color:var(--muted);max-width:68ch}
+.lede::first-line{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:13px;color:var(--muted)}
+.legend .chip{margin-left:8px}
+.legend .chip:first-child{margin-left:0}
+
+.chip{display:inline-block;font-size:11px;font-weight:500;line-height:1;padding:4px 7px 4px;border-radius:99px;letter-spacing:.01em;vertical-align:2px;white-space:nowrap}
+.chip.proved{color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair-2)}
+.chip.settled{color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair-2);background:transparent;border:1px dashed var(--hair-2);padding:3px 6px}
+
+/* blocks: prose on the left, the thing itself on the right */
+.block{display:grid;gap:22px;padding-block:56px 8px}
+@media (min-width:900px){.block{grid-template-columns:260px minmax(0,1fr);gap:48px}.side{position:sticky;top:76px;align-self:start}}
+.side{display:grid;gap:10px;align-content:start;color:var(--muted);font-size:14.5px}
+.side h2{color:var(--ink);margin-bottom:2px}
+.side b{color:var(--ink);font-weight:600}
+.hint{font-size:13px;color:var(--faint)}
+.note{font-size:13.5px;color:var(--muted);margin-top:-6px}
+
+.sheet{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-3),0 0 0 1px var(--hair);padding:22px}
+
+/* cards: one concept each */
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:16px 16px 14px;display:grid;gap:10px;align-content:start;transition:box-shadow .25s,transform .25s}
+.card:hover{box-shadow:var(--lift-3),0 0 0 1px var(--hair)}
+.card.is-settled{background:transparent;box-shadow:none;border:1px dashed var(--hair-2)}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h3{font-family:var(--mono);font-weight:500;font-size:15px;letter-spacing:0}
+.card dl{margin:0;display:grid;gap:8px}
+.card dt{font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+.card dd{margin:0;font-size:14px;line-height:1.5}
+.card dd+dt{margin-top:2px}
+.pending{font-size:12.5px;color:var(--muted);border-left:2px solid var(--hair-2);padding-left:8px}
+.laws{display:flex;flex-wrap:wrap;gap:4px}
+.laws a{text-decoration:none}
+.laws code{font-size:11px;color:var(--muted);background:var(--ground);padding:2px 6px;border-radius:5px;transition:color .15s}
+.laws a:hover code{color:var(--ink)}
+
+.rows{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair)}
+.row{display:grid;grid-template-columns:130px minmax(0,1fr);gap:4px 16px;padding:12px 16px;border-top:1px solid var(--hair)}
+.row:first-child{border-top:0}
+.row-k{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.row-k b{font-family:var(--mono);font-weight:500;font-size:14px}
+.row-k.wide{font-size:14px}
+.row-v{display:grid;gap:6px;font-size:14px}
+.row.is-settled .row-k b{color:var(--muted)}
+.made{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+.foot{padding-block:64px 48px;font-size:12.5px;color:var(--faint)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:560px){.top-row{flex-wrap:wrap;row-gap:4px;padding-block:10px 8px}.seg{width:100%;margin-right:0;margin-left:-10px}}
+
+/* The grammar page, on the register in design/register.css. */
+/* the sentence */
+.sentence-sheet{display:grid;gap:18px}
+.sentence{font-size:19px;line-height:2.5;letter-spacing:-.005em}
+.sentence .w{position:relative;display:inline;padding:3px 2px;border-radius:6px;cursor:default;transition:background .18s}
+.sentence .w code{white-space:nowrap;font-size:.8em;background:var(--sunk);padding:2px 5px;border-radius:5px}
+.sentence .role{position:absolute;left:2px;top:-1.15em;font-family:var(--mono);font-size:10.5px;line-height:1;color:var(--faint);white-space:nowrap;pointer-events:none;transition:color .18s}
+.sentence .w.hot{background:var(--sunk)}
+.sentence .w.hot .role{color:var(--ink)}
+.sentence .w.body{color:var(--muted)}
+.env{margin:0;padding:14px 16px;border-radius:10px;background:var(--ground);line-height:1.7;overflow-x:auto;font-size:12.5px;color:var(--muted)}
+.env span{display:inline-block;border-radius:4px;padding:0 3px;margin:0 -3px;transition:background .18s,color .18s}
+.env span.hot{background:var(--sheet);color:var(--ink);box-shadow:0 0 0 1px var(--hair)}
+.caption{font-size:13px;color:var(--muted)}
+
+/* verbs */
+.stack{display:grid;gap:12px;align-content:start}
+.stack h3{margin-top:14px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+.stack h3:first-child{margin-top:0}
+#provenance .row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+@media (max-width:560px){#provenance .row{grid-template-columns:1fr}}
+
+.refusals{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.ref{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:12px 14px;display:grid;gap:8px;align-content:start}
+.ref.is-settled{background:transparent;box-shadow:none;border:1px dashed var(--hair-2)}
+.ref-h{font-size:13.5px}
+.ref-h span{color:var(--faint);font-size:12.5px}
+.codes{display:flex;flex-wrap:wrap;gap:4px}
+.codes code{font-size:11.5px;background:var(--ground);padding:2px 6px;border-radius:5px}
+
+/* layers */
+.layers-fig{display:grid;gap:24px;align-items:center}
+@media (min-width:1240px){.layers-fig{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}}
+.stack3d{position:relative;height:360px;perspective:1400px;perspective-origin:50% 0%}
+@property --lift{syntax:"<length>";inherits:false;initial-value:0px}
+.stack3d .iso{--gap:34px;position:absolute;left:54%;top:60%;width:230px;height:160px;margin:-80px 0 0 -115px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-40deg)}
+.plate{position:absolute;inset:0;border-radius:14px;background:var(--sheet);box-shadow:0 0 0 1px var(--hair-2);transform:translateZ(calc(var(--z) * var(--gap) + var(--lift)));cursor:pointer}
+.plate[data-layer="5"]{background:var(--sunk);box-shadow:0 0 0 1px var(--hair)}
+.plate.is-settled{background:color-mix(in srgb,var(--sheet) 55%,transparent);border:1px dashed var(--hair-2);box-shadow:none}
+.plate span{display:none}
+.plate-label{position:absolute;transform:translate(-100%,-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
+.plate-label.hot{color:var(--ink);font-weight:500}
+.plate.hot{box-shadow:0 0 0 1.5px var(--ink)}
+.plate::after{content:"";position:absolute;inset:14px 18px auto;height:6px;border-radius:3px;background:var(--hair);box-shadow:0 12px 0 var(--hair),0 24px 0 var(--hair)}
+.plate[data-layer="5"]::after{display:none}
+.stack3d .loop{position:absolute;right:2%;top:8%;height:76%;width:44px;color:var(--faint);overflow:visible}
+.stack3d .loop path{fill:none;stroke:currentColor;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.loop-t{position:absolute;right:calc(2% + 50px);top:50%;transform:translateY(-50%);font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
+@media (max-width:560px){.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
+
+.layer-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.layer-table th,.layer-table td{text-align:left;vertical-align:top;padding:9px 10px 9px 0;border-top:1px solid var(--hair)}
+.layer-table thead th{border-top:0;font-weight:500;color:var(--faint);font-size:12px}
+.layer-table tbody th{font-weight:600;min-width:150px}
+.layer-table .gist{display:block;font-weight:400;color:var(--muted);font-size:12.5px;margin-top:2px;max-width:30ch}
+.layer-table td{color:var(--muted)}
+.layer-table tr{transition:background .18s}
+.layer-table tbody tr{cursor:pointer}
+.layer-table tbody tr.hot th,.layer-table tbody tr.hot td{color:var(--ink)}
+@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}}
+
+/* the walk */
+.steps{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:1px;counter-reset:s}
+.steps button{all:unset;cursor:pointer;display:flex;gap:10px;align-items:baseline;padding:3px 0;color:var(--faint);font-size:14px;transition:color .2s}
+.steps button::before{counter-increment:s;content:counter(s);font-family:var(--mono);font-size:12px;width:14px}
+.steps button:hover{color:var(--muted)}
+.steps button[aria-current="step"]{color:var(--ink);font-weight:500}
+.steps button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}
+.step-text{font-size:14px;color:var(--ink);min-height:8em;display:grid;gap:8px;margin-top:6px}
+.step-text .laws code{font-size:10.5px}
+.step-text .chip{justify-self:start}
+
+.stage{position:relative;background:var(--sunk);border-radius:16px;box-shadow:inset 0 0 0 1px var(--hair);padding:14px;display:grid;gap:12px;overflow:hidden;min-height:520px;align-content:start}
+.stage-bar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.stage-bar b{color:var(--ink);font-weight:500}
+.stage-ctl{display:flex;gap:4px}
+.stage-ctl button{font:inherit;font-size:14px;width:30px;height:28px;border-radius:8px;border:0;background:var(--sheet);color:var(--ink);box-shadow:var(--lift-1),0 0 0 1px var(--hair);cursor:pointer}
+.stage-ctl button:disabled{opacity:.4;cursor:default}
+.arrival{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+.dag{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,auto);gap:14px 18px;min-height:250px;align-items:center;padding:6px 2px 34px}
+.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.edges path{fill:none;stroke:var(--hair-2);stroke-width:1.5}
+.edges path.erase{stroke:var(--alert);stroke-dasharray:4 4;stroke-width:1.3}
+.rec{position:relative;z-index:1;justify-self:center;width:min(100%,116px);background:var(--sheet);border-radius:10px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:8px 9px;display:grid;gap:3px;font-size:12px;min-width:0;transition:box-shadow .3s,background .3s,opacity .3s}
+.rec .rid{display:flex;justify-content:space-between;gap:4px;font-family:var(--mono);font-size:11.5px;font-weight:500}
+.rec .rid span{color:var(--faint);font-weight:400}
+.rec .who{color:var(--muted);font-size:11px}
+.rec .val{font-size:12px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rec .tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--faint)}
+.rec.super{box-shadow:var(--lift-1),0 0 0 1px var(--hair);opacity:.72}
+.rec.head{box-shadow:var(--lift-3),0 0 0 1.5px var(--ink)}
+.rec.fork{box-shadow:var(--lift-3),0 0 0 1.5px var(--alert)}
+.rec.fork .tag{color:var(--alert)}
+.rec .val.erased,.rec .val.withheld{font-family:var(--mono);font-size:11px;color:var(--faint);font-style:normal}
+.rec .val.erased{color:var(--alert)}
+@media (max-width:640px){.dag{gap:10px 8px}.rec{padding:6px}.rec .who,.rec .val{display:none}.rec .rid span{display:none}}
+
+.panes{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.pane{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:12px 14px;display:grid;gap:8px;align-content:start;min-width:0}
+.pane-h{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.spec-json{margin:0;font-size:11.5px;line-height:1.55;color:var(--muted);overflow-x:auto}
+.slot{display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;font-size:13px;align-items:baseline}
+.slot .mono{color:var(--muted);font-size:12px}
+.slot .v{font-variant-numeric:tabular-nums}
+.slot .sub{color:var(--muted);font-size:12px}
+.slot .alert{color:var(--alert)}
+.tick{border:1px dashed var(--hair-2);border-radius:10px;padding:8px 10px;font-size:12.5px;display:grid;gap:4px;justify-items:start}
+.tick .mono{font-size:11.5px;color:var(--muted)}
+.lens{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-4),0 0 0 1px var(--hair);padding:14px 16px;display:grid;gap:8px}
+.lens pre{margin:0;font-size:13px;line-height:1.6}
+.lens .gone{color:var(--faint);text-decoration:line-through}
+.lens .new{background:var(--ground);border-radius:4px;padding:0 3px}
+.lens-out{font-size:12.5px;color:var(--muted)}
+
+/* matrix */
+.matrix-wrap{display:grid;gap:10px;min-width:0}
+.matrix-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
+.matrix{border-collapse:separate;border-spacing:0;width:100%}
+.matrix th,.matrix td{padding:0;text-align:center;border-top:1px solid var(--hair);height:34px;min-width:34px}
+.matrix thead th{border-top:0;height:96px;vertical-align:bottom;padding-bottom:8px;font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted)}
+.matrix thead th span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block}
+.matrix thead th.is-settled{color:var(--faint);font-style:italic}
+.matrix tbody th{text-align:left;padding:0 14px;font-family:var(--mono);font-weight:500;font-size:12.5px;white-space:nowrap}
+.matrix tbody tr th,.matrix thead th:first-child{position:sticky;left:0;background:var(--sheet);z-index:1}
+.matrix td.on{cursor:pointer}
+.matrix .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ink);transition:transform .2s}
+.matrix td.on:hover .dot,.matrix td.on.hot .dot{transform:scale(1.5)}
+.matrix td.col-hot,.matrix th.col-hot{background:color-mix(in srgb,var(--ground) 60%,var(--sheet))}
+.matrix .cell-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.matrix-note{font-size:13.5px;color:var(--muted);min-height:1.5em}
+.matrix-note b{color:var(--ink);font-family:var(--mono);font-weight:500}
+
+
+/* Narrow screens: the steps become a row above the stage, and the step's words follow it,
+   so a tap and its result are on screen together. */
+@media (max-width:899px){
+  #walk .side{display:contents}
+  #walk .side>h2{order:0}
+  #walk .side>p{order:1}
+  #walk .steps{order:2;display:flex;overflow-x:auto;scrollbar-width:none;gap:4px 14px;margin:0;padding-bottom:2px}
+  #walk .steps::-webkit-scrollbar{display:none}
+  #walk .steps button{white-space:nowrap}
+  #walk .stage{order:3;min-height:0}
+  #walk .step-text{order:4;min-height:0;margin-top:-8px}
+}
+
+/* Without scripts the walk is a list of its steps, each with the state the model gave it. */
+.walk-static{grid-column:1/-1;list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:w}
+.walk-static li{counter-increment:w;background:var(--sheet);border-radius:10px;box-shadow:0 0 0 1px var(--hair);padding:10px 14px;display:grid;gap:4px;font-size:14px}
+.walk-static li::before{content:counter(w);font-family:var(--mono);font-size:12px;color:var(--muted)}
+.walk-static .mono{color:var(--muted);font-size:12px}
+:root.js .walk-static{display:none}
+:root:not(.js) #stage,:root:not(.js) .steps,:root:not(.js) .step-text,:root:not(.js) #sentence .hint,:root:not(.js) #layers .hint{display:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-row">
+    <p class="mark"><a href="../rethink/">Strange Loops</a><a class="page" href="../grammar/" aria-current="page">Grammar</a><a class="page" href="../laws/">Laws</a></p>
+    <nav class="seg" aria-label="Sections">
+      <a href="#nouns">Nouns</a><a href="#verbs">Verbs</a><a href="#layers">Layers</a><a href="#walk">Walk</a><a href="#matrix">Matrix</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="wrap intro">
+  <h1>Grammar</h1>
+  <p class="lede">Records in, folds and ticks out, lenses back to text. Thirteen nouns, twelve verbs and six layers, each a little higher off the ground and a little more temporary. Everything said is a record on the ground; everything above it is worked out, and can be thrown away and worked out again.</p>
+  <p class="legend"><span class="chip proved">proved</span><span>a theorem in <code>model/Laws</code>, pinned by vectors</span><span class="chip settled">settled</span><span>decided in the design ledger, not built yet</span></p>
+</section>
+
+<section class="wrap block" id="sentence" aria-labelledby="h-sentence">
+  <div class="side">
+    <h2 id="h-sentence">A record is one sentence</h2>
+    <p>The envelope is the grammar of a single observation: who saw, what sort of thing they saw, of what, when, and what it replaces. The core reads every word of it and nothing else.</p>
+    <p>The payload is the sentence's content. The core never interprets it, so it can be withheld or erased and the sentence still parses: its id, its place in the chain and every test on its envelope hold.</p>
+    <p class="hint">Point at or tap a word to find its field.</p>
+  </div>
+  <div class="sheet sentence-sheet">
+    <p class="sentence" id="sentence-text">
+      <span class="w" data-f="observer"><span class="role">observer</span><code>sl:ada…</code></span>
+      says, of
+      <span class="w" data-f="about"><span class="role">about</span><code>decision:auth</code></span>,
+      a
+      <span class="w" data-f="kind"><span class="role">kind</span><code>decision</code></span>,
+      <span class="w" data-f="occurred"><span class="role">occurred</span>made in <code>2026-10</code></span>,
+      <span class="w" data-f="emitted"><span class="role">emitted</span>written <code>2026-10-01 09:40Z</code></span>,
+      <span class="w" data-f="prev"><span class="role">prev</span>replacing <code>r:M…</code></span>,
+      <span class="w" data-f="erases"><span class="role">erases</span>erasing <code>r:A…</code>'s payload</span>,
+      <span class="w" data-f="under"><span class="role">under</span>on the grant <code>r:G…</code></span>:
+      <span class="w body" data-f="payload"><span class="role">payload</span>&ldquo;Passkeys; device flow on TVs.&rdquo;</span>
+    </p>
+    <pre class="env" id="sentence-env" aria-label="The same record as stored"><span data-f="line">{"env": {</span>
+  <span data-f="about">"about": ["decision:auth"],</span>
+  <span data-f="emitted">"emitted": "2026-10-01T09:40:00Z",</span>
+  <span data-f="erases">"erases": ["r:A…"],</span>
+  <span data-f="kind">"kind": "decision",</span>
+  <span data-f="observer">"observer": "sl:ada…",</span>
+  <span data-f="occurred">"occurred": "2026-10",</span>
+  <span data-f="prev">"prev": ["r:M…"],</span>
+  <span data-f="under">"under": "r:G…"</span>
+<span data-f="line">},</span>
+<span data-f="line"> "id": "r:E…",</span>
+<span data-f="payload"> "payload": {"choice": "Passkeys; device flow on TVs."},</span>
+<span data-f="line"> "salt": "…", "sig": {…}}</span></pre>
+    <p class="caption">As stored: one canonical line, members sorted at every depth. This is E from the walk below, with an <code>occurred</code> and a grant added to show every field. The id hashes the envelope and the payload's commitment, never the payload itself.</p>
+  </div>
+</section>
+
+<section class="wrap block" id="nouns" aria-labelledby="h-nouns">
+  <div class="side">
+    <h2 id="h-nouns">Nouns</h2>
+    <p>Each noun has one purpose, its own state, and an operating principle: what happens, step by step, when you use it. The laws under each card are the theorems that hold it to its principle.</p>
+  </div>
+  <div class="cards">
+    <article class="card" id="noun-record">
+      <div class="card-h"><h3>record</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Say one thing an observer saw, so anyone can check it and nobody can change it.</dd>
+        <dt>State</dt><dd>An envelope the core reads, a payload it never interprets, a signature. Named by <code>r:</code> and a hash of the envelope and the payload's commitment.</dd>
+        <dt>Principle</dt><dd>Its id hashes what it says, written canonically: spell a set another way and the id doesn't move. Erase its payload and the id, the signature and every record citing it still hold.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-record-erasure"><code>record.erasure</code></a> <a href="../laws/#law-record-sets"><code>record.sets</code></a> <a href="../laws/#law-write-checked"><code>write.checked</code></a></p>
+    </article>
+    <article class="card" id="noun-observer">
+      <div class="card-h"><h3>observer</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Say who saw it.</dd>
+        <dt>State</dt><dd>A typed reference on every record, usually a lineage id <code>sl:…</code>.</dd>
+        <dt>Principle</dt><dd>Nothing a record says is true; it is said, by its observer. Two observers disagreeing is two records, both kept.</dd>
+      </dl>
+      <p class="pending">Keys checked at read, and standing, arrive in step 3.</p>
+      <p class="laws"><a href="../laws/#law-record-refuse"><code>record.refuse</code></a></p>
+    </article>
+    <article class="card" id="noun-thing">
+      <div class="card-h"><h3>thing</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Give each subject its own state, so records about different things never interfere.</dd>
+        <dt>State</dt><dd>A typed reference, <code>prefix:value</code>, in a record's <code>about</code>. A record about nothing anchors a thing named by its own id.</dd>
+        <dt>Principle</dt><dd>Revise a thing's record and the revision is its head. Revise one record twice and the thing has two heads, a fork, until a record names both.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-thing-local"><code>thing.local</code></a> <a href="../laws/#law-admit-no-cross"><code>admit.no-cross</code></a></p>
+    </article>
+    <article class="card" id="noun-store">
+      <div class="card-h"><h3>store</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Hold records, and nothing else: it owns no meaning.</dd>
+        <dt>State</dt><dd>A set of records, kept in places, each record one canonical line.</dd>
+        <dt>Principle</dt><dd>A store is a set. Read its places in any order and a reader settles the same records, one per id.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-input-union"><code>input.union</code></a> <a href="../laws/#law-settle-set"><code>settle.set</code></a></p>
+    </article>
+    <article class="card" id="noun-view">
+      <div class="card-h"><h3>view</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Let readers who hold different payloads still agree on what is current.</dd>
+        <dt>State</dt><dd>What one reader holds: each record with its payload, withheld, or erased. Envelopes are always held.</dd>
+        <dt>Principle</dt><dd>A view folds to the same heads as a reader holding everything. What it can't read it counts as unread, never guesses.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-view-no-resurrection-things"><code>view.no-resurrection</code></a> <a href="../laws/#law-result-unread"><code>result.unread</code></a></p>
+    </article>
+    <article class="card" id="noun-spec">
+      <div class="card-h"><h3>spec</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Write a standing question as data anyone can check.</dd>
+        <dt>State</dt><dd><code>vertex</code>, the sources in <code>from</code>, the slots in <code>fold</code>.</dd>
+        <dt>Principle</dt><dd>An accepted spec's parsed form parses back to itself. A refused one names the first rule it breaks, and where.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-spec-parse"><code>spec.parse</code></a></p>
+    </article>
+    <article class="card" id="noun-source">
+      <div class="card-h"><h3>source</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Choose records by their envelopes alone.</dd>
+        <dt>State</dt><dd>A <code>store</code>, then optionally the <code>kind</code>s and the thing it is <code>about</code>.</dd>
+        <dt>Principle</dt><dd>A source takes a record when its kind is listed and it is about the thing. A view selects exactly the same records.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-spec-select"><code>spec.select</code></a> <a href="../laws/#law-spec-from-thing"><code>spec.from-thing</code></a></p>
+    </article>
+    <article class="card" id="noun-slot">
+      <div class="card-h"><h3>slot</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Hold one answer.</dd>
+        <dt>State</dt><dd>A name, one fold, and optionally <code>where</code>, <code>follow</code> and <code>limit</code>.</dd>
+        <dt>Principle</dt><dd>The same set of records gives every slot of every spec the same value. A slot over heads never brings back a superseded record.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-spec-set"><code>spec.set</code></a> <a href="../laws/#law-spec-after-supersession"><code>spec.after-supersession</code></a></p>
+    </article>
+    <article class="card" id="noun-fold">
+      <div class="card-h"><h3>fold</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Turn a set of records into state.</dd>
+        <dt>State</dt><dd>One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code>, over heads; and <code>collect</code>, over heads when it follows <code>prev</code> and over every selected record when it doesn't.</dd>
+        <dt>Principle</dt><dd>The set decides: arrival order and two-way syncs never change the answer, and a late record folded onto the cached state gives what folding the whole set again gives.</dd>
+      </dl>
+      <p class="laws"><a href="../laws/#law-acc-set"><code>acc.set</code></a> <a href="../laws/#law-heads-set"><code>heads.set</code></a> <a href="../laws/#law-latest-by-converge"><code>latest-by.converge</code></a></p>
+    </article>
+    <article class="card" id="noun-vertex">
+      <div class="card-h"><h3>vertex</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Ask a standing question over stores: select, fold, tick.</dd>
+        <dt>State</dt><dd>A spec run over what a reader holds.</dd>
+        <dt>Principle</dt><dd>Run it on the same set and it gives the same slots, each with how many records it couldn't read.</dd>
+      </dl>
+      <p class="pending">Naming a vertex by its spec's hash, and when it ticks, are settled, not built.</p>
+      <p class="laws"><a href="../laws/#law-spec-set"><code>spec.set</code></a> <a href="../laws/#law-result-unread"><code>result.unread</code></a></p>
+    </article>
+    <article class="card is-settled" id="noun-tick">
+      <div class="card-h"><h3>tick</h3><span class="chip settled">settled</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Fix a vertex's result at a moment, so others can cite it.</dd>
+        <dt>State</dt><dd>The vertex, the records it covers, listed exactly, and the result; an id over all three.</dd>
+        <dt>Principle</dt><dd>Anyone holding the covered records recomputes the same tick.</dd>
+      </dl>
+    </article>
+    <article class="card" id="noun-lens">
+      <div class="card-h"><h3>lens</h3><span class="chip proved">proved</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Turn state into text people edit, and edits back into records.</dd>
+        <dt>State</dt><dd>A render, a parse and a diff by ids; the base the text came from.</dd>
+        <dt>Principle</dt><dd>Parse a render and you get back what was rendered. A dropped section changes nothing: absence is never an edit.</dd>
+      </dl>
+      <p class="pending">Keyed sections are proved; applying edits as records is settled.</p>
+      <p class="laws"><a href="../laws/#law-lens-round-trip"><code>lens.round-trip</code></a> <a href="../laws/#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a></p>
+    </article>
+    <article class="card is-settled" id="noun-grant">
+      <div class="card-h"><h3>grant</h3><span class="chip settled">settled</span></div>
+      <dl>
+        <dt>Purpose</dt><dd>Give standing ahead of time, with a scope.</dd>
+        <dt>State</dt><dd>A record; a record acting on it names it in <code>under</code>.</dd>
+        <dt>Principle</dt><dd>A record without standing stays visible but has no effect.</dd>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<section class="wrap block" id="verbs" aria-labelledby="h-verbs">
+  <div class="side">
+    <h2 id="h-verbs">Verbs</h2>
+    <p>Two verbs write: <b>emit</b> and <b>tick</b>. Every other verb reads, and reading never changes a store. A lens closes the loop the only way anything gets down to the ground: its edits become records.</p>
+    <p>Most of what feels like an action is a construction, an emit with a field filled in. Revising, merging and erasing are sentences, not new verbs.</p>
+  </div>
+  <div class="stack">
+    <h3>Write</h3>
+    <div class="rows">
+      <div class="row"><div class="row-k"><b>emit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write a record: checked, signed, appended. Nothing else enters a store.</p><p class="laws"><a href="../laws/#law-write-checked"><code>write.checked</code></a></p></div></div>
+      <div class="row is-settled"><div class="row-k"><b>tick</b><span class="chip settled">settled</span></div><div class="row-v"><p>Fix a vertex's result at a boundary, as a value anyone can recompute.</p></div></div>
+    </div>
+    <h3>Any layer</h3>
+    <div class="rows">
+      <div class="row"><div class="row-k"><b>refuse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Say no, with a code from a closed set and the path of what broke the rule. Never guess.</p><p class="laws"><a href="../laws/#law-record-refuse"><code>record.refuse</code></a> <a href="../laws/#law-batch-refuse-order"><code>batch.refuse-order</code></a></p></div></div>
+    </div>
+    <h3>Read</h3>
+    <div class="rows">
+      <div class="row"><div class="row-k"><b>settle</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn the forms a reader's places hold into one record per id, payload kept unless erased.</p><p class="laws"><a href="../laws/#law-settle-keeps"><code>settle.keeps</code></a> <a href="../laws/#law-settle-erased"><code>settle.erased</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>admit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Refuse records not entitled to their <code>prev</code>. Standing joins it in step 3.</p><p class="laws"><a href="../laws/#law-admit-set"><code>admit.set</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>take</b><span class="chip proved">proved</span></div><div class="row-v"><p>A source takes the records its store, kinds and thing choose.</p><p class="laws"><a href="../laws/#law-spec-select"><code>spec.select</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>test</b><span class="chip proved">proved</span></div><div class="row-v"><p>A <code>where</code> test answers yes, no, or, on a payload the reader lacks, unknown.</p><p class="laws"><a href="../laws/#law-where-total"><code>where.total</code></a> <a href="../laws/#law-view-refines-where"><code>view.refines</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>fold</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn what was taken into a slot's value.</p><p class="laws"><a href="../laws/#law-acc-set"><code>acc.set</code></a> <a href="../laws/#law-heads-set"><code>heads.set</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>follow</b><span class="chip proved">proved</span></div><div class="row-v"><p>Walk <code>prev</code> within a thing to its heads: what nothing about it replaces.</p><p class="laws"><a href="../laws/#law-latest-by-order"><code>latest-by.order</code></a> <a href="../laws/#law-thing-local"><code>thing.local</code></a></p></div></div>
+    </div>
+    <h3>Text</h3>
+    <div class="rows">
+      <div class="row"><div class="row-k"><b>render</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write state as text for an audience.</p><p class="laws"><a href="../laws/#law-lens-escaping"><code>lens.escaping</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>parse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Read edited text back, refusing what it can't read.</p><p class="laws"><a href="../laws/#law-lens-round-trip"><code>lens.round-trip</code></a> <a href="../laws/#law-lens-refuse"><code>lens.refuse</code></a></p></div></div>
+      <div class="row is-settled"><div class="row-k"><b>apply</b><span class="chip settled">settled</span></div><div class="row-v"><p>Turn the edits a parse found into records, emitted together.</p><p class="laws"><a href="../laws/#law-lens-put-get"><code>lens.put-get</code></a></p></div></div>
+    </div>
+    <h3>Constructions</h3>
+    <div class="rows">
+      <div class="row"><div class="row-k"><b>start</b></div><div class="row-v"><p class="made">emit with no <code>prev</code></p><p>A new chain. About nothing, the record anchors a thing of its own.</p></div></div>
+      <div class="row"><div class="row-k"><b>revise</b></div><div class="row-v"><p class="made">emit with <code>prev: [x]</code></p><p>Replace x within a thing both are about. Naming one about other things is refused, <code>prev-unrelated</code>.</p></div></div>
+      <div class="row"><div class="row-k"><b>fork</b></div><div class="row-v"><p class="made">two records naming one <code>prev</code></p><p>Nobody's verb: a state. The thing has two heads, both shown, the newer by content order winning.</p></div></div>
+      <div class="row"><div class="row-k"><b>merge</b></div><div class="row-v"><p class="made">emit with <code>prev: [x, y]</code></p><p>One head again.</p></div></div>
+      <div class="row"><div class="row-k"><b>erase</b></div><div class="row-v"><p class="made">emit with <code>erases: [x]</code></p><p>Any kind may. x keeps its id, signature and place; only its opening goes.</p></div></div>
+      <div class="row"><div class="row-k"><b>withhold</b></div><div class="row-v"><p class="made">hold a record without its payload</p><p>Not a write at all: a view. Envelopes still answer every test on them.</p></div></div>
+    </div>
+    <h3>Refusals</h3>
+    <p class="note">A closed set: every code the vectors pin is here, and the build fails if one isn't.</p>
+    <div class="refusals">
+      <div class="ref"><p class="ref-h"><b>Envelope</b> <span>checked in this order</span></p><p class="codes"><code>kind-empty</code> <code>observer-not-typed</code> <code>emitted-not-rfc3339</code> <code>occurred-not-span</code> <code>about-not-typed</code> <code>prev-not-record-id</code> <code>under-not-record-id</code> <code>erases-not-record-id</code></p></div>
+      <div class="ref"><p class="ref-h"><b>Writing</b> <span>after the envelope</span></p><p class="codes"><code>salt-not-16-bytes</code> <code>member-duplicate</code> <code>number-out-of-range</code></p></div>
+      <div class="ref"><p class="ref-h"><b>Batch</b> <span>labels, then writing, then prev</span></p><p class="codes"><code>label-duplicate</code> <code>label-unknown</code> <code>label-cycle</code> <code>prev-unknown</code> <code>prev-unrelated</code></p></div>
+      <div class="ref"><p class="ref-h"><b>Spec</b> <span>the grammar's check order</span></p><p class="codes"><code>member-duplicate</code> <code>spec-not-object</code> <code>unknown-key</code> <code>vertex-missing</code> <code>vertex-invalid</code> <code>from-missing</code> <code>from-invalid</code> <code>fold-invalid</code> <code>fold-type</code> <code>follow-missing</code> <code>follow-invalid</code> <code>limit-invalid</code> <code>fold-argument</code> <code>where-invalid</code></p></div>
+      <div class="ref is-settled"><p class="ref-h"><b>Not pinned yet</b> <span>named in the laws, no vector</span></p><p class="codes"><code>prev-not-permitted</code> <code>sum-overflow</code></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap block" id="layers" aria-labelledby="h-layers">
+  <div class="side">
+    <h2 id="h-layers">Layers</h2>
+    <p>Six layers, each as high as it is temporary. The ground is what was said; nothing on it is ever edited. Each layer above is worked out from the one below it, so any of them can be dropped and rebuilt.</p>
+    <p>Every arrow up recomputes. The only arrow down is a record.</p>
+    <p class="hint">Point at or tap a layer to lift it.</p>
+  </div>
+  <div class="layers-fig">
+    <div class="stack3d" id="stack3d" aria-hidden="true">
+      <div class="iso">
+      <div class="plate" data-layer="0" style="--z:5"><span>Text</span></div>
+      <div class="plate is-settled" data-layer="1" style="--z:4"><span>Tick</span></div>
+      <div class="plate" data-layer="2" style="--z:3"><span>State</span></div>
+      <div class="plate" data-layer="3" style="--z:2"><span>View</span></div>
+      <div class="plate" data-layer="4" style="--z:1"><span>Store</span></div>
+      <div class="plate" data-layer="5" style="--z:0"><span>Record</span></div>
+      </div>
+      <svg class="loop" viewBox="0 0 64 300" preserveAspectRatio="none"><path d="M8 18 C 58 18, 58 282, 12 282"/><path d="M19 276 L 11 282 L 19 288"/></svg>
+      <p class="loop-t">edits come down<br>as records</p>
+    </div>
+    <table class="layer-table">
+      <thead><tr><th scope="col"></th><th scope="col">Made by</th><th scope="col">Lasts</th><th scope="col">Named by</th></tr></thead>
+      <tbody>
+        <tr data-layer="0"><th scope="row">Text<span class="gist">For an audience: what a lens renders, and what people edit.</span></th><td>render</td><td>until the next render</td><td>its base: tick, lens, audience</td></tr>
+        <tr data-layer="1"><th scope="row">Tick <span class="chip settled">settled</span><span class="gist">A result at a moment, covering exactly the records folded.</span></th><td>tick</td><td>stored when cited</td><td>id over vertex, covers, result</td></tr>
+        <tr data-layer="2"><th scope="row">State<span class="gist">A vertex's slots, worked out from the set.</span></th><td>fold</td><td>a cache: recomputed at will</td><td>its vertex and the set</td></tr>
+        <tr data-layer="3"><th scope="row">View<span class="gist">What one reader holds, settled and admitted.</span></th><td>settle, admit</td><td>until more arrives</td><td>nothing: it is the reader's</td></tr>
+        <tr data-layer="4"><th scope="row">Store<span class="gist">A set of records in places. No order, no positions.</span></th><td>holding</td><td>as long as a place keeps it</td><td>its anchor</td></tr>
+        <tr data-layer="5"><th scope="row">Record<span class="gist">The ground. Appended, never edited; only a payload can go.</span></th><td>emit</td><td>for good</td><td><code>r:</code> content hash</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="wrap block" id="walk" aria-labelledby="h-walk">
+  <div class="side">
+    <h2 id="h-walk">A walk</h2>
+    <p>One decision, nine steps: two people write, fork, merge and erase; a reader with less sees the same; a vertex ticks; a lens turns the result into text and an edit back into a record.</p>
+    <ol class="steps" id="steps"></ol>
+    <div class="step-text" id="step-text" aria-live="polite"></div>
+  </div>
+  <div class="stage" id="stage">
+    <div class="stage-bar">
+      <span class="mono" id="stage-where">store <b>team</b></span>
+      <span class="stage-ctl">
+        <button type="button" id="prev-step" aria-label="Previous step">&larr;</button>
+        <button type="button" id="next-step" aria-label="Next step">&rarr;</button>
+        <button type="button" id="reset-walk" aria-label="Start again">&#8634;</button>
+      </span>
+    </div>
+    <div class="dag" id="dag"><svg class="edges" id="edges"></svg></div>
+    <div class="panes">
+      <div class="pane">
+        <p class="pane-h">spec</p>
+<pre class="spec-json">{"vertex": "decisions",
+ "from": [{"store": "team",
+           "kind": ["decision"]}],
+ "fold": {
+   "current": {"latest-by": "about",
+               "follow": "prev"},
+   "decisions": {"count": true}}}</pre>
+      </div>
+      <div class="pane slots" id="slots">
+        <p class="pane-h">slots</p>
+        <div class="slot"><span class="mono">current</span><div id="slot-current"></div></div>
+        <div class="slot"><span class="mono">decisions</span><div id="slot-count"></div></div>
+        <div class="tick" id="tick" hidden></div>
+      </div>
+    </div>
+    <div class="lens" id="lens" hidden>
+      <p class="pane-h">lens: keyed sections</p>
+      <pre id="lens-text"></pre>
+      <p class="lens-out" id="lens-out"></p>
+    </div>
+  </div>
+  <ol class="walk-static" id="walk-static">
+      <li><b>Emit</b> <span>Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.</span> <span class="mono">heads A · decisions 1</span></li>
+      <li><b>Revise</b> <span>Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.</span> <span class="mono">heads B · decisions 2</span></li>
+      <li><b>Fork</b> <span>Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.</span> <span class="mono">heads C, B · decisions 3</span></li>
+      <li><b>Merge</b> <span>Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.</span> <span class="mono">heads M · decisions 4</span></li>
+      <li><b>Erase</b> <span>A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.</span> <span class="mono">heads E · decisions 5 · erased A</span></li>
+      <li><b>Any order</b> <span>Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.</span> <span class="mono">heads E · decisions 5 · erased A</span></li>
+      <li><b>Less in view</b> <span>Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's payload is withheld, and the slot says so instead of guessing; the count, needing no payload, is still five.</span> <span class="mono">heads E · decisions 5 · erased A · withheld E</span></li>
+      <li><b>Tick</b> <span class="chip settled">settled</span> <span>At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet: the state shown is the model's, the tick around it is not.</span> <span class="mono">heads E · decisions 5 · erased A</span></li>
+      <li><b>Back to text</b> <span>A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.</span> <span class="mono">heads F · decisions 6 · erased A</span></li>
+  </ol>
+</section>
+
+<section class="wrap block" id="matrix" aria-labelledby="h-matrix">
+  <div class="side">
+    <h2 id="h-matrix">Where nouns meet verbs</h2>
+    <p>Rows are nouns, columns verbs. A filled cell says what the verb does to the noun. The grid is sparse on purpose: each verb has a narrow job, and the record is the one noun every verb touches.</p>
+  </div>
+  <div class="matrix-wrap">
+    <div class="matrix-scroll">
+    <table class="matrix">
+      <thead><tr><th scope="col"></th><th scope="col"><span>emit</span></th><th scope="col"><span>refuse</span></th><th scope="col"><span>settle</span></th><th scope="col"><span>admit</span></th><th scope="col"><span>take</span></th><th scope="col"><span>test</span></th><th scope="col"><span>fold</span></th><th scope="col"><span>follow</span></th><th scope="col" class="is-settled"><span>tick</span></th><th scope="col"><span>render</span></th><th scope="col"><span>parse</span></th><th scope="col" class="is-settled"><span>apply</span></th></tr></thead>
+      <tbody>
+        <tr><th scope="row">record</th><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">written</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">a bad envelope or payload</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">one per id</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">entitled to its prev</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">by envelope</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">env. or payload</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">into slots</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">via prev</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">what an edit becomes</span></td></tr>
+        <tr><th scope="row">thing</th><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">latest-by about</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">its heads</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td></tr>
+        <tr><th scope="row">store</th><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">appended to</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">its places</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">named by a source</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td></tr>
+        <tr><th scope="row">view</th><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">made by</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">made by</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">unknown when withheld</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">same heads</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td></tr>
+        <tr><th scope="row">spec</th><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">first broken rule</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">into its parsed form</span></td><td><span class="sr">—</span></td></tr>
+        <tr><th scope="row">slot</th><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">its where</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">holds the value</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td></tr>
+        <tr><th scope="row">tick</th><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">written</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">a base</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td></tr>
+        <tr><th scope="row">lens</th><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">malformed text</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">state as text</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">text read back</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">edits as records</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="matrix-note" id="matrix-note" aria-live="polite">Point at or tap a dot.</p>
+  </div>
+</section>
+
+<section class="wrap block" id="provenance" aria-labelledby="h-prov">
+  <div class="side">
+    <h2 id="h-prov">Where this form comes from</h2>
+    <p>The words are the protocol's; the full glossary, retired words included, is in <a href="../rethink/#glossary">the design walk</a>. The way of laying them out is borrowed.</p>
+  </div>
+  <div class="rows">
+    <div class="row"><div class="row-k wide">Daniel Jackson, <a href="https://essenceofsoftware.com"><i>The Essence of Software</i></a></div><div class="row-v"><p>Every noun has one purpose, its own state and an operational principle: the card's three lines.</p></div></div>
+    <div class="row"><div class="row-k wide">Daniel Rosenberg, <i>UX Magic</i></div><div class="row-v"><p>The grammar comes first, as nouns and verbs, and the object–action matrix shows where they meet.</p></div></div>
+    <div class="row"><div class="row-k wide">Johnson &amp; Henderson, <i>Conceptual Models</i></div><div class="row-v"><p>Objects and operations only: no file formats, commands or screens.</p></div></div>
+    <div class="row"><div class="row-k wide">Maggie Appleton, <a href="https://x.com/Mappletons/status/2114779610596675824">a grammar page</a></div><div class="row-v"><p>The form: nouns, verbs and layers, each layer as high as it is temporary, and a walk taken step by step.</p></div></div>
+  </div>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <p>Built from <code>design/grammar/</code> by <code>node design/build.mjs</code>. Law names link to their place on <a href="../laws/">the laws page</a>.</p>
+</footer>
+
+<script>
+const WALK = {"records":{"A":{"who":"ada","at":"09:00","col":1,"row":2,"body":"Device flow. Client secret: 9f3c…","prev":[],"erases":[]},"B":{"who":"ada","at":"09:10","col":2,"row":1,"body":"Device flow; revisit in Q3.","prev":["A"],"erases":[]},"C":{"who":"bo","at":"09:12","col":2,"row":3,"body":"Use passkeys.","prev":["A"],"erases":[]},"M":{"who":"ada","at":"09:30","col":3,"row":2,"body":"Passkeys; device flow on TVs.","prev":["B","C"],"erases":[]},"E":{"who":"ada","at":"09:40","col":4,"row":2,"body":"Passkeys; device flow on TVs.","prev":["M"],"erases":["A"]},"F":{"who":"bo","at":"10:05","col":5,"row":2,"body":"Passkeys everywhere.","prev":["E"],"erases":[]}},"steps":[{"title":"Emit","text":"Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.","laws":["write.checked"],"shown":["A"],"heads":["A"],"winner":"A","count":1,"erased":[],"withheld":[],"current":[{"id":"A","shown":"here"}]},{"title":"Revise","text":"Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.","laws":["admit.no-cross"],"shown":["A","B"],"heads":["B"],"winner":"B","count":2,"erased":[],"withheld":[],"current":[{"id":"B","shown":"here"}]},{"title":"Fork","text":"Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.","laws":["latest-by.order"],"shown":["A","B","C"],"heads":["C","B"],"winner":"C","count":3,"erased":[],"withheld":[],"current":[{"id":"C","shown":"here"},{"id":"B","shown":"here"}]},{"title":"Merge","text":"Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.","laws":["heads.set"],"shown":["A","B","C","M"],"heads":["M"],"winner":"M","count":4,"erased":[],"withheld":[],"current":[{"id":"M","shown":"here"}]},{"title":"Erase","text":"A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.","laws":["record.erasure","settle.erased"],"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}]},{"title":"Any order","text":"Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.","laws":["latest-by.set","input.union"],"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}],"orders":[["A","B","C","M","E"],["B","C","M","E","A"],["C","M","E","A","B"]]},{"title":"Less in view","text":"Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's payload is withheld, and the slot says so instead of guessing; the count, needing no payload, is still five.","laws":["view.no-resurrection"],"reader":"cy","shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":["E"],"current":[{"id":"E","shown":"withheld"}]},{"title":"Tick","text":"At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet: the state shown is the model's, the tick around it is not.","laws":[],"settled":true,"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}],"tick":{"covers":["A","B","C","M","E"]}},{"title":"Back to text","text":"A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.","laws":["lens.round-trip","lens.put-get"],"shown":["A","B","C","M","E","F"],"heads":["F"],"winner":"F","count":6,"erased":["A"],"withheld":[],"current":[{"id":"F","shown":"here"}],"lens":{"before":["::: decision:auth","Passkeys; device flow on TVs.",":::"],"after":["::: decision:auth","Passkeys everywhere.",":::"],"outcome":"accepted <code>decision:auth</code> → emit F, <code>prev: [E]</code>"}}]};
+const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-no-cross","latest-by.order":"law-latest-by-order","heads.set":"law-heads-set","record.erasure":"law-record-erasure","settle.erased":"law-settle-erased","latest-by.set":"law-latest-by-set","input.union":"law-input-union","view.no-resurrection":"law-view-no-resurrection-things","lens.round-trip":"law-lens-round-trip","lens.put-get":"law-lens-put-get"};
+</script>
+<script>
+// The grammar page's behaviour: the sentence, the layer stack, the walk and the matrix.
+// Motion (window.Motion) supplies the springs. Without it, or with reduced motion, every
+// animation jumps to its last frame, so the page reads the same either way.
+(() => {
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const M = !reduced && window.Motion ? window.Motion : null;
+  const last = (v) => (Array.isArray(v) ? v[v.length - 1] : v);
+  const animate = M ? M.animate : (el, kf) => {
+    for (const [k, v] of Object.entries(kf)) {
+      if (k.startsWith("--")) el.style.setProperty(k, last(v)); else el.style[k] = last(v);
+    }
+    return Promise.resolve();
+  };
+  const spring = (stiffness, damping, delay = 0) => ({ type: "spring", stiffness, damping, delay });
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const wait = (ms) => new Promise((r) => setTimeout(r, M ? ms : 0));
+  const rid = (k) => `r:${k}…`;
+
+  // Section links: mark the one in view.
+  const links = $$(".seg a");
+  const io = new IntersectionObserver((es) => {
+    for (const e of es) if (e.isIntersecting) {
+      for (const a of links) a.setAttribute("aria-current", a.hash === `#${e.target.id}` ? "true" : "false");
+    }
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  for (const a of links) { const s = $(a.hash); if (s) io.observe(s); }
+
+  // The sentence: a word and its field light together.
+  const sentence = $("#sentence");
+  const heat = (f) => $$("[data-f]", sentence).forEach((el) => el.classList.toggle("hot", el.dataset.f === f));
+  for (const w of $$(".w", sentence)) {
+    w.tabIndex = 0;
+    w.addEventListener("mouseenter", () => heat(w.dataset.f));
+    w.addEventListener("focus", () => heat(w.dataset.f));
+    w.addEventListener("click", () => heat(w.dataset.f));
+  }
+  sentence.addEventListener("mouseleave", () => heat(null));
+
+  // The layer stack. The ground never lifts: nothing on it is ever edited.
+  const stack = $("#stack3d");
+  const plates = $$(".plate", stack);
+  const rows = $$(".layer-table tbody tr");
+  const ground = plates.length - 1;
+  const labels = plates.map((p) => {
+    const l = document.createElement("span");
+    l.className = "plate-label";
+    l.textContent = p.textContent.trim();
+    stack.appendChild(l);
+    return l;
+  });
+  const placeLabels = () => {
+    const box = stack.getBoundingClientRect();
+    plates.forEach((p, k) => {
+      const r = p.getBoundingClientRect();
+      labels[k].style.left = `${r.left - box.left - 10}px`;
+      labels[k].style.top = `${r.top - box.top + r.height * 0.62}px`;
+    });
+  };
+  let follow = 0;
+  const track = (ms) => {
+    const until = performance.now() + ms;
+    const go = () => { placeLabels(); if (performance.now() < until) follow = requestAnimationFrame(go); };
+    cancelAnimationFrame(follow); go();
+  };
+  let lifted = null;
+  const lift = (k) => {
+    if (k === lifted) return;
+    lifted = k;
+    plates.forEach((p, i) => {
+      const up = k !== null && i === k && i !== ground;
+      p.classList.toggle("hot", i === k);
+      labels[i].classList.toggle("hot", i === k);
+      animate(p, { "--lift": up ? "22px" : "0px" }, spring(260 + 40 * i, 18 + 2 * i));
+    });
+    rows.forEach((r, i) => r.classList.toggle("hot", i === k));
+    track(900);
+  };
+  [...plates, ...rows].forEach((el) => {
+    const k = Number(el.dataset.layer);
+    el.addEventListener("mouseenter", () => lift(k));
+    el.addEventListener("click", () => lift(k));
+  });
+  $(".layers-fig").addEventListener("mouseleave", () => lift(null));
+  addEventListener("resize", placeLabels);
+  placeLabels();
+  if (M) {
+    // Each layer settles onto the one below it, the ground first.
+    plates.forEach((p) => { p.style.opacity = "0"; p.style.setProperty("--lift", "140px"); });
+    M.inView(stack, () => {
+      plates.slice().reverse().forEach((p, j) => {
+        animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j));
+      });
+      track(2200);
+    }, { amount: 0.4 });
+  }
+
+  // The walk: each step is a whole state; render it, animating what changed.
+  const dag = $("#dag"), edges = $("#edges");
+  const stepsEl = $("#steps"), stepText = $("#step-text");
+  const cards = new Map();
+  let at = -1, token = 0;
+
+  WALK.steps.forEach((s, k) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = s.title;
+    b.addEventListener("click", () => show(k));
+    li.appendChild(b);
+    stepsEl.appendChild(li);
+  });
+
+  function card(id) {
+    if (cards.has(id)) return cards.get(id);
+    const r = WALK.records[id];
+    const el = document.createElement("div");
+    el.className = "rec";
+    el.dataset.id = id;
+    el.style.gridColumn = r.col;
+    el.style.gridRow = r.row;
+    el.innerHTML = `<div class="rid">${rid(id)}<span>${r.at}</span></div><div class="who">${r.who}</div><div class="val"></div><div class="tag"></div>`;
+    dag.appendChild(el);
+    cards.set(id, el);
+    return el;
+  }
+
+  function paint(s, shown) {
+    const fork = s.heads.length > 1;
+    for (const [id, el] of cards) if (!shown.includes(id)) { cards.delete(id); el.remove(); }
+    const fresh = [];
+    for (const id of shown) {
+      const isNew = !cards.has(id);
+      const el = card(id);
+      if (isNew) fresh.push(el);
+      const head = s.heads.includes(id);
+      el.classList.toggle("head", head && !fork);
+      el.classList.toggle("fork", head && fork);
+      el.classList.toggle("super", !head);
+      const val = $(".val", el);
+      const erased = (s.erased || []).includes(id), withheld = (s.withheld || []).includes(id);
+      val.className = `val${erased ? " erased" : withheld ? " withheld" : ""}`;
+      val.textContent = erased ? "erased · h:…" : withheld ? "withheld" : WALK.records[id].body;
+      $(".tag", el).textContent = !head ? "superseded" : fork ? (id === s.heads[0] ? "fork · wins" : "fork") : "head";
+    }
+    fresh.forEach((el, j) => animate(el, { opacity: [0, 1], transform: ["translateY(10px) scale(0.96)", "translateY(0px) scale(1)"] }, spring(380, 26, 0.06 * j)));
+    // A later step may have removed these cards by the time the frame runs.
+    const my = token;
+    requestAnimationFrame(() => { if (my === token) drawEdges(shown, fresh.map((el) => el.dataset.id)); });
+  }
+
+  function drawEdges(shown, fresh) {
+    const box = dag.getBoundingClientRect();
+    const rect = (id) => cards.get(id).getBoundingClientRect();
+    const paths = [];
+    for (const id of shown) {
+      const r = WALK.records[id];
+      for (const p of r.prev) if (shown.includes(p)) {
+        const a = rect(p), b = rect(id);
+        const x1 = a.right - box.left, y1 = a.top + a.height / 2 - box.top;
+        const x2 = b.left - box.left, y2 = b.top + b.height / 2 - box.top;
+        const dx = (x2 - x1) / 2;
+        paths.push({ d: `M${x1} ${y1} C${x1 + dx} ${y1},${x2 - dx} ${y2},${x2} ${y2}`, cls: "", key: `${p}>${id}`, isNew: fresh.includes(id) });
+      }
+      for (const e of r.erases || []) if (shown.includes(e)) {
+        const a = rect(id), b = rect(e);
+        const x1 = a.left + a.width / 2 - box.left, y1 = a.bottom - box.top;
+        const x2 = b.left + b.width / 2 - box.left, y2 = b.bottom - box.top;
+        // Under every card, so the line never crosses one.
+        const low = Math.max(...[...cards.values()].map((c) => c.getBoundingClientRect().bottom)) - box.top + 26;
+        paths.push({ d: `M${x1} ${y1} C${x1} ${low},${x2} ${low},${x2} ${y2}`, cls: "erase", key: `${id}x${e}`, isNew: fresh.includes(id) });
+      }
+    }
+    edges.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+    edges.innerHTML = paths.map((p) => `<path class="${p.cls}" data-k="${p.key}" d="${p.d}"/>`).join("");
+    paths.forEach((p) => {
+      if (!p.isNew) return;
+      const el = edges.querySelector(`[data-k="${p.key}"]`);
+      if (p.cls) { animate(el, { opacity: [0, 1] }, { duration: 0.5, delay: 0.25 }); return; }
+      const len = el.getTotalLength();
+      el.style.strokeDasharray = `${len}`;
+      animate(el, { strokeDashoffset: [len, 0] }, { duration: 0.45, ease: "easeOut", delay: 0.12 });
+    });
+  }
+
+  function slots(s, heads, count) {
+    const cur = $("#slot-current");
+    const withheld = s.withheld || [];
+    const h = heads[0];
+    cur.innerHTML = `<span class="v mono">${rid(h)}</span> ` + (withheld.includes(h)
+      ? `<span class="sub">payload withheld</span>`
+      : `<span class="sub">&ldquo;${WALK.records[h].body}&rdquo;</span>`) +
+      (heads.length > 1 ? `<div class="sub alert">fork: also ${heads.slice(1).map(rid).join(", ")}</div>` : "");
+    $("#slot-count").innerHTML = `<span class="v">${count}</span> <span class="sub">unread 0</span>`;
+    for (const el of [cur, $("#slot-count")]) animate(el, { opacity: [0.35, 1] }, { duration: 0.35 });
+  }
+
+  function words(s) {
+    const laws = s.laws.map((l) => `<a href="../laws/#${LAW_AT[l]}"><code>${l}</code></a>`).join(" ");
+    stepText.innerHTML = `${s.settled ? '<span class="chip settled">settled</span>' : ""}<p>${s.text}</p>` +
+      (laws ? `<p class="laws">${laws}</p>` : "") + (s.orders ? '<p class="arrival" id="arrival"></p>' : "");
+    animate(stepText, { opacity: [0, 1], transform: ["translateY(4px)", "translateY(0px)"] }, spring(300, 30));
+  }
+
+  async function show(k) {
+    k = Math.max(0, Math.min(WALK.steps.length - 1, k));
+    const my = ++token;
+    const s = WALK.steps[k];
+    at = k;
+    $$("button", stepsEl).forEach((b, i) => (i === k ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current")));
+    // Keep the current step in view where the steps are a row (narrow screens), without moving the page.
+    const cur = $$("button", stepsEl)[k];
+    stepsEl.scrollLeft = cur.offsetLeft - stepsEl.offsetLeft - stepsEl.clientWidth / 2 + cur.offsetWidth / 2;
+    $("#prev-step").disabled = k === 0;
+    $("#next-step").disabled = k === WALK.steps.length - 1;
+    $("#stage-where").innerHTML = s.reader ? `reader <b>${s.reader}</b> · store <b>team</b>` : "store <b>team</b>";
+    words(s);
+    const tick = $("#tick"), lens = $("#lens");
+
+    tick.hidden = !s.tick;
+    if (s.tick) {
+      tick.innerHTML = `<span class="chip settled">settled</span><span>tick of <b>decisions</b></span>` +
+        `<span class="mono">covers ${s.tick.covers.map(rid).join(" ")}</span>` +
+        `<span class="mono">current ${rid(s.heads[0])} · decisions ${s.count}</span>`;
+      animate(tick, { opacity: [0, 1], transform: ["translateY(8px)", "translateY(0px)"] }, spring(320, 24));
+    }
+
+    if (!s.lens) {
+      lens.hidden = true;
+      paint(s, s.shown);
+      slots(s, s.heads, s.count);
+    } else {
+      // Render, edit, parse, apply: the new record arrives only once the edit is applied.
+      const prior = WALK.steps[k - 1];
+      paint(prior, s.shown.filter((id) => prior.shown.includes(id)));
+      slots(prior, prior.heads, prior.count);
+      const text = $("#lens-text"), out = $("#lens-out");
+      text.innerHTML = s.lens.before.join("\n");
+      out.textContent = "";
+      lens.hidden = false;
+      animate(lens, { opacity: [0, 1], transform: ["translateY(18px)", "translateY(0px)"] }, spring(260, 24));
+      await wait(1100); if (my !== token) return;
+      const [open, body, close] = [s.lens.before[0], s.lens.before[1], s.lens.before[2]];
+      text.innerHTML = `${open}\n<span class="gone">${body}</span>\n<span class="new">${s.lens.after[1]}</span>\n${close}`;
+      animate($(".new", text), { opacity: [0, 1] }, { duration: 0.35 });
+      await wait(1100); if (my !== token) return;
+      out.innerHTML = s.lens.outcome;
+      animate(out, { opacity: [0, 1] }, { duration: 0.35 });
+      await wait(700); if (my !== token) return;
+      paint(s, s.shown);
+      slots(s, s.heads, s.count);
+    }
+
+    if (s.orders) {
+      // Re-deliver in each order; the slots don't move.
+      let j = 0;
+      while (my === token) {
+        const order = s.orders[j++ % s.orders.length];
+        const line = $("#arrival");
+        if (!line) return;
+        line.textContent = `arrives: ${order.map(rid).join(" · ")}`;
+        order.forEach((id, i) => animate(cards.get(id), { opacity: [0.15, 1], transform: ["translateY(-6px)", "translateY(0px)"] }, spring(420, 22, 0.14 * i)));
+        if (!M) return;
+        await wait(2600);
+      }
+    }
+  }
+
+  $("#prev-step").addEventListener("click", () => show(at - 1));
+  $("#next-step").addEventListener("click", () => show(at + 1));
+  $("#reset-walk").addEventListener("click", () => {
+    for (const el of cards.values()) el.remove();
+    cards.clear();
+    show(0);
+  });
+  $("#stage").addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); show(at + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); show(at - 1); }
+  });
+  $("#stage").tabIndex = 0;
+  addEventListener("resize", () => { if (at >= 0) drawEdges(WALK.steps[at].shown.filter((id) => cards.has(id)), []); });
+  show(0);
+
+  // The matrix: a dot names what the verb does to the noun.
+  const note = $("#matrix-note");
+  const table = $(".matrix");
+  const heads = $$("thead th", table);
+  const tell = (td) => {
+    const tr = td.parentElement;
+    const col = [...tr.children].indexOf(td);
+    $$(".hot, .col-hot", table).forEach((el) => el.classList.remove("hot", "col-hot"));
+    td.classList.add("hot");
+    heads[col].classList.add("col-hot");
+    $$("tbody tr", table).forEach((r) => r.children[col].classList.add("col-hot"));
+    note.innerHTML = `<b>${tr.firstElementChild.textContent}</b> × <b>${heads[col].textContent}</b>: ${$(".cell-t", td).textContent}`;
+  };
+  for (const td of $$("td.on", table)) {
+    td.tabIndex = 0;
+    td.addEventListener("mouseenter", () => tell(td));
+    td.addEventListener("focus", () => tell(td));
+    td.addEventListener("click", () => tell(td));
+  }
+})();
+</script>
+</body>
+</html>

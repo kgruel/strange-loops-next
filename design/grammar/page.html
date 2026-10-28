@@ -1,0 +1,176 @@
+<!-- build:header -->
+
+<main>
+<section class="wrap intro">
+  <h1>Grammar</h1>
+<!-- build:lede -->
+  <p class="legend"><span class="chip proved">proved</span><span>a theorem in <code>model/Laws</code>, pinned by vectors</span><span class="chip settled">settled</span><span>decided in the design ledger, not built yet</span></p>
+</section>
+
+<section class="wrap block" id="sentence" aria-labelledby="h-sentence">
+  <div class="side">
+    <h2 id="h-sentence">A record is one sentence</h2>
+    <p>The envelope is the grammar of a single observation: who saw, what sort of thing they saw, of what, when, and what it replaces. The core reads every word of it and nothing else.</p>
+    <p>The payload is the sentence's content. The core never interprets it, so it can be withheld or erased and the sentence still parses: its id, its place in the chain and every test on its envelope hold.</p>
+    <p class="hint">Point at or tap a word to find its field.</p>
+  </div>
+  <div class="sheet sentence-sheet">
+    <p class="sentence" id="sentence-text">
+      <span class="w" data-f="observer"><span class="role">observer</span><code>sl:ada…</code></span>
+      says, of
+      <span class="w" data-f="about"><span class="role">about</span><code>decision:auth</code></span>,
+      a
+      <span class="w" data-f="kind"><span class="role">kind</span><code>decision</code></span>,
+      <span class="w" data-f="occurred"><span class="role">occurred</span>made in <code>2026-10</code></span>,
+      <span class="w" data-f="emitted"><span class="role">emitted</span>written <code>2026-10-01 09:40Z</code></span>,
+      <span class="w" data-f="prev"><span class="role">prev</span>replacing <code>r:M…</code></span>,
+      <span class="w" data-f="erases"><span class="role">erases</span>erasing <code>r:A…</code>'s payload</span>,
+      <span class="w" data-f="under"><span class="role">under</span>on the grant <code>r:G…</code></span>:
+      <span class="w body" data-f="payload"><span class="role">payload</span>&ldquo;Passkeys; device flow on TVs.&rdquo;</span>
+    </p>
+    <pre class="env" id="sentence-env" aria-label="The same record as stored"><span data-f="line">{"env": {</span>
+  <span data-f="about">"about": ["decision:auth"],</span>
+  <span data-f="emitted">"emitted": "2026-10-01T09:40:00Z",</span>
+  <span data-f="erases">"erases": ["r:A…"],</span>
+  <span data-f="kind">"kind": "decision",</span>
+  <span data-f="observer">"observer": "sl:ada…",</span>
+  <span data-f="occurred">"occurred": "2026-10",</span>
+  <span data-f="prev">"prev": ["r:M…"],</span>
+  <span data-f="under">"under": "r:G…"</span>
+<span data-f="line">},</span>
+<span data-f="line"> "id": "r:E…",</span>
+<span data-f="payload"> "payload": {"choice": "Passkeys; device flow on TVs."},</span>
+<span data-f="line"> "salt": "…", "sig": {…}}</span></pre>
+    <p class="caption">As stored: one canonical line, members sorted at every depth. This is E from the walk below, with an <code>occurred</code> and a grant added to show every field. The id hashes the envelope and the payload's commitment, never the payload itself.</p>
+  </div>
+</section>
+
+<section class="wrap block" id="nouns" aria-labelledby="h-nouns">
+  <div class="side">
+    <h2 id="h-nouns">Nouns</h2>
+    <p>Each noun has one purpose, its own state, and an operating principle: what happens, step by step, when you use it. The laws under each card are the theorems that hold it to its principle.</p>
+  </div>
+  <div class="cards">
+<!-- build:nouns -->
+  </div>
+</section>
+
+<section class="wrap block" id="verbs" aria-labelledby="h-verbs">
+  <div class="side">
+    <h2 id="h-verbs">Verbs</h2>
+    <p>Two verbs write: <b>emit</b> and <b>tick</b>. Every other verb reads, and reading never changes a store. A lens closes the loop the only way anything gets down to the ground: its edits become records.</p>
+    <p>Most of what feels like an action is a construction, an emit with a field filled in. Revising, merging and erasing are sentences, not new verbs.</p>
+  </div>
+  <div class="stack">
+<!-- build:verbs -->
+    <h3>Constructions</h3>
+    <div class="rows">
+<!-- build:constructions -->
+    </div>
+    <h3>Refusals</h3>
+    <p class="note">A closed set: every code the vectors pin is here, and the build fails if one isn't.</p>
+    <div class="refusals">
+<!-- build:refusals -->
+    </div>
+  </div>
+</section>
+
+<section class="wrap block" id="layers" aria-labelledby="h-layers">
+  <div class="side">
+    <h2 id="h-layers">Layers</h2>
+    <p>Six layers, each as high as it is temporary. The ground is what was said; nothing on it is ever edited. Each layer above is worked out from the one below it, so any of them can be dropped and rebuilt.</p>
+    <p>Every arrow up recomputes. The only arrow down is a record.</p>
+    <p class="hint">Point at or tap a layer to lift it.</p>
+  </div>
+  <div class="layers-fig">
+    <div class="stack3d" id="stack3d" aria-hidden="true">
+      <div class="iso">
+<!-- build:plates -->
+      </div>
+      <svg class="loop" viewBox="0 0 64 300" preserveAspectRatio="none"><path d="M8 18 C 58 18, 58 282, 12 282"/><path d="M19 276 L 11 282 L 19 288"/></svg>
+      <p class="loop-t">edits come down<br>as records</p>
+    </div>
+    <table class="layer-table">
+      <thead><tr><th scope="col"></th><th scope="col">Made by</th><th scope="col">Lasts</th><th scope="col">Named by</th></tr></thead>
+      <tbody>
+<!-- build:layer-rows -->
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="wrap block" id="walk" aria-labelledby="h-walk">
+  <div class="side">
+    <h2 id="h-walk">A walk</h2>
+    <p>One decision, nine steps: two people write, fork, merge and erase; a reader with less sees the same; a vertex ticks; a lens turns the result into text and an edit back into a record.</p>
+    <ol class="steps" id="steps"></ol>
+    <div class="step-text" id="step-text" aria-live="polite"></div>
+  </div>
+  <div class="stage" id="stage">
+    <div class="stage-bar">
+      <span class="mono" id="stage-where">store <b>team</b></span>
+      <span class="stage-ctl">
+        <button type="button" id="prev-step" aria-label="Previous step">&larr;</button>
+        <button type="button" id="next-step" aria-label="Next step">&rarr;</button>
+        <button type="button" id="reset-walk" aria-label="Start again">&#8634;</button>
+      </span>
+    </div>
+    <div class="dag" id="dag"><svg class="edges" id="edges"></svg></div>
+    <div class="panes">
+      <div class="pane">
+        <p class="pane-h">spec</p>
+<pre class="spec-json">{"vertex": "decisions",
+ "from": [{"store": "team",
+           "kind": ["decision"]}],
+ "fold": {
+   "current": {"latest-by": "about",
+               "follow": "prev"},
+   "decisions": {"count": true}}}</pre>
+      </div>
+      <div class="pane slots" id="slots">
+        <p class="pane-h">slots</p>
+        <div class="slot"><span class="mono">current</span><div id="slot-current"></div></div>
+        <div class="slot"><span class="mono">decisions</span><div id="slot-count"></div></div>
+        <div class="tick" id="tick" hidden></div>
+      </div>
+    </div>
+    <div class="lens" id="lens" hidden>
+      <p class="pane-h">lens: keyed sections</p>
+      <pre id="lens-text"></pre>
+      <p class="lens-out" id="lens-out"></p>
+    </div>
+  </div>
+  <ol class="walk-static" id="walk-static">
+<!-- build:walk-static -->
+  </ol>
+</section>
+
+<section class="wrap block" id="matrix" aria-labelledby="h-matrix">
+  <div class="side">
+    <h2 id="h-matrix">Where nouns meet verbs</h2>
+    <p>Rows are nouns, columns verbs. A filled cell says what the verb does to the noun. The grid is sparse on purpose: each verb has a narrow job, and the record is the one noun every verb touches.</p>
+  </div>
+  <div class="matrix-wrap">
+    <div class="matrix-scroll">
+    <table class="matrix">
+<!-- build:matrix -->
+    </table>
+    </div>
+    <p class="matrix-note" id="matrix-note" aria-live="polite">Point at or tap a dot.</p>
+  </div>
+</section>
+
+<section class="wrap block" id="provenance" aria-labelledby="h-prov">
+  <div class="side">
+    <h2 id="h-prov">Where this form comes from</h2>
+    <p>The words are the protocol's; the full glossary, retired words included, is in <a href="../rethink/#glossary">the design walk</a>. The way of laying them out is borrowed.</p>
+  </div>
+  <div class="rows">
+<!-- build:provenance -->
+  </div>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <p>Built from <code>design/grammar/</code> by <code>node design/build.mjs</code>. Law names link to their place on <a href="../laws/">the laws page</a>.</p>
+</footer>

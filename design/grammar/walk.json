@@ -1,0 +1,72 @@
+{
+  "vector": "scenario/01-decision",
+  "records": [
+    { "label": "A", "col": 1, "row": 2 },
+    { "label": "B", "col": 2, "row": 1 },
+    { "label": "C", "col": 2, "row": 3 },
+    { "label": "M", "col": 3, "row": 2 },
+    { "label": "E", "col": 4, "row": 2 },
+    { "label": "F", "col": 5, "row": 2 }
+  ],
+  "steps": [
+    {
+      "name": "emit",
+      "title": "Emit",
+      "text": "Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.",
+      "laws": ["write.checked"]
+    },
+    {
+      "name": "revise",
+      "title": "Revise",
+      "text": "Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.",
+      "laws": ["admit.no-cross"]
+    },
+    {
+      "name": "fork",
+      "title": "Fork",
+      "text": "Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.",
+      "laws": ["latest-by.order"]
+    },
+    {
+      "name": "merge",
+      "title": "Merge",
+      "text": "Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.",
+      "laws": ["heads.set"]
+    },
+    {
+      "name": "erase",
+      "title": "Erase",
+      "text": "A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.",
+      "laws": ["record.erasure", "settle.erased"]
+    },
+    {
+      "name": "any-order",
+      "title": "Any order",
+      "text": "Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.",
+      "laws": ["latest-by.set", "input.union"],
+      "orders": true
+    },
+    {
+      "name": "less-in-view",
+      "title": "Less in view",
+      "text": "Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's payload is withheld, and the slot says so instead of guessing; the count, needing no payload, is still five.",
+      "laws": ["view.no-resurrection"],
+      "reader": "cy"
+    },
+    {
+      "name": "tick",
+      "title": "Tick",
+      "text": "At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet: the state shown is the model's, the tick around it is not.",
+      "laws": [],
+      "settled": true,
+      "tick": true
+    },
+    {
+      "name": "back-to-text",
+      "title": "Back to text",
+      "text": "A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.",
+      "laws": ["lens.round-trip", "lens.put-get"],
+      "lens": true
+    }
+  ]
+}

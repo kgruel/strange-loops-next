@@ -1,6 +1,6 @@
 # Vectors
 
-`fold/`, `lens/`, `record/`, `spec/`, `batch/`, `realm/` and `occurred/` are written by `model/` (`lake exe gen
+`fold/`, `lens/`, `record/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/` are written by `model/` (`lake exe gen
 ../vectors`); never edit them by hand. CI regenerates them and fails on any
 difference. `standard/` holds test data from the standards themselves; see
 its README.
@@ -109,6 +109,23 @@ gives what the reader keeps, one record per id with what it holds of each
 (`refused`); each thing's state over the rest (`things`, as in
 `fold/latest-by`); and Sum over them (`sum`). Every rotation of the forms
 must give the same.
+
+## `scenario`
+
+A sequence of steps over one spec. `input.records` are the records, in full;
+each of `input.steps` names the forms a reader's places hold at that step
+(`forms`, each an id and what is held of it) and the orders `gen` checked
+(`orders`, every rotation). `expect.steps` gives, per step, what the reader
+keeps (`settled`, as in `realm`), what is admitted (`admitted`),
+`input.thing`'s heads newest first and its winner, and each slot of the spec
+over the settled records (`slots`, as in `spec/run`). Every rotation of a
+step's forms must give the same. `input.lens` and `expect.lens` add a lens
+edit: the head rendered as a keyed section (`rendered`), the text after an
+edit, and the outcomes and what applying them gives, as in `lens/section`.
+
+`01-decision` is the walk the grammar page draws: two people write, fork,
+merge and erase one decision, a reader holds less, and a lens edit comes
+back as a record.
 
 ## `occurred`
 

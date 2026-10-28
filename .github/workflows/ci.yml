@@ -22,6 +22,18 @@ jobs:
           lake exe gen ../vectors
           git diff --exit-code -- ../vectors
           test -z "$(git status --porcelain -- ../vectors)"
+      - name: The proof graph is a pure render of the proofs
+        working-directory: model
+        run: |
+          lake exe proofs ../design/laws/proofs.json
+          git diff --exit-code -- ../design/laws/proofs.json
+          test -z "$(git status --porcelain -- ../design/laws/proofs.json)"
+      - name: The premise cases are a pure render of the model
+        working-directory: model
+        run: |
+          lake exe boundaries ../design/laws/boundaries.json
+          git diff --exit-code -- ../design/laws/boundaries.json
+          test -z "$(git status --porcelain -- ../design/laws/boundaries.json)"
 
   interop:
     runs-on: ubuntu-latest
@@ -40,8 +52,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: The design page is a pure render of design/
+      - name: The design pages are a pure render of design/, protocol/ and vectors/
         run: |
           node design/build.mjs
           git diff --exit-code -- out
           test -z "$(git status --porcelain -- out)"
+      - name: The design build refuses every mutant it should
+        run: node design/mutants.mjs
