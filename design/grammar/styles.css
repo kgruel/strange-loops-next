@@ -144,3 +144,11 @@
   #walk .stage{order:3;min-height:0}
   #walk .step-text{order:4;min-height:0;margin-top:-8px}
 }
+
+/* Without scripts the walk is a list of its steps, each with the state the model gave it. */
+.walk-static{grid-column:1/-1;list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:w}
+.walk-static li{counter-increment:w;background:var(--sheet);border-radius:10px;box-shadow:0 0 0 1px var(--hair);padding:10px 14px;display:grid;gap:4px;font-size:14px}
+.walk-static li::before{content:counter(w);font-family:var(--mono);font-size:12px;color:var(--muted)}
+.walk-static .mono{color:var(--muted);font-size:12px}
+:root.js .walk-static{display:none}
+:root:not(.js) #stage,:root:not(.js) .steps,:root:not(.js) .step-text,:root:not(.js) #sentence .hint,:root:not(.js) #layers .hint{display:none}

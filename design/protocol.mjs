@@ -39,6 +39,10 @@ export function lawTable(root) {
     if (cells.length !== 4) throw new Error(`laws.md: a law row needs four cells: ${line}`);
     const [law, theorems, says, vectors] = cells;
     const key = law.replace(/`/g, "");
+    // A theorem cell is backticked names (and a file in parentheses), or "(by construction)":
+    // a name that lost its backticks would otherwise drop out of the law's proof unnoticed.
+    if (theorems.trim() !== "(by construction)" && !/^[\s,()]*$/.test(theorems.replace(/`[^`]+`/g, "")))
+      throw new Error(`laws.md: ${key}: the theorem cell holds more than backticked names: ${theorems}`);
     const names = [...law.matchAll(/`([^`]+)`/g)].map((x) => x[1]);
     rows.push({
       key, section, files: file, names: names.length ? names : [key],
@@ -84,8 +88,10 @@ export function vectorCodes(files) {
 }
 
 // A law row's Vectors cell, resolved to files. `dir/NN` names a file; a bare `NN` after it is in
-// the same directory; `NN`–`MM` is the range; `dir/*` is all of a directory. Anything else in the
-// cell ("every fold vector", "(the read path)") is a description, kept as written.
+// the same directory; `NN`–`MM` is the range, every member of which must exist; `dir/*`, or a
+// directory named on its own ("every `spec/run` vector"), is all of a directory. A backticked
+// token that is none of these and holds a `/` is refused; one without (a field such as
+// `erased_line`, a law such as `acc.set`) belongs to the cell's description, kept as written.
 export function resolveVectors(cell, files) {
   const names = [...files.keys()];
   const found = new Set();
@@ -102,13 +108,16 @@ export function resolveVectors(cell, files) {
     if (t[0] === "–") { range = true; continue; }
     let tok = t[1];
     const slash = tok.lastIndexOf("/");
+    if (slash >= 0 && !/^(\d+|\*)$/.test(tok.slice(slash + 1))) {
+      if (!names.some((n) => n.startsWith(`${tok}/`))) throw new Error(`laws.md: ${tok} is no vector or directory of vectors (in "${cell}")`);
+      pick(tok, "*");
+      dir = null; last = null; range = false;
+      continue;
+    }
     if (slash >= 0) { dir = tok.slice(0, slash); tok = tok.slice(slash + 1); }
     if (!dir || !/^(\d+|\*)$/.test(tok)) { range = false; continue; }
     if (range && last !== null) {
-      for (let n = Number(last) + 1; n < Number(tok); n++) {
-        const item = String(n).padStart(tok.length, "0");
-        if (names.some((x) => x.startsWith(`${dir}/${item}-`))) pick(dir, item);
-      }
+      for (let n = Number(last) + 1; n < Number(tok); n++) pick(dir, String(n).padStart(tok.length, "0"));
     }
     pick(dir, tok);
     last = tok === "*" ? null : tok;
@@ -120,10 +129,12 @@ export function resolveVectors(cell, files) {
 // The proof graph: theorem → { module, uses }.
 export const proofs = (root) => JSON.parse(readFileSync(join(root, "design", "laws", "proofs.json"), "utf8")).theorems;
 
-// A theorem as laws.md names it (`Count.perm`) resolved to the one declaration it names.
+// A theorem as laws.md names it (`Count.perm`) resolved to the one declaration it names: null
+// when none does; refused when several do, since picking one would be a guess.
 export function resolveTheorem(name, graph) {
   const hits = Object.keys(graph).filter((n) => n === name || n.endsWith(`.${name}`));
-  return hits.length === 1 ? hits[0] : null;
+  if (hits.length > 1) throw new Error(`laws.md: ${name} is ambiguous: ${hits.join(", ")}`);
+  return hits[0] ?? null;
 }
 
 // Law to law: a proof of one law's theorem uses a theorem of another, directly or through

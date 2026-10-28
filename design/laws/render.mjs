@@ -106,7 +106,9 @@ export function renderLaws(root) {
     if (d.kind === "orders") {
       const os = v.input.orders;
       if (os.length < 2) fail(`demo ${d.law}: one order is nothing to vary`);
-      if (!os.every((o) => same(o.map((r) => r.id).sort(), os[0].map((r) => r.id).sort()))) fail(`demo ${d.law}: the orders aren't one set`);
+      // The same records, field for field, in each order: what varies is arrival alone.
+      const asSet = (o) => [...o].sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
+      if (!os.every((o) => same(asSet(o), asSet(os[0])))) fail(`demo ${d.law}: the orders aren't one set of records`);
       out.variants = os.map((o, i) => ({ label: `order ${i + 1} of ${os.length}`, html: order(o) }));
       out.answer = answerOf(d.vector, v.expect);
     } else if (d.kind === "repeats") {
@@ -120,6 +122,10 @@ export function renderLaws(root) {
       ];
     } else if (d.kind === "envs") {
       if (v.input.envs.length < 2) fail(`demo ${d.law}: one envelope is nothing to vary`);
+      // The spellings may differ only in what the canonical form removes: a set's order and repeats.
+      const canon = (e) => Object.fromEntries(Object.entries(e).map(([k, x]) =>
+        [k, ["about", "prev", "erases"].includes(k) ? [...new Set(x)].sort() : x]).sort(([a], [b]) => (a < b ? -1 : 1)));
+      if (!v.input.envs.every((e) => same(canon(e), canon(v.input.envs[0])))) fail(`demo ${d.law}: the envelopes differ in more than a set's spelling`);
       out.variants = v.input.envs.map((e, i) => ({ label: `spelling ${i + 1} of ${v.input.envs.length}`,
         html: `<pre class="jv">about: [${e.about.map((x) => `<span data-k="${esc(x)}">${esc(x)}</span>`).join(", ")}]</pre>` }));
       out.answer = `<code>${short(v.expect.id, 30)}</code>`;
@@ -169,7 +175,9 @@ export function renderLaws(root) {
   const first = data.laws[invariances[0].key];
   const opening = `    <p class="big-s" id="rotor"><span class="w">Change</span> <span class="slot var" id="rotor-change">${first.change}</span>, ` +
     `<span class="w">and</span> <span class="slot inv" id="rotor-stays">${first.stays}</span> <span class="w">stays.</span></p>\n` +
-    `    <p class="rotor-law" id="rotor-law">${lawLink(invariances[0].key)}</p>\n`;
+    `    <p class="rotor-law" id="rotor-law">${lawLink(invariances[0].key)}</p>\n` +
+    `    <p class="rotor-ctl"><button type="button" id="rotor-next">Next law</button>` +
+    `<button type="button" id="rotor-pause" aria-pressed="false">Pause</button></p>\n`;
   const lede = `  <p class="lede">${rows.length} laws, each a theorem Lean checks on every build, or a rule held by construction. ` +
     `Most say one thing: change this, and that stays. The rest take one of ${count(Object.keys(data.shapes).length - 1)} other shapes. ` +
     `Every sentence here is joined to the theorem that proves it, the vectors that pin it, and the laws its proof rests on.</p>\n`;
@@ -193,6 +201,7 @@ export function renderLaws(root) {
     `    <article class="demo${d.shape === "limit" ? " is-limit" : ""}" id="try-${slug(d.law)}" data-demo="${i}">\n` +
     `      <div class="demo-h"><a href="#${d.anchor}"><code>${d.law}</code></a><span class="chip">${data.shapes[d.shape].name}</span></div>\n` +
     `      <p class="demo-s">${sentence(data.laws[d.key])}</p>\n` +
+    (data.laws[d.key].scope ? `      <p class="law-scope">${data.laws[d.key].scope}</p>\n` : "") +
     `      <div class="demo-in">${d.variants.map((x, j) => `<div class="variant" data-v="${j}"${j ? " hidden" : ""}><p class="variant-l">${x.label}</p>${x.html}</div>`).join("")}</div>\n` +
     `      <div class="demo-ctl"><button type="button" class="poke">${d.change} <span aria-hidden="true">↻</span></button></div>\n` +
     `      <div class="demo-out"><p class="out-l">${d.shape === "limit" ? `the ${d.stays} moves` : `the ${d.stays}`}</p>` +
@@ -213,13 +222,15 @@ export function renderLaws(root) {
     const extra = naming.get(r.key).filter((p) => !listed.includes(p));
     const impl = runBy([...listed, ...extra]);
     const theorems = ts.length
-      ? ts.map((t) => `<code title="${graph[t].module}">${esc(t.replace(/^Loops\./, ""))}</code>`).join(" ") +
+      ? ts.map((t) => `<details class="thm"><summary><code>${esc(t.replace(/^Loops\./, ""))}</code></summary>` +
+        `<p class="thm-m">${graph[t].module}</p><pre>${esc(graph[t].states.replace(/\bLoops\./g, ""))}</pre></details>`).join("") +
         (r.theorems.filter((t) => data.notTheorems[t]).map((t) => ` <code class="not">${t}</code>`).join(""))
       : r.byConstruction ? "<span class=\"muted\">by construction: no theorem, pinned by vectors</span>" : "<span class=\"muted\">none named</span>";
     const many = listed.length > 6;
     return `    <article class="law${l.shape === "limit" ? " is-limit" : ""}" id="${anchor(r.key)}" data-shape="${l.shape}">\n` +
       `      <div class="law-h"><h4>${esc(label(r))}</h4><span class="chip">${data.shapes[l.shape].name}</span></div>\n` +
       `      <p class="law-s">${sentence(l)}</p>\n` +
+      (l.scope ? `      <p class="law-scope">${l.scope}</p>\n` : "") +
       `      <p class="law-md"><span>laws.md</span> ${inline(r.says)}</p>\n` +
       `      <dl class="chain">\n` +
       `        <dt>proved by</dt><dd>${theorems}</dd>\n` +

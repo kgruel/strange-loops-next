@@ -14,6 +14,7 @@ export function renderGrammar(root) {
   const read = (...p) => readFileSync(join(root, "design", "grammar", ...p), "utf8");
   const words = JSON.parse(read("words.json"));
   const walk = JSON.parse(read("walk.json"));
+  const walkData = walkOf(root, walk);
 
   // A law name to its card on the laws page.
   const { rows } = lawTable(root);
@@ -99,9 +100,13 @@ export function renderGrammar(root) {
   const provenance = words.provenance.map((p) =>
     `    <div class="row"><div class="row-k wide">${p.work}</div><div class="row-v"><p>${p.here}</p></div></div>\n`).join("");
 
+  const walkStatic = walkData.steps.map((st) =>
+    `      <li><b>${st.title}</b>${st.settled ? ' <span class="chip settled">settled</span>' : ""} <span>${st.text}</span> ` +
+    `<span class="mono">heads ${st.heads.join(", ")} · decisions ${st.count}${st.erased.length ? ` · erased ${st.erased.join(", ")}` : ""}` +
+    `${st.withheld.length ? ` · withheld ${st.withheld.join(", ")}` : ""}</span></li>\n`).join("");
   const top = header("grammar", [["nouns", "Nouns"], ["verbs", "Verbs"], ["layers", "Layers"], ["walk", "Walk"], ["matrix", "Matrix"]]);
   let body = read("page.html");
-  for (const [name, value] of Object.entries({ header: top, lede, nouns: nounCards, verbs: verbRows, constructions, refusals, plates, "layer-rows": layerRows, matrix, provenance }))
+  for (const [name, value] of Object.entries({ header: top, lede, nouns: nounCards, verbs: verbRows, constructions, refusals, plates, "layer-rows": layerRows, matrix, provenance, "walk-static": walkStatic }))
     body = fill(body, name, value);
 
   const walkLaws = Object.fromEntries(walk.steps.flatMap((s) => s.laws).map((l) => [l, lawAt.get(l)]));
@@ -109,6 +114,49 @@ export function renderGrammar(root) {
     head: read("head.html"),
     css: read("styles.css"),
     body,
-    scripts: [`const WALK = ${JSON.stringify(walk)};\nconst LAW_AT = ${JSON.stringify(walkLaws)};\n`, read("app.js")],
+    scripts: [`const WALK = ${JSON.stringify(walkData)};\nconst LAW_AT = ${JSON.stringify(walkLaws)};\n`, read("app.js")],
   });
+}
+
+// The walk: its narration and layout are walk.json's, and everything it shows of the protocol
+// (records, heads, winner, counts, what is erased or withheld, the lens edit) is the
+// scenario vector the model wrote. The two must name the same records and steps.
+function walkOf(root, walk) {
+  const v = vectorFiles(root).get(walk.vector);
+  if (!v) throw new Error(`grammar: no vector ${walk.vector}`);
+  const fail = (m) => { throw new Error(`grammar: walk: ${m}`); };
+  const recs = v.input.records;
+  if (recs.length !== walk.records.length) fail(`${walk.records.length} records drawn, ${recs.length} in the vector`);
+  const label = new Map(recs.map((r, i) => [r.id, walk.records[i].label]));
+  if (new Set(label.values()).size !== recs.length) fail("two records share a label");
+  const L = (id) => label.get(id) ?? fail(`no record ${id}`);
+  const names = v.input.steps.map((s) => s.name);
+  if (JSON.stringify(names) !== JSON.stringify(walk.steps.map((s) => s.name))) fail(`steps ${walk.steps.map((s) => s.name)} aren't the vector's ${names}`);
+  const records = Object.fromEntries(recs.map((r, i) => [L(r.id), {
+    who: r.observer.replace(/^sl:/, ""), at: r.emitted.slice(11, 16), col: walk.records[i].col, row: walk.records[i].row,
+    body: r.value, prev: r.prev.map(L), erases: (r.erases ?? []).map(L),
+  }]));
+  const thing = v.input.thing;
+  const lens = v.expect.lens;
+  const steps = walk.steps.map((w, i) => {
+    const e = v.expect.steps[i];
+    const shownAs = (k) => e.settled.filter((x) => x.shown === k).map((x) => L(x.id));
+    const st = {
+      title: w.title, text: w.text, laws: w.laws, reader: w.reader, settled: w.settled,
+      shown: e.settled.map((x) => L(x.id)), heads: e.heads.map(L), winner: e.winner && L(e.winner),
+      count: e.slots.decisions.value, erased: shownAs("erased"), withheld: shownAs("withheld"),
+      current: e.slots.current.things[thing].map((h) => ({ id: L(h.id), shown: h.shown })),
+    };
+    if (JSON.stringify(st.current.map((h) => h.id)) !== JSON.stringify(st.heads)) fail(`${w.name}: the slot's heads aren't the thing's`);
+    if (w.orders) st.orders = v.input.steps[i].orders.slice(0, 3).map((o) => o.map(L));
+    if (w.tick) st.tick = { covers: st.shown };
+    if (w.lens) {
+      const [acc] = lens.outcomes;
+      const back = recs.find((r) => r.value === acc.body.join("\n")) ?? fail("no record carries the accepted edit");
+      st.lens = { before: lens.rendered, after: v.input.lens.text,
+        outcome: `accepted <code>${acc.accepted}</code> → emit ${L(back.id)}, <code>prev: [${back.prev.map(L).join(", ")}]</code>` };
+    }
+    return st;
+  });
+  return { records, steps };
 }

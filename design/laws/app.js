@@ -42,11 +42,22 @@
     change.innerHTML = r.change; stays.innerHTML = r.stays; law.innerHTML = r.link;
     [change, stays, law].forEach((el, i) => animate(el, { opacity: [0, 1], transform: ["translateY(6px)", "translateY(0px)"] }, spring(320, 26, 0.05 * i)));
   };
-  sheet.addEventListener("click", (e) => { if (!e.target.closest("a")) next(); });
+  // It turns by itself only while nobody is reading it: not under the pointer, not holding
+  // focus, not paused. Next and Pause are real buttons, so the keyboard has both.
+  let paused = !M, focused = false;
+  const pause = $("#rotor-pause");
+  const showPause = () => { pause.setAttribute("aria-pressed", String(paused)); pause.textContent = paused ? "Play" : "Pause"; };
+  if (!M) pause.hidden = true;
+  showPause();
+  $("#rotor-next").addEventListener("click", next);
+  pause.addEventListener("click", () => { paused = !paused; showPause(); });
+  sheet.addEventListener("click", (e) => { if (!e.target.closest("a, button")) next(); });
   sheet.addEventListener("mouseenter", () => (hover = true));
   sheet.addEventListener("mouseleave", () => (hover = false));
+  sheet.addEventListener("focusin", () => (focused = true));
+  sheet.addEventListener("focusout", (e) => { if (!sheet.contains(e.relatedTarget)) focused = false; });
   new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(sheet);
-  if (M) setInterval(() => { if (visible && !hover && !document.hidden) next(); }, 4200);
+  if (M) setInterval(() => { if (visible && !hover && !focused && !paused && !document.hidden) next(); }, 4200);
 
   // The demos: show the next variant, moving each piece from where it was to where it is.
   for (const demo of $$(".demo")) {
@@ -141,7 +152,7 @@
     const out = await new ELK().layout(graph);
     const LEFT = 92;
     const W = out.width + LEFT, H = out.height;
-    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img", "aria-label": "Which laws each law's proof rests on" });
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "group", "aria-label": "Which laws each law's proof rests on" });
     const bands = el("g", {}, svg);
     const pos = new Map(out.children.map((c) => [c.id, c]));
     MAP.layers.forEach((layer, i) => {
@@ -164,7 +175,7 @@
     const nodeEls = new Map();
     for (const n of MAP.nodes) {
       const c = pos.get(n.id);
-      const g = el("g", { class: `node${n.shape === "limit" ? " limit" : ""}`, transform: `translate(${c.x} ${c.y})`, tabindex: 0, role: "button" }, gNodes);
+      const g = el("g", { class: `node${n.shape === "limit" ? " limit" : ""}`, transform: `translate(${c.x} ${c.y})`, tabindex: 0, role: "button", "aria-label": `${n.label}: follow it; Enter opens its card` }, gNodes);
       el("rect", { width: c.width, height: c.height, rx: 7 }, g);
       const t = el("text", { x: 10, y: 17 }, g);
       t.textContent = n.label;
@@ -210,6 +221,12 @@
     for (const [id, g] of nodeEls) {
       g.addEventListener("mouseenter", () => focus(id));
       g.addEventListener("focus", () => focus(id));
+      g.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        focus(id);
+        location.hash = id;
+      });
       g.addEventListener("click", () => {
         focus(id);
         // On a map wider than its column, bring the law to the middle.
@@ -217,7 +234,10 @@
         holder.scrollBy({ left: r.left + r.width / 2 - (h.left + h.width / 2), behavior: reduced ? "auto" : "smooth" });
       });
     }
-    svg.addEventListener("mouseleave", () => focus(null));
+    // Leaving with the pointer keeps a law the keyboard chose; leaving with the keyboard clears it.
+    const chosen = () => document.activeElement?.closest?.(".node")?.dataset.id ?? null;
+    svg.addEventListener("mouseleave", () => focus(chosen()));
+    svg.addEventListener("focusout", (e) => { if (!svg.contains(e.relatedTarget)) focus(null); });
   }
   new IntersectionObserver(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); drawMap(); } }, { rootMargin: "600px 0px" }).observe(holder);
 

@@ -18,7 +18,7 @@ writer that must agree with it byte for byte.
 | `out/rethink/`, `out/grammar/`, `out/laws/` | the pages, written by `node design/build.mjs`, never by hand |
 
 Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
-`xtask` checking token and surface budgets); `scenarios/` (end-to-end walks),
+`xtask` checking token and surface budgets); more end-to-end scenarios (`vectors/scenario/` holds the first),
 `.loops/` (this repo's own decision store).
 
 ## Checking
@@ -54,14 +54,16 @@ Two more pages share a shell (`design/page.mjs`, `design/register.css`) and
 read the protocol through `design/protocol.mjs`:
 
 * `design/grammar/`: the protocol's nouns, verbs and layers. Its words are
-  data (`words.json`, and `walk.json` for the stepped walk); the build refuses
-  a law name that isn't in `protocol/laws.md`, or a set of refusal codes that
-  differs from the ones the vectors pin.
+  data (`words.json`); the build refuses a law name that isn't in
+  `protocol/laws.md`, or a set of refusal codes that differs from the ones the
+  vectors pin. Its walk is `vectors/scenario/01-decision`, which the model
+  writes; `walk.json` holds only its narration and layout.
 * `design/laws/`: every law as a sentence and one of six shapes
   (`laws.json`), joined to its row in `protocol/laws.md`, the theorems that
-  prove it, the vectors that pin it, and the laws its proof rests on. That
-  last join is `design/laws/proofs.json`, written by `lake exe proofs` from
-  the checked proofs; CI regenerates it as it does the vectors. The build
+  prove it (each with its statement as Lean prints it), the vectors that pin
+  it, and the laws its proof rests on. That last join is
+  `design/laws/proofs.json`, written by `lake exe proofs` from the checked
+  proofs; CI regenerates it as it does the vectors. The build
   fails on a law without a sentence, a theorem name that resolves to nothing,
   a vector reference to no file, a law name a vector uses that isn't a law,
   or a proof that rests on a layer above its own.

@@ -10,7 +10,7 @@
   <div class="side">
     <h2 id="h-sentence">A law is one sentence</h2>
     <p>Name what may vary, and name what doesn't move when it does. Arrival order, repeats, which payloads a reader holds, how a time is spelled: the answer stays.</p>
-    <p class="hint">Tap the sentence for the next law.</p>
+    <p class="hint">It turns on its own while you aren't reading it; Next and Pause are under it.</p>
   </div>
   <div class="sheet rotor-sheet">
 <!-- build:opening -->
@@ -33,7 +33,7 @@
 <section class="wrap block" id="try" aria-labelledby="h-try">
   <div class="side">
     <h2 id="h-try">Try to break it</h2>
-    <p>Each card is a vector the model wrote. Press the button to vary what the law says may vary; the answer underneath is the one the model computed for every variant. Nothing here is computed in your browser.</p>
+    <p>Each card is a vector the model wrote. Press the button to vary what the law says may vary; the answer underneath is the one the model computed for every variant. Nothing here is computed in your browser, and CI regenerates every vector from the model.</p>
     <p>The last card is a limit: there, the answer does move, and the law says who must account for it.</p>
   </div>
   <div class="demos">
@@ -45,6 +45,7 @@
   <div class="side">
     <h2 id="h-chain">From claim to code</h2>
     <p>A law is a sentence here, a row in <code>protocol/laws.md</code>, a theorem Lean checks, and vectors every implementation must pass. The build joins all four and fails when one doesn't meet the next.</p>
+    <p>A sentence says no more than its theorems: where a premise or a proof's reach needs saying, it follows the sentence. Open a theorem to read exactly what Lean checked.</p>
     <p>Laws are grouped by the layer they govern, from the ground up.</p>
   </div>
   <div class="stack">
@@ -59,11 +60,12 @@
   <div class="side">
     <h2 id="h-map">What rests on what</h2>
     <p>A line from one law down to another says a proof of the first uses a theorem of the second, directly or through lemmas no law names. Lean recorded every one of them; <code>lake exe proofs</code> reads them out of the checked proofs.</p>
-    <p>The stack only rests downward: the build fails if a proof ever leans on a layer above its own.</p>
+    <p>The stack only rests downward: the build fails if a proof ever leans on a layer above its own. A law's layer is declared, not derived; that check is all the proofs say about it.</p>
+    <p>A proof by computation (<code>decide</code>) evaluates definitions and uses no theorem, so it draws no line.</p>
     <p class="hint">Point at or tap a law to follow it.</p>
   </div>
   <div class="map-wrap">
-    <div class="map" id="lawmap"><p class="note map-wait">Drawing the map&hellip;</p></div>
+    <div class="map" id="lawmap"><p class="note map-wait">The map is drawn in the browser by elkjs. Without it, every law's card above still lists what it rests on and what it carries.</p></div>
     <p class="map-note" id="map-note" aria-live="polite"></p>
 <!-- build:alone -->
   </div>

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Strange Loops Grammar</title>
+<script>document.documentElement.classList.add("js")</script>
 <meta name="description" content="The protocol's nouns, verbs and layers, and a walk through them.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +15,9 @@
 /* The register: a warm grey table, white sheets resting on it, height shown by shadow and
    hairline. One colour only, for what is erased or in conflict. */
 :root{
-  --ground:#EBEAE6; --sunk:#E3E2DD; --sheet:#FFFFFF; --ink:#1D1D1B; --muted:#6C6B66; --faint:#A3A29C;
+  --ground:#EBEAE6; --sunk:#E3E2DD; --sheet:#FFFFFF; --ink:#1D1D1B; --muted:#5A5954; --faint:#63625C;
   --hair:rgba(29,29,27,.09); --hair-2:rgba(29,29,27,.16);
-  --alert:#C4421A; --alert-soft:rgba(196,66,26,.10);
+  --alert:#B23A16; --alert-soft:rgba(178,58,22,.10);
   --lift-1:0 1px 2px rgba(40,38,30,.06);
   --lift-2:0 1px 2px rgba(40,38,30,.06),0 4px 12px rgba(40,38,30,.06);
   --lift-3:0 2px 4px rgba(40,38,30,.06),0 12px 28px rgba(40,38,30,.09);
@@ -26,7 +27,7 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#6E6D68;
+  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#8E8C86;
   --hair:rgba(236,235,231,.08); --hair-2:rgba(236,235,231,.16);
   --alert:#F0784F; --alert-soft:rgba(240,120,79,.14);
   --lift-1:0 1px 2px rgba(0,0,0,.4);
@@ -35,7 +36,7 @@
   --lift-4:0 4px 8px rgba(0,0,0,.45),0 22px 48px rgba(0,0,0,.5);
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#6E6D68;
+  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#8E8C86;
   --hair:rgba(236,235,231,.08); --hair-2:rgba(236,235,231,.16);
   --alert:#F0784F; --alert-soft:rgba(240,120,79,.14);
   --lift-1:0 1px 2px rgba(0,0,0,.4);
@@ -274,6 +275,14 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   #walk .stage{order:3;min-height:0}
   #walk .step-text{order:4;min-height:0;margin-top:-8px}
 }
+
+/* Without scripts the walk is a list of its steps, each with the state the model gave it. */
+.walk-static{grid-column:1/-1;list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:w}
+.walk-static li{counter-increment:w;background:var(--sheet);border-radius:10px;box-shadow:0 0 0 1px var(--hair);padding:10px 14px;display:grid;gap:4px;font-size:14px}
+.walk-static li::before{content:counter(w);font-family:var(--mono);font-size:12px;color:var(--muted)}
+.walk-static .mono{color:var(--muted);font-size:12px}
+:root.js .walk-static{display:none}
+:root:not(.js) #stage,:root:not(.js) .steps,:root:not(.js) .step-text,:root:not(.js) #sentence .hint,:root:not(.js) #layers .hint{display:none}
 </style>
 </head>
 <body>
@@ -308,7 +317,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       a
       <span class="w" data-f="kind"><span class="role">kind</span><code>decision</code></span>,
       <span class="w" data-f="occurred"><span class="role">occurred</span>made in <code>2026-10</code></span>,
-      <span class="w" data-f="emitted"><span class="role">emitted</span>written <code>2026-10-24 09:40Z</code></span>,
+      <span class="w" data-f="emitted"><span class="role">emitted</span>written <code>2026-10-01 09:40Z</code></span>,
       <span class="w" data-f="prev"><span class="role">prev</span>replacing <code>r:M…</code></span>,
       <span class="w" data-f="erases"><span class="role">erases</span>erasing <code>r:A…</code>'s payload</span>,
       <span class="w" data-f="under"><span class="role">under</span>on the grant <code>r:G…</code></span>:
@@ -316,7 +325,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </p>
     <pre class="env" id="sentence-env" aria-label="The same record as stored"><span data-f="line">{"env": {</span>
   <span data-f="about">"about": ["decision:auth"],</span>
-  <span data-f="emitted">"emitted": "2026-10-24T09:40:00Z",</span>
+  <span data-f="emitted">"emitted": "2026-10-01T09:40:00Z",</span>
   <span data-f="erases">"erases": ["r:A…"],</span>
   <span data-f="kind">"kind": "decision",</span>
   <span data-f="observer">"observer": "sl:ada…",</span>
@@ -324,9 +333,10 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   <span data-f="prev">"prev": ["r:M…"],</span>
   <span data-f="under">"under": "r:G…"</span>
 <span data-f="line">},</span>
+<span data-f="line"> "id": "r:E…",</span>
 <span data-f="payload"> "payload": {"choice": "Passkeys; device flow on TVs."},</span>
-<span data-f="line"> "id": "r:E…", "salt": "…", "sig": {…}}</span></pre>
-    <p class="caption">As stored: one canonical line, members sorted. The id hashes the envelope and the payload's commitment, never the payload itself.</p>
+<span data-f="line"> "salt": "…", "sig": {…}}</span></pre>
+    <p class="caption">As stored: one canonical line, members sorted at every depth. This is E from the walk below, with an <code>occurred</code> and a grant added to show every field. The id hashes the envelope and the payload's commitment, never the payload itself.</p>
   </div>
 </section>
 
@@ -341,7 +351,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <dl>
         <dt>Purpose</dt><dd>Say one thing an observer saw, so anyone can check it and nobody can change it.</dd>
         <dt>State</dt><dd>An envelope the core reads, a payload it never interprets, a signature. Named by <code>r:</code> and a hash of the envelope and the payload's commitment.</dd>
-        <dt>Principle</dt><dd>Change any field and it is another record, with another id. Erase its payload and the id, the signature and every record citing it still hold.</dd>
+        <dt>Principle</dt><dd>Its id hashes what it says, written canonically: spell a set another way and the id doesn't move. Erase its payload and the id, the signature and every record citing it still hold.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-record-erasure"><code>record.erasure</code></a> <a href="../laws/#law-record-sets"><code>record.sets</code></a> <a href="../laws/#law-write-checked"><code>write.checked</code></a></p>
     </article>
@@ -413,8 +423,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="card-h"><h3>fold</h3><span class="chip proved">proved</span></div>
       <dl>
         <dt>Purpose</dt><dd>Turn a set of records into state.</dd>
-        <dt>State</dt><dd>One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code> and <code>collect</code>, over heads.</dd>
-        <dt>Principle</dt><dd>The set decides. Arrival order, late records and two-way syncs never change the answer.</dd>
+        <dt>State</dt><dd>One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code>, over heads; and <code>collect</code>, over heads when it follows <code>prev</code> and over every selected record when it doesn't.</dd>
+        <dt>Principle</dt><dd>The set decides: arrival order and two-way syncs never change the answer, and a late record folded onto the cached state gives what folding the whole set again gives.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-acc-set"><code>acc.set</code></a> <a href="../laws/#law-heads-set"><code>heads.set</code></a> <a href="../laws/#law-latest-by-converge"><code>latest-by.converge</code></a></p>
     </article>
@@ -584,6 +594,17 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <p class="lens-out" id="lens-out"></p>
     </div>
   </div>
+  <ol class="walk-static" id="walk-static">
+      <li><b>Emit</b> <span>Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.</span> <span class="mono">heads A · decisions 1</span></li>
+      <li><b>Revise</b> <span>Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.</span> <span class="mono">heads B · decisions 2</span></li>
+      <li><b>Fork</b> <span>Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.</span> <span class="mono">heads C, B · decisions 3</span></li>
+      <li><b>Merge</b> <span>Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.</span> <span class="mono">heads M · decisions 4</span></li>
+      <li><b>Erase</b> <span>A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.</span> <span class="mono">heads E · decisions 5 · erased A</span></li>
+      <li><b>Any order</b> <span>Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.</span> <span class="mono">heads E · decisions 5 · erased A</span></li>
+      <li><b>Less in view</b> <span>Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's payload is withheld, and the slot says so instead of guessing; the count, needing no payload, is still five.</span> <span class="mono">heads E · decisions 5 · erased A · withheld E</span></li>
+      <li><b>Tick</b> <span class="chip settled">settled</span> <span>At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet: the state shown is the model's, the tick around it is not.</span> <span class="mono">heads E · decisions 5 · erased A</span></li>
+      <li><b>Back to text</b> <span>A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.</span> <span class="mono">heads F · decisions 6 · erased A</span></li>
+  </ol>
 </section>
 
 <section class="wrap block" id="matrix" aria-labelledby="h-matrix">
@@ -630,8 +651,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 </footer>
 
 <script>
-const WALK = {"records":{"A":{"who":"ada","at":"09:00","col":1,"row":2,"body":"Device flow. Client secret: 9f3c…","prev":[]},"B":{"who":"ada","at":"09:10","col":2,"row":1,"body":"Device flow; revisit in Q3.","prev":["A"]},"C":{"who":"bo","at":"09:12","col":2,"row":3,"body":"Use passkeys.","prev":["A"]},"M":{"who":"ada","at":"09:30","col":3,"row":2,"body":"Passkeys; device flow on TVs.","prev":["B","C"]},"E":{"who":"ada","at":"09:40","col":4,"row":2,"body":"Passkeys; device flow on TVs.","prev":["M"],"erases":["A"]},"F":{"who":"bo","at":"10:05","col":5,"row":2,"body":"Passkeys everywhere.","prev":["E"]}},"steps":[{"title":"Emit","text":"Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.","laws":["write.checked"],"shown":["A"],"heads":["A"],"count":1},{"title":"Revise","text":"Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.","laws":["admit.no-cross"],"shown":["A","B"],"heads":["B"],"count":2},{"title":"Fork","text":"Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.","laws":["latest-by.order"],"shown":["A","B","C"],"heads":["C","B"],"count":3},{"title":"Merge","text":"Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.","laws":["heads.set"],"shown":["A","B","C","M"],"heads":["M"],"count":4},{"title":"Erase","text":"A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.","laws":["record.erasure","settle.erased"],"shown":["A","B","C","M","E"],"erased":["A"],"heads":["E"],"count":5},{"title":"Any order","text":"Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.","laws":["latest-by.set","input.union"],"shown":["A","B","C","M","E"],"erased":["A"],"heads":["E"],"count":5,"orders":[["E","C","A","M","B"],["B","M","E","A","C"],["C","A","B","E","M"]]},{"title":"Less in view","text":"Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's value is unread, and the result says so instead of guessing; the count, needing no payload, is still five.","laws":["view.no-resurrection","result.unread"],"reader":"cy","shown":["A","B","C","M","E"],"erased":["A"],"withheld":["E"],"heads":["E"],"count":5},{"title":"Tick","text":"At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet.","laws":[],"settled":true,"shown":["A","B","C","M","E"],"erased":["A"],"heads":["E"],"count":5,"tick":{"covers":["A","B","C","M","E"]}},{"title":"Back to text","text":"A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.","laws":["lens.round-trip","lens.put-get"],"shown":["A","B","C","M","E","F"],"erased":["A"],"heads":["F"],"count":6,"lens":{"before":["::: decision:auth","Passkeys; device flow on TVs.",":::"],"after":["::: decision:auth","Passkeys everywhere.",":::"],"outcome":"accepted <code>decision:auth</code> → emit F, <code>prev: [E]</code>"}}]};
-const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-no-cross","latest-by.order":"law-latest-by-order","heads.set":"law-heads-set","record.erasure":"law-record-erasure","settle.erased":"law-settle-erased","latest-by.set":"law-latest-by-set","input.union":"law-input-union","view.no-resurrection":"law-view-no-resurrection-things","result.unread":"law-result-unread","lens.round-trip":"law-lens-round-trip","lens.put-get":"law-lens-put-get"};
+const WALK = {"records":{"A":{"who":"ada","at":"09:00","col":1,"row":2,"body":"Device flow. Client secret: 9f3c…","prev":[],"erases":[]},"B":{"who":"ada","at":"09:10","col":2,"row":1,"body":"Device flow; revisit in Q3.","prev":["A"],"erases":[]},"C":{"who":"bo","at":"09:12","col":2,"row":3,"body":"Use passkeys.","prev":["A"],"erases":[]},"M":{"who":"ada","at":"09:30","col":3,"row":2,"body":"Passkeys; device flow on TVs.","prev":["B","C"],"erases":[]},"E":{"who":"ada","at":"09:40","col":4,"row":2,"body":"Passkeys; device flow on TVs.","prev":["M"],"erases":["A"]},"F":{"who":"bo","at":"10:05","col":5,"row":2,"body":"Passkeys everywhere.","prev":["E"],"erases":[]}},"steps":[{"title":"Emit","text":"Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.","laws":["write.checked"],"shown":["A"],"heads":["A"],"winner":"A","count":1,"erased":[],"withheld":[],"current":[{"id":"A","shown":"here"}]},{"title":"Revise","text":"Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.","laws":["admit.no-cross"],"shown":["A","B"],"heads":["B"],"winner":"B","count":2,"erased":[],"withheld":[],"current":[{"id":"B","shown":"here"}]},{"title":"Fork","text":"Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.","laws":["latest-by.order"],"shown":["A","B","C"],"heads":["C","B"],"winner":"C","count":3,"erased":[],"withheld":[],"current":[{"id":"C","shown":"here"},{"id":"B","shown":"here"}]},{"title":"Merge","text":"Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.","laws":["heads.set"],"shown":["A","B","C","M"],"heads":["M"],"winner":"M","count":4,"erased":[],"withheld":[],"current":[{"id":"M","shown":"here"}]},{"title":"Erase","text":"A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.","laws":["record.erasure","settle.erased"],"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}]},{"title":"Any order","text":"Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.","laws":["latest-by.set","input.union"],"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}],"orders":[["A","B","C","M","E"],["B","C","M","E","A"],["C","M","E","A","B"]]},{"title":"Less in view","text":"Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's payload is withheld, and the slot says so instead of guessing; the count, needing no payload, is still five.","laws":["view.no-resurrection"],"reader":"cy","shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":["E"],"current":[{"id":"E","shown":"withheld"}]},{"title":"Tick","text":"At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet: the state shown is the model's, the tick around it is not.","laws":[],"settled":true,"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}],"tick":{"covers":["A","B","C","M","E"]}},{"title":"Back to text","text":"A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.","laws":["lens.round-trip","lens.put-get"],"shown":["A","B","C","M","E","F"],"heads":["F"],"winner":"F","count":6,"erased":["A"],"withheld":[],"current":[{"id":"F","shown":"here"}],"lens":{"before":["::: decision:auth","Passkeys; device flow on TVs.",":::"],"after":["::: decision:auth","Passkeys everywhere.",":::"],"outcome":"accepted <code>decision:auth</code> → emit F, <code>prev: [E]</code>"}}]};
+const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-no-cross","latest-by.order":"law-latest-by-order","heads.set":"law-heads-set","record.erasure":"law-record-erasure","settle.erased":"law-settle-erased","latest-by.set":"law-latest-by-set","input.union":"law-input-union","view.no-resurrection":"law-view-no-resurrection-things","lens.round-trip":"law-lens-round-trip","lens.put-get":"law-lens-put-get"};
 </script>
 <script>
 // The grammar page's behaviour: the sentence, the layer stack, the walk and the matrix.
@@ -780,7 +801,9 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
       $(".tag", el).textContent = !head ? "superseded" : fork ? (id === s.heads[0] ? "fork · wins" : "fork") : "head";
     }
     fresh.forEach((el, j) => animate(el, { opacity: [0, 1], transform: ["translateY(10px) scale(0.96)", "translateY(0px) scale(1)"] }, spring(380, 26, 0.06 * j)));
-    requestAnimationFrame(() => drawEdges(shown, fresh.map((el) => el.dataset.id)));
+    // A later step may have removed these cards by the time the frame runs.
+    const my = token;
+    requestAnimationFrame(() => { if (my === token) drawEdges(shown, fresh.map((el) => el.dataset.id)); });
   }
 
   function drawEdges(shown, fresh) {
@@ -822,7 +845,7 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
     const withheld = s.withheld || [];
     const h = heads[0];
     cur.innerHTML = `<span class="v mono">${rid(h)}</span> ` + (withheld.includes(h)
-      ? `<span class="sub">value unread</span>`
+      ? `<span class="sub">payload withheld</span>`
       : `<span class="sub">&ldquo;${WALK.records[h].body}&rdquo;</span>`) +
       (heads.length > 1 ? `<div class="sub alert">fork: also ${heads.slice(1).map(rid).join(", ")}</div>` : "");
     $("#slot-count").innerHTML = `<span class="v">${count}</span> <span class="sub">unread 0</span>`;

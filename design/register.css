@@ -1,9 +1,9 @@
 /* The register: a warm grey table, white sheets resting on it, height shown by shadow and
    hairline. One colour only, for what is erased or in conflict. */
 :root{
-  --ground:#EBEAE6; --sunk:#E3E2DD; --sheet:#FFFFFF; --ink:#1D1D1B; --muted:#6C6B66; --faint:#A3A29C;
+  --ground:#EBEAE6; --sunk:#E3E2DD; --sheet:#FFFFFF; --ink:#1D1D1B; --muted:#5A5954; --faint:#63625C;
   --hair:rgba(29,29,27,.09); --hair-2:rgba(29,29,27,.16);
-  --alert:#C4421A; --alert-soft:rgba(196,66,26,.10);
+  --alert:#B23A16; --alert-soft:rgba(178,58,22,.10);
   --lift-1:0 1px 2px rgba(40,38,30,.06);
   --lift-2:0 1px 2px rgba(40,38,30,.06),0 4px 12px rgba(40,38,30,.06);
   --lift-3:0 2px 4px rgba(40,38,30,.06),0 12px 28px rgba(40,38,30,.09);
@@ -13,7 +13,7 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#6E6D68;
+  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#8E8C86;
   --hair:rgba(236,235,231,.08); --hair-2:rgba(236,235,231,.16);
   --alert:#F0784F; --alert-soft:rgba(240,120,79,.14);
   --lift-1:0 1px 2px rgba(0,0,0,.4);
@@ -22,7 +22,7 @@
   --lift-4:0 4px 8px rgba(0,0,0,.45),0 22px 48px rgba(0,0,0,.5);
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#6E6D68;
+  --ground:#171716; --sunk:#121211; --sheet:#22221F; --ink:#ECEBE7; --muted:#A09E98; --faint:#8E8C86;
   --hair:rgba(236,235,231,.08); --hair-2:rgba(236,235,231,.16);
   --alert:#F0784F; --alert-soft:rgba(240,120,79,.14);
   --lift-1:0 1px 2px rgba(0,0,0,.4);

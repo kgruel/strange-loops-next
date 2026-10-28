@@ -10,7 +10,7 @@ name = "Laws"
 
 [[lean_lib]]
 name = "Gen"
-roots = ["Gen.Json", "Gen.Sha2", "Gen.Ed25519", "Gen.Records", "Gen.Encode", "Gen.Spec", "Gen.Batch", "Gen.Realm", "Gen.Occurred"]
+roots = ["Gen.Json", "Gen.Sha2", "Gen.Ed25519", "Gen.Records", "Gen.Encode", "Gen.Spec", "Gen.Batch", "Gen.Realm", "Gen.Occurred", "Gen.Scenario"]
 
 [[lean_exe]]
 name = "gen"
@@ -19,4 +19,5 @@ root = "Gen.Main"
 [[lean_exe]]
 name = "proofs"
 root = "Gen.Proofs"
+supportInterpreter = true
 extraDepTargets = ["Laws"]

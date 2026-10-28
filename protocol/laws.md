@@ -58,8 +58,8 @@ the cached state in both, so there is no partial rewind.
 | `heads.why` | `Max.cannot_follow_prev` | Max can't follow `prev`: no step from Max's state and the next record keeps the current maximum | `fold/heads/01`, `02` |
 | `view.no-resurrection` | `LatestBy.view`, `LatestBy.view_head_ids`, `LatestBy.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
 | `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
-| `result.unread` | `LatestBy.maxHeads_view` | a result counts the covered records it couldn't read | `fold/view/04`, `fold/select/*` |
-| `result.full` | `Acc.select_full` | with every payload here, nothing is unread and the result is the plain fold | `fold/select/03` |
+| `result.unread` | `LatestBy.maxHeads_view` | a result counts the covered records it couldn't read: proved for Max over heads, which counts the heads it doesn't hold; the other folds' counts are pinned by vectors | `fold/view/04`, `fold/select/*` |
+| `result.full` | `Acc.select_full` | when every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold | `fold/select/03` |
 | `select.set` | `Acc.select_set_decides` | what is read and what is unread depend only on the set | `fold/select/*` |
 
 `view.no-resurrection` holds because `prev`, ids and times are on the
@@ -98,9 +98,9 @@ everything left:
 | `settle.keeps` | `settle_keeps` | a payload any place holds is kept unless erased | `realm/01`, `02` |
 | `settle.erased` | `settle_erased` | once a record naming it in `erases` is held, every form of its target is erased | `realm/03`, `09` |
 | `admit.set` | `admit_same`, `refusalOf_none` | admission depends only on the set; a record is refused exactly when it isn't entitled to its `prev` | `realm/04` |
-| `admit.no-cross` | `admit_no_cross` | an admitted record's `prev` names only held records it shares a thing with and may replace | `realm/04`, `08` |
+| `admit.no-cross` | `admit_no_cross` | every held record an admitted record's `prev` names shares a thing with it and may be replaced by it; a `prev` naming a record the reader doesn't hold is admitted, since the reader can't judge it | `realm/04`, `08` |
 | `thing.local` | `stateIn_local`, `perThing_set_decides` | a thing's state depends only on the records about it; the set decides per thing | `realm/04`–`08`, `fold/latest-by/*` |
-| `view.no-resurrection` (things) | `admit_view`, `stateIn_view`, `stateIn_no_false_resurrection` | a view admits the same records and folds each thing to the full reader's state; a record superseded in a thing is never current there | `fold/view/*`, `spec/run/03` |
+| `view.no-resurrection` (things) | `admit_view`, `stateIn_view`, `stateIn_no_false_resurrection` | a view admits the same records and folds each thing to the full reader's state, each record in the view's form; a record superseded in a thing is never current there | `fold/view/*`, `spec/run/03` |
 
 Writing checks `prev` too: you can only replace what you hold. `emit`
 refuses a `prev` naming a record neither in the batch nor in the store
@@ -169,7 +169,7 @@ pinned by the vectors rather than proved.
 |---|---|---|---|
 | `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`–`03` |
 | `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a draft `write` refuses, a `prev` naming a record not held, or one about other things | `batch/10`–`17` |
-| `batch.refuse-order` | `firstRefusal_set`, `writeProblem_codes` | the refusal reported depends only on which refusals there are: across the batch, labels, then writing, then `prev-unknown`, then `prev-unrelated` | `batch/15`, `16` |
+| `batch.refuse-order` | `firstRefusal_set`, `writeProblem_codes` | the refusal reported depends only on which refusals there are: across the batch, labels, then writing, then `prev-unknown`, then `prev-unrelated`. Proved for writing's refusals (`firstRefusal_set`); the order across stages is by construction | `batch/15`, `16` |
 
 `gen` checks every batch vector in every rotation of its drafts, and again
 with each draft's `prev` reversed: an accepted batch must give the same

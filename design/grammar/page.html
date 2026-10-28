@@ -22,7 +22,7 @@
       a
       <span class="w" data-f="kind"><span class="role">kind</span><code>decision</code></span>,
       <span class="w" data-f="occurred"><span class="role">occurred</span>made in <code>2026-10</code></span>,
-      <span class="w" data-f="emitted"><span class="role">emitted</span>written <code>2026-10-24 09:40Z</code></span>,
+      <span class="w" data-f="emitted"><span class="role">emitted</span>written <code>2026-10-01 09:40Z</code></span>,
       <span class="w" data-f="prev"><span class="role">prev</span>replacing <code>r:M…</code></span>,
       <span class="w" data-f="erases"><span class="role">erases</span>erasing <code>r:A…</code>'s payload</span>,
       <span class="w" data-f="under"><span class="role">under</span>on the grant <code>r:G…</code></span>:
@@ -30,7 +30,7 @@
     </p>
     <pre class="env" id="sentence-env" aria-label="The same record as stored"><span data-f="line">{"env": {</span>
   <span data-f="about">"about": ["decision:auth"],</span>
-  <span data-f="emitted">"emitted": "2026-10-24T09:40:00Z",</span>
+  <span data-f="emitted">"emitted": "2026-10-01T09:40:00Z",</span>
   <span data-f="erases">"erases": ["r:A…"],</span>
   <span data-f="kind">"kind": "decision",</span>
   <span data-f="observer">"observer": "sl:ada…",</span>
@@ -38,9 +38,10 @@
   <span data-f="prev">"prev": ["r:M…"],</span>
   <span data-f="under">"under": "r:G…"</span>
 <span data-f="line">},</span>
+<span data-f="line"> "id": "r:E…",</span>
 <span data-f="payload"> "payload": {"choice": "Passkeys; device flow on TVs."},</span>
-<span data-f="line"> "id": "r:E…", "salt": "…", "sig": {…}}</span></pre>
-    <p class="caption">As stored: one canonical line, members sorted. The id hashes the envelope and the payload's commitment, never the payload itself.</p>
+<span data-f="line"> "salt": "…", "sig": {…}}</span></pre>
+    <p class="caption">As stored: one canonical line, members sorted at every depth. This is E from the walk below, with an <code>occurred</code> and a grant added to show every field. The id hashes the envelope and the payload's commitment, never the payload itself.</p>
   </div>
 </section>
 
@@ -139,6 +140,9 @@
       <p class="lens-out" id="lens-out"></p>
     </div>
   </div>
+  <ol class="walk-static" id="walk-static">
+<!-- build:walk-static -->
+  </ol>
 </section>
 
 <section class="wrap block" id="matrix" aria-labelledby="h-matrix">

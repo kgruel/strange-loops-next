@@ -9,7 +9,7 @@
       "status": "proved",
       "purpose": "Say one thing an observer saw, so anyone can check it and nobody can change it.",
       "state": "An envelope the core reads, a payload it never interprets, a signature. Named by <code>r:</code> and a hash of the envelope and the payload's commitment.",
-      "principle": "Change any field and it is another record, with another id. Erase its payload and the id, the signature and every record citing it still hold.",
+      "principle": "Its id hashes what it says, written canonically: spell a set another way and the id doesn't move. Erase its payload and the id, the signature and every record citing it still hold.",
       "laws": ["record.erasure", "record.sets", "write.checked"]
     },
     {
@@ -73,8 +73,8 @@
       "word": "fold",
       "status": "proved",
       "purpose": "Turn a set of records into state.",
-      "state": "One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code> and <code>collect</code>, over heads.",
-      "principle": "The set decides. Arrival order, late records and two-way syncs never change the answer.",
+      "state": "One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code>, over heads; and <code>collect</code>, over heads when it follows <code>prev</code> and over every selected record when it doesn't.",
+      "principle": "The set decides: arrival order and two-way syncs never change the answer, and a late record folded onto the cached state gives what folding the whole set again gives.",
       "laws": ["acc.set", "heads.set", "latest-by.converge"]
     },
     {

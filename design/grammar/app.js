@@ -144,7 +144,9 @@
       $(".tag", el).textContent = !head ? "superseded" : fork ? (id === s.heads[0] ? "fork · wins" : "fork") : "head";
     }
     fresh.forEach((el, j) => animate(el, { opacity: [0, 1], transform: ["translateY(10px) scale(0.96)", "translateY(0px) scale(1)"] }, spring(380, 26, 0.06 * j)));
-    requestAnimationFrame(() => drawEdges(shown, fresh.map((el) => el.dataset.id)));
+    // A later step may have removed these cards by the time the frame runs.
+    const my = token;
+    requestAnimationFrame(() => { if (my === token) drawEdges(shown, fresh.map((el) => el.dataset.id)); });
   }
 
   function drawEdges(shown, fresh) {
@@ -186,7 +188,7 @@
     const withheld = s.withheld || [];
     const h = heads[0];
     cur.innerHTML = `<span class="v mono">${rid(h)}</span> ` + (withheld.includes(h)
-      ? `<span class="sub">value unread</span>`
+      ? `<span class="sub">payload withheld</span>`
       : `<span class="sub">&ldquo;${WALK.records[h].body}&rdquo;</span>`) +
       (heads.length > 1 ? `<div class="sub alert">fork: also ${heads.slice(1).map(rid).join(", ")}</div>` : "");
     $("#slot-count").innerHTML = `<span class="v">${count}</span> <span class="sub">unread 0</span>`;
