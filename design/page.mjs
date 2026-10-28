@@ -16,6 +16,7 @@ export function fill(text, name, value) {
 export const PAGES = [
   { id: "grammar", name: "Grammar" },
   { id: "laws", name: "Laws" },
+  { id: "evidence", name: "Evidence" },
 ];
 
 export function header(current, sections) {

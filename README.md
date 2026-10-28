@@ -14,8 +14,8 @@ writer that must agree with it byte for byte.
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS writer for layer 0 |
-| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences and the proof graph; `build.mjs` renders all three |
-| `out/rethink/`, `out/grammar/`, `out/laws/` | the pages, written by `node design/build.mjs`, never by hand |
+| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `build.mjs` renders all four |
+| `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/` | the pages, written by `node design/build.mjs`, never by hand |
 
 Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
 `xtask` checking token and surface budgets); more end-to-end scenarios (`vectors/scenario/` holds the first),
@@ -52,7 +52,7 @@ one HTML file per tab under `sections/`, the decision ledger as records in
 node design/build.mjs       # writes out/rethink/index.html; commit it with the source
 ```
 
-Two more pages share a shell (`design/page.mjs`, `design/register.css`) and
+Three more pages share a shell (`design/page.mjs`, `design/register.css`) and
 read the protocol through `design/protocol.mjs`:
 
 * `design/grammar/`: the protocol's nouns, verbs and layers. Its words are
@@ -61,28 +61,37 @@ read the protocol through `design/protocol.mjs`:
   vectors pin. Its walk is `vectors/scenario/01-decision`, which the model
   writes; `walk.json` holds only its narration and layout.
 * `design/laws/`: every law as a sentence and one of six shapes
-  (`laws.json`), joined to its row in `protocol/laws.md`, the theorems that
-  prove it (each with its statement as Lean prints it), the vectors that pin
-  it, and the laws its proof rests on. That last join is
+  (`laws.json`), under the one reader's question it answers (a closed list in
+  `laws.json`; the build refuses a law without one, or a question no law
+  answers), with the demos that let a reader try it. `join.mjs` joins each law
+  to its row in `protocol/laws.md`, the theorems that prove it (each with its
+  statement as Lean prints it), the vectors that pin it, and the laws its
+  proof rests on. That last join is
   `design/laws/proofs.json`, written by `lake exe proofs` from the checked
   proofs; CI regenerates it as it does the vectors. `lake exe boundaries` writes
   `design/laws/boundaries.json`: some laws asked with their premise and
   without it, the model checking that the premise matters. These aren't
   vectors, since several of their inputs are ones the protocol never
-  produces. The map is laid out when the page is built
-  (`design/laws/layout.mjs`). The build
+  produces. The build
   fails on a law without a sentence, a theorem name that resolves to nothing,
   a vector reference to no file, a law name a vector uses that isn't a law,
   or a proof that rests on a layer above its own.
+* `design/evidence/`: the same joins, for an implementer or maintainer: each
+  law's card with its theorems, vectors and who runs them, what it rests on
+  and carries; the coverage table; and the proof map, laid out when the page
+  is built (`design/evidence/layout.mjs`). A law's sentence on the laws page
+  and its card here share an anchor (`#law-<name>`), and the build fails on
+  any link between the pages that lands on no anchor.
 
 `node design/mutants.mjs` holds those checks to account: it applies plausible
 wrong edits to a copy of the sources and fails unless the build refuses each
 one, apart from an explicit, shrink-only list of survivors with why. CI runs
 it.
 
-Both load a pinned library from a CDN (Motion), so
+The grammar and laws pages load a pinned library from a CDN (Motion), so
 they are published only on the site, at `/strange-loops/grammar/` and
-`/strange-loops/laws/`, with no artifact mirror.
+`/strange-loops/laws/`, with no artifact mirror; the evidence page is built
+for the site too, at `/strange-loops/evidence/` once the site's sync carries it.
 
 CI rebuilds every page and fails if `out/` differs, as with the vectors. To publish:
 

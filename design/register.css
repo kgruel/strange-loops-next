@@ -84,6 +84,11 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 
 .sheet{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-3),0 0 0 1px var(--hair);padding:22px}
 
+/* a column of things under small headings */
+.stack{display:grid;gap:12px;align-content:start;min-width:0}
+.stack h3{margin-top:14px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+.stack h3:first-child{margin-top:0}
+
 /* cards: one concept each */
 .cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 .card{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:16px 16px 14px;display:grid;gap:10px;align-content:start;transition:box-shadow .25s,transform .25s}

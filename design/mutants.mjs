@@ -52,6 +52,10 @@ const MUTANTS = [
   ["a gap in a cited range", "vectors/record/23-emitted-lowercase.json", null],
   ["a demo's law renamed away from its vector", "design/laws/laws.json", json((d) => { d.demos[1].law = "latest-by.repeats"; })],
   ["a law with no edges moved to another layer", "design/laws/laws.json", json((d) => { d.laws["record.commit"].layer = "Text"; })],
+  ["a law with no question", "design/laws/laws.json", json((d) => { delete d.laws["count.perm"].question; })],
+  ["an unknown question key", "design/laws/laws.json", json((d) => { d.laws["count.perm"].question = "attic"; })],
+  ["a question no law answers", "design/laws/laws.json", json((d) => { d.questions["no-such"] = "What if nobody asks?"; })],
+  ["a link to a law's evidence that lands nowhere", "design/evidence/render.mjs", swap('" id="${anchor(r.key)}" data-shape', '" id="card-${slug(r.key)}" data-shape')],
 ];
 
 // What the build can't know, and why.

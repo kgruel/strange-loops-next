@@ -14,9 +14,6 @@
 .caption{font-size:13px;color:var(--muted)}
 
 /* verbs */
-.stack{display:grid;gap:12px;align-content:start}
-.stack h3{margin-top:14px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
-.stack h3:first-child{margin-top:0}
 #provenance .row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
 @media (max-width:560px){#provenance .row{grid-template-columns:1fr}}
 

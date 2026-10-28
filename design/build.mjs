@@ -1,16 +1,17 @@
-// Build the design pages: design/rethink/, design/grammar/ and design/laws/.
+// Build the design pages: design/rethink/, design/grammar/, design/laws/ and design/evidence/.
 //
 //   node design/build.mjs                    writes out/<page>/index.html for each
 //   node design/build.mjs --fragment <file>  writes the rethink page as the claude.ai artifact takes it
 //
 // The fragment is what the artifact host wraps in its own document; the full
 // document carries that wrapper's reset (base.css) so the page renders the
-// same on projects.gruel.world. The grammar and laws pages are built on
+// same on projects.gruel.world. The grammar, laws and evidence pages are built on
 // design/page.mjs and have no artifact mirror. No dependencies.
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderEvidence } from "./evidence/render.mjs";
 import { renderGrammar } from "./grammar/render.mjs";
 import { fill } from "./page.mjs";
 import { renderLaws } from "./laws/render.mjs";
@@ -73,14 +74,20 @@ const outputs = at >= 0
   ? [[args[at + 1], fragment]]
   : [[join(root, "out", "rethink", "index.html"), full],
      [join(root, "out", "grammar", "index.html"), renderGrammar(root)],
-     [join(root, "out", "laws", "index.html"), renderLaws(root)]];
-// The grammar page links laws to their cards on the laws page: every link must land.
+     [join(root, "out", "laws", "index.html"), renderLaws(root)],
+     [join(root, "out", "evidence", "index.html"), renderEvidence(root)]];
+// The pages link to places on each other: a law's sentence, its evidence, a demo. Every such
+// link, ../<page>/#<id>, must land on an id that page has. The grammar page also carries law
+// anchors as data for its walk, which links them to the laws page when it runs.
 if (at < 0) {
-  const [, grammar, laws] = outputs.map(([, text]) => text);
-  const cards = new Set([...laws.matchAll(/id="(law-[a-z0-9-]+)"/g)].map((m) => m[1]));
-  const links = [...grammar.matchAll(/\.\.\/laws\/#(law-[a-z0-9-]+)/g), ...grammar.matchAll(/"(law-[a-z0-9-]+)"/g)].map((m) => m[1]);
-  const lost = [...new Set(links)].filter((l) => !cards.has(l));
-  if (lost.length) throw new Error(`grammar links to laws with no card: ${lost.join(", ")}`);
+  const pages = new Map(outputs.map(([file, text]) => [basename(dirname(file)), text]));
+  const ids = new Map([...pages].map(([p, text]) => [p, new Set([...text.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]))]));
+  for (const [p, text] of pages) {
+    const links = [...text.matchAll(/href="\.\.\/([a-z]+)\/#([a-z0-9-]+)"/g)].map((m) => [m[1], m[2]]);
+    if (p === "grammar") links.push(...[...text.matchAll(/"(law-[a-z0-9-]+)"/g)].map((m) => ["laws", m[1]]));
+    const lost = [...new Set(links.filter(([q, id]) => !ids.get(q)?.has(id)).map(([q, id]) => `../${q}/#${id}`))];
+    if (lost.length) throw new Error(`${p} links to places no page has: ${lost.slice(0, 5).join(", ")}${lost.length > 5 ? `, and ${lost.length - 5} more` : ""}`);
+  }
 }
 for (const [file, text] of outputs) {
   if (!file) throw new Error("--fragment needs a path");
