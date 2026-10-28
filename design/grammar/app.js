@@ -208,9 +208,6 @@
     const s = WALK.steps[k];
     at = k;
     $$("button", stepsEl).forEach((b, i) => (i === k ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current")));
-    // Keep the current step in view where the steps are a row (narrow screens), without moving the page.
-    const cur = $$("button", stepsEl)[k];
-    stepsEl.scrollLeft = cur.offsetLeft - stepsEl.offsetLeft - stepsEl.clientWidth / 2 + cur.offsetWidth / 2;
     $("#prev-step").disabled = k === 0;
     $("#next-step").disabled = k === WALK.steps.length - 1;
     $("#stage-where").innerHTML = s.reader ? `reader <b>${s.reader}</b> · store <b>team</b>` : "store <b>team</b>";

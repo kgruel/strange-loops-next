@@ -4,11 +4,22 @@
 // broken in turn, a gate with two bins, and a boundary in the limit colour with who accounts
 // for it. A reader learns six forms once and reads every law with them.
 //
-// shapeFigure(shape, law?) returns an inline SVG string, worked out when the page is built.
-// Deterministic: the same shape and law always give the same bytes. Given a law (an entry of
+// shapeFigure(shape, law?, given?) returns an inline SVG string, worked out when the page is
+// built. Deterministic: the same arguments always give the same bytes. Given a law (an entry of
 // laws.json's `laws`, its key as law.key), the figure is labelled with the law's own words,
 // short and truncated; without one it is the shape's generic figure. Each label says no more
 // than the words it is taken from.
+//
+// `given` is what a Try card's vector holds, so the figure above the card draws that and not
+// the law's generic lanes: as many lanes as the card has variants, each with the card's own
+// records or spellings. Each lane is marked data-lane="i", the card's variant i, which the page
+// lights as the reader steps; render.mjs checks the count. A figure reads only the keys of
+// `given` it draws:
+//   invariance  { change, lanes }   lanes: per variant, its items left to right, each a record
+//                                    { k, mod } or words { t, code }; change: the card's words
+//   round-trip  { forms }           how many sections the form holds; lane 0 is the start, 1 the far side
+//   limit       { lane, held, moved }  the records delivered, in order, and the answer each way;
+//                                    lane 0 is through the boundary, 1 is past it
 //
 // Colour lives in shapes.css, by class: nothing here names a colour. Motion lives in shapes.js,
 // which reads the data-m marks; without it every figure is already complete. Records are
@@ -152,34 +163,59 @@ const LANE_RECS = {
 };
 export const laneKind = (change) => (LANES.find(([re]) => re.test(plain(change))) ?? [null, "forms"])[1];
 
-function invariance(law) {
-  const change = law ? law.change : "the order the records arrive in";
+// A generic lane's letters as items: "B?" is withheld, X and Y are about other things, "|" a cut.
+const item = (r) => (r === "|" ? { cut: true } : { k: r.replace("?", ""), mod: r.endsWith("?") ? "withheld" : /[XY]/.test(r) ? "other" : "" });
+const itemW = (it) => (it.cut ? 8 : it.t != null ? tokW({ t: it.t, code: it.code }, SIZE) + 6 : R + 6);
+const laneNeed = (items) => 8 + items.reduce((s, it) => s + itemW(it), 0) + 2;
+const laneText = (items) => items.filter((it) => !it.cut).map((it) => it.t ?? `${it.k}${it.mod === "withheld" ? " (payload not held)" : ""}`).join(" ");
+const SIDE = 160;                  // a lane wider than this puts the state under the lanes
+
+function invariance(law, given) {
+  if (given && !given.lanes?.length) throw new Error(`shapes: ${law.key}: a card's figure needs its lanes`);
+  const change = given ? given.change : law ? law.change : "the order the records arrive in";
   const stays = law ? law.stays : "the state";
-  const kind = law ? laneKind(change) : "orders";
-  const top = 70, laneH = 30, laneGap = 10, laneX = 12, laneW = 140;
-  const bx = 212, bw = 116, by = top, bh = 3 * laneH + 2 * laneGap;
+  const lanes = given ? given.lanes : LANE_RECS[law ? laneKind(change) : "orders"].map((l) => l.map(item));
+  const top = 70, laneH = 30, laneGap = 10, laneX = 12;
+  const need = Math.max(...lanes.map(laneNeed));
+  if (need > W - 24 - 44) throw new Error(`shapes: ${law?.key}: a lane is too wide to draw`);
+  const side = need <= SIDE, laneW = side ? Math.max(140, need) : need;
+  const lanesH = lanes.length * laneH + (lanes.length - 1) * laneGap;
+  // The state: beside the lanes, as tall as they are or its words; or, past SIDE, under them.
+  const bx = side ? laneX + laneW + 60 : laneX, bw = W - 12 - bx;
+  const boxLines = wrap(stays, bw - 20, SIZE, 4).length, boxNeed = 28 + boxLines * SIZE * 1.3 + 12;
+  const by = side ? top : top + lanesH + 30, bh = side ? Math.max(lanesH, boxNeed) : boxNeed;
+  const lanesTop = side ? by + (bh - lanesH) / 2 : top;
   const bmid = by + bh / 2;
+  const mx = W - 22, my = by - 12;           // past SIDE, where the lanes meet over the state
   let out = cap(12, 18, "change") + words(12, 38, change, { width: W - 24, lines: 2, cls: "sg-t sg-ink" }).svg;
-  LANE_RECS[kind].forEach((lane, i) => {
-    const y = top + i * (laneH + laneGap), mid = y + laneH / 2;
-    out += `<rect class="sg-lane" x="${laneX}" y="${y}" width="${laneW}" height="${laneH}" rx="8"/>`;
+  lanes.forEach((lane, i) => {
+    const y = lanesTop + i * (laneH + laneGap), mid = y + laneH / 2;
+    let g = `<rect class="sg-lane" x="${laneX}" y="${n(y)}" width="${n(laneW)}" height="${laneH}" rx="8"/>`;
     let x = laneX + 8;
-    lane.forEach((r, j) => {
+    lane.forEach((it, j) => {
       const at = 0.08 * i + 0.06 * j;
-      if (r === "|") { out += `<path class="sg-cut" d="M${n(x + 2)},${y + 5}V${y + laneH - 5}"/>`; x += 8; return; }
-      const mod = r.endsWith("?") ? "withheld" : /[XY]/.test(r) ? "other" : "";
-      out += rec(x, y + 4, r.replace("?", ""), { mod, m: mv("in", at) });
-      x += R + 6;
+      if (it.cut) { g += `<path class="sg-cut" d="M${n(x + 2)},${n(y + 5)}V${n(y + laneH - 5)}"/>`; x += 8; return; }
+      if (it.t != null) g += `<text class="sg-t sg-ink${it.code ? " sg-code" : ""}" x="${n(x)}" y="${n(mid + 4.5)}"${mv("in", at)}>${esc(it.t)}</text>`;
+      else g += rec(x, y + 4, it.k, { mod: it.mod, m: mv("in", at) });
+      x += itemW(it);
     });
     // Each lane runs into the one state: the curves meet where the claim is.
-    const x0 = laneX + laneW + 4, x1 = bx - 2;
-    out += wire(`M${x0},${mid}C${x0 + 30},${mid} ${x1 - 34},${bmid} ${x1},${bmid}`, "sg-wire", mv("draw", 0.3 + 0.08 * i));
-    out += ghost([[x0, mid], [x0 + 22, mid + (bmid - mid) * 0.25], [x1 - 18, bmid - (bmid - mid) * 0.08], [x1 + 10, bmid]], 0.55 + 0.12 * i);
+    const x0 = laneX + laneW + 4;
+    if (side) {
+      const x1 = bx - 2;
+      g += wire(`M${n(x0)},${n(mid)}C${n(x0 + 30)},${n(mid)} ${n(x1 - 34)},${n(bmid)} ${n(x1)},${n(bmid)}`, "sg-wire", mv("draw", 0.3 + 0.08 * i));
+      g += ghost([[x0, mid], [x0 + 22, mid + (bmid - mid) * 0.25], [x1 - 18, bmid - (bmid - mid) * 0.08], [x1 + 10, bmid]], 0.55 + 0.12 * i);
+    } else {
+      g += wire(`M${n(x0)},${n(mid)}C${n(mx)},${n(mid)} ${n(mx)},${n(mid)} ${n(mx)},${n(my)}V${n(by - 4)}`, "sg-wire", mv("draw", 0.3 + 0.08 * i));
+      g += ghost([[x0, mid], [mx, mid], [mx, by - 4], [mx, by + 10]], 0.55 + 0.12 * i);
+    }
+    out += given ? `<g data-lane="${i}">${g}</g>` : g;
   });
-  out += head(bx - 2, bmid);
+  out += side ? head(bx - 2, bmid) : head(mx, by - 2, Math.PI / 2);
   out += box(bx, by, bw, bh, "stays", stays, { lines: 4, m: mv("pulse", 1.0) });
-  const title = law ? `Invariance: change ${plain(change)}, and ${plain(stays)} stays.` : "Invariance: change this, and that stays.";
-  return { h: top + bh + 12, body: out, title };
+  const title = given ? `Invariance: ${plain(change)}: ${lanes.map(laneText).join("; ")}; and ${plain(stays)} stays.`
+    : law ? `Invariance: change ${plain(change)}, and ${plain(stays)} stays.` : "Invariance: change this, and that stays.";
+  return { h: by + bh + 12, body: out, title };
 }
 
 // ---- round trip: a loop back to the start ---------------------------------------------------
@@ -197,26 +233,30 @@ const TRIPS = {
 };
 const GENERIC_TRIP = { start: ["text", "text"], out: "parse", mid: ["parsed form", "form"], back: "render", join: "the same text" };
 
-// A station: a sheet with its name and a glyph of what it holds, lines of text or records.
-function station(x, y, w, name, kind, m) {
+// A station: a sheet with its name and a glyph of what it holds, lines of text or the parts of
+// a form (three, unless a card's vector says how many).
+function station(x, y, w, name, kind, m, forms = 3) {
   let g = `<g class="sg-sheet"${m}><rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="50" rx="8"/>` +
     words(x + 10, y + 19, name, { width: w - 20, lines: 1, cls: "sg-t sg-ink" }).svg;
   if (kind === "text") for (let i = 0; i < 2; i++) g += `<path class="sg-lines" d="M${x + 10},${y + 31 + i * 8}H${x + w - (i ? 34 : 18)}"/>`;
-  else if (kind === "form") for (let i = 0; i < 3; i++) g += `<rect class="sg-mini" x="${x + 10 + i * 15}" y="${y + 28}" width="11" height="11" rx="2.5"/>`;
+  else if (kind === "form") for (let i = 0; i < forms; i++) g += `<rect class="sg-mini" x="${x + 10 + i * 15}" y="${y + 28}" width="11" height="11" rx="2.5"/>`;
   return g + "</g>";
 }
 
-function roundTrip(law) {
+function roundTrip(law, given) {
   if (law && !TRIPS[law.key]) throw new Error(`shapes: no way round for the round trip ${law.key}; add it to TRIPS`);
+  if (given && !(given.forms > 0)) throw new Error(`shapes: ${law.key}: a card's figure needs how many sections its form holds`);
   const t = law ? TRIPS[law.key] : GENERIC_TRIP;
   const end = t.end ?? t.start;
+  const forms = given ? given.forms : 3;
+  const lane = (i, svg) => (given ? `<g data-lane="${i}">${svg}</g>` : svg);
   const sx = 12, sw = 118, s1 = 26, s2 = 136;          // the join: where the loop starts and ends
   const fx = 214, fw = 114, fy = 81;                    // the far side
   const fcx = fx + fw / 2;
   let out = "";
-  out += station(sx, s1, sw, t.start[0], t.start[1], mv("in", 0));
-  out += station(fx, fy, fw, t.mid[0], t.mid[1], mv("in", 0.45));
-  out += station(sx, s2, sw, end[0], end[1], mv("in", 0.95));
+  out += lane(0, station(sx, s1, sw, t.start[0], t.start[1], mv("in", 0), forms));
+  out += lane(1, station(fx, fy, fw, t.mid[0], t.mid[1], mv("in", 0.45), forms));
+  out += station(sx, s2, sw, end[0], end[1], mv("in", 0.95), forms);
   // Out along the top, round the far side, back along the bottom.
   const a = `M${sx + sw + 4},${s1 + 25}H${fcx - 22}C${fcx - 2},${s1 + 25} ${fcx},${s1 + 35} ${fcx},${fy - 6}`;
   const b = `M${fcx},${fy + 56}C${fcx},${s2 + 15} ${fcx - 2},${s2 + 25} ${fcx - 22},${s2 + 25}H${sx + sw + 6}`;
@@ -428,28 +468,32 @@ export function limitParts(says) {
   return { moves, party: so ? so[1] : null, repeats: /twice|again|doubles/.test(s), noun: (s.match(/the (\w+) doubles/) ?? [])[1] ?? null };
 }
 
-function limit(law) {
+function limit(law, given) {
   const p = law ? limitParts(law.says) : { moves: "the answer", party: "whoever the law names", repeats: false, noun: null };
   if (!p.party) throw new Error(`shapes: limit ${law.key} names nobody who accounts for it (a sentence beginning "So")`);
-  const lane = p.repeats ? ["A", "B", "C", "A", "B", "C"] : ["A", "B", "C"];
-  const ly = 86, lw = p.repeats ? 18 : R;
+  if (given && !(given.lane?.length && given.held != null && given.moved != null)) throw new Error(`shapes: ${law.key}: a card's figure needs its records and both answers`);
+  const lane = given ? given.lane : p.repeats ? ["A", "B", "C", "A", "B", "C"] : ["A", "B", "C"];
+  const again = lane.findIndex((l, i) => lane.indexOf(l) < i);    // where the first repeat arrives
+  const ly = 86, lw = lane.length > 4 ? 18 : R;
+  if (12 + lane.length * (lw + 4) > 172) throw new Error(`shapes: ${law?.key}: too many records to draw before the boundary`);
+  const part = (i, svg) => (given ? `<g data-lane="${i}">${svg}</g>` : svg);
   let out = "";
-  if (p.repeats) out += cap(12 + 3 * (lw + 4), ly - lw / 2 - 8, "again");
+  if (again >= 0) out += cap(12 + again * (lw + 4), ly - lw / 2 - 8, "again");
   lane.forEach((l, i) => out += rec(12 + i * (lw + 4), ly - lw / 2, l, { w: lw, h: lw, m: mv("in", 0.05 * i) }));
   const lx = 12 + lane.length * (lw + 4) + 2;
   const bx = 212, bw = W - 12 - bx;
   // Without whoever accounts for it, the answer moves: in the limit colour.
   const upY = 12, upH = 66, upM = upY + upH / 2;
-  out += wire(`M${lx},${ly}C${lx + 30},${ly} ${bx - 40},${upM} ${bx - 4},${upM}`, "sg-wire sg-limit-wire", mv("draw", 0.3)) + head(bx - 2, upM, 0, "sg-head sg-limit-head");
-  const moved = p.noun === "count" ? `${p.moves}: 6` : p.moves;
-  out += box(bx, upY, bw, upH, "moves", moved, { cls: "sg-state is-moved", lines: 2, m: mv("pulse", 1.0) });
+  const moved = p.noun === "count" ? `${p.moves}: ${given ? given.moved : 6}` : p.moves;
+  out += part(1, wire(`M${lx},${ly}C${lx + 30},${ly} ${bx - 40},${upM} ${bx - 4},${upM}`, "sg-wire sg-limit-wire", mv("draw", 0.3)) + head(bx - 2, upM, 0, "sg-head sg-limit-head") +
+    box(bx, upY, bw, upH, "moves", moved, { cls: "sg-state is-moved", lines: 2, m: mv("pulse", 1.0) }));
   // Through the boundary, it holds.
   const dnY = 100, dnH = 44, dnM = dnY + dnH / 2, wallX = 184;
-  out += wire(`M${lx},${ly}C${lx + 30},${ly} ${wallX - 30},${dnM} ${bx - 4},${dnM}`, "sg-wire sg-strong", mv("draw", 0.55)) + head(bx - 2, dnM);
+  const held = p.noun === "count" ? `the count: ${given ? given.held : 3}` : p.noun ? `the ${p.noun}, once each` : "holds";
+  out += part(0, wire(`M${lx},${ly}C${lx + 30},${ly} ${wallX - 30},${dnM} ${bx - 4},${dnM}`, "sg-wire sg-strong", mv("draw", 0.55)) + head(bx - 2, dnM) +
+    `<g class="sg-state"${mv("pulse", 1.3)}><rect x="${bx}" y="${dnY}" width="${bw}" height="${dnH}" rx="9"/>` +
+    words(bx + 10, dnM + 4.5, held, { width: bw - 20, lines: 1, cls: "sg-t sg-ink" }).svg + "</g>");
   out += `<rect class="sg-wall" x="${wallX - 3}" y="${dnY - 6}" width="6" height="${dnH + 12}" rx="2"/>`;
-  const held = p.noun === "count" ? "the count: 3" : p.noun ? `the ${p.noun}, once each` : "holds";
-  out += `<g class="sg-state"${mv("pulse", 1.3)}><rect x="${bx}" y="${dnY}" width="${bw}" height="${dnH}" rx="9"/>` +
-    words(bx + 10, dnM + 4.5, held, { width: bw - 20, lines: 1, cls: "sg-t sg-ink" }).svg + "</g>";
   // Who accounts for it: a rule from the boundary, and their words under it.
   const py = dnY + dnH + 40;
   out += `<path class="sg-leader" d="M${wallX},${dnY + dnH + 6}V${py - 18}H12"/>`;
@@ -459,8 +503,9 @@ function limit(law) {
   out += ghost([[lx, ly], [lx + 40, ly - 22], [bx - 30, upM], [bx + 10, upM]], 0.6, "is-limit");
   out += ghost([[lx, ly], [lx + 40, ly + 10], [wallX, dnM], [bx + 10, dnM]], 0.85);
   // A repeat meets the boundary and goes no further: the store hands each id over once.
-  if (p.repeats) out += ghost([[lx, ly], [lx + 40, ly + 10], [wallX - 6, dnM]], 1.05, "is-stopped");
-  const title = law ? `Limit: ${plain(law.says)}` : "Limit: this one moves, or can't be done here, and here is who accounts for it.";
+  if (again >= 0) out += ghost([[lx, ly], [lx + 40, ly + 10], [wallX - 6, dnM]], 1.05, "is-stopped");
+  const title = (law ? `Limit: ${plain(law.says)}` : "Limit: this one moves, or can't be done here, and here is who accounts for it.") +
+    (given ? ` Delivered: ${lane.join(" ")}; ${moved}; ${held}.` : "");
   return { h: py + 20 + (party.lines - 1) * SIZE * 1.3 + 10, body: out, title };
 }
 
@@ -469,11 +514,13 @@ function limit(law) {
 const FIGURES = { invariance, "round-trip": roundTrip, refinement, order, exactness, limit };
 export const SHAPES = Object.keys(FIGURES);
 
-export function shapeFigure(shape, law) {
+export function shapeFigure(shape, law, given) {
   const draw = FIGURES[shape];
   if (!draw) throw new Error(`shapes: no figure for shape ${shape}`);
   if (law && law.shape !== shape) throw new Error(`shapes: ${law.key ?? "a law"} is ${law.shape}, not ${shape}`);
-  const { h, body, title } = draw(law);
+  if (given && !law) throw new Error("shapes: a figure drawn from a vector is drawn for its law");
+  if (given && !["invariance", "round-trip", "limit"].includes(shape)) throw new Error(`shapes: ${law.key}: no ${shape} figure is drawn from a vector`);
+  const { h, body, title } = draw(law, given);
   return `<svg class="shape-fig sg-${shape}" viewBox="0 0 ${W} ${n(h)}" width="100%" role="img" data-shape="${shape}"${law?.key ? ` data-law="${esc(law.key)}"` : ""}>` +
     `<title>${esc(title)}</title>${body}</svg>`;
 }

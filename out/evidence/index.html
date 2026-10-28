@@ -126,9 +126,18 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .row-k b{font-family:var(--mono);font-weight:500;font-size:14px}
 .row-k.wide{font-size:14px}
 .row-v{display:grid;gap:6px;font-size:14px}
+/* a row with no label: its words take the label's column too */
+.row.is-full .row-v{grid-column:1/-1}
 .row.is-settled .row-k b{color:var(--muted)}
 .made{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 @media (max-width:560px){.row{grid-template-columns:1fr}}
+/* a sideways scroller wider than the screen: its right edge fades to say there is more, until
+   it is scrolled to the end. Without scripts the fade shows wherever a pan is narrow enough to
+   need it; register.js shows it exactly while there is more. */
+.pan{position:relative;min-width:0}
+.pan::after{content:"";position:absolute;top:1px;right:1px;bottom:1px;width:36px;border-radius:0 var(--pan-r,12px) var(--pan-r,12px) 0;background:linear-gradient(to right,color-mix(in srgb,var(--sheet) 0%,transparent),var(--sheet) 85%);pointer-events:none;opacity:0;transition:opacity .2s}
+@media (max-width:560px){:root:not(.js) .pan::after{opacity:1}}
+.pan.is-more::after{opacity:1}
 .foot{padding-block:64px 48px;font-size:12.5px;color:var(--faint)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:560px){.top-row{flex-wrap:wrap;row-gap:4px;padding-block:10px 8px}.seg{width:100%;margin-right:0;margin-left:-10px}}
@@ -219,10 +228,15 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .cov th,.cov td{padding:5px 10px;text-align:center;border-top:1px solid var(--hair);white-space:nowrap}
 .cov thead th{position:sticky;top:0;background:var(--sheet);z-index:2;font-weight:500;font-size:11.5px;color:var(--muted);border-top:0;cursor:help}
 .cov tbody th{text-align:left;font-weight:400;position:sticky;left:0;background:var(--sheet);z-index:1}
+/* the law column stays as the rest scrolls under it, behind an edge that says so */
+.cov thead th:first-child{text-align:left;left:0;z-index:3}
+.cov tbody tr:not(.cov-band) th,.cov thead th:first-child{box-shadow:inset -1px 0 0 var(--hair-2)}
 .cov tbody th a{text-decoration:none}
 .cov tbody th code{font-size:11.5px}
 .cov .sh{color:var(--muted);text-align:left}
 .cov .cov-band th{text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground);position:static}
+/* a layer's name stays in sight as its row scrolls */
+.cov .cov-band th span{position:sticky;left:10px}
 .cov tbody tr:not(.cov-band):hover td,.cov tbody tr:not(.cov-band):hover th{background:color-mix(in srgb,var(--ground) 50%,var(--sheet))}
 .cov .z{color:var(--faint)}
 .cov .ok{color:var(--ink)}
@@ -232,7 +246,11 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 /* the map */
 .map-wrap{display:grid;gap:10px;min-width:0}
 .map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;position:relative}
-.map svg{display:block;height:auto}
+/* The map shrinks to 85% of its natural width and no further; on a phone it keeps its natural
+   width, so a label stays at 11px, and pans. */
+.map-pan{--pan-r:14px}
+.map svg{display:block;height:auto;min-width:calc(var(--w) * .85);max-width:var(--w)}
+@media (max-width:560px){.map svg{min-width:var(--w)}}
 .map .band{fill:var(--ground);opacity:.55}
 .map .band.alt{opacity:0}
 .map .band-l{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;fill:var(--faint)}
@@ -279,10 +297,10 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   </div>
   <div class="stack">
     <p class="cov-sum">63 laws are theorems and 4 hold by construction; for 23, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>
-    <div class="cov-scroll"><table class="cov">
+    <div class="pan"><div class="cov-scroll"><table class="cov">
       <thead><tr><th scope="col">law</th><th scope="col">shape</th><th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th><th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th><th scope="col" title="the JS writer runs at least one of its vectors">JS</th><th scope="col">demo</th><th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>
       <tbody>
-        <tr class="cov-band"><th scope="rowgroup" colspan="9">Record</th></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>Record</span></th></tr>
         <tr><th scope="row"><a href="#law-content-order"><code>content order</code></a></th><td class="sh">Order</td><td>5</td><td>4</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/latest-by/05-emitted-breaks-tie, fold/latest-by/06-id-breaks-tie, fold/latest-by/12-emitted-without-occurred, fold/latest-by/13-span-order">−4</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / 5</td></tr>
         <tr><th scope="row"><a href="#law-batch-meaning"><code>batch.meaning</code></a></th><td class="sh">Exactness</td><td>1</td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-batch-refuse"><code>batch.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>8</td><td>8</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
@@ -300,10 +318,10 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row"><a href="#law-occurred-moment"><code>occurred.moment</code></a></th><td class="sh">Invariance</td><td>4</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-occurred-order"><code>occurred.order</code></a></th><td class="sh">Order</td><td>3</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
         <tr><th scope="row"><a href="#law-occurred-refuse"><code>occurred.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>2</td><td>1</td><td><span class="off" title="cited, not naming it: record/34-occurred-duration">−1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
-        <tr class="cov-band"><th scope="rowgroup" colspan="9">Store</th></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>Store</span></th></tr>
         <tr><th scope="row"><a href="#law-input-distinct"><code>input.distinct</code></a></th><td class="sh">Exactness</td><td>3</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 3</td></tr>
         <tr><th scope="row"><a href="#law-input-union"><code>input.union</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
-        <tr class="cov-band"><th scope="rowgroup" colspan="9">View</th></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>View</span></th></tr>
         <tr><th scope="row"><a href="#law-view-no-resurrection"><code>view.no-resurrection</code></a></th><td class="sh">Invariance</td><td>3</td><td>4</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/view/01-withheld-head-still-supersedes, fold/view/02-erased-head-still-supersedes, fold/view/03-withheld-ancestor, fold/view/04-max-counts-unread-heads">−4</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td>1 / 2</td></tr>
         <tr><th scope="row"><a href="#law-view-refines"><code>view.refines</code></a></th><td class="sh">Refinement</td><td>1</td><td>1</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/select/01-payload-test-on-withheld">−1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-settle-set"><code>settle.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>3</td><td>4</td><td><span class="off" title="naming it, not cited: realm/09-revision-erases">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
@@ -313,7 +331,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row"><a href="#law-admit-no-cross"><code>admit.no-cross</code></a></th><td class="sh">Exactness</td><td>1</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-view-no-resurrection-things"><code>view.no-resurrection (things)</code></a></th><td class="sh">Invariance</td><td>3</td><td>5</td><td>6</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / 1</td></tr>
         <tr><th scope="row"><a href="#law-view-refines-where"><code>view.refines (where)</code></a></th><td class="sh">Refinement</td><td>3</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
-        <tr class="cov-band"><th scope="rowgroup" colspan="9">State</th></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>State</span></th></tr>
         <tr><th scope="row"><a href="#law-incremental-batch"><code>incremental = batch</code></a></th><td class="sh">Invariance</td><td>2</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 2</td></tr>
         <tr><th scope="row"><a href="#law-count-perm"><code>count.perm</code></a></th><td class="sh">Invariance</td><td>1</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-count-repeats"><code>count.repeats</code></a></th><td class="sh">Limit</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
@@ -345,7 +363,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row"><a href="#law-spec-set"><code>spec.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>9</td><td>10</td><td><span class="off" title="naming it, not cited: scenario/01-decision">+1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>5 / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-spec-after-supersession"><code>spec.after-supersession</code></a></th><td class="sh">Exactness</td><td>3</td><td>3</td><td>2</td><td><span class="off" title="cited, not naming it: spec/run/03-withheld-successor">−1</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>4 / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-spec-parse"><code>spec.parse</code></a></th><td class="sh">Round trip</td><td>6</td><td>61</td><td>61</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
-        <tr class="cov-band"><th scope="rowgroup" colspan="9">Text</th></tr>
+        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>Text</span></th></tr>
         <tr><th scope="row"><a href="#law-lens-escaping"><code>lens.escaping</code></a></th><td class="sh">Round trip</td><td>2</td><td>2</td><td>2</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-lens-round-trip"><code>lens.round-trip</code></a></th><td class="sh">Round trip</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span> / 3</td></tr>
         <tr><th scope="row"><a href="#law-lens-no-op"><code>lens.no-op</code></a></th><td class="sh">Round trip</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
@@ -355,7 +373,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row"><a href="#law-normal-form"><code>normal form</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-lens-refuse"><code>lens.refuse</code></a></th><td class="sh">Exactness</td><td><span class="c" title="by construction">c</span></td><td>3</td><td>3</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
       </tbody>
-    </table></div>
+    </table></div></div>
   </div>
 </section>
 
@@ -369,8 +387,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <p>The map is laid out when the page is built: the same laws and proofs always draw the same map.</p>
   </div>
   <div class="map-wrap">
-    <div class="map" id="lawmap">
-<svg viewBox="0 0 773 866" width="100%" style="min-width:657px;max-width:773px" role="group" aria-label="Which laws each law's proof rests on">
+    <div class="pan map-pan"><div class="map" id="lawmap">
+<svg viewBox="0 0 773 866" width="100%" style="--w:773px" role="group" aria-label="Which laws each law's proof rests on">
 <g class="bands"><rect class="band" x="0" y="7" width="773" height="100"/><text class="band-l" x="14" y="61">Text</text><rect class="band alt" x="0" y="139" width="773" height="268"/><text class="band-l" x="14" y="277">State</text><rect class="band" x="0" y="439" width="773" height="100"/><text class="band-l" x="14" y="493">View</text><rect class="band alt" x="0" y="571" width="773" height="100"/><text class="band-l" x="14" y="625">Store</text><rect class="band" x="0" y="703" width="773" height="156"/><text class="band-l" x="14" y="785">Record</text></g>
 <g class="edges">
 <g class="edge" data-a="law-acc-late" data-b="law-acc-set" data-via="Acc.late → Acc.set_decides"><path class="hit" d="M132.5 174 C132.5 217,129 217,129 260"/><path class="line" d="M132.5 174 C132.5 217,129 217,129 260"/></g>
@@ -444,7 +462,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <a class="node" href="#law-write-member-order" data-id="law-write-member-order" transform="translate(615.8 712)"><title>write.member-order</title><rect width="139" height="26" rx="7"/><text x="10" y="17">write.member-order</text></a>
 </g>
 </svg>
-    </div>
+    </div></div>
     <p class="map-note" id="map-note" aria-live="polite"></p>
     <p class="note">35 laws stand alone: their proofs use no other law's theorem. <a class="lawref" href="#law-count-perm"><code>count.perm</code></a> <a class="lawref" href="#law-count-repeats"><code>count.repeats</code></a> <a class="lawref" href="#law-sum-perm"><code>sum.perm</code></a> <a class="lawref" href="#law-sum-repeats"><code>sum.repeats</code></a> <a class="lawref" href="#law-extrema-set"><code>extrema.set</code></a> <a class="lawref" href="#law-heads-why"><code>heads.why</code></a> <a class="lawref" href="#law-view-refines"><code>view.refines</code></a> <a class="lawref" href="#law-result-full"><code>result.full</code></a> <a class="lawref" href="#law-settle-set"><code>settle.set</code></a> <a class="lawref" href="#law-settle-keeps"><code>settle.keeps</code></a> <a class="lawref" href="#law-settle-erased"><code>settle.erased</code></a> <a class="lawref" href="#law-admit-no-cross"><code>admit.no-cross</code></a> <a class="lawref" href="#law-where-complements"><code>where.complements</code></a> <a class="lawref" href="#law-where-fields"><code>where.fields</code></a> <a class="lawref" href="#law-where-time"><code>where.time</code></a> <a class="lawref" href="#law-where-total"><code>where.total</code></a> <a class="lawref" href="#law-where-set"><code>where.set</code></a> <a class="lawref" href="#law-view-refines-where"><code>view.refines (where)</code></a> <a class="lawref" href="#law-spec-select"><code>spec.select</code></a> <a class="lawref" href="#law-spec-from-thing"><code>spec.from-thing</code></a> <a class="lawref" href="#law-batch-meaning"><code>batch.meaning</code></a> <a class="lawref" href="#law-batch-refuse"><code>batch.refuse</code></a> <a class="lawref" href="#law-batch-refuse-order"><code>batch.refuse-order</code></a> <a class="lawref" href="#law-lens-put-get"><code>lens.put-get</code></a> <a class="lawref" href="#law-lens-nothing-dropped"><code>lens.nothing-dropped</code></a> <a class="lawref" href="#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a> <a class="lawref" href="#law-lens-refuse"><code>lens.refuse</code></a> <a class="lawref" href="#law-record-erasure"><code>record.erasure</code></a> <a class="lawref" href="#law-record-commit"><code>record.commit</code></a> <a class="lawref" href="#law-record-refuse"><code>record.refuse</code></a> <a class="lawref" href="#law-write-checked"><code>write.checked</code></a> <a class="lawref" href="#law-occurred-span"><code>occurred.span</code></a> <a class="lawref" href="#law-occurred-qualifier"><code>occurred.qualifier</code></a> <a class="lawref" href="#law-occurred-moment"><code>occurred.moment</code></a> <a class="lawref" href="#law-occurred-refuse"><code>occurred.refuse</code></a></p>
   </div>
@@ -1295,6 +1313,19 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   <p>Built from <code>design/evidence/</code>, <code>design/laws/</code> and <code>protocol/laws.md</code> by <code>node design/build.mjs</code>; the proof graph is <code>design/laws/proofs.json</code>, written by <code>lake exe proofs</code>.</p>
 </footer>
 
+<script>
+// What every page built on design/page.mjs does: a .pan says whether there is more of it to
+// the right, so its fade shows exactly while there is (design/register.css).
+(() => {
+  for (const pan of document.querySelectorAll(".pan")) {
+    const s = pan.firstElementChild;
+    const more = () => pan.classList.toggle("is-more", s.scrollLeft + s.clientWidth < s.scrollWidth - 1);
+    s.addEventListener("scroll", more, { passive: true });
+    addEventListener("resize", more);
+    more();
+  }
+})();
+</script>
 <script>
 const MAP_NOTES = {"law-incremental-batch":{"label":"incremental = batch","sentence":"Change <span class=\"var\">folding in parts or all at once</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-set":{"label":"latest-by.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every thing's state, its heads and winner</span> stays."},"law-latest-by-order":{"label":"latest-by.order","sentence":"The winner is a head, a record nothing about its thing names in <code>prev</code>, and newer than every other head by content order: span, then <code>emitted</code>, then id."},"law-content-order":{"label":"content order","sentence":"Any two records with different ids order one way: by span, then <code>emitted</code>, then id. Never by how a time is spelled."},"law-latest-by-repeats":{"label":"latest-by.repeats","sentence":"Change <span class=\"var\">delivering records again</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-converge":{"label":"latest-by.converge","sentence":"Change <span class=\"var\">which way two places sync</span>, and <span class=\"inv\">the state both reach</span> stays."},"law-latest-set-latest-repeats":{"label":"latest.set …","sentence":"Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">Latest's winner</span> stays."},"law-input-distinct":{"label":"input.distinct","sentence":"A fold is handed each id exactly once: the realm's union removes repeats."},"law-input-union":{"label":"input.union","sentence":"Change <span class=\"var\">which place is read first</span>, and <span class=\"inv\">the union</span> stays."},"law-acc-set":{"label":"acc.set","sentence":"Change <span class=\"var\">the order, for any step that commutes</span>, and <span class=\"inv\">the state</span> stays."},"law-acc-late":{"label":"acc.late","sentence":"Change <span class=\"var\">whether a late record, not yet folded, is folded onto the cached state or the whole set refolded</span>, and <span class=\"inv\">the new state</span> stays."},"law-heads-set":{"label":"heads.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">any answer worked out from the heads</span> stays."},"law-heads-late":{"label":"heads.late","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached heads or the whole set refolded</span>, and <span class=\"inv\">any answer worked out from the new heads</span> stays."},"law-view-no-resurrection":{"label":"view.no-resurrection","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the heads, by id</span> stays."},"law-result-unread":{"label":"result.unread","sentence":"Max over heads counts the heads whose payload it doesn't hold, instead of guessing at them."},"law-select-set":{"label":"select.set","sentence":"Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">what is read and what is unread</span> stays."},"law-admit-set":{"label":"admit.set","sentence":"A record is refused exactly when it isn't entitled to its <code>prev</code>, and that depends only on the set."},"law-thing-local":{"label":"thing.local","sentence":"Change <span class=\"var\">the records about other things, once records are settled and admitted</span>, and <span class=\"inv\">this thing's state</span> stays."},"law-view-no-resurrection-things":{"label":"view.no-resurrection (things)","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">which records are admitted, and each thing's heads, by id</span> stays."},"law-where-typed":{"label":"where.typed","sentence":"A test is accepted exactly when its argument fits its field, and renders back as it was written."},"law-spec-set":{"label":"spec.set","sentence":"Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">every slot of every spec</span> stays."},"law-spec-after-supersession":{"label":"spec.after-supersession","sentence":"A slot over heads returns only records that are a head of some thing, that <code>from</code> takes and every test holds for."},"law-spec-parse":{"label":"spec.parse","sentence":"An accepted spec's parsed form parses back to itself, and the parser gives exactly the specs that fit."},"law-lens-escaping":{"label":"lens.escaping","sentence":"Any body survives rendering and parsing, backslashes and all."},"law-lens-round-trip":{"label":"lens.round-trip","sentence":"Render, then parse, and you get back what you rendered."},"law-lens-no-op":{"label":"lens.no-op","sentence":"Parse an unedited render and there is nothing to apply."},"law-normal-form":{"label":"normal form","sentence":"Change <span class=\"var\">normalizing text that is already normal</span>, and <span class=\"inv\">the text</span> stays."},"law-record-sets":{"label":"record.sets","sentence":"Change <span class=\"var\">the order of <code>about</code>, <code>prev</code> or <code>erases</code>, and repeats in them</span>, and <span class=\"inv\">the id</span> stays."},"law-record-member-order":{"label":"record.member-order","sentence":"Change <span class=\"var\">the order of an object's members, their names distinct</span>, and <span class=\"inv\">its canonical bytes</span> stays."},"law-utf-16-order":{"label":"UTF-16 order","sentence":"Any two distinct strings order one way, by UTF-16 code units."},"law-write-member-order":{"label":"write.member-order","sentence":"Change <span class=\"var\">the order of a written payload's members</span>, and <span class=\"inv\">its commitment</span> stays."},"law-occurred-order":{"label":"occurred.order","sentence":"Spans order by start, then end, an open end last: every store orders them the same."}};
 </script>

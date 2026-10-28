@@ -39,6 +39,8 @@ export function renderLaws(root) {
   // The demos: a vector that names its law, the inputs it varies, and what the model gave. Each
   // variant has what is shown (html), the model's answer to it (said) and the name it goes by in
   // the trail; `done` is what the card may say once every variant the vector holds has been shown.
+  // `fig` is what the card's figure draws from the same vector (shapes.mjs, `given`): one lane
+  // per variant, in the card's letters, so the figure never shows other records or orders.
   const demos = data.demos.map((d) => demo(d));
   function demo(d) {
     const v = files.get(d.vector) ?? fail(`demo ${d.law}: no vector ${d.vector}`);
@@ -68,6 +70,8 @@ export function renderLaws(root) {
       const label = lettering(v);
       const a = answerOf(d.vector, v.expect, label);
       out.variants = os.map((o, i) => ({ label: `order ${i + 1} of ${os.length}`, key: `order ${i + 1}`, html: order(label, o), said: a.said }));
+      // A record shown without its payload (withheld, erased) is drawn dashed, as the figures draw one not held.
+      out.fig = { change: d.change, lanes: os.map((o) => o.map((r) => ({ k: label(r.id), mod: r.shown ? "withheld" : "" }))) };
       out.answer = a.html;
       out.done = d.done ? d.done.replace("{n}", `all ${os.length}`) : `Same ${d.stays} for all ${os.length} orders the vector holds.`;
       if (d.note) out.note = d.note;
@@ -85,6 +89,7 @@ export function renderLaws(root) {
         { label: `delivered again`, key: "delivered again", html: order(label, v.input.orders[0]), answer: twice.html, said: twice.said },
       ];
       out.done = `On this vector the ${d.stays} moves, ${once.said} to ${twice.said}.`;
+      out.fig = { lane: v.input.orders[0].map((r) => label(r.id)), held: once.said, moved: twice.said };
     } else if (d.kind === "envs") {
       if (v.input.envs.length < 2) fail(`demo ${d.law}: one envelope is nothing to vary`);
       // The spellings may differ only in what the canonical form removes: a set's order and repeats.
@@ -98,6 +103,11 @@ export function renderLaws(root) {
           `<pre class="jv">[${e.about.map((x) => `<span data-k="${esc(x)}">${esc(x)}</span>`).join(", ")}]</pre></div>` }));
       out.answer = `id ${id}`;
       out.done = `Same id for all ${v.input.envs.length} spellings the vector holds.`;
+      // The figure spells each thing by its scheme (topic, svc, url), which must tell them apart.
+      const scheme = (x) => x.replace(/:.*$/, "");
+      const things = [...new Set(v.input.envs.flatMap((e) => e.about))];
+      if (new Set(things.map(scheme)).size !== things.length) fail(`demo ${d.law}: two things share a scheme, so the figure can't tell them apart`);
+      out.fig = { change: d.change, lanes: v.input.envs.map((e) => [{ k: "A" }, { t: `[${e.about.map(scheme).join(", ")}]`, code: true }]) };
       out.note = `One id for every spelling: the envelope is written in its canonical form, sorted with repeats removed, before it is hashed. The JS writer computes the same id.`;
     } else if (d.kind === "lines") {
       for (const f of ["line", "erased_line"]) if (!v.expect[f].includes(`"id":"${v.expect.id}"`)) fail(`demo ${d.law}: ${f} doesn't carry the id`);
@@ -112,6 +122,7 @@ export function renderLaws(root) {
       ];
       out.answer = `id ${id}`;
       out.done = "Same id for both lines the vector holds.";
+      out.fig = { change: d.change, lanes: [[{ k: "A" }, { t: out.variants[0].key }], [{ k: "A", mod: "withheld" }, { t: out.variants[1].key }]] };
       out.note = "Both lines are the vector's own; each carries this id. The id hashes the commitment, never the payload, so forgetting the opening can't move it.";
     } else if (d.kind === "spans") {
       const picked = d.pick.map((i) => [v.input.occurred[i], v.expect.spans[i]]);
@@ -120,6 +131,7 @@ export function renderLaws(root) {
       out.variants = picked.map(([t], i) => ({ label: `spelling ${i + 1} of ${picked.length}`, key: `spelling ${i + 1}`, html: `<pre class="jv big">${esc(t)}</pre>`, said: span }));
       out.answer = span;
       out.done = `Same span for all ${picked.length} spellings this card picks from the vector.`;
+      out.fig = { change: d.change, lanes: picked.map(([t]) => [{ t, code: true }]) };
     } else if (d.kind === "lens") {
       const ids = (ss) => ss.map((s) => s.id).join(", ");
       const sections = (ss) => `<pre class="jv">${ss.map((s) => `<span data-k="${esc(s.id)}"><b>${esc(s.id)}</b>  ${esc(s.body.filter(Boolean).join(" / "))}</span>`).join("\n")}</pre>`;
@@ -132,6 +144,9 @@ export function renderLaws(root) {
           said: `<code>${esc(ids(v.expect.parsed))}</code>${absent.length ? ` · absent <code>${absent.join(", ")}</code>` : ""}` },
       ];
       out.answer = sections(target);
+      // A round trip draws the form's sections; an invariance, the sections each variant holds.
+      out.fig = { change: d.change, forms: v.input.base.length,
+        lanes: [v.input.base, v.expect.parsed].map((ss) => [{ t: ss.map((s) => s.id).join(", "), code: true }]) };
       out.done = absent.length
         ? `Parsing reports ${absent.map((a) => `<code>${a}</code>`).join(", ")} as absent, and applying changes nothing: the section is still there.`
         : "Parsing the render gives the sections back, exactly.";
@@ -171,7 +186,15 @@ export function renderLaws(root) {
         ` <span class="t-in">${esc(label)}</span></li>` };
   };
 
-  const figure = (key) => `      <div class="demo-fig">${shapeFigure(law(key).shape, { ...law(key), key })}</div>\n`;
+  const figure = (key, given) => `      <div class="demo-fig">${shapeFigure(law(key).shape, { ...law(key), key }, given)}</div>\n`;
+  // A card's figure is drawn from its vector: one lane per variant, read off the figure as built.
+  const cardFigure = (d) => {
+    const f = figure(d.key, d.fig);
+    const lanes = [...new Set([...f.matchAll(/ data-lane="(\d+)"/g)].map((m) => Number(m[1])))].sort((a, b) => a - b);
+    if (lanes.length !== d.variants.length || lanes.some((l, i) => l !== i))
+      fail(`demo ${d.law}: its figure draws ${lanes.length} lane${lanes.length === 1 ? "" : "s"} for the card's ${d.variants.length} variants`);
+    return f;
+  };
   const trailOf = (items, done) =>
     `      <ol class="trail" aria-label="What this card has shown" aria-live="polite">${items.join("")}</ol>\n` +
     (done ? `      <p class="trail-done">${done}</p>\n` : "");
@@ -181,7 +204,7 @@ export function renderLaws(root) {
     return `    <article class="demo${d.shape === "limit" ? " is-limit" : ""}" id="try-${slug(d.law)}" data-demo="${i}">\n` +
       `      <p class="demo-s">${sentence(law(d.key))}</p>\n` +
       (law(d.key).scope ? `      <p class="law-scope">${law(d.key).scope}</p>\n` : "") +
-      figure(d.key) +
+      cardFigure(d) +
       `      <div class="demo-in">${d.variants.map((x, j) => `<div class="variant" data-v="${j}"><p class="variant-l">${x.label}</p>${x.html}</div>`).join("")}</div>\n` +
       `      <div class="demo-ctl"><button type="button" class="poke">${d.change} <span aria-hidden="true">↻</span></button>${p ? p.ctl : ""}</div>\n` +
       (p ? "      " + p.note : "") +
@@ -280,7 +303,7 @@ export function renderLaws(root) {
   const bullets = (heading) => (notes[heading] ?? fail(`laws.md has no notes under ${heading}`)).map((b) => {
     const m = b.match(/^\*\*(.+?)\*\*\s*(.*)$/);
     return m ? `      <div class="row"><div class="row-k wide"><b>${inline(m[1])}</b></div><div class="row-v"><p>${inline(m[2])}</p></div></div>\n`
-      : `      <div class="row"><div class="row-v"><p>${inline(b)}</p></div></div>\n`;
+      : `      <div class="row is-full"><div class="row-v"><p>${inline(b)}</p></div></div>\n`;
   }).join("");
 
   const top = header("laws", [["sentence", "Sentence"], ["overview", "Overview"], ["questions", "Questions"], ["stop", "Edges"]]);

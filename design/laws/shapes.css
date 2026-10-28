@@ -33,6 +33,12 @@
 .sg-state.is-moved rect{fill:var(--alert-soft);stroke:var(--alert)}
 .sg-state.is-moved .sg-cap{fill:var(--alert)}
 
+/* a Try card's figure, drawn from its vector: with scripts, the lane of the variant on show is
+   lit and the rest dimmed, so the figure, the records and the trail move together */
+.shape-fig.is-stepping [data-lane]{opacity:.3;transition:opacity .25s}
+.shape-fig.is-stepping [data-lane].is-on{opacity:1}
+.shape-fig.is-stepping [data-lane].is-on .sg-lane{stroke:var(--ink);stroke-width:1}
+
 /* invariance */
 .sg-lane{fill:var(--sunk)}
 .sg-cut{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:2 2}

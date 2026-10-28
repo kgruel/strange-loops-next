@@ -113,9 +113,18 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .row-k b{font-family:var(--mono);font-weight:500;font-size:14px}
 .row-k.wide{font-size:14px}
 .row-v{display:grid;gap:6px;font-size:14px}
+/* a row with no label: its words take the label's column too */
+.row.is-full .row-v{grid-column:1/-1}
 .row.is-settled .row-k b{color:var(--muted)}
 .made{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 @media (max-width:560px){.row{grid-template-columns:1fr}}
+/* a sideways scroller wider than the screen: its right edge fades to say there is more, until
+   it is scrolled to the end. Without scripts the fade shows wherever a pan is narrow enough to
+   need it; register.js shows it exactly while there is more. */
+.pan{position:relative;min-width:0}
+.pan::after{content:"";position:absolute;top:1px;right:1px;bottom:1px;width:36px;border-radius:0 var(--pan-r,12px) var(--pan-r,12px) 0;background:linear-gradient(to right,color-mix(in srgb,var(--sheet) 0%,transparent),var(--sheet) 85%);pointer-events:none;opacity:0;transition:opacity .2s}
+@media (max-width:560px){:root:not(.js) .pan::after{opacity:1}}
+.pan.is-more::after{opacity:1}
 .foot{padding-block:64px 48px;font-size:12.5px;color:var(--faint)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:560px){.top-row{flex-wrap:wrap;row-gap:4px;padding-block:10px 8px}.seg{width:100%;margin-right:0;margin-left:-10px}}

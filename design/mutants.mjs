@@ -59,6 +59,8 @@ const MUTANTS = [
   ["a premise case that no card shows", "design/laws/render.mjs", swap("else alone.push(c);", "else if (c.law === \"\") alone.push(c);")],
   ["a note under a question nobody asks", "design/laws/laws.json", json((d) => { d.questionNotes["no-such"] = "x"; })],
   ["a card quoting a README sentence that changed", "vectors/README.md", swap("reader holding everything gets", "reader holding anything gets")],
+  ["a Try card's figure drawn from its law, not its vector", "design/laws/render.mjs", swap("const f = figure(d.key, d.fig);", "const f = figure(d.key);")],
+  ["a Try card's figure missing one of the vector's orders", "design/laws/render.mjs", swap("lanes: os.map((o) =>", "lanes: os.slice(1).map((o) =>")],
   ["a link to a law's evidence that lands nowhere", "design/evidence/render.mjs", swap('" id="${anchor(r.key)}" data-shape', '" id="card-${slug(r.key)}" data-shape')],
 ];
 

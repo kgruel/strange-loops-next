@@ -82,7 +82,7 @@ export function renderEvidence(root) {
   const coverRows = [...layers].reverse().map((layer) => {
     const rs = rows.filter((r) => law(r.key).layer === layer);
     if (!rs.length) return "";
-    return `        <tr class="cov-band"><th scope="rowgroup" colspan="9">${layer}</th></tr>\n` + rs.map((r) => {
+    return `        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>${layer}</span></th></tr>\n` + rs.map((r) => {
       const listed = cited.get(r.key), named = naming.get(r.key);
       const unnamed = listed.filter((x) => !named.includes(x)), uncited = named.filter((x) => !listed.includes(x));
       const agree = !listed.length && !named.length ? dash
@@ -100,11 +100,11 @@ export function renderEvidence(root) {
   const byConstructionCount = rows.filter((r) => !resolved.get(r.key).length && r.byConstruction).length;
   const coverage = `    <p class="cov-sum">${byTheorem} laws are theorems and ${byConstructionCount} hold by construction; ` +
     `for ${disagree}, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>\n` +
-    `    <div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
+    `    <div class="pan"><div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
     `<th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th>` +
     `<th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th>` +
     `<th scope="col" title="the JS writer runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
-    `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div>\n`;
+    `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div></div>\n`;
 
   // What rests on what: the laws joined by a proof, laid out when the page is built.
   const connected = new Set(edges.flat());

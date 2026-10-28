@@ -56,10 +56,15 @@
 .cov th,.cov td{padding:5px 10px;text-align:center;border-top:1px solid var(--hair);white-space:nowrap}
 .cov thead th{position:sticky;top:0;background:var(--sheet);z-index:2;font-weight:500;font-size:11.5px;color:var(--muted);border-top:0;cursor:help}
 .cov tbody th{text-align:left;font-weight:400;position:sticky;left:0;background:var(--sheet);z-index:1}
+/* the law column stays as the rest scrolls under it, behind an edge that says so */
+.cov thead th:first-child{text-align:left;left:0;z-index:3}
+.cov tbody tr:not(.cov-band) th,.cov thead th:first-child{box-shadow:inset -1px 0 0 var(--hair-2)}
 .cov tbody th a{text-decoration:none}
 .cov tbody th code{font-size:11.5px}
 .cov .sh{color:var(--muted);text-align:left}
 .cov .cov-band th{text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground);position:static}
+/* a layer's name stays in sight as its row scrolls */
+.cov .cov-band th span{position:sticky;left:10px}
 .cov tbody tr:not(.cov-band):hover td,.cov tbody tr:not(.cov-band):hover th{background:color-mix(in srgb,var(--ground) 50%,var(--sheet))}
 .cov .z{color:var(--faint)}
 .cov .ok{color:var(--ink)}
@@ -69,7 +74,11 @@
 /* the map */
 .map-wrap{display:grid;gap:10px;min-width:0}
 .map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;position:relative}
-.map svg{display:block;height:auto}
+/* The map shrinks to 85% of its natural width and no further; on a phone it keeps its natural
+   width, so a label stays at 11px, and pans. */
+.map-pan{--pan-r:14px}
+.map svg{display:block;height:auto;min-width:calc(var(--w) * .85);max-width:var(--w)}
+@media (max-width:560px){.map svg{min-width:var(--w)}}
 .map .band{fill:var(--ground);opacity:.55}
 .map .band.alt{opacity:0}
 .map .band-l{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;fill:var(--faint)}

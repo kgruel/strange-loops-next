@@ -76,6 +76,7 @@
   // one variant at a time, and the trail starts with the first answer and gains one for each
   // variant the reader asks for; when all are shown, the card says so, in words scoped to the
   // vector. The premise button takes the law's premise away and adds what the model then says.
+  // The card's figure is drawn from the same vector, a lane per variant: the lane on show is lit.
   const appear = (el) => animate(el, { opacity: [0, 1], transform: ["translateY(4px)", "translateY(0px)"] }, spring(380, 26));
   for (const demo of $$(".demo")) {
     const variants = $$(".variant", demo);
@@ -86,12 +87,15 @@
     const done = $(".trail-done", demo);
     const poke = $(".poke", demo), unpremise = $(".unpremise", demo);
     const compact = demo.classList.contains("is-compact");
+    const fig = $(".demo-fig svg", demo), lanes = fig ? $$("[data-lane]", fig) : [];
+    if (lanes.length) fig.classList.add("is-stepping");
     const seen = new Set([0]);
     let at = 0;
     const view = (i) => {
       at = i;
       variants.forEach((v, k) => (v.hidden = k !== at));
       answers.forEach((a, k) => (a.hidden = k !== at));
+      lanes.forEach((l) => l.classList.toggle("is-on", Number(l.dataset.lane) === at));
     };
     view(0);
     entries.forEach((li, k) => (li.hidden = k > 0));

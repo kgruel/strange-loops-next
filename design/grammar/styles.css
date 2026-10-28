@@ -102,7 +102,7 @@
 
 /* matrix */
 .matrix-wrap{display:grid;gap:10px;min-width:0}
-.matrix-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
+.matrix-scroll{position:relative;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
 .matrix{border-collapse:separate;border-spacing:0;width:100%}
 .matrix th,.matrix td{padding:0;text-align:center;border-top:1px solid var(--hair);height:34px;min-width:34px}
 .matrix thead th{border-top:0;height:96px;vertical-align:bottom;padding-bottom:8px;font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted)}
@@ -119,14 +119,13 @@
 .matrix-note b{color:var(--ink);font-family:var(--mono);font-weight:500}
 
 
-/* Narrow screens: the steps become a row above the stage, and the step's words follow it,
-   so a tap and its result are on screen together. */
+/* Narrow screens: the steps wrap into rows above the stage, every one in sight, and the step's
+   words follow the stage, so a tap and its result are on screen together. */
 @media (max-width:899px){
   #walk .side{display:contents}
   #walk .side>h2{order:0}
   #walk .side>p{order:1}
-  #walk .steps{order:2;display:flex;overflow-x:auto;scrollbar-width:none;gap:4px 14px;margin:0;padding-bottom:2px}
-  #walk .steps::-webkit-scrollbar{display:none}
+  #walk .steps{order:2;display:flex;flex-wrap:wrap;gap:2px 16px;margin:0}
   #walk .steps button{white-space:nowrap}
   #walk .stage{order:3;min-height:0}
   #walk .step-text{order:4;min-height:0;margin-top:-8px}

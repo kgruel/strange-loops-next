@@ -127,9 +127,18 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .row-k b{font-family:var(--mono);font-weight:500;font-size:14px}
 .row-k.wide{font-size:14px}
 .row-v{display:grid;gap:6px;font-size:14px}
+/* a row with no label: its words take the label's column too */
+.row.is-full .row-v{grid-column:1/-1}
 .row.is-settled .row-k b{color:var(--muted)}
 .made{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 @media (max-width:560px){.row{grid-template-columns:1fr}}
+/* a sideways scroller wider than the screen: its right edge fades to say there is more, until
+   it is scrolled to the end. Without scripts the fade shows wherever a pan is narrow enough to
+   need it; register.js shows it exactly while there is more. */
+.pan{position:relative;min-width:0}
+.pan::after{content:"";position:absolute;top:1px;right:1px;bottom:1px;width:36px;border-radius:0 var(--pan-r,12px) var(--pan-r,12px) 0;background:linear-gradient(to right,color-mix(in srgb,var(--sheet) 0%,transparent),var(--sheet) 85%);pointer-events:none;opacity:0;transition:opacity .2s}
+@media (max-width:560px){:root:not(.js) .pan::after{opacity:1}}
+.pan.is-more::after{opacity:1}
 .foot{padding-block:64px 48px;font-size:12.5px;color:var(--faint)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:560px){.top-row{flex-wrap:wrap;row-gap:4px;padding-block:10px 8px}.seg{width:100%;margin-right:0;margin-left:-10px}}
@@ -253,7 +262,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 
 /* matrix */
 .matrix-wrap{display:grid;gap:10px;min-width:0}
-.matrix-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
+.matrix-scroll{position:relative;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
 .matrix{border-collapse:separate;border-spacing:0;width:100%}
 .matrix th,.matrix td{padding:0;text-align:center;border-top:1px solid var(--hair);height:34px;min-width:34px}
 .matrix thead th{border-top:0;height:96px;vertical-align:bottom;padding-bottom:8px;font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted)}
@@ -270,14 +279,13 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .matrix-note b{color:var(--ink);font-family:var(--mono);font-weight:500}
 
 
-/* Narrow screens: the steps become a row above the stage, and the step's words follow it,
-   so a tap and its result are on screen together. */
+/* Narrow screens: the steps wrap into rows above the stage, every one in sight, and the step's
+   words follow the stage, so a tap and its result are on screen together. */
 @media (max-width:899px){
   #walk .side{display:contents}
   #walk .side>h2{order:0}
   #walk .side>p{order:1}
-  #walk .steps{order:2;display:flex;overflow-x:auto;scrollbar-width:none;gap:4px 14px;margin:0;padding-bottom:2px}
-  #walk .steps::-webkit-scrollbar{display:none}
+  #walk .steps{order:2;display:flex;flex-wrap:wrap;gap:2px 16px;margin:0}
   #walk .steps button{white-space:nowrap}
   #walk .stage{order:3;min-height:0}
   #walk .step-text{order:4;min-height:0;margin-top:-8px}
@@ -620,7 +628,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <p>Rows are nouns, columns verbs. A filled cell says what the verb does to the noun. The grid is sparse on purpose: each verb has a narrow job, and the record is the one noun every verb touches.</p>
   </div>
   <div class="matrix-wrap">
-    <div class="matrix-scroll">
+    <div class="pan"><div class="matrix-scroll">
     <table class="matrix">
       <thead><tr><th scope="col"></th><th scope="col"><span>emit</span></th><th scope="col"><span>refuse</span></th><th scope="col"><span>settle</span></th><th scope="col"><span>admit</span></th><th scope="col"><span>take</span></th><th scope="col"><span>test</span></th><th scope="col"><span>fold</span></th><th scope="col"><span>follow</span></th><th scope="col" class="is-settled"><span>tick</span></th><th scope="col"><span>render</span></th><th scope="col"><span>parse</span></th><th scope="col" class="is-settled"><span>apply</span></th></tr></thead>
       <tbody>
@@ -634,7 +642,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row">lens</th><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">malformed text</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td><span class="sr">—</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">state as text</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">text read back</span></td><td class="on"><span class="dot" aria-hidden="true"></span><span class="cell-t">edits as records</span></td></tr>
       </tbody>
     </table>
-    </div>
+    </div></div>
     <p class="matrix-note" id="matrix-note" aria-live="polite">Point at or tap a dot.</p>
   </div>
 </section>
@@ -657,6 +665,19 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   <p>Built from <code>design/grammar/</code> by <code>node design/build.mjs</code>. Law names link to their place on <a href="../laws/">the laws page</a>.</p>
 </footer>
 
+<script>
+// What every page built on design/page.mjs does: a .pan says whether there is more of it to
+// the right, so its fade shows exactly while there is (design/register.css).
+(() => {
+  for (const pan of document.querySelectorAll(".pan")) {
+    const s = pan.firstElementChild;
+    const more = () => pan.classList.toggle("is-more", s.scrollLeft + s.clientWidth < s.scrollWidth - 1);
+    s.addEventListener("scroll", more, { passive: true });
+    addEventListener("resize", more);
+    more();
+  }
+})();
+</script>
 <script>
 const WALK = {"records":{"A":{"who":"ada","at":"09:00","col":1,"row":2,"body":"Device flow. Client secret: 9f3c…","prev":[],"erases":[]},"B":{"who":"ada","at":"09:10","col":2,"row":1,"body":"Device flow; revisit in Q3.","prev":["A"],"erases":[]},"C":{"who":"bo","at":"09:12","col":2,"row":3,"body":"Use passkeys.","prev":["A"],"erases":[]},"M":{"who":"ada","at":"09:30","col":3,"row":2,"body":"Passkeys; device flow on TVs.","prev":["B","C"],"erases":[]},"E":{"who":"ada","at":"09:40","col":4,"row":2,"body":"Passkeys; device flow on TVs.","prev":["M"],"erases":["A"]},"F":{"who":"bo","at":"10:05","col":5,"row":2,"body":"Passkeys everywhere.","prev":["E"],"erases":[]}},"steps":[{"title":"Emit","text":"Ada emits a <code>decision</code> about <code>decision:auth</code>. It is checked, signed and appended: the store holds one record, and the thing has one head.","laws":["write.checked"],"shown":["A"],"heads":["A"],"winner":"A","count":1,"erased":[],"withheld":[],"current":[{"id":"A","shown":"here"}]},{"title":"Revise","text":"Ada revises it. B names A in <code>prev</code>, within the thing both are about. Nothing is edited: A is still there, superseded, and B is the head.","laws":["admit.no-cross"],"shown":["A","B"],"heads":["B"],"winner":"B","count":2,"erased":[],"withheld":[],"current":[{"id":"B","shown":"here"}]},{"title":"Fork","text":"Bo, holding only A, revises it too. Two records name A, so the thing has two heads: a fork, shown as a conflict. C wins by content order, its later <code>emitted</code>, never by which arrived first; B is still shown.","laws":["latest-by.order"],"shown":["A","B","C"],"heads":["C","B"],"winner":"C","count":3,"erased":[],"withheld":[],"current":[{"id":"C","shown":"here"},{"id":"B","shown":"here"}]},{"title":"Merge","text":"Ada writes M naming both B and C. One head again. A merge is an emit whose <code>prev</code> holds two ids, not a verb of its own.","laws":["heads.set"],"shown":["A","B","C","M"],"heads":["M"],"winner":"M","count":4,"erased":[],"withheld":[],"current":[{"id":"M","shown":"here"}]},{"title":"Erase","text":"A had a secret pasted in. Ada's next revision, E, also <code>erases</code> A. A keeps its id, its signature and its place in the chain; only its opening goes, for every reader that holds E. <code>decisions</code> still counts five: count needs no payload.","laws":["record.erasure","settle.erased"],"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}]},{"title":"Any order","text":"Deliver the same five in any order, from any place, and every slot is the same. The set decides; that is what lets late arrivals, re-sent segments and two-way syncs agree.","laws":["latest-by.set","input.union"],"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}],"orders":[["A","B","C","M","E"],["B","C","M","E","A"],["C","M","E","A","B"]]},{"title":"Less in view","text":"Cy's place holds E without its payload. Cy sees the same head, because <code>prev</code> is on the envelope and every reader holds envelopes. E's payload is withheld, and the slot says so instead of guessing; the count, needing no payload, is still five.","laws":["view.no-resurrection"],"reader":"cy","shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":["E"],"current":[{"id":"E","shown":"withheld"}]},{"title":"Tick","text":"At a boundary the vertex ticks: its result, covering exactly the five records it folded. Anyone holding them works out the same tick, so it can be cited. Ticks are settled, not built yet: the state shown is the model's, the tick around it is not.","laws":[],"settled":true,"shown":["A","B","C","M","E"],"heads":["E"],"winner":"E","count":5,"erased":["A"],"withheld":[],"current":[{"id":"E","shown":"here"}],"tick":{"covers":["A","B","C","M","E"]}},{"title":"Back to text","text":"A lens renders the head as a keyed section. Bo edits it; parsing finds one accepted edit, and applying it emits F, revising E. The edit is a record on the ground again: the loop closes. Applying edits as records is settled; the section round trip is proved.","laws":["lens.round-trip","lens.put-get"],"shown":["A","B","C","M","E","F"],"heads":["F"],"winner":"F","count":6,"erased":["A"],"withheld":[],"current":[{"id":"F","shown":"here"}],"lens":{"before":["::: decision:auth","Passkeys; device flow on TVs.",":::"],"after":["::: decision:auth","Passkeys everywhere.",":::"],"outcome":"accepted <code>decision:auth</code> → emit F, <code>prev: [E]</code>"}}]};
 const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-no-cross","latest-by.order":"law-latest-by-order","heads.set":"law-heads-set","record.erasure":"law-record-erasure","settle.erased":"law-settle-erased","latest-by.set":"law-latest-by-set","input.union":"law-input-union","view.no-resurrection":"law-view-no-resurrection-things","lens.round-trip":"law-lens-round-trip","lens.put-get":"law-lens-put-get"};
@@ -872,9 +893,6 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
     const s = WALK.steps[k];
     at = k;
     $$("button", stepsEl).forEach((b, i) => (i === k ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current")));
-    // Keep the current step in view where the steps are a row (narrow screens), without moving the page.
-    const cur = $$("button", stepsEl)[k];
-    stepsEl.scrollLeft = cur.offsetLeft - stepsEl.offsetLeft - stepsEl.clientWidth / 2 + cur.offsetWidth / 2;
     $("#prev-step").disabled = k === 0;
     $("#next-step").disabled = k === WALK.steps.length - 1;
     $("#stage-where").innerHTML = s.reader ? `reader <b>${s.reader}</b> · store <b>team</b>` : "store <b>team</b>";
