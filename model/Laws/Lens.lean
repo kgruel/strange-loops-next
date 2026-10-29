@@ -3,15 +3,14 @@ import Loops.Lens
 /-!
 # Laws of the keyed-section lens
 
-* **Escaping.** Any body survives rendering and parsing, whatever it holds:
+* **Escaping.** With a nonempty section id, any body survives rendering and parsing:
   fences, headers, backslashes. Reading drops a backslash only where
   rendering would have written one, so `\\hello` typed into a body stays
   `\\hello` (`unescape_keeps`).
-* **Round trip.** Valid documents survive rendering and parsing.
-* **No-op.** Rendering the base and reading it back gives no outcomes.
-* **Put-get.** When an edit keeps the base's sections in order, applying its
-  outcomes gives exactly the edited document, so the text reads back as
-  edited, up to its normal form.
+* **Round trip.** Documents with nonempty, distinct section ids survive rendering and parsing.
+* **No-op.** Rendering a valid base and reading it back gives no outcomes.
+* **Put-get.** The base ids must be distinct.
+  An edit that keeps exactly the base's sections in the same order applies exactly, up to normal form.
 * **Nothing dropped.** Every section of the edited text is unchanged,
   accepted or reported; every section it drops is reported as absent.
 * **Normal form.** Normalizing twice is normalizing once.
@@ -105,7 +104,7 @@ theorem parse_render (d : List Section) (hv : Valid d) : parse (render d) = some
 theorem parse_render_iff (d : List Section) : parse (render d) = some d ↔ Valid d :=
   ⟨parse_valid, parse_render d⟩
 
-/-- Escaping: one section with any body at all comes back intact. -/
+/-- A section with a nonempty id preserves any body through rendering and parsing. -/
 theorem escaping (id : Line) (body : List Line) (hi : id ≠ []) :
     parse (render [⟨id, body⟩]) = some [⟨id, body⟩] :=
   parse_render _ (by simp [Valid, ids, hi])
@@ -259,7 +258,7 @@ theorem map_pick {base edited : List Section} (hb : (ids base).Nodup) (he : ids 
         simp [pick, lookup_cons_ne hne]
       rw [map_cons, hhead, htail, ih hb.2 he.2]
 
-/-- Put-get: an edit that keeps the base's sections in order is applied exactly. -/
+/-- With distinct base ids, an edit keeping exactly the same ordered id list applies exactly. -/
 theorem put_get {base edited : List Section} (hb : (ids base).Nodup) (he : ids edited = ids base) :
     apply base (diff base edited) = edited := by
   rw [apply_diff hb (he ▸ hb), map_pick hb he]

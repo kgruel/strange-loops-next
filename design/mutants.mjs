@@ -59,7 +59,7 @@ const MUTANTS = [
   ["a question no law answers", "design/laws/laws.json", json((d) => { d.questions["no-such"] = "What if nobody asks?"; })],
   ["a premise case that no card shows", "design/laws/render.mjs", swap("else alone.push(c);", "else if (c.law === \"\") alone.push(c);")],
   ["a note under a question nobody asks", "design/laws/laws.json", json((d) => { d.questionNotes["no-such"] = "x"; })],
-  ["a card quoting a README sentence that changed", "vectors/README.md", swap("reader holding everything gets", "reader holding anything gets")],
+  ["a card quoting a README sentence that changed", "vectors/README.md", swap("With consistent forms, these are the same heads as the full reader's.", "With inconsistent forms, these are the same heads as the full reader's.")],
   ["a law that drops a premise its theorem takes", "design/laws/laws.json", json((d) => { delete d.laws["view.no-resurrection (things)"].premises; })],
   ["a law that drops a premise its other theorems take too", "design/laws/laws.json", json((d) => { d.laws["lens.put-get"].premises = []; })],
   ["a lens roundtrip without section validity", "design/laws/laws.json", json((d) => { d.laws["lens.round-trip"].premises = []; })],

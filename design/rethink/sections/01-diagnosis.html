@@ -1,10 +1,11 @@
 <section class="panel" id="diagnosis" role="tabpanel" aria-labelledby="t-diagnosis">
   <div class="panel-head"><h2>Diagnosis</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p><b>Earlier Python prototype context.</b> The counts, timings and source paths below describe that prototype, not the current integrated Rust implementation. Historical references may name files absent from this repository.</p>
   <p class="gist">The model is small. A closed set of about ten folds covers it in roughly 3,600 lines. The codebase around it is about 77,000 lines, and much of that is custody machinery, migration and duplicated storage encodings. The rewrite pays off through what it leaves out more than through the language.</p>
 
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 305" role="img" aria-label="Source lines by package. engine 29.9k, of which 8.9k is the arrival protocol; CLI 28.4k; lang 6.1k; atoms 3.6k; migrate 3.1k; sdk 2.6k; store 2.2k; sign 0.5k; custody 0.3k.">
+      <svg class="dg" viewBox="0 0 400 305" role="img" aria-label="Source lines by package: engine 29.9k, including arrival protocol 8.9k. CLI 28.4k; lang 6.1k; atoms 3.6k; migrate 3.1k; sdk 2.6k; store 2.2k; sign 0.5k; custody 0.3k.">
         <line class="faint" x1="84" y1="30" x2="84" y2="280"/>
         <text x="297" y="28" text-anchor="middle" class="xs tb">arrival 8.9k</text>
         <text x="78" y="48" text-anchor="end" class="s">engine</text>
@@ -46,7 +47,7 @@
   <p>The use case is several people writing records and sharing them, which is a multi-writer, merge-by-default problem. Arrival's core invariant is "one lineage has exactly one designated authority," which is single-writer custody. The two conflict.</p>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="Top: Arrival, an ordered log of six records with a head and an authority doing compare-and-append. Bottom: two sets, alice's a b c and bob's c d e, whose union is a b c d e with no head and no authority.">
+      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="Top: Arrival, an ordered log of six records with a head and an authority doing compare-and-append. Bottom: alice holds a b c; bob holds c d e. Their union is a b c d e, with no head or authority.">
         <rect class="panel" x="0" y="0" width="400" height="150" rx="10"/>
         <text x="16" y="26" class="b">Arrival: one ordered log, one authority</text>
         <g>
@@ -127,7 +128,7 @@
     <figcaption>f1 says the status is open at 09:00. f2 says it's closed at 10:00. Store B happened to receive f2 first. With receipt order, two people holding the same records see a different current state.</figcaption>
   </figure>
 
-  <details class="unfold"><summary>What the codebase is, in numbers</summary><div class="body">
+  <details class="unfold"><summary>The earlier Python prototype, in numbers</summary><div class="body">
     <div class="tbl"><table>
       <thead><tr><th>Package</th><th>Source</th><th>Tests</th><th>Role</th></tr></thead>
       <tbody>
@@ -152,7 +153,7 @@
         <tr><td>arrival_contract.py</td><td class="num">524</td></tr><tr><td>arrival_body.py</td><td class="num">318</td></tr>
         <tr><td>arrival_registry.py</td><td class="num">229</td></tr>
       </tbody></table></div>
-      <p>Related but not counted: <code>canonical_audit.py</code> (1,171), <code>witness.py</code> (917), <code>ceremony.py</code> (831), <code>admission.py</code> (739). The repo root also holds about 30 <code>GATE-*</code>, <code>*-FIX-REPORT</code> and <code>SOLHIGH-*</code> files from rounds of adversarial review.</p>
+      <p>Related but not counted: <code>canonical_audit.py</code> (1,171), <code>witness.py</code> (917), <code>ceremony.py</code> (831), <code>admission.py</code> (739). That prototype's repo root also holds about 30 <code>GATE-*</code>, <code>*-FIX-REPORT</code> and <code>SOLHIGH-*</code> files from rounds of adversarial review.</p>
     </div></details>
   </div></details>
 
@@ -170,15 +171,15 @@
     <p>Times in milliseconds, before the receipt-order change. Receipt order cut held-handle receive by 69% at 1k and 87% at 5k. <code>sdk_emit_fact</code> didn't move, because every emit cold-opens the vertex and replays the whole prefix.</p>
     <ul>
       <li><b>The language fixes:</b> CLI cold start (61 ms of Python imports) and constant factors.</li>
-      <li><b>The language doesn't fix:</b> replay on open. That needs cached state. Start whole-vertex: cache each vertex's state keyed by its spec, its covered set and the tick ids of the vertices it reads, and refold the vertex when any of them changes. Partial rewind to a checkpoint waits until a real store hurts: across vertices that read each other, its invalidation would become the new Arrival.</li>
+      <li><b>The language doesn't fix:</b> replay on open. That needs cached state. Start whole-vertex: cache each vertex's state. Key it by its spec, covered set and the tick ids of vertices it reads. Refold when any key input changes. Partial rewind to a checkpoint waits until a real store hurts: across vertices that read each other, its invalidation would become the new Arrival.</li>
     </ul>
     <details class="source"><summary>benchmarks/LEDGER.md</summary><div class="body">
-      <p>Findings 1 to 6: every write re-folded the entire history; ingest was quadratic; the read path is fine; the SDK's stateless surface is a constant tax; search only covers declared kinds; receipt-order fold-in-place fixed held handles only. Measured 2026-08-15 on one machine. Treat sub-10% deltas as unproven.</p>
+      <p>Findings 1 to 6: every write re-folded the entire history, so ingest was quadratic. The read path is fine. The SDK's stateless surface adds a constant tax. Search only covers declared kinds. Receipt-order fold-in-place fixed held handles only. Measured 2026-08-15 on one machine. Treat sub-10% deltas as unproven.</p>
     </div></details>
   </div></details>
 
   <details class="unfold"><summary>How Arrival grew</summary><div class="body">
-    <p>Sharing knowledge about a large work platform, among colleagues, encoded into git or JSONL, led to "mergeable by default." Arrival answered with a backend-neutral custody protocol: lineages, dense ordinals, hash chaining, compare-and-append, head attestations, and later rollback and equivocation detection, epochs and re-custody.</p>
+    <p>Colleagues shared knowledge about a large work platform in git or JSONL. That led to "mergeable by default". Arrival answered with a backend-neutral custody protocol. It added lineages, dense ordinals, hash chaining, compare-and-append and head attestations. Rollback and equivocation detection, epochs and re-custody followed.</p>
     <p>Receipt order came from the performance work. Folding on <code>(ts, id)</code> made ingest quadratic, so fold order became the order this store received facts. That's store-local by definition, so <code>merge(A,B)</code> and <code>merge(B,A)</code> give different fold sequences. Mergeability then had to be rebuilt on top through custody, which is where the scope spiralled.</p>
     <details class="source"><summary>docs/RECEIPT_ORDER_FOLD.md and libs/store/src/store/merge.py</summary><div class="body">
       <p>"Receipt order is store-local. A rowid means something only relative to the store that assigned it." The merge docstring: "No claim is made about event time, about rowids as a primitive, or about the relationship between merge(A,B) and merge(B,A)."</p>

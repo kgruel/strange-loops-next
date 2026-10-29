@@ -1,6 +1,6 @@
 <section class="panel" id="map" role="tabpanel" aria-labelledby="t-map">
   <div class="panel-head"><h2>Where we are</h2><button class="toggle-all" type="button">Unfold all</button></div>
-  <p class="gist">Arrival tried to make a single-writer custody log carry every kind of sharing. Going back to the roots: records form an observed <b>set</b>, meaning binds at read, the observer is first-class, and stores avoid coordination by being <b>immutable</b>, so they never need an authority. For the whole picture built up one step at a time, start with <a href="#scenarios" data-tab="scenarios">Scenarios</a>; for everything at once, see the <a href="#example" data-tab="example">worked example</a>.</p>
+  <p class="gist">Arrival tried to make one writer's custody log carry every kind of sharing. Records now form an observed <b>set</b>. Meaning binds at read. Stores merge without a coordinating authority; admission still applies. Start with <a href="#scenarios" data-tab="scenarios">Scenarios</a> or read the <a href="#example" data-tab="example">worked example</a>.</p>
 
   <h3>The walk, layer by layer</h3>
   <ol class="layers">
@@ -10,13 +10,13 @@
     <li><span class="k">3</span><span class="t"><b>Composition</b><span>one vertex reading many stores; things, <code>about</code>, <code>resolve-by</code></span></span><span class="pill p-ok">closed</span></li>
     <li><span class="k">4</span><span class="t"><b>Places</b><span>places, store definitions, a slim index, small erasure</span></span><span class="pill p-ok">closed</span></li>
     <li><span class="k">5</span><span class="t"><b>Sharing</b><span>union by segment lists, key tiers, presence, retire through</span></span><span class="pill p-ok">closed</span></li>
-    <li class="here"><span class="k">→</span><span class="t"><b>Build</b><span>Rust, a Cargo workspace beside the Lean model; one local API, the CLI, specs as JSON; limits and budgets set; no unit tests; steps 0 and 1 done, step 2 modelled and reviewed; next, formalize the data model in Lean</span></span><span class="pill p-lean">building</span></li>
+    <li class="here"><span class="k">→</span><span class="t"><b>Build</b><span>Rust implements the modeled protocol beside Lean and JS. Rust checks all protocol fixture families and external standards. Storage and higher transitions remain planned.</span></span><span class="pill p-lean">building</span></li>
     <li><span class="k">+</span><span class="t"><b>Horizons</b><span>editable lenses, selective disclosure, knowledge as a build</span></span><span class="pill p-next">exploring</span></li>
   </ol>
 
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 380" role="img" aria-label="The loop: world observed by an observer, who emits a record into a store; a vertex reads it through a spec and ticks at a boundary; the tick returns to an observer through a lens, or feeds a higher vertex.">
+      <svg class="dg" viewBox="0 0 400 380" role="img" aria-label="An observer emits a record into a store. A spec reads the set and produces a tick at a boundary. A lens returns it to an observer, or a higher vertex reads it.">
         <rect class="box" x="100" y="8" width="200" height="38" rx="8"/><text x="200" y="32" text-anchor="middle" class="b">world</text>
         <rect class="box-acc" x="100" y="72" width="200" height="38" rx="8"/><text x="200" y="96" text-anchor="middle" class="b">observer</text>
         <rect class="box" x="100" y="136" width="200" height="38" rx="8"/><text x="200" y="160" text-anchor="middle" class="b">record</text>
@@ -43,7 +43,7 @@
 <!-- build:ledger -->
   </div>
 
-  <details class="unfold"><summary>How the conversation moved</summary><div class="body">
+  <details class="unfold"><summary>Historical conversation: how the design moved</summary><div class="body">
     <ol>
       <li>Started as a language question: rewrite in something faster and easier to install.</li>
       <li>Narrowed to the real pain: Arrival grew out of hand while trying to make stores shareable and mergeable by default.</li>
@@ -54,24 +54,24 @@
       <li>Places kept erasure small, split the old vertex file four ways, and a worked example tested everything together.</li>
       <li>Sharing needed nothing new: union, admission, witness-style cuts and key bindings. The work went into keys, presence and agents.</li>
       <li>Build chose Go once bindings dropped out, then Rust in version 31, once phones and extensions needed the core itself. Horizons collected what the design makes cheap: editable lenses, selective disclosure, knowledge as a build.</li>
-      <li>Versions 26 to 31 walked the local API, MCP and the CLI, ran a vocabulary pass (seal retired, vertex kept), made specs JSON, and moved the build to Rust, with the page folded into a build brief.</li>
-      <li>Version 32 took two outside reviews and settled three things in the model: folds come in two families, both proved to depend only on the set; a payload is here, withheld or erased, and supersession never reads it; a tick is a value, stored only as a signed record. A vertex became the hash of its spec, which removed vertex anchors and vertex standing.</li>
-      <li>Version 34 asked what the model actually proves. Four holes, each reproduced against it: selection ran before supersession, two places' forms of one record broke "the set decides", <code>prev</code> was global, and <code>about</code> was one key. Now <code>prev</code> is succession within a thing, supersession runs over everything held, erasure is a record, and <code>about</code> is a set.</li>
-      <li>Version 33 caught the repo up: the model took the vocabulary (<code>protocol/</code>, LatestBy, Stored), PRs 1 and 2 merged, and step 2's model went up as PR 4. Modelling the spec found that payload tests must apply after supersession, or a filter brings back what was replaced.</li>
+      <li>Versions 26 to 31 walked the local API, MCP and CLI. They retired seal, kept vertex, made specs JSON and chose Rust. The page became a build brief.</li>
+      <li>Version 32 incorporated two outside reviews. It separated fold families and made supersession envelope-only. Payloads became here, withheld or erased. Ticks became values, stored as signed records. Vertex identity became the spec hash, removing vertex anchors and standing.</li>
+      <li>Version 34 tested the model's premises. Selection preceded supersession, place forms disagreed, <code>prev</code> was global and <code>about</code> held one key. Supersession now runs per thing over held records. Read-order invariance requires consistent forms. Erasure is a record; <code>about</code> is a set.</li>
+      <li>Version 33 aligned the model vocabulary: <code>protocol/</code>, LatestBy and Stored. PRs 1 and 2 merged; PR 4 added step 2's model. That work placed payload tests after supersession, so filters cannot restore replaced records.</li>
       <li>A second opinion from Gemini found seams the page had papered over: a weighted Latest, <code>prev</code> as one pointer, SKOS left in the example. Each closed with parts already in the model.</li>
-      <li>Walking the LSP end to end replaced "paths as dated names" with birth keys read along each branch's history, and made git segment files close on commit. Nothing entered the core.</li>
+      <li>The LSP walk replaced dated path names with birth keys read along branch history. Git segment files close on commit. Neither choice entered the core.</li>
       <li>Walking web annotation found federation already there: each person's own store, composed. Publishing became a declaration on the store, and admission became the spam filter.</li>
-      <li>Walking context by tick id turned into a walk about references a reader can't fully see: five states, shown honestly, with provenance carried into an agent's context.</li>
-      <li>Extending it to the whole pipeline, from a design thread to a cloud run and back, separated what a place holds from what an agent sees, and made the trip up a disclosure and the trip home a plain sync.</li>
-      <li>Unpacking knowledge as a build gave every result two names, so work stops where results stop changing, and stated plainly what privacy here is: withholding, not hiding.</li>
-      <li>Breaking the editable lens on purpose changed its contract, not the record: a base names its lens and audience, a committed render is a promotion, and absence is never an edit.</li>
+      <li>The context walk identified five reference states. It carried visible provenance into agent context without guessing unseen content.</li>
+      <li>The pipeline walk separated what a place holds from what an agent sees. The outward cloud trip became disclosure; the return became plain sync.</li>
+      <li>The build walk gave each result two names, so work stops when results stop changing. Privacy means withholding content, not hiding its existence.</li>
+      <li>The lens review changed the contract, not the record. A base names its lens and audience. A committed render is promotion; absence never means edit.</li>
       <li>Drawing the limits found the spec's predicates drifting toward a language. They closed to a typed set, parse pipelines left for collectors, and anything more gets recorded by an observer.</li>
-      <li>Asking what a size budget is for turned one line count into four budgets, and a proof language found a role outside the build: proving the fold laws and writing the vectors the core must pass.</li>
-      <li>Choosing Lean 4 over Bend 2 brought the lens laws into reach for the syntax we own, and replaced unit tests with four checks that never take their answer from the code they check.</li>
-      <li>Laying out the repo turned the budgets into structure: a core module with nothing to require, one public package, and a store of its own decisions.</li>
+      <li>The budget walk replaced one line count with four budgets. Lean proved fold laws and computed protocol-vector answers outside the Rust build.</li>
+      <li>The historical Lean choice brought owned lens syntax into proof scope. It proposed replacing unit tests with external checks. Rust now also has characterization tests.</li>
+      <li>The proposed layout used budgets to constrain modules, one public package and a store for its own decisions.</li>
       <li>Step 0 proved the first laws in a day and found that the law worth proving was not "incremental = batch" but "the set decides".</li>
-      <li>Step 1, built overnight, found two things a design walk wouldn't: an off-by-one in number formatting that the standard's own data caught, and that a sum over floats can't satisfy "the set decides".</li>
-      <li>Version 35 reviewed step 2's model, with an outside review from Codex, and found the laws holding but the boundaries not establishing what they assume. A batch skipped the write checks, a repeated member name meant three different things, and refusals depended on order. Writing now returns its proof, Go left the repo, and this page moved into it. Next: the data model, formalized end to end, before anything is built on it.</li>
+      <li>Step 1 found a number-formatting off-by-one through standard vectors. It also showed why floating-point sums cannot satisfy set invariance.</li>
+      <li>Version 35 reviewed step 2 with Codex. The boundaries did not establish all law premises. Batches skipped checks, duplicate members had conflicting meanings, and refusals depended on order. Writing now returns its proof. Go left the repo and this page entered it. The historical next step was data-model formalization. Rust now implements the modeled protocol.</li>
     </ol>
     <p>The full trail, turn by turn, is in the <a href="#sources" data-tab="sources">Sources</a> tab.</p>
   </div></details>

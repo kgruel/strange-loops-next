@@ -1,27 +1,27 @@
 # strange-loops
 
 Records in, folds and ticks out, lenses back to text. A rewrite from first
-principles: the product is **the protocol, its vectors and one implementation**.
+principles: the product is **the protocol, its vectors and checked implementations**.
 
-Step 1 is in: layer 0, the record, in the model and in a small JS
-writer that must agree with it byte for byte. The readers (folds, specs,
-realms, lenses, batches) are in the model and in JS, the JS written from the
-prose and checked against every vector.
+The Lean model, independent JS implementation and Rust workspace implement the record and readers.
+Readers cover folds, specs, realms, lenses and batches.
+JS and Rust check protocol fixtures and external standards.
+The theorem files prove the listed model laws; fixture checks do not prove implementation equivalence.
 
 ## Layout
 
 | Path | Holds |
 |---|---|
-| `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), `gen`, which writes the vectors, and `proofs`, which writes the proof graph the laws page draws |
-| `vectors/` | written by `gen`, never by hand; every implementation must pass them |
+| `model/` | Lean 4: executable model (`Loops/`) and proofs (`Laws/`). `gen` writes protocol vectors. `proofs` writes the laws page's proof graph. |
+| `vectors/` | Model-written protocol fixtures and independent standards data. Every implementation checks all families. |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/lens.md`](protocol/lens.md) the lens contract, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
-| `interop/js/` | a small, independent JS implementation, written from the prose: the layer 0 writer (`loops.mjs`) and the readers (`fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`) |
-| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `build.mjs` renders all four |
+| `interop/js/` | Independent JS writer (`loops.mjs`) and readers. Reader modules: `fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`. |
+| `design/` | Page sources. `rethink/` holds the design and ledger. `grammar/` holds words and the walk. `laws/` holds law metadata. `evidence/` shows evidence. `build.mjs` renders all four. |
 | `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/` | the pages, written by `node design/build.mjs`, never by hand |
 
-Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
-`xtask` checking token and surface budgets); more end-to-end scenarios (`vectors/scenario/` holds the first),
-`.loops/` (this repo's own decision store).
+`rust/` contains the implemented pure core and fixture evaluator; see [`rust/PORTING.md`](rust/PORTING.md).
+The product CLI, storage, budget tooling and the repo's own `.loops/` decision store remain planned.
+`vectors/scenario/` already covers reader scenarios, not the future product CLI.
 
 ## Checking
 
@@ -38,9 +38,9 @@ lake exe boundaries ../design/laws/boundaries.json   # laws without their premis
 git diff --exit-code ../design/laws
 ```
 
-CI runs the same steps. The vectors and the premise cases are a pure render
-of the model, and the proof graph of the proofs: editing any of them by hand
-fails CI. Then:
+CI runs the same steps. The model writes protocol vectors and premise cases; standards fixtures come from external sources.
+The proof graph comes from the checked proofs.
+CI rejects manual edits to model-generated files. Then:
 
 ```sh
 node interop/js/check.mjs vectors   # the JS implementation passes every vector
@@ -48,10 +48,9 @@ node interop/js/check.mjs vectors   # the JS implementation passes every vector
 
 ## The design page
 
-The design walk ("Strange Loops Rethink") is built from `design/rethink/`:
-one HTML file per tab under `sections/`, the decision ledger as records in
-`ledger.json`, and the shared `styles.css`, `app.js`, `head.html` and
-`top.html`. Edit those, then:
+The design walk ("Strange Loops Rethink") uses `design/rethink/`.
+Each tab has an HTML file under `sections/`; `ledger.json` holds decision records.
+Shared files are `styles.css`, `app.js`, `head.html` and `top.html`. Edit those, then:
 
 ```sh
 node design/build.mjs       # writes out/rethink/index.html; commit it with the source
@@ -60,53 +59,41 @@ node design/build.mjs       # writes out/rethink/index.html; commit it with the 
 Three more pages share a shell (`design/page.mjs`, `design/register.css`) and
 read the protocol through `design/protocol.mjs`:
 
-* `design/grammar/`: the protocol's nouns, verbs and layers. Its words are
-  data (`words.json`); the build refuses a law name that isn't in
-  `protocol/laws.md`, or a set of refusal codes that differs from the ones the
-  vectors pin. Its walk is `vectors/scenario/01-decision`, which the model
+* `design/grammar/`: the protocol's nouns, verbs and layers. `words.json` holds its words.
+  The build refuses unknown law names and refusal codes that differ from vector metadata. Its walk is `vectors/scenario/01-decision`, which the model
   writes; `walk.json` holds only its narration and layout.
-* `design/laws/`: every law as a sentence and one of six shapes
-  (`laws.json`), under the one reader's question it answers (a closed list in
-  `laws.json`; the build refuses a law without one, or a question no law
-  answers), with the demos that let a reader try it. `join.mjs` joins each law
-  to its row in `protocol/laws.md`, the theorems that prove it (each with its
-  statement as Lean prints it), the vectors that pin it, and the laws its
-  proof rests on. That last join is
+* `design/laws/`: `laws.json` assigns each law a sentence, shape and reader question.
+  The build refuses missing questions and questions with no laws.
+  Demos let readers try selected laws.
+  `join.mjs` joins protocol rows, printed theorem statements, cited vectors and proof dependencies. That last join is
   `design/laws/proofs.json`, written by `lake exe proofs` from the checked
   proofs; CI regenerates it as it does the vectors. `lake exe boundaries` writes
   `design/laws/boundaries.json`: some laws asked with their premise and
   without it, the model checking that the premise matters. These aren't
   vectors, since several of their inputs are ones the protocol never
-  produces. Each is a card on the laws page, on its law's Try card when the
-  law has a demo and on a card of its own when not, and the build refuses a
-  case no card shows. A Try card letters its records A, B, C by when they were
-  written (`shapes.mjs` draws the card's figure, one per shape), and keeps a
-  trail of the answer the model gave to each variant shown. The build
-  fails on a law without a sentence, a theorem name that resolves to nothing,
-  a vector reference to no file, a law name a vector uses that isn't a law,
-  or a proof that rests on a layer above its own. It also reads the
-  hypotheses off each theorem's statement (`premises.mjs`) and fails when a
-  law's sentence leaves one out (`Addressed`, `EnvOnly`, ...): each is said
-  page-wide, on the law (`premises`, shown as "Holds when"), or listed as the
-  law's subject in `laws.json`'s `premises` vocabulary, and a premise a law
-  lists that no theorem of it takes fails too. That names the premise; what it
+  produces. Each case appears on its law's Try card or a separate card.
+  The build refuses cases without cards.
+  Try cards label records A, B, C by writing time.
+  `shapes.mjs` draws each figure; cards retain the model's answers for the shown variants.
+  The build rejects missing sentences, unresolved theorem names, missing vectors and unknown law names.
+  It also rejects proof dependencies on higher layers.
+  `premises.mjs` reads theorem hypotheses and checks their metadata declarations.
+  Premises appear page-wide, under "Holds when", or as the law's subject in the premise vocabulary.
+  The build also rejects declared premises absent from the law's theorems. That names the premise; what it
   quantifies over is still wording.
-* `design/evidence/`: the same joins, for an implementer or maintainer: each
-  law's card with its theorems, vectors and who runs them, what it rests on
-  and carries; the coverage table; and the proof map, laid out when the page
-  is built (`design/evidence/layout.mjs`). A law's sentence on the laws page
-  and its card here share an anchor (`#law-<name>`), and the build fails on
-  any link between the pages that lands on no anchor.
+* `design/evidence/`: the same joins for implementers and maintainers.
+  Cards show theorems, vectors, implementation coverage and proof dependencies.
+  The page also shows a coverage table and proof map, laid out by `design/evidence/layout.mjs`.
+  Law cards share anchors (`#law-<name>`) across pages.
+  The build rejects links between these pages without matching anchors.
 
-`node design/mutants.mjs` holds those checks to account: it applies plausible
-wrong edits to a copy of the sources and fails unless the build refuses each
-one, apart from an explicit, shrink-only list of survivors with why. CI runs
+`node design/mutants.mjs` applies plausible wrong edits to source copies.
+It requires build refusal except for an explicit, shrink-only survivor list with reasons. CI runs
 it.
 
-The grammar and laws pages load a pinned library from a CDN (Motion), so
-they are published only on the site, at `/strange-loops/grammar/` and
-`/strange-loops/laws/`, with no artifact mirror; the evidence page is built
-for the site too, at `/strange-loops/evidence/` once the site's sync carries it.
+The grammar and laws pages load Motion, a pinned CDN library.
+They publish only at `/strange-loops/grammar/` and `/strange-loops/laws/`, without artifact mirrors.
+The evidence page publishes at `/strange-loops/evidence/` when the site sync carries it.
 
 CI rebuilds every page and fails if `out/` differs, as with the vectors. To publish:
 
@@ -114,7 +101,6 @@ CI rebuilds every page and fails if `out/` differs, as with the vectors. To publ
   snapshots the committed page (it refuses uncommitted output), then push its
   `main`. It is served unlisted, with `noindex`, at
   `https://projects.gruel.world/strange-loops/rethink/`.
-* **The claude.ai artifact** is a mirror:
-  `node design/build.mjs --fragment <file>` writes the page as the artifact
-  takes it (no document wrapper; the host adds its own), and that file is
-  republished to the same artifact URL.
+* **The claude.ai artifact** is a mirror.
+  `node design/build.mjs --fragment <file>` writes the fragment without a document wrapper; the host adds one.
+  Republish that file to the same artifact URL.

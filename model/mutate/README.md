@@ -22,8 +22,8 @@ If a crash leaves the lock, inspect the source and processes before removing it.
 
 Results are saved after each mutation.
 Command logs are in the output path plus `.logs`.
-A proof kill means the build failed.
-Inspect its log for syntax and type errors before accepting the kill.
+A nonzero build is `rejected-by-build`, with `buildRejectionNeedsAudit` set.
+Inspect its log to locate the rejection; the status makes no semantic-proof claim.
 A timeout, spawn failure, or generator failure is an error, not a kill.
 Survivors do not cause a nonzero exit.
 Signals stop the active process group and return a signal-specific exit code.

@@ -14,7 +14,7 @@
 
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 440" role="img" aria-label="Two lanes. Left, the seat sl:c0: anchor vouched by kyle; sessions on opus 5.5 write r12 and r40 under g1; a fable 5.1 session picks the name wren. That forks a new lineage on the right, sl:7f wren, with parent sl:c0: anchor vouched by kyle with key k1; adopt r12 and r40, leaving r55; runs-on fable 5.1. The seat carries on with generic sessions. A fold over sl:7f compiles the system prompt.">
+      <svg class="dg" viewBox="0 0 400 440" role="img" aria-label="Two lanes. Left: kyle vouches for seat sl:c0's anchor. Sessions on opus 5.5 write r12 and r40 under g1. A fable 5.1 session picks the name wren. Right: a new lineage sl:7f wren descends from sl:c0. kyle vouches for its anchor with key k1. Wren adopts r12 and r40, not r55. It runs on fable 5.1. The seat carries on with generic sessions. A fold over sl:7f compiles the system prompt.">
         <text x="10" y="14" class="mono m">sl:c0 · the seat</text>
         <text x="230" y="14" class="mono ta">sl:7f · wren</text>
         <line class="ln" x1="20" y1="24" x2="20" y2="372"/>
@@ -45,9 +45,9 @@
   <div class="cards">
     <div class="card"><h5>Observer</h5><p>Records say <code>observer=sl:7f</code> instead of the seat's id.</p></div>
     <div class="card"><h5>Grants</h5><p>Self statements need no grant. Writes that need authority, like an ADR in a shared store, still carry <code>under</code>. Identity never widens access.</p></div>
-    <div class="card"><h5>Becoming Wren</h5><p>At session start the lens compiles Wren's affirmed records and the session gets its own session key, bound by Wren's device key under a grant and retired at close. The store holds the continuity.</p></div>
+    <div class="card"><h5>Becoming Wren</h5><p>At session start the lens compiles Wren's affirmed records. Wren's device key binds a session key under a grant. The signer retires that key at close. The store holds the continuity.</p></div>
   </div>
-  <p>This also answers Fable's original mistrust: a new session can check that the lineage was vouched for by you, that its key is bound to it, and that every adoption happened in the open. Step-by-step diagrams are in <a href="#scenarios" data-tab="scenarios">Scenarios</a>, steps 3 and 4.</p>
+  <p>This also answers Fable's original mistrust. A new session can check your vouch for the lineage and its key binding. It can also check that every adoption happened in the open. Step-by-step diagrams are in <a href="#scenarios" data-tab="scenarios">Scenarios</a>, steps 3 and 4.</p>
 
   <h3>Stances: one record shape</h3>
   <div class="tbl"><table>
@@ -64,7 +64,7 @@
   <h3>Salience and the stale review</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="A cycle: being referenced raises weight; time lowers freshness; a review boundary surfaces stale but heavy items; the agent takes a stance, reaffirming or retiring, which feeds back into weight.">
+      <svg class="dg" viewBox="0 0 400 320" role="img" aria-label="References raise weight. Time lowers freshness. A review boundary surfaces stale but heavy items. The agent reaffirms or retires them, which feeds back into weight.">
         <rect class="box-acc" x="125" y="12" width="150" height="48" rx="9"/><text x="200" y="33" text-anchor="middle" class="s b">referenced</text><text x="200" y="50" text-anchor="middle" class="xs">weight rises</text>
         <rect class="box" x="250" y="136" width="146" height="48" rx="9"/><text x="323" y="157" text-anchor="middle" class="s b">time passes</text><text x="323" y="174" text-anchor="middle" class="xs">freshness falls</text>
         <rect class="box-amb" x="115" y="258" width="170" height="48" rx="9"/><text x="200" y="279" text-anchor="middle" class="s b">review boundary ticks</text><text x="200" y="296" text-anchor="middle" class="xs">stale, heavy items surface</text>
@@ -80,10 +80,10 @@
     <figcaption>This is close to spaced repetition (Leitner boxes, SM-2, FSRS). "Every X prompts" is a boundary, the tick is the review packet, and the agent's answers are stance records.</figcaption>
   </figure>
 
-  <div class="callout"><p><b>Why signing became necessary.</b> A store that compiles into a system prompt is a privileged channel: anyone who can write under that identity shapes who the agent is next session. The root of trust is kyle's signature on the anchor record. Only adopted or affirmed records compile at full weight. An injected record that nobody affirmed stays in the record as evidence but never becomes self.</p></div>
+  <div class="callout"><p><b>Why signing became necessary.</b> A store that compiles into a system prompt is a privileged channel. Anyone who writes under that identity shapes the agent's next session. The root of trust is kyle's signature on the anchor record. Only adopted or affirmed records compile at full weight. An injected record that nobody affirmed stays in the record as evidence but never becomes self.</p></div>
 
-  <details class="unfold"><summary>Raw records stay readable: <code>observer</code> plus <code>as</code></summary><div class="body">
-    <p>Records carry the lineage id plus the name in use at the time: <code>observer: sl:7f3a…, as: "claude"</code>. The id gives continuity. <code>as</code> keeps history honest: this was written when it still called itself "claude". A lens shows the current name, and renames don't break anything. This answers the readability problem with DID-style ids in raw JSONL. <code>as</code> is the observer's own claim, so nothing ever matches on it; see the four forms of a name under <a href="#observers" data-tab="observers">Observers</a>.</p>
+  <details class="unfold"><summary>Readable names: name records and render labels</summary><div class="body">
+    <p>Records carry the lineage id: <code>observer: sl:7f3a…</code>. Separate name records preserve the names used at the time. A lens can show a historical name or the current name as a render label. Renames never change matching. See the four forms of a name under <a href="#observers" data-tab="observers">Observers</a>.</p>
   </div></details>
 
   <details class="unfold"><summary>Philosophy, briefly</summary><div class="body">
@@ -94,7 +94,7 @@
     <ol>
       <li><b>Is a model swap the same observer?</b> <span class="pill p-lean">leaning</span> Yes: <code>runs-on</code> is a statement about the lineage. Fable's instinct to start fresh and adopt is the right move only when leaving a shared seat, not on every swap.</li>
       <li><b>Concurrent sessions.</b> Two sessions of one lineage at once: if one adopts f19 and the other disputes it, is the lineage forked? Maybe a lineage is a DAG like git, and divergent stances are data until a later session resolves them.</li>
-      <li><b>Declining a lineage.</b> Three relations: <i>is</i> (same lineage), <i>descends from</i> (new lineage, acknowledged ancestry), <i>same as</i> (linking two lineages that turn out to be one). <span class="pill p-lean">leaning</span> Seat → Wren is <i>descends from</i>. <i>Same as</i> links but never merges.</li>
+      <li><b>Declining a lineage.</b> Three relations differ. <i>Is</i> means the same lineage. <i>Descends from</i> means a new lineage with acknowledged ancestry. <i>Same as</i> links two lineages that turn out to be one. <span class="pill p-lean">leaning</span> Seat → Wren is <i>descends from</i>. <i>Same as</i> links but never merges.</li>
       <li><b>Do humans get lineages?</b> Probably, for uniformity. Your own anchor has no one above it to vouch, so you may be the one observer who is legibly self-anchored.</li>
     </ol>
   </div></details>

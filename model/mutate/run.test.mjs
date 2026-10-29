@@ -75,12 +75,12 @@ async function fixture() {
   for (const sub of ['model/mutate', 'model/Loops', 'vectors', 'bin']) await mkdir(path.join(dir, sub), { recursive: true });
   await copyFile(path.join(here, 'run.mjs'), path.join(dir, 'model/mutate/run.mjs'));
   await copyFile(path.join(here, 'mutants.json'), path.join(dir, 'model/mutate/mutants.json'));
-  const mutants = ['proof', 'vector', 'survive', 'genfail', 'timeout', 'signal'].map(id => ({ id, file: 'Test.lean', before: 'ORIGINAL', after: id, reason: id }));
+  const mutants = ['syntax', 'type', 'vector', 'survive', 'genfail', 'timeout', 'signal'].map(id => ({ id, file: 'Test.lean', before: 'ORIGINAL', after: id, reason: id }));
   await writeFile(path.join(dir, 'model/mutate/mutants.json'), JSON.stringify(mutants));
   await writeFile(path.join(dir, 'model/Loops/Test.lean'), 'ORIGINAL\n');
   await writeFile(path.join(dir, 'vectors/data'), 'baseline');
   const lake = path.join(dir, 'bin/lake');
-  await writeFile(lake, `#!${process.execPath}\nconst fs=require('fs'); const s=fs.readFileSync('Loops/Test.lean','utf8').trim(); const args=process.argv.slice(2); if(args[0]==='build') { if(s==='proof') process.exit(1); if(s==='timeout'||s==='signal') { fs.writeFileSync(${JSON.stringify(path.join(dir, 'ready'))},s); setInterval(()=>{},1000); } } else { if(s==='genfail') process.exit(2); fs.writeFileSync(args[2]+'/data',s==='vector'?'changed':'baseline'); }\n`);
+  await writeFile(lake, `#!${process.execPath}\nconst fs=require('fs'); const s=fs.readFileSync('Loops/Test.lean','utf8').trim(); const args=process.argv.slice(2); if(args[0]==='build') { if(s==='syntax'||s==='type') { console.error(s+' error'); process.exit(1); } if(s==='timeout'||s==='signal') { fs.writeFileSync(${JSON.stringify(path.join(dir, 'ready'))},s); setInterval(()=>{},1000); } } else { if(s==='genfail') process.exit(2); fs.writeFileSync(args[2]+'/data',s==='vector'?'changed':'baseline'); }\n`);
   await chmod(lake, 0o755);
   for (const args of [['init', '-q'], ['config', 'user.email', 'test@example.com'], ['config', 'user.name', 'Test'], ['add', '.'], ['commit', '-qm', 'fixture']]) {
     const r = spawnSync('git', args, { cwd: dir, encoding: 'utf8' }); assert.equal(r.status, 0, r.stderr);
@@ -98,12 +98,18 @@ function runFixture(dir, args) {
 test('synthetic repository exercises mutation outcomes and restoration', async () => {
   const dir = await fixture();
   try {
-    const result = await runFixture(dir, ['--only', 'proof,vector,survive,genfail,timeout', '--timeout', '0.4']).done;
+    const result = await runFixture(dir, ['--only', 'syntax,type,vector,survive,genfail,timeout', '--timeout', '0.4']).done;
     assert.equal(result.code, 1, result.output);
     const report = JSON.parse(await readFile(path.join(dir, 'result.json')));
-    assert.deepEqual(report.mutants.map(m => m.status), ['killed-by-proof', 'killed-by-vector', 'survived', 'error', 'error']);
-    assert.equal(report.mutants[3].commands[1].status, 'nonzero');
-    assert.equal(report.mutants[4].commands[0].status, 'timeout');
+    assert.deepEqual(report.mutants.map(m => m.status), ['rejected-by-build', 'rejected-by-build', 'killed-by-vector', 'survived', 'error', 'error']);
+    for (const entry of report.mutants.slice(0, 2)) {
+      assert.equal(entry.buildRejectionNeedsAudit, true);
+      assert.equal(Object.hasOwn(entry, 'proofKillNeedsAudit'), false);
+      assert.equal(entry.commands[0].status, 'nonzero');
+      assert.match(await readFile(entry.commands[0].log, 'utf8'), /^(syntax|type) error/);
+    }
+    assert.equal(report.mutants[4].commands[1].status, 'nonzero');
+    assert.equal(report.mutants[5].commands[0].status, 'timeout');
     assert.equal(report.finalBaseline.status, 'ok');
     assert.equal(await readFile(path.join(dir, 'model/Loops/Test.lean'), 'utf8'), 'ORIGINAL\n');
   } finally { await rm(dir, { recursive: true, force: true }); }
@@ -133,7 +139,7 @@ test('dirty and staged candidate files are refused without changing bytes', asyn
       await writeFile(source, 'ORIGINAL\nlocal changes\n');
       if (staged) assert.equal(spawnSync('git', ['add', 'model/Loops/Test.lean'], { cwd: dir }).status, 0);
       const before = await readFile(source);
-      const result = await runFixture(dir, ['--only', 'proof']).done;
+      const result = await runFixture(dir, ['--only', 'syntax']).done;
       assert.equal(result.code, 1, result.output); assert.match(result.output, /dirty/);
       assert.deepEqual(await readFile(source), before);
     } finally { await rm(dir, { recursive: true, force: true }); }

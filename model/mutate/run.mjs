@@ -169,7 +169,7 @@ export async function main(args) {
         mutated = relative;
         await writeFile(absolute, patch.text);
         const build = await run(`${m.id}-build`, 'lake', ['build', '--wfail']); entry.commands.push(build);
-        if (build.status === 'nonzero') { entry.status = 'killed-by-proof'; entry.failureDetail = `Build exited ${build.code}; audit the build log for syntax or type errors.`; entry.proofKillNeedsAudit = true; }
+        if (build.status === 'nonzero') { entry.status = 'rejected-by-build'; entry.failureDetail = `Build exited ${build.code}; inspect the build log to identify the rejection.`; entry.buildRejectionNeedsAudit = true; }
         else if (build.status === 'ok') {
           const dir = await mkdtemp(path.join(temp, `${m.id}-`));
           await cp(path.join(root, 'vectors'), dir, { recursive: true });

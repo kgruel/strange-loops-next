@@ -113,7 +113,7 @@
   </figure>
 
   <h3>Realms and the boundary rule</h3>
-  <p>A realm is a <b>name table plus a boundary rule</b>. <code>@home</code> names a table, not a store: every store has one, a realm has one that links its children, and a domain can optionally vouch for one. Because records hold only hash ids, joining stores into larger realms changes how names resolve and never rewrites data.</p>
+  <p>A realm is a <b>name table plus a boundary rule</b>. <code>@home</code> names a table, not a store. Each store has a table. A realm's table links its children. A domain can optionally vouch for one. Because records hold only hash ids, joining stores into larger realms changes how names resolve and never rewrites data.</p>
   <div class="tbl"><table>
     <thead><tr><th>Relationship</th><th>Within a realm</th><th>Across realms</th></tr></thead>
     <tbody>
@@ -136,7 +136,7 @@
       <li><b>Resolution</b> follows a search path: current store's table, then its parents, then any <code>@home</code> named explicitly.</li>
       <li><b>Realm names are your petnames</b> for root tables, so nested realms need no DNS-style hierarchy. A domain matters only when colleagues must agree what <code>@acme</code> means.</li>
       <li><b>Work is an ownership boundary.</b> At work the root is the team and your work lineage is admitted by their grants. Work and home lineages stay separate; any <code>same-as</code> between them lives only at home.</li>
-      <li><b>Lens output stays with the reader.</b> A compiled system prompt drawn from both realms is computed at read; if kept, it's a tick in the reading realm that references foreign records by hash.</li>
+      <li><b>Lens output stays with the reader.</b> A system prompt drawn from both realms is computed at read. If kept, it is a tick in the reading realm, referencing foreign records by hash.</li>
     </ul>
   </div></details>
 
@@ -145,11 +145,11 @@
       <thead><tr><th></th><th>Mechanism</th><th>Verdict</th></tr></thead>
       <tbody>
         <tr><td><b>A</b></td><td>Ticks flow directly; a vertex folds records and ticks</td><td><span class="pill p-ok">chosen</span> Simplest. "The vertex is where loops meet."</td></tr>
-        <tr><td>B</td><td>The vertex turns its tick into an observation with observer = the vertex</td><td>Blurs observations and ticks. What the code does today.</td></tr>
+        <tr><td>B</td><td>The vertex turns its tick into an observation with observer = the vertex</td><td>Blurs observations and ticks. Earlier Python prototype behavior, not a claim about the current integrated Rust implementation.</td></tr>
         <tr><td>C</td><td>An observer (a bridge) sits on every wire</td><td>My first proposal. One moving part too many.</td></tr>
       </tbody>
     </table></div>
-    <p>Consequence for layer 1: a spec routes and folds records. A route must be able to say "ticks from vertex V" as easily as "records of kind K." A fold over child ticks, like "how many slices passed review," is ordinary.</p>
+    <p>Consequence for layer 1: a spec routes and folds records. A route must select ticks from vertex V as easily as records of kind K. A fold over child ticks can count slices that passed review.</p>
   </div></details>
 
   <details class="unfold"><summary>Why immutable segments instead of a log with a head</summary><div class="body">

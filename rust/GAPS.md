@@ -40,10 +40,12 @@ store string is preserved but does not cause I/O during pure execution.
   retains previous-round mappings, first label/held lookup, raw labels,
   mapping/draft order, and the model's global refusal rank. The adapter does
   not claim unique meaning for arbitrary raw drafts.
-- Lens roundtrip/no-op/put-get properties retain their stated premises,
-  including unique base ids where required. Edited duplicate/empty ids are
-  refused; duplicate base ids retain first-match behavior. Absent and unknown
-  outcomes leave the base unchanged.
+- Lens laws retain their validity and success premises.
+  No-op and put-get require distinct base ids.
+  Put-get also requires the same ordered ids.
+  Edited duplicate and empty ids are refused.
+  Duplicate base-id policy remains open; raw Lean uses first-match behavior.
+  Absent and unknown outcomes leave the base unchanged.
 
 ## Numeric and canonical boundaries
 
@@ -56,11 +58,13 @@ Raw `Json::Int` obeys the same bound; refusal priority is unchanged.
 Canonical formatting covers all finite binary64 values, independently of writing. Exact accumulated integer outputs are not
 rounded through the input decoder.
 
-Rust's native shortest formatter is converted to ECMAScript notation, with
-the external 4,000-case corpus deciding compatibility. A Lean roundtrip/
-shortest proof is roadmap work, not a reason to skip the standards.
-Canonicalization remains defined on repeated object names: first equal-key
-value wins after UTF-16 sorting, but validators inspect the full raw object.
+Rust converts native shortest formatting to ECMAScript notation.
+It applies exact midpoint tie-to-even correction.
+The external 4,000-case corpus checks compatibility.
+Lean roundtrip and shortest proofs remain nonblocking roadmap work.
+Canonicalization handles repeated object names with stable UTF-16 sorting.
+The first equal-key value is rendered, but validators inspect all raw members.
+NaN and infinities are refused; negative zero canonicalizes to zero.
 
 The test suite consumes every merged JSON fixture, all six JCS byte pairs,
 4,000 IEEE-hex number rows and 128 SUPERCOP signing rows. There is no
@@ -84,4 +88,14 @@ Fixture diagnostic wording is Rust-specific; it does not claim byte-identical
 Lean diagnostics. Protocol refusals retain their wire codes and spec paths.
 JSON decoder refusals become per-file error rows, while process I/O failures
 are fatal. Expected fixture answers never participate in evaluator decoding
-or execution.
+or execution. Rust validates ignored metadata for Unicode, with regression tests.
+
+## Adapter boundaries needing decisions
+
+- Rust rejects nonfinite overflow during decoding. Lean retains an overflow
+  value until writer refusal. Error mapping, stage, and precedence remain open.
+- Rust signing fixtures require a 32-byte seed. Lean accepts canonical base32
+  seeds of other lengths. This is a fixture adapter boundary, not a record rule.
+- Lean returns the first writer refusal for record variants. Rust checks
+  Cartesian variants and may report a seed or disagreement error instead.
+  Mixed variants need an explicit fixture contract.

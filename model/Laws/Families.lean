@@ -7,16 +7,17 @@ import Laws.Numeric
 
 * **Distinct input.** A fold is handed each id once. The realm's union of
   several places is `dedup`, and it doesn't matter which place is read first.
-* **Accumulating folds: the set decides.** Any step that commutes gives the
-  same state for the same set, and a late record folds onto the cached state.
+* **Accumulating folds: the set decides.** A commuting step gives the same state for the same distinct-id set.
+  A new record folds onto that cached accumulator.
 * **Folds over heads: the set decides.** Any answer worked out from LatestBy's
   state inherits `LatestBy.set_decides`.
-* **Why there are two.** A bounded state can't follow `prev`: Max can't be
-  kept current over heads from its own state.
+* **Why there are two.** Max's scalar state cannot maintain the maximum over changing heads.
 * **No false resurrection.** A view folds to the same heads, so withholding or
   erasing a payload never makes a superseded record current.
 * **Honest results.** A view only loses information: a `where` answer stays
-  the same or becomes unknown. With every payload here, nothing is unread.
+  the same or becomes unknown.
+  When every test answers and every covered record is readable to the fold, unread is zero.
+  The result then equals the selected fold.
 -/
 
 namespace Loops
@@ -150,9 +151,10 @@ def cx.b : Record :=
 def cx.c : Record :=
   { id := ⟨3, by decide⟩, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [⟨2, by decide⟩], emitted := default, n := 1 }
 
-/-- Max can't follow `prev`. Max holds 9 after `[a, b]` and after
-`[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and
-1 in the other. No step from Max's state can know which. -/
+/-- Max's scalar state cannot maintain the maximum over changing heads.
+Max holds 9 after `[a, b]` and after `[b]`.
+Once `c` supersedes `b`, the current maximum is 5 in one history and 1 in the other.
+No step from Max's scalar state can know which. -/
 theorem Max.cannot_follow_prev :
     ¬ ∃ g : Option Int → Record → Option Int, ∀ xs r, Distinct (xs ++ [r]) →
       g (Max.fold none xs) r = (OverHeads.fold LatestBy.maxHeads (xs ++ [r])).value := by
@@ -313,9 +315,8 @@ theorem Count.select_unread (ev : Record → Tri) (xs : List Record) :
     (Count.acc.select ev xs).unread = (xs.filter (ev · == .unknown)).length := by
   simp [Acc.select_unread, Count.acc]
 
-/-- When the test answers for every record and the fold can read every
-record, nothing is unread and the result is the plain fold of what is
-selected. -/
+/-- Every test must answer and the fold must read every covered record.
+Then unread is zero and the result equals the selected fold. -/
 theorem Acc.select_full {σ} (f : Acc σ) (ev : Record → Tri) {xs : List Record}
     (hev : ∀ r ∈ xs, ev r ≠ .unknown) (hr : ∀ r ∈ xs, f.readable r = true) :
     f.select ev xs = ⟨f.fold (xs.filter (ev · == .yes)), 0⟩ := by
@@ -326,7 +327,8 @@ theorem Acc.select_full {σ} (f : Acc σ) (ev : Record → Tri) {xs : List Recor
   · intro r h; simp [hr r (mem_filter.1 h).1]
   · intro r h; simpa using hev r h
 
-/-- With every payload here, a `where` test answers for every record. -/
+/-- With held payloads, every `where` test answers.
+When the fold can also read every covered record, unread is zero and the result equals the selected fold. -/
 theorem Acc.select_here {σ} (f : Acc σ) (w : Where) {xs : List Record}
     (h : ∀ r ∈ xs, r.shown = .here) (hr : ∀ r ∈ xs, f.readable r = true) :
     f.select w.eval xs = ⟨f.fold (xs.filter (w.eval · == .yes)), 0⟩ :=
@@ -341,7 +343,7 @@ theorem Acc.select_set_decides {σ} (f : Acc σ) (ev : Record → Tri) {xs ys : 
   rw [f.perm (((p.filter _).filter _)), (p.filter _).length_eq,
     ((p.filter _).filter _).length_eq]
 
-/-- Max over heads counts every numeric value it cannot read. -/
+/-- Max over heads counts each head whose `n` field lacks a readable safe whole value. -/
 theorem LatestBy.maxHeads_view {f : Record → Record} (hf : View f) {xs : List Record}
     (hx : Addressed xs) :
     (OverHeads.fold LatestBy.maxHeads (xs.map f)).unread =

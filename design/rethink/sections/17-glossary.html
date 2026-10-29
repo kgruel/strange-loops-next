@@ -1,6 +1,6 @@
 <section class="panel" id="glossary" role="tabpanel" aria-labelledby="t-glossary">
   <div class="panel-head"><h2>Glossary</h2></div>
-  <p class="gist">One word per concept, one concept per word. Every public name in the <code>loops</code> crate appears here, and every word here means one thing across the page and the code. Plain words win; <b>vertex</b> is the one word kept from the strange-loop vocabulary, on purpose.</p>
+  <p class="gist">One word per concept, one concept per word. This glossary defines the page's principal terms. Plain words win; <b>vertex</b> is the one word kept from the strange-loop vocabulary, on purpose.</p>
 
   <h3>Records</h3>
     <div class="tbl"><table>
@@ -8,7 +8,7 @@
       <tbody>
         <tr><td><b>record</b></td><td>The unit of everything: an envelope, a payload and a signature, named by a content hash. An observation, never a statement of truth.</td></tr>
         <tr><td><b>emit</b></td><td>To write a record. One of the two write verbs; the other is <i>tick</i>.</td></tr>
-        <tr><td><b>envelope</b></td><td>The fields the core reads: <code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code>, <code>prev</code>, <code>under</code>. A field belongs here only if the core reads it.</td></tr>
+        <tr><td><b>envelope</b></td><td>The fields the core reads: <code>kind</code>, <code>observer</code>, <code>emitted</code>, <code>occurred</code>, <code>about</code>, <code>prev</code>, <code>under</code>, <code>erases</code>. A field belongs here only if the core reads it.</td></tr>
         <tr><td><b>payload</b></td><td>Everything else. The core never interprets it; folds read typed fields from it.</td></tr>
         <tr><td><b>kind</b></td><td>A record's label. It stays a label, not a type; declarations describe it.</td></tr>
         <tr><td><b>observer</b></td><td>Whoever says "I saw": a lineage id on every record. A collector is an observer reporting hearsay.</td></tr>
@@ -16,7 +16,8 @@
         <tr><td><b>about</b></td><td>The things a record is about: a set, usually one.</td></tr>
         <tr><td><b>prev</b></td><td>The records this one replaces, within the things both are about: a set. Empty starts a chain; two or more merge. It may name only records the writer holds about a shared thing.</td></tr>
         <tr><td><b>under</b></td><td>The grant a record relies on.</td></tr>
-        <tr><td><b>commitment · salt</b></td><td>The payload's hash, salted so a withheld payload can't be guessed. Opening it means showing the payload and the salt.</td></tr>
+        <tr><td><b>commitment · salt</b></td><td>The payload's salted hash. A secret salt makes offline guesses harder while the opening remains withheld. Opening it means showing the payload and the salt.</td></tr>
+        <tr><td><b>erases</b></td><td>The ids whose openings this record asks the store to erase.</td></tr>
         <tr><td><b>erasure</b></td><td>Removing a payload but keeping its commitment, so the id and every tick that cites it still hold.</td></tr>
       </tbody>
     </table></div>
@@ -45,12 +46,12 @@
         <tr><td><b>declaration · maturity</b></td><td>Records in a store describing its kinds, writers and policy. A store matures from open to declared to strict.</td></tr>
         <tr><td><b>vertex</b></td><td>A standing question over stores: it selects, folds and ticks, and its ticks feed higher vertices. Where loops meet, which nothing else names, so it keeps its word from the original vocabulary.</td></tr>
         <tr><td><b>spec</b></td><td>A vertex's definition: inputs, folds, a boundary. One spec can be instantiated as several vertices, each named by the hash of the spec and its parameters. Written as JSON, stored as a record of kind <code>vertex</code>; its <code>note</code> explains it and stays out of the input key.</td></tr>
-        <tr><td><b>fold</b></td><td>Turning a set of records into state, with one of six: Count, Sum, Min, Max, LatestBy, Collect. Accumulating folds are commutative; folds over heads follow <code>prev</code>. Latest, TopN and Window are modifiers of these, and Avg is left to the lens.</td></tr>
+        <tr><td><b>fold</b></td><td>Turning a set of records into state, with one of six: Count, Sum, Min, Max, LatestBy, Collect. Accumulating folds are commutative; folds over heads follow <code>prev</code>. Latest, TopN and Window are proposed modifiers; Avg is left to the lens.</td></tr>
         <tr><td><b>head</b></td><td>A record nothing about the same thing names in <code>prev</code>: a thing's current record. A thing with several heads is forked, shown as a conflict. Heads are worked out from envelopes alone, over everything the reader holds.</td></tr>
         <tr><td><b>content order</b></td><td>How a fold decides which record wins: taken from what records carry, never from arrival. No fold needs records read in this order.</td></tr>
         <tr><td><b>predicate</b></td><td>Wherever a spec says which records, or when to tick. A closed, typed set.</td></tr>
         <tr><td><b>boundary · marker</b></td><td>When a vertex ticks. A marker is a record whose arrival is that moment.</td></tr>
-        <tr><td><b>tick</b></td><td>A vertex's result at a moment, covering exactly the records it folded. Also the verb: a vertex ticks at each boundary. A <b>content tick</b> is a value anyone can recompute, with an id over its vertex, covers and result; it is stored, when cited or sent, as a record of kind <code>tick</code> signed by its writer. A <b>witness tick</b> is such a record saying what the runner had.</td></tr>
+        <tr><td><b>tick</b></td><td>A vertex's result at a moment, covering exactly the records it folded. Also the verb: a vertex ticks at each boundary. A <b>content tick</b> is a value a holder of its inputs can recompute. Its id covers its vertex, covers and result. When cited or sent, its writer stores and signs a record of kind <code>tick</code>. A <b>witness tick</b> is such a record saying what the runner had.</td></tr>
         <tr><td><b>covers</b></td><td>The records a tick folded, listed exactly; also its field, <code>covers=(…)</code>.</td></tr>
         <tr><td><b>as of</b></td><td>The cut a fold is taken at, for either time. Always an input, never the clock.</td></tr>
       </tbody>
@@ -96,7 +97,8 @@
       </tbody>
     </table></div>
 
-  <h3>API words</h3>
+  <h3>Proposed API words</h3>
+  <p>These names describe the design vocabulary, not a complete inventory of the integrated crate's public API.</p>
     <div class="tbl"><table>
       <thead><tr><th>Term</th><th>Means</th></tr></thead>
       <tbody>

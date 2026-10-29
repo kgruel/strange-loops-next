@@ -1,9 +1,11 @@
 # Vectors
 
-`fold/`, `lens/`, `record/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/` are written by `model/` (`lake exe gen
-../vectors`); never edit them by hand. CI regenerates them and fails on any
-difference. `standard/` holds test data from the standards themselves; see
-its README.
+`model/` writes the protocol fixture families:
+`fold/`, `lens/`, `record/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/`.
+Run `lake exe gen ../vectors` from `model/`; never edit these fixtures by hand.
+CI regenerates them and fails on any difference.
+`standard/` holds external standards data; see its README.
+JS and the Rust workspace check all fixture families and standards.
 
 Every file has the same envelope:
 
@@ -20,147 +22,163 @@ Every file has the same envelope:
 
 ## `fold/count`, `fold/latest-by`, `fold/latest`, `fold/sum`, `fold/extrema`
 
-`input.orders` lists one or more arrival orders of the same records. An
-implementation folds each order separately; every one must produce
-`expect` (except `count.repeats`, which has one order).
+`input.orders` lists arrival orders of the same records.
+Fold each order separately; each must produce `expect`.
+`count.repeats` has one order.
 
 * Count: `expect` is the number.
-* LatestBy: per thing, its `heads` (newest first), its `winner` and its
-  `others` (a fork when non-empty). A record about several things counts in
-  each; a record about nothing anchors a thing of its own, named by its id.
-* Latest: the `winner` and the `others`.
-* Sum: the number. Extrema: `min` and `max`, `null` when nothing was folded.
+* LatestBy: each thing has `heads` newest first, a `winner` and `others`.
+  Nonempty `others` shows a fork.
+  A record about several things counts in each.
+  A record about nothing anchors its own thing, named by its id.
+* Latest: the `winner` and `others` of the combined, distinct-id per-thing heads.
+* Sum: the number.
+* Extrema: `min` and `max`, each `null` when nothing was folded.
 
-Each record's `about` is a set of things. It carries `emitted` and may carry
-`occurred`, both as text per `protocol/record.md`, and some spell one time two
-ways. Content order is the record's span, by start, then end (a record
-without `occurred` is an instant at its `emitted`), then the `emitted`
-moment, then the id as digest bytes, the greatest newest. Ids are written
-as layer 0 writes them, but their digests are made up. It carries `n`, the integer the
-numeric folds read, and may carry `observer`, `erases` (the ids whose
-payloads it erases, whatever its kind) and `fields`, further payload fields
-by name. A record whose payload the reader doesn't hold has `shown`
-(`withheld` or `erased`) instead of `value`, `n` and `fields`.
+Each record's `about` is a set of things.
+It carries `emitted` and may carry `occurred`, as text per `protocol/record.md`.
+Some fixtures spell one time two ways.
+Content order compares span start, span end, `emitted`, then id digest bytes.
+A record without `occurred` has an instant span at its `emitted`.
+Newest first reverses this whole order.
+Ids use layer 0's encoding, but these fixture digests are made up.
+The `n` field supplies held safe-whole numbers to the raw sum and extrema fixtures.
+Selected-reader semantics do not redefine these raw primitives.
+Optional `observer`, `erases` and `fields` supply the observer, erased ids and further payload fields.
+A hidden payload uses `shown` (`withheld` or `erased`) instead of `value`, `n` and `fields`.
 
 ## `fold/heads`
 
-Answers worked out from LatestBy's heads. `expect.max` is the largest `n`
-among the readable heads (`value`, `null` if none) and how many heads were
-unreadable (`unread`); `expect["limit-2"]` is the two newest heads.
+Answers come from LatestBy's heads.
+`expect.max.value` is the largest readable safe whole `n`, or `null` if none exists.
+`expect.max.unread` counts every head with an unreadable `n`, not just hidden payloads.
+`expect["limit-2"]` lists the two newest heads.
 
 ## `fold/view`
 
-Some records arrive without their payload. `expect.heads` lists the heads
-newest first, each with what the reader holds (`shown`): the same heads a
-reader holding everything gets. `expect.max` is as in `fold/heads`.
+Some records arrive without payloads.
+`expect.heads` lists heads newest first, with each record's `shown` form.
+With consistent forms, these are the same heads as the full reader's.
+`expect.max` follows `fold/heads`.
 
 ## `fold/select`
 
-`input.where` is a test as a spec writes it, with envelope fields named
-`env.<field>` (`gen` checks it gives what the model runs). A test on the
-envelope always answers; a test on a payload the reader doesn't hold answers unknown.
-`expect.count` and `expect.sum` give the `value` over the selected, readable
-records and how many covered records were `unread`: unknown to the test, or
-selected but needed by the fold and not readable. Count needs no payload;
-sum, min and max read a record only when its payload is held and has the
-field as a number.
+`input.where` uses spec syntax and names envelope fields `env.<field>`.
+`gen` checks that it gives the test the model runs.
+An envelope test always answers.
+A payload test answers unknown when the reader lacks the payload.
+`expect.count` and `expect.sum` give `value` over selected, readable records and an `unread` count.
+A covered record is unread if its test is unknown or its selected fold cannot read it.
+Count needs no payload.
+Sum, min and max require a held payload and a safe whole field value.
+Full-result equality requires both answering tests and fold-readable covered records.
 
 ## `spec/parse`
 
-`input.spec` is a vertex's spec as JSON. A spec that repeats a key also
-comes as `input.spec_text`, the spec as written: read that one, since a JSON
-parser may keep only one of the repeats. `expect` is either `parsed`, the
-spec in its parsed form (which parses back to itself), or `refused` with a
-code and the `path` of what broke the rule. `protocol/spec.md` is the
-grammar, the parsed form and the order the refusals are checked in; several
-vectors break more than one rule, so that only that order gives the code
-and path expected.
+`input.spec` is a vertex's JSON spec.
+A repeated-key spec also supplies `input.spec_text`; read that text without discarding repeats.
+`expect.parsed` gives the parsed form, which parses back to itself.
+Alternatively, `expect.refused` gives the code and `path`.
+`protocol/spec.md` defines the normative grammar, parsed form and refusal order.
+Several vectors break multiple rules; refusal order decides the expected code and path.
 
 ## `spec/run`
 
-`input.spec` and `input.orders`, as in the fold vectors. `expect` names each
-slot of `fold` and what it holds: `value` and `unread` for count, sum, min
-and max; for latest-by, each thing's current records (`things`), and for
-collect the records newest first (`heads`), each with what the reader holds
-of it, and how many a payload test couldn't answer (`unread`). Latest-by,
-and collect with `"follow": "prev"`, read heads: supersession runs over
-everything held, per thing, then `from` and the envelope tests choose heads
-and payload tests filter them. Collect without `follow` takes every selected
-record, superseded or not.
+`input.spec` and `input.orders` follow the fold fixtures.
+`expect` names each `fold` slot.
+Count, sum, min and max return `value` and `unread`.
+Latest-by returns each thing's current records in `things`.
+Collect returns records newest first in `heads`.
+Each record carries its held form; `unread` counts records whose payload tests cannot answer.
+Count each unread id once per slot, even when it heads several things.
+
+Latest-by and collect with `"follow": "prev"` read heads.
+Supersession runs per thing over the admitted set before selection.
+`from` and envelope tests choose heads; payload tests then filter them.
+Collect without `follow` takes every selected record, superseded or not.
+Collect counts unread candidates before applying its limit.
 
 ## `batch`
 
-`input.drafts` is one changeset: each draft has an optional `label`
-(`@name`), an envelope whose `about` and `prev` may use labels (`erases` may
-not), a `salt` and a payload. `input.held` lists what the store already holds: each id and its
-`about`. `expect.records` gives each record's `id` and canonical envelope
-with labels replaced by ids, in the order given; or `expect.refused`:
-`label-duplicate`, `label-unknown`, `label-cycle`, a code `write` gives
-(the first, in `protocol/record.md`'s order, among every draft's), then
-`prev-unknown` or `prev-unrelated`, each checked across the whole batch.
-Every order of the drafts, and of each `prev` set, gives the same records or
-the same refusal.
+`input.drafts` is one changeset.
+Each draft has an optional `label` (`@name`), an envelope, a `salt` and a payload.
+`about`, `prev` and `under` may use labels; `erases` may not.
+`input.held` lists store-held ids and their `about` sets.
+Writers require every `prev` target in the batch or held store state.
+Readers can admit unknown targets because they cannot judge them.
+
+`expect.records` gives ids and canonical envelopes in draft order, with labels replaced by ids.
+Alternatively, `expect.refused` gives the first refusal.
+Label checks run first: `label-duplicate`, `label-unknown`, then `label-cycle`.
+Next come writer codes, in `protocol/record.md` order across every draft.
+Finally, `prev-unknown` and `prev-unrelated` run across the whole batch.
+Every draft order and `prev` order gives the same records or refusal.
+Meaning uniqueness states at most one satisfying label assignment; it does not prove resolver correctness.
 
 ## `realm`
 
-`input.forms` lists every form a reader's places hold, in one list. `expect`
-gives what the reader keeps, one record per id with what it holds of each
-(`settled`); the records refused for their `prev`, with the code
-(`refused`); each thing's state over the rest (`things`, as in
-`fold/latest-by`); and Sum over them (`sum`). Every rotation of the forms
-must give the same.
-Write `settled` and `refused` in ascending record-id order.
-Compare ids by unsigned digest bytes, first byte first, not by id text.
+`input.forms` lists all forms held across places.
+Consistent forms share one record per id.
+A held eraser can suppress a target's payload; a bare erased copy cannot suppress a held payload.
+`expect.settled` gives one record per id and its held form.
+`expect.refused` gives admission refusals and codes.
+`expect.things` gives per-thing states, as in `fold/latest-by`.
+`expect.sum` gives Sum over admitted records.
+Every rotation must give the same answer when forms are consistent.
+Write `settled` and `refused` in ascending id digest-byte order, not id-text order.
 This order does not change head content order.
 
 ## `scenario`
 
-A sequence of steps over one spec. `input.records` are the records, in full;
-each of `input.steps` names the forms a reader's places hold at that step
-(`forms`, each an id and what is held of it) and the orders `gen` checked
-(`orders`, every rotation). `expect.steps` gives, per step, what the reader
-keeps (`settled`, as in `realm`), what is admitted (`admitted`),
-`input.thing`'s heads newest first and its winner, and each slot of the spec
-over the admitted records (`slots`, as in `spec/run`). Every rotation of a
-step's forms must give the same.
-Write `settled` and `admitted` in ascending record-id order, by unsigned digest bytes.
-`input.lens.base` holds base sections, and `input.lens.text` holds edited lines.
-`expect.lens` holds the rendered base, outcomes, and applied sections.
-The scenario adapter splits a head's value at each LF and keeps all parts, including empty parts.
-It leaves CR unchanged; the lens itself does not split line elements.
+A scenario gives steps over one spec.
+`input.records` supplies full records.
+Each `input.steps` entry names place-held `forms`: an id and its held form.
+Its `orders` lists the rotations checked by `gen`.
+Each `expect.steps` entry gives `settled`, `admitted`, the requested thing's heads and winner, and spec `slots`.
+These fields follow `realm` and `spec/run`.
+Consistent forms give the same answer in every rotation.
+Write `settled` and `admitted` in ascending id digest-byte order.
+
+`input.lens.base` holds base sections; `input.lens.text` holds edited lines.
+`expect.lens` holds rendered base, outcomes and applied sections.
+The scenario adapter splits head values at LF, keeping all parts, including empty parts.
+It leaves CR unchanged.
+The lens itself does not split line elements.
 See [`protocol/lens.md`](../protocol/lens.md).
 
-`01-decision` is the walk the grammar page draws: two people write, fork,
-merge and erase one decision, a reader holds less, and a lens edit comes
-back as a record.
+`01-decision` supplies the grammar page's walk.
+Two people write, fork, merge and erase a decision.
+A reader holds less; a lens edit returns as a record.
 
 ## `occurred`
 
-`input.occurred` lists `occurred` texts. `expect.spans` gives each one's
-span, `start` and `end` as UTC instants (`end` is `null` when the span has
-no end yet; years outside 0000 to 9999 are signed or five digits, as
-`-0001-12-31T23:00:00Z` and `10000-01-01T00:00:00Z`), or
-`refused`, in the same order. In `08-order`, `expect["oldest-first"]` is the
-texts sorted by span, per `protocol/record.md`.
+`input.occurred` lists time texts.
+`expect.spans` gives each span's UTC `start` and `end`, or `refused`, in input order.
+An open span has `end: null`.
+UTC offsets can cross years 0000 or 9999.
+Outside years use signed or five-digit forms, such as `-0001-12-31T23:00:00Z` and `10000-01-01T00:00:00Z`.
+In `08-order`, `expect["oldest-first"]` lists texts ordered by span, per `protocol/record.md`.
 
 ## `lens/section`
 
-`input.base` is the base document, `input.text` the edited text as lines.
-`expect` is either `{"parsed": null, "refused": true}` or the parsed
-document, its normal form, the outcomes (`accepted`, `unknown`, `absent`)
-and the base with the outcomes applied.
+`input.base` supplies base sections; `input.text` supplies edited lines.
+`expect` is either `{"parsed": null, "refused": true}` or the parsed document and its normal form.
+It also gives `accepted`, `unknown` and `absent` outcomes, plus the applied base.
+Render roundtrip requires nonempty, distinct ids.
+Put-get additionally requires distinct base ids and the exact same ordered id list in the edit.
 
 ## `record`
 
-A stored-record vector gives `input.envs` (envelope variants that must all give the
-same id), `input.payloads` (payload variants that must all give the same
-commitment), the `salt` and the signing key's `seed` (both base32).
-`expect` pins every intermediate: the canonical envelope and payload, the
-commitment, the id's preimage, the id, the signing key and signature, and
-the stored line before and after erasure.
+`input.envs` gives envelope variants with the same id.
+`input.payloads` gives payload variants with the same commitment.
+`salt` and the signing key's `seed` use base32.
+`expect` pins canonical envelope and payload, commitment, id preimage, id, signing key, signature and both stored lines.
+The two stored lines show forms before and after erasure.
+The signed message uses the exact prefix `loops/record/v1:`.
 
-A refused vector has `expect.refused`: writing its envelope with its `salt`
-(base32) and its payload is refused for that reason, per
-`protocol/record.md`. The payload is given as JSON text, `payload_text`, so
-a repeated member name survives into the vector; parse it with a parser that
-refuses repeats.
+A refused vector's `expect.refused` names the writer refusal from `protocol/record.md`.
+`payload_text` preserves repeated member names in JSON text.
+Use a parser that detects repeated names.
+Writers cap every number's magnitude at 2^53 − 1, whole or not.
+Numeric readers separately require safe whole values.
+JS and Rust sums use unbounded integers; future bounded ports must refuse overflow.

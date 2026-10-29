@@ -1,10 +1,11 @@
 <section class="panel" id="things" role="tabpanel" aria-labelledby="t-things">
   <div class="panel-head"><h2>Things and <code>about</code></h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="callout"><b>Design proposals:</b> these examples include unsupported grammar and future product surfaces. <code>protocol/spec.md</code> defines accepted specs. Examples are not conformance fixtures.</p>
   <p class="gist">Records are the only thing stored. A <b>thing</b> is what a record is about. Identity moves out of the fold and into the record, through <code>about</code> on the envelope. Tested against every case so far, it holds with no new machinery and six refinements.</p>
-  <p><span class="pill p-ok">layer closed</span> Composition starts here: a vertex reading many stores can only merge meaning if it can tell when two records are about the same thing. It closed on three more decisions:</p>
+  <p><span class="pill p-ok">layer closed</span> Composition needs shared thing identity when a vertex reads several stores. It closed on three more decisions:</p>
   <ul>
     <li><b>Promotion carries its anchor</b> verbatim when the target store lacks it. Across realms a natural key is content, not a reference (<code>svc:auth@corp-prod</code> says something), so it crosses only by bridge. A public store is a standing bridge, which is how <code>url:</code> keys meet across realms (see the web annotation walk in <a href="#horizons/h-web" data-tab="horizons" data-sub="h-web">Horizons</a>).</li>
-    <li><b>Input resolves against the target store's names first, then home.</b> What a miss does follows the store's maturity (see "Referencing a thing mid-flow" below), and it always happens in the target store, so personal petnames don't leak into team anchors.</li>
+    <li><b>Input resolves against the target store's names first, then home.</b> A miss follows the target store's maturity; see the flow below. Resolution stays there so personal petnames do not leak into team anchors.</li>
     <li><b><code>as</code> drops from the envelope.</b> The name in effect at <code>emitted</code> is a fold over dated name records; the automatic first-emit anchor carries the initial self-name.</li>
   </ul>
 
@@ -14,16 +15,16 @@
     <tbody>
       <tr><td><b>Record</b></td><td>an immutable claim; the only thing stored</td><td>log snippet, RSS entry, prose save, tick</td><td>content hash</td><td>none: a record is a point</td></tr>
       <tr><td><b>Thing</b></td><td>what records are <i>about</i></td><td>chapter, incident, service, URL, Mara</td><td>an anchoring record, or a natural key</td><td>vertices only</td></tr>
-      <tr><td><b>Primitive</b></td><td>what the system is made of</td><td>observer, store, vertex</td><td><code>*-anchor</code> lineage</td><td>the core library itself</td></tr>
+      <tr><td><b>Primitive</b></td><td>observer or store lineage</td><td>observer, store</td><td><code>*-anchor</code> lineage</td><td>future standing code</td></tr>
     </tbody>
   </table></div>
-  <p>A chapter has a lineage just as an observer does: a first record, then later records that fold into its current self. The difference is who reads it. The core folds observers, stores and vertices to decide admission, signatures and writer policy. It never needs to know what a chapter is. Primitives have <b>standing</b>: they can sign, hold a grant, admit a record. A thing is acted on and never acts.</p>
+  <p>A chapter has a lineage just as an observer does: a first record, then later records that fold into its current self. The difference is who reads it. The future standing layer folds observer and store declarations for admission and writer policy. A vertex is its spec hash, not a lineage. It never needs to know what a chapter is. In the proposed authority design, observers sign and hold grants. Store policy admits records. Vertices hold neither keys nor standing. A thing is acted on and never acts.</p>
 
   <h3>Where identity lives</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="Left, loops today: a decision fact and a thread fact both carry topic=auth in their payload, and a vertex folds by topic; nothing names the thing, so the link exists only in the fold. Right, now: a component-start record anchors r:x1, the decision and thread records both say about r:x1, and the vertex groups by about; the link is in the record.">
-        <text x="88" y="18" text-anchor="middle" class="b">loops today</text>
+      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="The historical vertex grouped decision and thread payloads by topic=auth. The new design anchors r:x1 with a component-start record. Each observation states about r:x1. Grouping arbitrary payload fields remains proposed.">
+        <text x="88" y="18" text-anchor="middle" class="b">earlier prototype</text>
         <text x="298" y="18" text-anchor="middle" class="b">now</text>
         <line class="faint" x1="193" y1="8" x2="193" y2="248"/>
         <rect class="box dash" x="8" y="30" width="160" height="36" rx="8"/><text x="88" y="52" text-anchor="middle" class="xs m">nothing names the thing</text>
@@ -44,14 +45,14 @@
         <text x="298" y="242" text-anchor="middle" class="xs ta">the link is in the record</text>
       </svg>
     </div>
-    <figcaption>Today a vertex picks a payload field (<code>Upsert key="topic"</code>), so two facts are related only because their strings happen to match. Now the emitter states the thing. The old style survives as the case with no <code>about</code>: a vertex can still group by any payload field, including ones nobody declared as identity.</figcaption>
+    <figcaption>In the earlier prototype, a vertex picked a payload field (<code>Upsert key="topic"</code>). Two facts were related only because their strings happened to match. Now the emitter states the thing. Payload-field grouping remains proposed grammar, not implemented LatestBy behavior.</figcaption>
   </figure>
-  <p><code>about</code> is the emitter's <b>claim</b> ("this is about r:x1"). A fold key is the vertex's <b>question</b> ("group these by host"). Both stay. <code>about</code> can point at three sorts of target: a record id that anchors a thing (<code>r:…</code>), a natural key (<code>url:…</code>, <code>host:…</code>, <code>svc:…</code>), or a primitive (<code>sl:…</code>, <code>st:…</code>, <code>vx:…</code>).</p>
+  <p><code>about</code> is the emitter's <b>claim</b> ("this is about r:x1"). A fold key is the vertex's <b>question</b> ("group these by host"). Both stay. <code>about</code> carries typed references. The design uses anchoring record ids, natural keys and named system objects. A vertex reference names its spec hash.</p>
 
   <h3>Case: a chapter, in facets</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="A chapter-start record anchors r:a1. Four facets are about it: prose saves p1 and p2 chained by prev, then two p3 saves from laptop and phone that both name p2 as prev; titles t1 and t2; mentions m1 and m2, with m2 referencing Mara r:c1; and notes n1 to n3, collected rather than chained. The chapter view upserts by kind and shows the prose fork.">
+      <svg class="dg" viewBox="0 0 400 256" role="img" aria-label="Chapter-start anchors r:a1. Prose p2 replaces p1; two concurrent p3 saves both replace p2. Titles and mentions form separate chains. Mentions refer to Mara r:c1. Notes n1 to n3 accumulate. The proposed chapter view shows facets and the prose fork.">
         <rect class="box-amb" x="8" y="74" width="100" height="44" rx="9"/><text x="58" y="92" text-anchor="middle" class="s b">chapter-start</text><text x="58" y="107" text-anchor="middle" class="xs">r:a1</text>
         <text x="58" y="136" text-anchor="middle" class="xs ta">every record:</text><text x="58" y="150" text-anchor="middle" class="xs ta">about r:a1</text>
         <line class="ln-acc" x1="122" y1="39" x2="122" y2="169"/>
@@ -116,7 +117,7 @@
   <h3>Case: the team platform</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 334" role="img" aria-label="Three people name one service three ways: auth-svc, the auth service, SSO gateway. No name matches, so each input mints an anchor: r:x1, r:x2, r:x3. Kyle records same-as x1 x2, a developer same-as x2 x3, and the director disputes x2 x3. An identity vertex folds those per pair, with stewards deciding. The platform-knowledge vertex uses it through resolve-by, a state reference, and groups notes about x1, x2 and x3 by class: x1 and x2 together, x3 apart.">
+      <svg class="dg" viewBox="0 0 400 334" role="img" aria-label="Three people mint anchors r:x1, r:x2 and r:x3 for one service. Kyle joins x1 with x2; a developer joins x2 with x3. The director disputes the second pair. A proposed identity vertex folds those claims. Platform knowledge then groups accepted classes through resolve-by. Another reader can choose different equivalence claims.">
         <rect class="box dash" x="8" y="8" width="120" height="36" rx="8"/><text x="68" y="23" text-anchor="middle" class="s">"auth-svc"</text><text x="68" y="37" text-anchor="middle" class="xs m">a developer</text>
         <rect class="box dash" x="140" y="8" width="120" height="36" rx="8"/><text x="200" y="23" text-anchor="middle" class="s">"the auth service"</text><text x="200" y="37" text-anchor="middle" class="xs m">kyle</text>
         <rect class="box dash" x="272" y="8" width="120" height="36" rx="8"/><text x="332" y="23" text-anchor="middle" class="s">"SSO gateway"</text><text x="332" y="37" text-anchor="middle" class="xs m">director</text>
@@ -165,7 +166,7 @@
       <tr><td><b><code>resolve-by</code></b> is the third state reference.</td><td>Identity across anchors is disputed, so it's a fold, read like <code>weight-by</code>.</td></tr>
       <tr><td><b>Natural keys are typed</b>: <code>prefix:value</code>, with normalization declared per prefix in the store.</td><td>Makes <code>url:</code>, <code>host:</code>, <code>svc:</code> comparable without minting.</td></tr>
       <tr><td><b>Only primitives use the reserved <code>*-anchor</code> kinds.</b> Any other thing is anchored by whatever record starts it.</td><td>Keeps the reserved list short; thing kinds stay in user vocabulary.</td></tr>
-      <tr><td><b><code>prev</code> is a general link and a set,</b> and Latest follows it. Two records sharing a <code>prev</code> are a fork; one record naming both heads merges it.</td><td>Prose saves, name records and stances all hit concurrent edits. Following the chain takes clock skew out of "current". Heads are records nothing else names in <code>prev</code>.</td></tr>
+      <tr><td><b><code>prev</code> is a general link and a set,</b> and Latest follows it. Two records sharing a <code>prev</code> are a fork; one record naming both heads merges it.</td><td>Prose saves, name records and stances all hit concurrent edits. Following the chain takes clock skew out of "current". Heads are records no successor names in <code>prev</code> for that thing. A whole view retains a record if any thing retains it.</td></tr>
     </tbody>
   </table></div>
 
@@ -174,9 +175,9 @@
   <div class="tbl"><table>
     <thead><tr><th></th><th>How many</th><th>What</th></tr></thead>
     <tbody>
-      <tr><td><b>Identifiers</b></td><td>2</td><td>A <b>content hash</b>: record ids, and also lineage, store and vertex ids and thing anchors, which are hashes of the records that started them (prefixes are labels, not separate systems). A <b>natural key</b>, <code>prefix:value</code>.</td></tr>
+      <tr><td><b>Identifiers</b></td><td>2</td><td>A <b>content hash</b> names records and anchoring records for lineages, stores and things. A vertex hash names its spec and parameters. Prefixes label references. A <b>natural key</b>, <code>prefix:value</code>.</td></tr>
       <tr><td><b>Names</b></td><td>1</td><td>Name records in name tables. Self-name, petname paths and <code>@home</code> are forms of it. Never matched.</td></tr>
-      <tr><td><b>Envelope pointers</b></td><td>4</td><td><code>about</code> · <code>prev</code> · <code>under</code> · <code>covers</code> (ticks)</td></tr>
+      <tr><td><b>Envelope pointers</b></td><td>4</td><td><code>about</code> · <code>prev</code> · <code>under</code> · <code>erases</code>. Proposed tick payloads carry <code>covers</code>.</td></tr>
       <tr><td><b>Vertex state references</b></td><td>3</td><td><code>admitted-by</code> · <code>weight-by</code> · <code>resolve-by</code></td></tr>
       <tr><td><b>Everything else</b></td><td></td><td>A record whose <code>about</code> points at something. Stances point at a record; <code>same-as</code> at two things; vouch, grant, tenure and <code>runs-on</code> at a lineage; name records at what they name.</td></tr>
     </tbody>
@@ -189,10 +190,10 @@
       <tr><td><b>Succession</b></td><td>record → the records it replaces</td><td><code>prev</code></td><td>Latest</td></tr>
     </tbody>
   </table></div>
-  <p>The three families stay separate; blurring them is the <code>owl:sameAs</code> failure. That settled <code>derived-from</code>: a restated promotion keeps the thing's identity through <code>about</code>, so the link back to its original is provenance only, and a payload convention.</p>
+  <p>The three families stay separate; blurring them is the <code>owl:sameAs</code> failure. A restated promotion keeps thing identity through <code>about</code>. Its <code>derived-from</code> link records provenance as a payload convention.</p>
 
   <h3>Discipline in an open store</h3>
-  <p>In a semantic store, convention is what keeps a growing store aligned. Admission happens at read time, so discipline can tighten after a store has grown messy: nothing is rewritten, and records that don't meet the new rules become visible rejections. A schema-first store must be disciplined from day one; this one can be disciplined as it matures.</p>
+  <p>In a semantic store, convention is what keeps a growing store aligned. The future admission design applies policy at read time. Records remain unchanged. Records outside the current policy become visible rejections. A schema-first store must be disciplined from day one; this one can be disciplined as it matures.</p>
   <div class="tbl"><table>
     <thead><tr><th>Surface</th><th>Disciplined by</th><th>Drift looks like</th></tr></thead>
     <tbody>
@@ -214,12 +215,12 @@ strict    refused: no thing called "auth service"; did you mean auth-svc (r:x1)?
     <li><b>Keys converge on their own.</b> Two agents who write <code>topic:auth-service</code> meet without coordinating. Anchors never collide, so minting on every miss makes duplicates: three anchors for one service in the team case above.</li>
     <li><b>Minting becomes deliberate</b> when a thing must survive a rename or be told apart from a namesake. It comes with a <code>same-as</code> from the key to the new anchor, and every early record joins the anchor's class through <code>resolve-by</code>. No migration.</li>
     <li><b>The start record carries the first name,</b> as an anchor carries a self-name; no separate name record.</li>
-    <li><b>Only <code>about</code> joins.</b> A record that names its topic only in a payload field (<code>topic=auth</code>) is reached by a vertex grouping on that field, or by a later record about the key that refers to it. <code>resolve-by</code> never reads payloads.</li>
+    <li><b>Only <code>about</code> joins.</b> Payload-topic grouping is proposed. A later record can link evidence to a thing through <code>about</code> and a payload reference. <code>resolve-by</code> never reads payloads.</li>
   </ul>
 
   <details class="unfold"><summary>Matching: one equality relation is enough</summary><div class="body">
-    <p>Linked Data's best-documented failure is <code>owl:sameAs</code>: used loosely for "same", "closely related" and "roughly the same", and global and transitive, so a few sloppy links merged unrelated entities across whole datasets. Here <code>same-as</code> is local and disputable, folded per reader. The other guard is a cheap place to say "related", so nobody overloads "same".</p>
-    <p>SKOS's mapping relations (<code>exactMatch</code>, <code>closeMatch</code>, <code>broadMatch</code>, <code>narrowMatch</code>, <code>relatedMatch</code>) were adopted as an opt-in vocabulary and then dropped. They mix the families in one kind: equivalence, hierarchy and association. And "related" throws away what was observed: the director meant "SSO gateway is the proxy in front of auth-svc", which is a note about both things, not a tag.</p>
+    <p>Linked Data often overloaded <code>owl:sameAs</code> with relatedness. Its global, transitive meaning let loose links merge unrelated entities. Here <code>same-as</code> is local and disputable, folded per reader. The other guard is a cheap place to say "related", so nobody overloads "same".</p>
+    <p>SKOS's mapping relations (<code>exactMatch</code>, <code>closeMatch</code>, <code>broadMatch</code>, <code>narrowMatch</code>, <code>relatedMatch</code>) were adopted as an opt-in vocabulary and then dropped. They mix the families in one kind: equivalence, hierarchy and association. A generic related tag loses the observation. The director's claim that SSO gateway fronts auth-svc belongs in a note about both things.</p>
     <div class="tbl"><table>
       <thead><tr><th>Relationship</th><th>Recorded as</th><th>Read by</th></tr></thead>
       <tbody>
@@ -229,15 +230,15 @@ strict    refused: no thing called "auth service"; did you mean auth-svc (r:x1)?
         <tr><td>One thing split from another</td><td>the new anchors' start records refer to the original (<code>split-from</code>, a payload convention)</td><td>lenses follow it for ancestry</td></tr>
       </tbody>
     </table></div>
-    <p><code>same-as</code> means "always the same thing", so it can't record a split: joining a monolith to the two services it became would pour every later observation of each into the other. <code>prev</code> stays inside one thing's chain. Observations about the monolith stay about the monolith.</p>
-    <p>None of it enters the core; <code>same-as</code> isn't even a reserved kind. The core holds only <code>resolve-by</code>'s contract: connected components over the pairs a vertex accepts.</p>
+    <p><code>same-as</code> means identity, not descent. Joining a monolith to its two successor services would mix their later observations. <code>prev</code> stays inside one thing's chain. Observations about the monolith stay about the monolith.</p>
+    <p>None of it enters the core; <code>same-as</code> isn't even a reserved kind. The proposed <code>resolve-by</code> contract uses connected components over accepted pairs. Higher reference transitions remain future model work.</p>
     <details class="source"><summary>Halpin et al.</summary><div class="body"><p>Halpin, Hayes, McCusker, McGuinness and Thompson, "When owl:sameAs isn't the same: an analysis of identity in Linked Data" (ISWC 2010). <a href="https://www.w3.org/TR/skos-reference/" rel="noopener">SKOS Reference</a>, W3C Recommendation (2009), section 10: mapping properties, considered and dropped.</p></div></details>
   </div></details>
 
   <details class="unfold"><summary>Where it strains</summary><div class="body"><ul>
     <li><b>Choosing natural keys is a modeling decision made at collection.</b> A container id dies with the container; the collector has to pick the stable key (<code>svc:jellyfin@nas</code>). A bad choice can only be repaired afterwards with <code>same-as</code>.</li>
     <li><b>Duplicate anchors will pile up</b> in the team store, though fewer in open stores, where a miss writes a key instead of minting. That's expected; a hygiene vertex (name similarity, or Wren proposing matches) feeding the stale review keeps them from piling up unmerged. See Discipline above.</li>
-    <li><b><code>resolve-by</code> is more than a lookup.</b> The identity vertex folds edges (LatestBy per pair, latest stance wins); turning edges into classes is a connected-components step that lives in <code>resolve-by</code>. That keeps the fold vocabulary closed, but the step has to be specified as carefully as a fold. A class's display id (lean: the earliest anchor in content order) can change when classes merge. Nothing stores it, and lenses show names, so that's acceptable.</li>
+    <li><b><code>resolve-by</code> is more than a lookup.</b> The identity vertex folds edges (LatestBy per pair, latest stance wins); turning edges into classes is a connected-components step that lives in <code>resolve-by</code>. That keeps the fold vocabulary closed, but the step has to be specified as carefully as a fold. A class's display id (Preferred design: the earliest anchor in content order) can change when classes merge. Nothing stores it, and lenses show names, so that's acceptable.</li>
     <li><b>Recognizing references by prefix</b> can misfire on a string that only looks like an id. Strict stores declare their reference fields; open stores accept the guess.</li>
     <li><b>"Everything about auth-svc" across a large class</b> is an index question. It belongs to places (layer 4), not to the semantics.</li>
   </ul></div></details>

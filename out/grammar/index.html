@@ -368,7 +368,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="card-h"><h3>record</h3><span class="chip proved">proved</span></div>
       <dl>
         <dt>Purpose</dt><dd>Say one thing an observer saw, so anyone can check it and nobody can change it.</dd>
-        <dt>State</dt><dd>An envelope the core reads, a payload it never interprets, a signature. Named by <code>r:</code> and a hash of the envelope and the payload's commitment.</dd>
+        <dt>State</dt><dd>An envelope, payload and signature. The record layer treats payload content as opaque; folds read supported fields. Its id hashes envelope and payload commitment.</dd>
         <dt>Principle</dt><dd>Its id hashes what it says, written canonically: spell a set another way and the id doesn't move. Erase its payload and the id, the signature and every record citing it still hold.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-record-erasure"><code>record.erasure</code></a> <a href="../laws/#law-record-sets"><code>record.sets</code></a> <a href="../laws/#law-write-checked"><code>write.checked</code></a></p>
@@ -386,9 +386,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <article class="card" id="noun-thing">
       <div class="card-h"><h3>thing</h3><span class="chip proved">proved</span></div>
       <dl>
-        <dt>Purpose</dt><dd>Give each subject its own state, so records about different things never interfere.</dd>
+        <dt>Purpose</dt><dd>Give each subject its own state within a fixed admitted record set.</dd>
         <dt>State</dt><dd>A typed reference, <code>prefix:value</code>, in a record's <code>about</code>. A record about nothing anchors a thing named by its own id.</dd>
-        <dt>Principle</dt><dd>Revise a thing's record and the revision is its head. Revise one record twice and the thing has two heads, a fork, until a record names both.</dd>
+        <dt>Principle</dt><dd>Within a thing, an unreplaced revision is a head. Concurrent revisions form a fork. A record naming those heads can merge them.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-thing-local"><code>thing.local</code></a> <a href="../laws/#law-admit-no-cross"><code>admit.no-cross</code></a></p>
     </article>
@@ -397,7 +397,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <dl>
         <dt>Purpose</dt><dd>Hold records, and nothing else: it owns no meaning.</dd>
         <dt>State</dt><dd>A set of records, kept in places, each record one canonical line.</dd>
-        <dt>Principle</dt><dd>A store is a set. Read its places in any order and a reader settles the same records, one per id.</dd>
+        <dt>Principle</dt><dd>A store is a set. When forms agree, settling keeps the same records in any read order, once per id.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-input-union"><code>input.union</code></a> <a href="../laws/#law-settle-set"><code>settle.set</code></a></p>
     </article>
@@ -406,7 +406,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <dl>
         <dt>Purpose</dt><dd>Let readers who hold different payloads still agree on what is current.</dd>
         <dt>State</dt><dd>What one reader holds: each record with its payload, withheld, or erased. Envelopes are always held.</dd>
-        <dt>Principle</dt><dd>A view folds to the same heads as a reader holding everything. What it can't read it counts as unread, never guesses.</dd>
+        <dt>Principle</dt><dd>An envelope-preserving view keeps each thing's head ids. Whole-reader heads retain any record that heads at least one thing. Unread counts name unavailable fold inputs.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-view-no-resurrection-things"><code>view.no-resurrection</code></a> <a href="../laws/#law-result-unread"><code>result.unread</code></a></p>
     </article>
@@ -433,7 +433,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <dl>
         <dt>Purpose</dt><dd>Hold one answer.</dd>
         <dt>State</dt><dd>A name, one fold, and optionally <code>where</code>, <code>follow</code> and <code>limit</code>.</dd>
-        <dt>Principle</dt><dd>The same set of records gives every slot of every spec the same value. A slot over heads never brings back a superseded record.</dd>
+        <dt>Principle</dt><dd>With each id supplied once, the same record set gives every slot the same value. A slot over heads returns only records that remain heads of at least one thing.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-spec-set"><code>spec.set</code></a> <a href="../laws/#law-spec-after-supersession"><code>spec.after-supersession</code></a></p>
     </article>
@@ -441,8 +441,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="card-h"><h3>fold</h3><span class="chip proved">proved</span></div>
       <dl>
         <dt>Purpose</dt><dd>Turn a set of records into state.</dd>
-        <dt>State</dt><dd>One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, in the accumulating family; <code>latest-by</code>, over heads; and <code>collect</code>, over heads when it follows <code>prev</code> and over every selected record when it doesn't.</dd>
-        <dt>Principle</dt><dd>The set decides: arrival order and two-way syncs never change the answer, and a late record folded onto the cached state gives what folding the whole set again gives.</dd>
+        <dt>State</dt><dd>One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, <code>latest-by</code>, <code>collect</code>. The first four accumulate. Latest-by runs over heads. Collect runs over heads when it follows <code>prev</code>; otherwise it reads every selected record.</dd>
+        <dt>Principle</dt><dd>The read path hands each id over once. Commuting accumulators accept a new record incrementally. Over-head proofs use cached LatestBy state, not just a cached answer.</dd>
       </dl>
       <p class="laws"><a href="../laws/#law-acc-set"><code>acc.set</code></a> <a href="../laws/#law-heads-set"><code>heads.set</code></a> <a href="../laws/#law-latest-by-converge"><code>latest-by.converge</code></a></p>
     </article>
@@ -469,9 +469,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <dl>
         <dt>Purpose</dt><dd>Turn state into text people edit, and edits back into records.</dd>
         <dt>State</dt><dd>A render, a parse and a diff by ids; the base the text came from.</dd>
-        <dt>Principle</dt><dd>Parse a render and you get back what was rendered. A dropped section changes nothing: absence is never an edit.</dd>
+        <dt>Principle</dt><dd>With nonempty, distinct section ids, parsing a render returns the document. A dropped section keeps its old body: absence is never an edit.</dd>
       </dl>
-      <p class="pending">Keyed sections are proved; applying edits as records is settled.</p>
+      <p class="pending">Keyed-section render requires nonempty, distinct ids. Put-get additionally keeps exactly the base's ordered id list. Emitting accepted edits remains planned.</p>
       <p class="laws"><a href="../laws/#law-lens-round-trip"><code>lens.round-trip</code></a> <a href="../laws/#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a></p>
     </article>
     <article class="card is-settled" id="noun-grant">
@@ -494,7 +494,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   <div class="stack">
     <h3>Write</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>emit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write a record: checked, signed, appended. Nothing else enters a store.</p><p class="laws"><a href="../laws/#law-write-checked"><code>write.checked</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>emit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Check and sign a record. Appending it to a product store remains planned.</p><p class="laws"><a href="../laws/#law-write-checked"><code>write.checked</code></a></p></div></div>
       <div class="row is-settled"><div class="row-k"><b>tick</b><span class="chip settled">settled</span></div><div class="row-v"><p>Fix a vertex's result at a boundary, as a value anyone can recompute.</p></div></div>
     </div>
     <h3>Any layer</h3>
@@ -503,7 +503,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </div>
     <h3>Read</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>settle</b><span class="chip proved">proved</span></div><div class="row-v"><p>Turn the forms a reader's places hold into one record per id, payload kept unless erased.</p><p class="laws"><a href="../laws/#law-settle-keeps"><code>settle.keeps</code></a> <a href="../laws/#law-settle-erased"><code>settle.erased</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>settle</b><span class="chip proved">proved</span></div><div class="row-v"><p>Settle consistent forms to one record per id. Keep a held payload unless a held eraser names its id.</p><p class="laws"><a href="../laws/#law-settle-keeps"><code>settle.keeps</code></a> <a href="../laws/#law-settle-erased"><code>settle.erased</code></a></p></div></div>
       <div class="row"><div class="row-k"><b>admit</b><span class="chip proved">proved</span></div><div class="row-v"><p>Refuse records not entitled to their <code>prev</code>. Standing joins it in step 3.</p><p class="laws"><a href="../laws/#law-admit-set"><code>admit.set</code></a></p></div></div>
       <div class="row"><div class="row-k"><b>take</b><span class="chip proved">proved</span></div><div class="row-v"><p>A source takes the records its store, kinds and thing choose.</p><p class="laws"><a href="../laws/#law-spec-select"><code>spec.select</code></a></p></div></div>
       <div class="row"><div class="row-k"><b>test</b><span class="chip proved">proved</span></div><div class="row-v"><p>A <code>where</code> test answers yes, no, or, on a payload the reader lacks, unknown.</p><p class="laws"><a href="../laws/#law-where-total"><code>where.total</code></a> <a href="../laws/#law-view-refines-where"><code>view.refines</code></a></p></div></div>
@@ -512,7 +512,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </div>
     <h3>Text</h3>
     <div class="rows">
-      <div class="row"><div class="row-k"><b>render</b><span class="chip proved">proved</span></div><div class="row-v"><p>Write state as text for an audience.</p><p class="laws"><a href="../laws/#law-lens-escaping"><code>lens.escaping</code></a></p></div></div>
+      <div class="row"><div class="row-k"><b>render</b><span class="chip proved">proved</span></div><div class="row-v"><p>Render keyed sections with nonempty, distinct ids. Audience-aware views remain planned.</p><p class="laws"><a href="../laws/#law-lens-escaping"><code>lens.escaping</code></a></p></div></div>
       <div class="row"><div class="row-k"><b>parse</b><span class="chip proved">proved</span></div><div class="row-v"><p>Read edited text back, refusing what it can't read.</p><p class="laws"><a href="../laws/#law-lens-round-trip"><code>lens.round-trip</code></a> <a href="../laws/#law-lens-refuse"><code>lens.refuse</code></a></p></div></div>
       <div class="row is-settled"><div class="row-k"><b>apply</b><span class="chip settled">settled</span></div><div class="row-v"><p>Turn the edits a parse found into records, emitted together.</p><p class="laws"><a href="../laws/#law-lens-put-get"><code>lens.put-get</code></a></p></div></div>
     </div>
@@ -521,7 +521,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="row"><div class="row-k"><b>start</b></div><div class="row-v"><p class="made">emit with no <code>prev</code></p><p>A new chain. About nothing, the record anchors a thing of its own.</p></div></div>
       <div class="row"><div class="row-k"><b>revise</b></div><div class="row-v"><p class="made">emit with <code>prev: [x]</code></p><p>Replace x within a thing both are about. Naming one about other things is refused, <code>prev-unrelated</code>.</p></div></div>
       <div class="row"><div class="row-k"><b>fork</b></div><div class="row-v"><p class="made">two records naming one <code>prev</code></p><p>Nobody's verb: a state. The thing has two heads, both shown, the newer by content order winning.</p></div></div>
-      <div class="row"><div class="row-k"><b>merge</b></div><div class="row-v"><p class="made">emit with <code>prev: [x, y]</code></p><p>One head again.</p></div></div>
+      <div class="row"><div class="row-k"><b>merge</b></div><div class="row-v"><p class="made">emit with <code>prev: [x, y]</code></p><p>Naming all heads of a thing leaves one head, unless another concurrent head remains.</p></div></div>
       <div class="row"><div class="row-k"><b>erase</b></div><div class="row-v"><p class="made">emit with <code>erases: [x]</code></p><p>Any kind may. x keeps its id, signature and place; only its opening goes.</p></div></div>
       <div class="row"><div class="row-k"><b>withhold</b></div><div class="row-v"><p class="made">hold a record without its payload</p><p>Not a write at all: a view. Envelopes still answer every test on them.</p></div></div>
     </div>

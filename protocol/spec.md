@@ -1,8 +1,8 @@
 # The spec
 
-A vertex's spec is JSON: `from` chooses records by their envelopes, and
-`fold` names slots, each one fold from a closed vocabulary with an optional
-`where`. This page is normative: it is the grammar `Spec.ofJson`
+A vertex's spec is JSON.
+`from` chooses records by their envelopes.
+`fold` names slots, each with one fold type and an optional `where`. This page is normative: it is the grammar `Spec.ofJson`
 (`model/Loops/Spec.lean`) implements. What the slots then hold is in
 [`laws.md`](laws.md), and the vectors in `vectors/spec/` pin both.
 
@@ -26,8 +26,9 @@ spec, as layer 0 refuses one in a payload.
 | `kind` | no | the kinds taken: an array of at least one, each text that isn't empty |
 | `about` | no | the thing taken: a typed reference (`prefix:value`) |
 
-A source takes a record when the record's kind is one of `kind` (or `kind`
-is left out) and the record is about `about` (or `about` is left out). The
+A source checks both kind and thing.
+A supplied `kind` must include the record's kind.
+A supplied `about` must name a thing the record belongs to. The
 spec takes a record when any of its sources does.
 
 For direct spec evaluation, the caller resolves store names outside the runner.
@@ -35,9 +36,9 @@ The runner receives records and does not look up stores.
 Each source tests only `kind` and `about` on those records.
 The direct spec and scenario vectors do not test store resolution, missing stores, or per-source routing.
 
-`about` here means about the thing: a record about nothing anchors the
-thing named by its own id, so `"about": "r:X"` takes X as well as every
-record about X. (`env.about` in `where` reads the field as written, which
+`about` here names the thing.
+A record about nothing anchors the thing named by its id.
+Thus `"about": "r:X"` takes X and every record about X. (`env.about` in `where` reads the field as written, which
 is empty on X.)
 
 ## Slots
@@ -87,10 +88,8 @@ The safe input range does not limit the sum accumulator.
 ## `where`
 
 A `where` map is an object of at least one field, each naming an object of
-at least one test: an operator and its argument. A field is `env.` and one
-of `kind`, `observer`, `about`, `prev`, `under`, `erases`, `emitted`,
-`occurred`, naming an envelope field; or a name that isn't empty and doesn't
-start `env.`, naming a payload field.
+at least one test: an operator and its argument. An envelope field starts `env.` and names `kind`, `observer`, `about`, `prev`, `under`, `erases`, `emitted` or `occurred`.
+A payload field has a nonempty name that does not start `env.`.
 
 | Operator | Argument |
 |---|---|
@@ -109,9 +108,10 @@ match:
 | `env.emitted`, `env.occurred` | a time in `occurred`'s grammar ([`record.md`](record.md)) |
 | a payload field | text, a whole number, or a boolean |
 
-What the tests mean is in [`laws.md`](laws.md): a map holds when every test
-does, a set field holds a value when one of its members is that value, and a
-time is tested by the span it reads as, never its spelling.
+[`laws.md`](laws.md) defines test meaning.
+A map holds when every test holds.
+A set field holds a value when a member equals that value.
+Time tests read spans, not spellings.
 
 For payload tests, read JSON numbers using the layer 0 binary64 rule.
 A whole value has no fractional part and lies within ±(2^53 − 1), inclusive.
@@ -130,8 +130,8 @@ A payload field test answers unknown when the reader does not hold the payload.
 ## Refusals
 
 A spec that breaks a rule is refused with a code and the path of what broke
-it. A path is the keys from the top of the spec to the offending member,
-joined by `.`; an array adds nothing, so every source's path starts `from`.
+it. A path joins keys from the spec root to the offending member with `.`.
+An array adds nothing, so every source's path starts `from`.
 Paths locate a refusal; they aren't unique, since a key may itself hold a
 `.` (`fold.c.where.env.kind`).
 
@@ -148,11 +148,10 @@ Checks run in this order, and the first that fails is the refusal:
 4. **`vertex`**: `vertex-missing` when it is left out, `vertex-invalid` when
    it isn't text or is empty; at `vertex`.
 5. **`from`**: `from-missing` when it is absent or an empty array; `from-invalid`
-   at `from` when it isn't an array. Then each source in order: not an
-   object (`from-invalid` at `from`), an unknown key (`unknown-key` at
-   `from.<key>`), then `store`, `kind` and `about`, in that order however
-   they are written (`from-invalid` at `from.store`, `from.kind`,
-   `from.about`).
+   at `from` when it isn't an array. Check each source in order.
+   Refuse a nonobject (`from-invalid` at `from`) or an unknown key (`unknown-key` at `from.<key>`).
+   Then check `store`, `kind` and `about`, regardless of written order.
+   These use `from-invalid` at `from.store`, `from.kind` and `from.about`.
 6. **`fold`**: `fold-invalid` at `fold` when it isn't an object. Then each
    slot in the order written, at `fold.<name>`:
    1. its name is empty, or it isn't an object: `fold-invalid`;
@@ -166,21 +165,21 @@ Checks run in this order, and the first that fails is the refusal:
    6. the fold type's argument: `fold-argument` at `fold.<name>.<type>`;
    7. `where`, below.
 7. **`where`**: `where-invalid` throughout. At `fold.<name>.where` when it
-   isn't an object or is empty. Then each field in the order written, at
-   `fold.<name>.where.<field>`: a name that isn't a field, or tests that
-   aren't an object or are empty; then each test in the order written, at
-   the same path: an unknown operator, or an argument that doesn't fit.
+   isn't an object or is empty. Check fields in written order, at `fold.<name>.where.<field>`.
+   Refuse an invalid field name or tests that are not a nonempty object.
+   Then check tests in written order, at that same path.
+   Refuse an unknown operator or an argument that does not fit.
 
 These are the only codes.
 
 ## The parsed form
 
-`spec/parse` vectors show an accepted spec in its parsed form: `vertex`;
-`from`, each source with `store`, then `kind` and `about` when given; and
-`fold`, every slot with its fold type, `follow` when it follows (always on
-latest-by), `limit` when given, and `where` as written, a time keeping its
-spelling. Carried keys and `note` are dropped. The parsed form of an
-accepted spec parses back to itself, and the specs the parser gives are
-exactly those that fit (`spec.parse` in [`laws.md`](laws.md)). That is a law
+`spec/parse` vectors show accepted specs in parsed form.
+They keep `vertex` and `from`.
+Each source has `store`, then supplied `kind` and `about`.
+Each `fold` slot keeps its fold type, applicable `follow`, supplied `limit` and written `where`.
+Latest-by always writes `follow`.
+Times keep their spelling. Carried keys and `note` are dropped. An accepted spec's parsed form parses back to itself.
+The parser gives exactly the specs that fit (`spec.parse` in [`laws.md`](laws.md)). That is a law
 about what the parser gives; which JSON it accepts is this page, pinned by
 the vectors.

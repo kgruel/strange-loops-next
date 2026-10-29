@@ -5,7 +5,7 @@
     <thead><tr><th>Case</th><th>What it surfaced</th></tr></thead>
     <tbody>
       <tr><td><b>Novel</b></td><td>The time axis can be a declared field (chapter, story time), not only <code>occurred</code> or <code>emitted</code>.</td></tr>
-      <tr><td><b>Orchestration</b></td><td>Specs are templates; vertices are instances created at run time, each with its own anchor.</td></tr>
+      <tr><td><b>Orchestration</b></td><td>Vertices are instantiated specs, named by their hash.</td></tr>
       <tr><td><b>Team store</b></td><td>Weights are records about observers, applied by a vertex at read time. Promotion is a stance.</td></tr>
     </tbody>
   </table></div>
@@ -13,6 +13,7 @@
   <h3>The novel</h3>
   <p>A hand-built store with one steward, made strict early because its shape is designed on purpose. Two vertices ask two questions of the same records: <i>what's the manuscript?</i> and <i>is the timeline consistent?</i> The JS front end is a lens; edits made in it are new records.</p>
   <details class="unfold"><summary>Store and vertices</summary><div class="body">
+    <p><b>PROPOSED FUTURE syntax.</b> This example uses <code>latest-by: &quot;id&quot;</code> and <code>collect</code> with <code>by</code>. It shows intended semantics, not runnable syntax. See the <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/spec.md">normative protocol/spec.md</a>.</p>
     <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># .loops/anchor
 {"kind":"store-anchor", "observer":"sl:a1", "name":"novel", "stewards":["sl:a1"]}
 
@@ -47,7 +48,7 @@
   <h3>Task orchestration</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 216" role="img" aria-label="A slice spec, stored as a template record, is instantiated three times: vx:s1, vx:s2 and vx:s3, each the slice spec plus its parameters, named by their hash, so nothing is written to create one. Each slice ticks into the orchestrator, which sends a bundle to the requester.">
+      <svg class="dg" viewBox="0 0 400 216" role="img" aria-label="A slice template has three instances: vx:s1, vx:s2 and vx:s3. Each is the spec plus its parameters, named by their hash. No record creates an instance. Each slice ticks into the orchestrator, which sends a bundle to the requester.">
         <rect class="box-amb" x="8" y="80" width="112" height="50" rx="9"/>
         <text x="64" y="101" text-anchor="middle" class="s b">spec: slice</text>
         <text x="64" y="118" text-anchor="middle" class="xs">a template record</text>
@@ -69,9 +70,10 @@
         <text x="346" y="208" text-anchor="middle" class="xs tb">requester</text>
       </svg>
     </div>
-    <figcaption>Each instance is its spec plus parameters, named by their hash: nothing is written to create one, and two orchestrators running the same slice for the same task get the same vertex. "All my children ticked" is a content boundary on folded state, which today's <code>Boundary.conditions</code> already supports. One store per run makes a natural unit to archive or discard.</figcaption>
+    <figcaption>Each instance is its spec plus parameters, named by their hash. No record is written to create an instance. Two orchestrators get the same vertex for the same spec and parameters. "All my children ticked" is a proposed content boundary on folded state. The earlier prototype supports this through <code>Boundary.conditions</code>. That prototype is not the integrated runner here. One store per run makes a natural unit to archive or discard.</figcaption>
   </figure>
   <details class="unfold"><summary>Templates and an instance</summary><div class="body">
+    <p><b>PROPOSED FUTURE syntax.</b> Templates, boundaries and these commands illustrate the proposed workflow. See the <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/spec.md">normative protocol/spec.md</a> for runnable spec syntax.</p>
     <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto"># templates the root store carries
 { "vertex": "subagent",
   "ticks": ["self"], "from": [{ "kind": ["step"] }],
@@ -97,7 +99,7 @@ loops read slice slice:=3 children:='["vx:a1…","vx:a2…"]' size:=2</pre>
   <h3>The team store</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 302" role="img" aria-label="Three personal stores, for kyle, the director and a developer, promote records by stance into a team store kept in git, where each person writes their own segment and merging is union. The platform-knowledge vertex reads decisions plus tenure records, weights by observer, and ranks without hiding: the director says X, two developers observed Y since.">
+      <svg class="dg" viewBox="0 0 400 302" role="img" aria-label="Personal stores for kyle, the director and a developer promote records by stance into a team store in git. Each person writes their own segment. Merging is union. The platform-knowledge vertex reads decisions plus tenure records, weights by observer, and ranks without hiding: the director says X, two developers observed Y since.">
         <rect class="box dash" x="8" y="8" width="120" height="34" rx="8"/><text x="68" y="29" text-anchor="middle" class="s">kyle · personal</text>
         <rect class="box dash" x="140" y="8" width="120" height="34" rx="8"/><text x="200" y="29" text-anchor="middle" class="s">director · personal</text>
         <rect class="box dash" x="272" y="8" width="120" height="34" rx="8"/><text x="332" y="29" text-anchor="middle" class="s">dev · personal</text>
@@ -131,6 +133,7 @@ loops read slice slice:=3 children:='["vx:a1…","vx:a2…"]' size:=2</pre>
     </tbody>
   </table></div>
   <details class="unfold"><summary>Weighting by observer</summary><div class="body">
+    <p><b>PROPOSED FUTURE syntax.</b> This example uses <code>collect</code> with <code>by</code> and <code>weight-by</code>. See the <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/spec.md">normative protocol/spec.md</a> for runnable syntax.</p>
     <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit tenure years:=20 domain=platform --about sl:director    # by sl:team-root
 loops emit tenure years:=14 domain=platform --about sl:a1          # by sl:team-root
 

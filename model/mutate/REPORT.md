@@ -11,13 +11,30 @@ The head mutation still selects hidden records and reads their fixture numbers.
 The accumulator mutations still mark hidden records as readable.
 No mutation requires retirement.
 Listing and eight runner tests validate the catalogue without running it on the real source.
-A full catalogue run on the merged model remains pending.
+A full catalogue run on the final tree remains pending.
+The run at `17bd7d4` predates Rust and the latest pins.
 The old counts, detection sites, and proposed laws are historical evidence only.
-In particular, the proposed extrema readability laws below do not describe the current safe-whole numeric reader.
+The extrema candidates below describe the current safe-whole numeric reader.
+They remain unapproved.
 No proposed law receives a proof or acceptance in this merge.
 The merged gates and vector parity are in `.pi/gates/04-mutants/`.
 
-## Counts
+## Integration run at `17bd7d4`
+
+The full run at `17bd7d4` covered 189 entries.
+It found 140 build rejections and 29 vector differences.
+It also found 14 generator assertions and six survivors.
+See `.pi/gates/04-mutants/full-summary.md` and `.pi/gates/04-mutants/full.json`.
+Of the 140 build rejections, 16 had type or elaboration diagnostics.
+The other 124 were not independently audited semantic proof kills.
+Automated Lean setup-file probes ran concurrently and may have affected shared Lake artifacts.
+This is not a full-catalogue result for the final tree.
+
+Four survivors were `wide-families-013`, `wide-spec-064`, `extra-families-max-acc`, and `extra-families-min-acc`.
+The two distinct equivalent candidates were `finish-json-hexdigit` and `last-spec-tests-conds`.
+These are candidate interpretations, not approved laws.
+
+## Historical branch counts
 
 | Pass | Mutants | Build gate | Vector difference | Survived | Gen assertion error |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -25,10 +42,11 @@ The merged gates and vector parity are in `.pi/gates/04-mutants/`.
 | Survivor retest | 16 | 1 | 6 | 6 | 3 |
 | Combined latest results | 189 | 131 | 36 | 6 | 16 |
 
-The 131 build detections comprise 130 proof failures and one heartbeat limit.
+The old branch report described the 131 build detections as 130 proof failures and one heartbeat limit.
+These historical labels are not independent semantic verdicts.
 Ten new cases detect ten initial survivors.
 Six survivors remain: two equivalent mutations and four low-level gaps.
-The four proposed laws below address those gaps.
+The four unapproved candidate laws below concern those gaps.
 
 ### Combined counts per file
 
@@ -67,11 +85,13 @@ No run shares `.lake` with another mutation run.
 
 ## Result limits
 
-The runner labels every nonzero build `killed-by-proof`.
-The tables call this the **build gate**, not a semantic verdict.
-The initial audit finds 129 proof failures and one proof heartbeat limit.
-The proof failures include law proofs, an embedded proof, and generator premise proofs.
-No audited build fails only from a malformed replacement or an unused binding.
+The old branch runner labeled every nonzero build `killed-by-proof`.
+That legacy table status means only a build rejection, not a semantic verdict.
+The current runner uses `rejected-by-build` and `buildRejectionNeedsAudit`.
+The old branch audit described 129 proof failures and one proof heartbeat limit.
+These locations alone do not establish semantic counterexamples.
+The reported failures include law proofs, an embedded proof, and generator premise proofs.
+The old branch audit found no build that failed only from a malformed replacement or an unused binding.
 
 `wide-time-091` reaches Lean's 200000-heartbeat limit in `model/Laws/Time.lean:167`.
 This outcome proves neither semantic difference nor equivalence.
@@ -163,8 +183,10 @@ The raw record writer does not call `Stamp.of?`.
 
 ## Proposed laws
 
-These statements specify the four remaining low-level gaps.
-This change does not add proofs or expand the vector schema.
+These four candidate laws remain unapproved human choices.
+This change adds no proofs or vector schema.
+The Sum and Spec candidates below also require human decisions.
+The extrema candidates use the current safe-whole reader, not the historical shown-only predicate.
 
 In `model/Laws/Families.lean`:
 
@@ -174,10 +196,10 @@ theorem Sum.on_step_missing (field : String) (s : Int) (r : Record)
     (Sum.on field).step s r = s
 
 theorem Max.acc_readable (r : Record) :
-    Max.acc.readable r = (r.shown == .here)
+    Max.acc.readable r = (r.num "n").isSome
 
 theorem Min.acc_readable (r : Record) :
-    Min.acc.readable r = (r.shown == .here)
+    Min.acc.readable r = (r.num "n").isSome
 ```
 
 Named extrema vectors call `Max.on` and `Min.on`, not the concrete accumulators.
@@ -205,6 +227,7 @@ node model/mutate/run.mjs --timeout 240 --output /tmp/loops-mutants.json
 node --test model/mutate/run.test.mjs
 ```
 
+This historical reproduction command does not instruct a full run on the current tree.
 The full mutation command returns 1 when generator assertions detect mutants.
 Inspect the result categories and logs rather than treating that exit as a baseline failure.
 

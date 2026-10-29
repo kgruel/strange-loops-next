@@ -213,7 +213,7 @@ export function renderLaws(root) {
       `</div>\n` +
       trailOf([...d.variants.map((x, j) => `<li data-v="${j}"><span class="t-k">${x.key}</span>: <span class="t-v">${x.said}</span></li>`), ...(p ? [p.gone] : [])], d.done) +
       (d.note ? `      <p class="demo-n">${d.note}</p>\n` : "") +
-      `      <p class="demo-src"><a href="#${d.anchor}"><code>${d.law}</code></a>, from <a href="${REPO}/vectors/${d.vector}.json"><code>vectors/${d.vector}.json</code></a> as the model wrote it</p>\n` +
+      `      <p class="demo-src"><a href="#${d.anchor}"><code>${d.law}</code></a>, from <a href="${REPO}/vectors/${d.vector}.json"><code>vectors/${d.vector}.json</code></a> (current main; may differ from this page's build). The model wrote the displayed vector.</p>\n` +
       `    </article>\n`;
   };
 
@@ -239,7 +239,7 @@ export function renderLaws(root) {
   const qOrder = (r) => questions.findIndex(([q]) => q === law(r.key).question);
   const shapeCount = (s) => rows.filter((r) => law(r.key).shape === s).length;
 
-  const lede = `  <p class="lede">${rows.length} laws, each a theorem Lean checks on every build, or a rule held by construction, or, where its card says so, partly pinned by vectors instead of proved. ` +
+  const lede = `  <p class="lede">${rows.length} laws have different kinds of evidence. Lean checks theorems on every build. Other rules hold by construction. Some cards cite partial vector evidence instead of a proof. ` +
     `They are grouped here by the question they answer, in plain sentences. ` +
     `What proves each one, the vectors that pin it and what its proof rests on are on <a href="../evidence/">the evidence page</a>.</p>\n`;
 
@@ -298,7 +298,7 @@ export function renderLaws(root) {
       `  <div class="side">\n    <p class="q-k">Question ${i + 1} of ${questions.length}</p>\n    <h2 id="h-q-${q}">${text}</h2>\n` +
       `    <p class="q-tally"><span>${rs.length} law${rs.length === 1 ? "" : "s"}:</span>${tally}</p>\n  </div>\n` +
       `  <div class="stack">\n` + (data.questionNotes[q] ? `    <p class="note q-note">${data.questionNotes[q]}</p>\n` : "") + `    <ol class="q-laws">\n${rs.map(entry).join("")}    </ol>\n` +
-      (ds.length || bs.length ? `    <h3>Try to break it</h3>\n    <p class="note">Each card is the model's own output: a vector it wrote, or, for a premise, a case <code>lake exe boundaries</code> writes. With scripts on, a button varies what the law lets vary, and the trail keeps the answer the model gave for each variant shown. Where a law has a premise, a second button takes it away and adds what the model says then; some of those inputs are ones the protocol doesn't produce, and each says whether it is one. Without scripts, a card lists every variant and every answer. Nothing is computed in your browser.</p>\n` +
+      (ds.length || bs.length ? `    <h3>Try to break it</h3>\n    <p class="note">Each card shows the model's output: a vector it wrote, or a premise case from <code>lake exe boundaries</code>. With scripts on, a button varies what the law lets vary. The trail keeps the model's answer for each variant. A second button removes a law's premise and adds the model's answer. Some inputs cannot come from the protocol. Each case states whether its input can. Without scripts, a card lists every variant and every answer. Nothing is computed in your browser.</p>\n` +
         `    <div class="demos">\n${ds.map(([d, i]) => demoCard(d, i)).join("")}${bs.map(boundCard).join("")}    </div>\n` : "") +
       `  </div>\n</section>\n`;
   };

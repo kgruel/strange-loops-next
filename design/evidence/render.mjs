@@ -18,8 +18,8 @@ export function renderEvidence(root) {
   const label = (r) => r.names.join(", ");
   const lawLink = (k) => `<a class="lawref" href="#${anchor(k)}"><code>${esc(k)}</code></a>`;
 
-  const lede = `  <p class="lede">What stands behind each sentence on <a href="../laws/">the laws page</a>: the theorems Lean checked, ` +
-    `the vectors that pin it and who runs them, and the laws its proof rests on. ` +
+  const lede = `  <p class="lede">Evidence for the listed laws on <a href="../laws/">the laws page</a>: the theorems Lean checked, ` +
+    `the vectors that pin it and who runs them. The page also shows the laws each proof uses. ` +
     `For an implementer, what to pass; for a maintainer, which laws have less evidence than others.</p>\n`;
 
   // The chain from claim to code, counted.
@@ -34,7 +34,7 @@ export function renderEvidence(root) {
 
   // A Vectors cell says more than its file names when words are left once the names are gone.
   const words = (cell) => /[a-z]/i.test(cell.replace(/`[^`]*`/g, ""));
-  const fileLinks = (ps) => ps.map((p) => `<a href="${REPO}/vectors/${p}.json"><code>${p}</code></a>`).join(" ");
+  const fileLinks = (ps) => ps.map((p) => `<a href="${REPO}/vectors/${p}.json"><code>${p}</code></a> (current main; may differ from this page's build)`).join(" ");
   const card = (r) => {
     const l = law(r.key);
     const ts = resolved.get(r.key);
@@ -98,8 +98,8 @@ export function renderEvidence(root) {
   }).join("");
   const byTheorem = rows.filter((r) => resolved.get(r.key).length).length;
   const byConstructionCount = rows.filter((r) => !resolved.get(r.key).length && r.byConstruction).length;
-  const coverage = `    <p class="cov-sum">${byTheorem} laws are theorems and ${byConstructionCount} hold by construction; ` +
-    `for ${disagree}, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>\n` +
+  const coverage = `    <p class="cov-sum">${byTheorem} laws are theorems and ${byConstructionCount} hold by construction. ` +
+    `For ${disagree}, the cited vectors and the vectors naming the law differ. Hover the cell to see which.</p>\n` +
     `    <div class="pan"><div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
     `<th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th>` +
     `<th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th>` +

@@ -4,7 +4,7 @@
   <p><span class="pill p-ok">layer closed</span> Every piece reuses something from below: segments (layer 4), admission and stances (layer 1), witness ticks (layer 2), key bindings (observers).</p>
 
   <h3>What moves</h3>
-  <p>Whole stores, within a realm only (across realms: compose or bridge). Records never change and every fold depends only on the set, so <b>two places holding the same records show the same state</b>, whatever order they arrived in. Concurrent edits are two heads on <code>prev</code>: data, not a sync failure.</p>
+  <p>Whole stores, within a realm only (across realms: compose or bridge). Records never change and each fold depends only on the set. <b>Two places holding the same records show the same state</b>, regardless of arrival order. Concurrent edits are two heads on <code>prev</code>: data, not a sync failure.</p>
   <figure>
     <div class="fig">
       <svg class="dg" viewBox="0 0 400 252" role="img" aria-label="Two places, laptop and homelab, each list every segment and the last record they hold from it. Laptop has sl:a1/laptop through r57, sl:a1/homelab through r12, and a closed session segment s-0420. Homelab has sl:a1/laptop through r41, sl:a1/homelab through r30, and no s-0420. Laptop sends r42 to r57 and the closed segment; homelab sends r13 to r30. Same records give the same state in any arrival order.">
@@ -25,7 +25,7 @@
         <text x="200" y="246" text-anchor="middle" class="xs m">same records ⇒ same state, in any arrival order</text>
       </svg>
     </div>
-    <figcaption>Each segment has one writer and only grows, so a place's state is just "last record held, per segment." Comparing those lists is the whole negotiation; closed segments compare by hash. This is the "manifest exchange" SQLite places needed.</figcaption>
+    <figcaption>Each segment has one writer and only grows. A place tracks the last record held per segment. Comparing those lists is the whole negotiation; closed segments compare by hash. This is the "manifest exchange" SQLite places needed.</figcaption>
   </figure>
   <ul>
     <li><b>Erasure doesn't disturb it.</b> A record that erases travels like any other and each place applies it locally; ids and line counts stay put, so the lists still match.</li>
@@ -50,7 +50,7 @@
   <h3>Who counts</h3>
   <p><b>Delivery isn't trust.</b> Anyone can hand you records. The id proves the content is intact, the signature proves who wrote it, and admission decides whether it counts.</p>
   <div class="cards">
-    <div class="card acc"><h5>What gets signed</h5><p>The record's <b>id</b>, prefixed <code>loops/record/v1</code>. The signature sits beside the record, outside the id: <code>sig { key, ed25519 }</code>. It survives erasure (the id covers the payload's commitment), and a stripped copy is the same record with less proof.</p></div>
+    <div class="card acc"><h5>What gets signed</h5><p>The record's <b>id</b>, prefixed <code>loops/record/v1:</code>. The signature sits beside the record, outside the id: <code>sig { key, ed25519 }</code>. It survives erasure (the id covers the payload's commitment), and a stripped copy is the same record with less proof.</p></div>
     <div class="card"><h5>When it's checked</h5><p>Once per record per machine, when it enters the index, which caches the verdict. Ed25519 takes tens of microseconds: a million records is well under a minute, once.</p></div>
     <div class="card"><h5>Signing by default</h5><p>The CLI makes keys silently on first run and signs every emit; store policy decides what's checked. Unsigned records only come from importers and outside tools, and the hygiene vertex counts them.</p></div>
     <div class="card"><h5>Stores verify themselves</h5><p>On your first write into a store, your anchor and current key bindings are copied in verbatim. Every signature in a store can be checked from that store, by any replica, offline.</p></div>
@@ -92,7 +92,7 @@
       <tr><td>Lost root and recovery key</td><td>a new lineage that descends from the old one and adopts its records; no recovery machinery</td></tr>
     </tbody>
   </table></div>
-  <p><b>Where keys live:</b> the OS keychain by default; a file readable only by its owner on headless machines (<code>~/.config/loops/keys/&lt;lineage&gt;/&lt;device&gt;</code>, the way SSH keeps keys); never in <code>.loops/</code> or any place. The signer is a small interface: keychain, file, later ssh-agent or a hardware key. Ed25519 only.</p>
+  <p><b>Where keys live:</b> the OS keychain by default. Headless machines use an owner-readable file: <code>~/.config/loops/keys/&lt;lineage&gt;/&lt;device&gt;</code>, like SSH. Keys never live in <code>.loops/</code> or any place. The signer is a small interface: keychain, file, later ssh-agent or a hardware key. Ed25519 only.</p>
   <p><b>Domain vouching</b> only when colleagues must agree what <code>@acme</code> means: <code>https://acme.com/.well-known/loops</code> maps the name to a root store id. The domain vouches for the mapping, never for content.</p>
 
   <h3>Presence: what needs a person</h3>
@@ -115,7 +115,7 @@
     <li><b>Checked at admission.</b> A standing-changing record counts only if a presence key signed it.</li>
   </ul>
   <details class="unfold"><summary>The honest limit on presence</summary><div class="body">
-    <p>A presence key's binding says "used only with you present", and other replicas take that on trust: Touch ID protects your machine, not their view of it. Hardware keys can prove it, since FIDO signatures carry a user-presence flag inside the signed bytes, but that means a second signature format beside Ed25519. Start with the keychain claim; add hardware proof only if someone needs it.</p>
+    <p>A presence key's binding says "used only with you present". Other replicas take that on trust. Touch ID protects your machine, not their view of it. Hardware keys can prove it, since FIDO signatures carry a user-presence flag inside the signed bytes, but that means a second signature format beside Ed25519. Start with the keychain claim; add hardware proof only if someone needs it.</p>
   </div></details>
 
   <h3>Agents</h3>
@@ -141,13 +141,13 @@
       <tr><td>remote or cloud</td><td><b>no</b>, by construction</td></tr>
     </tbody>
   </table></div>
-  <p>Sandboxing is an operating-system concern, not part of loops; loops makes all three setups safe the same way. Later, a local signer can sit outside the sandbox behind a socket (as ssh-agent or 1Password's SSH agent do), signing only as Wren, only within its grant: defence in depth.</p>
+  <p>Sandboxing is an operating-system concern, not part of loops; loops makes all three setups safe the same way. Later, a local signer can sit outside the sandbox behind a socket, like ssh-agent or 1Password's SSH agent. It signs only as Wren, within its grant: defence in depth.</p>
 
   <h3>Ending standing: retire through</h3>
-  <p>Two cases, one mechanism: a key stops speaking for a lineage (lost laptop, stolen key, rotation), or an observer stops writing to a store (a colleague leaves, a grant ends). <code>emitted</code> is self-stamped, so a cut by time can be dodged by backdating. <b>Cut by what was held instead.</b></p>
+  <p>One mechanism handles two cases. A key stops speaking for a lineage after loss, theft or rotation. Or an observer stops writing to a store when a colleague leaves or a grant ends. <code>emitted</code> is self-stamped, so a cut by time can be dodged by backdating. <b>Cut by what was held instead.</b></p>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 196" role="img" aria-label="The segment sl:7f/laptop holds r1 to r6. A retire record for key k7 through r4 cuts after r4: r1 to r4 stay admitted, r5 and r6 are kept and visible but don't count. A forged record dated 2025 isn't in the held prefix, so it doesn't count either.">
+      <svg class="dg" viewBox="0 0 400 196" role="img" aria-label="The segment sl:7f/laptop holds r1 to r6. A retire record for key k7 through r4 cuts after r4. Records r1 to r4 stay admitted. Records r5 and r6 stay visible but don't count. A forged record dated 2025 isn't in the held prefix, so it doesn't count either.">
         <text x="12" y="20" class="xs m">segments/sl:7f/laptop.jsonl</text>
         <rect class="box-acc" x="12" y="30" width="52" height="32" rx="6"/><text x="38" y="51" text-anchor="middle" class="mono">r1</text>
         <rect class="box-acc" x="72" y="30" width="52" height="32" rx="6"/><text x="98" y="51" text-anchor="middle" class="mono">r2</text>
@@ -169,16 +169,16 @@
     <figcaption>A segment has one writer and only grows, so "through r4" fixes everything before it exactly. It's a witness tick in miniature ("what I had from this key when I revoked it"), stored compactly. No time is involved.</figcaption>
   </figure>
   <ul>
-    <li><b>Late but legitimate records</b> written before the cut but not yet seen by the steward arrive afterwards: kept, not counted, flagged by the hygiene vertex, and affirmed by the steward if genuine.</li>
+    <li><b>Late but legitimate records</b> written before the cut may arrive after it. They stay visible but don't count. The hygiene vertex flags them; the steward affirms them if genuine.</li>
     <li><b>Departure isn't distrust.</b> A colleague who leaves keeps every record admitted; they just can't add more. If a key was stolen before anyone noticed, the steward disputes specific records. Nothing is rewritten.</li>
     <li><b>Pairing falls with the key.</b> Devices a stolen key paired after the cut lose standing too: their bindings sit in the cut-off part of its segment.</li>
     <li><b>Rotation</b> is a new binding, then the old key retired through its last record.</li>
   </ul>
 
   <h3>A boundary: withholding, not hiding</h3>
-  <p><span class="pill p-ok">settled</span> Privacy in Loops is <b>withholding</b>: a record, or anything computed from it, reaches you or it doesn't. Anything computed from a record carries some of it (a render, a fold result, a count, a summary, an embedding), so <b>a derived thing is as private as its least-public input</b> and travels under the same grant.</p>
+  <p><span class="pill p-ok">settled</span> Privacy in Loops is <b>withholding</b>: a record, or anything computed from it, reaches you or it doesn't. A render, fold result, count, summary or embedding carries information from its inputs. <b>A derived thing is as private as its least-public input.</b> It travels under the same grant.</p>
   <ul>
-    <li><b>What it offers:</b> envelopes and salted commitments show that something is withheld without showing what; folds over envelopes can be checked; unreachable hides even whether a record exists.</li>
+    <li><b>What it offers:</b> envelopes and commitments show that something is withheld, but still reveal metadata. A secret salt makes offline guesses harder while the opening remains withheld. Readers can check folds over envelopes. Unreachable does not distinguish private records from lost ones.</li>
     <li><b>What it doesn't:</b> computing over records a reader can't see while keeping them hidden. That needs zero-knowledge proofs or secure computation, and nothing needs them yet.</li>
     <li><b>So a computed claim you can't recompute is only attested:</b> it rests on the signer, and lenses say so.</li>
   </ul>
