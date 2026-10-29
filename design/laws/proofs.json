@@ -429,10 +429,31 @@
    "states":
    "∀ {p q : List Char} {a a' b e : Loops.Moment}, ¬'/' ∈ p → ¬'/' ∈ q → q ≠ ['.', '.'] → Loops.point? p = some (a, a') → Loops.point? q = some (b, e) → a ≤ b → ∃ sp, Loops.occurredSpanOf (p ++ '/' :: q) = some sp ∧ sp.start = a ∧ sp.stop = some e",
    "module": "Laws.Time"},
+  "Loops.newestFirst_unread":
+  {"uses":
+   ["Loops.idsOf_ext",
+    "Loops.idsOf_length",
+    "Loops.mem_newestFirst_iff",
+    "Loops.newestFirst_distinct",
+    "Loops.payTest_unlinked"],
+   "states":
+   "∀ (cs : List Loops.Cond) {xs : List Loops.Record}, Loops.Addressed xs → (List.filter (fun x => Loops.payTest cs x == Loops.Tri.unknown) (Loops.newestFirst xs)).length = (Loops.idsOf (List.filter (fun x => Loops.payTest cs x == Loops.Tri.unknown) xs)).length",
+   "module": "Laws.Spec"},
   "Loops.newestFirst_eq":
   {"uses": ["Loops.Addressed.unlinked", "Loops.LatestBy.set_decides"],
    "states":
    "∀ {xs ys : List Loops.Record}, Loops.Addressed xs → Loops.Addressed ys → (∀ (r : Loops.Record), r ∈ xs ↔ r ∈ ys) → Loops.newestFirst xs = Loops.newestFirst ys",
+   "module": "Laws.Spec"},
+  "Loops.newestFirst_distinct":
+  {"uses":
+   ["Loops.Addressed.sub",
+    "Loops.Addressed.unlinked",
+    "Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.Inv.heads_sorted",
+    "Loops.LatestBy.inv_of",
+    "Loops.Newer.irrefl"],
+   "states":
+   "∀ {xs : List Loops.Record}, Loops.Addressed xs → Loops.Distinct (Loops.newestFirst xs)",
    "module": "Laws.Spec"},
   "Loops.moment_lt_iff_scaled":
   {"uses":
@@ -449,6 +470,15 @@
   {"uses": [],
    "states":
    "∀ {xs : List Loops.Record} {t : String} {s : Loops.LatestBy}, (t, s) ∈ Loops.perThing xs → s = Loops.stateIn t xs",
+   "module": "Laws.Spec"},
+  "Loops.mem_newestFirst_iff":
+  {"uses":
+   ["Loops.Addressed.unlinked",
+    "Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.inv_of",
+    "Loops.mem_newestFirst"],
+   "states":
+   "∀ {xs : List Loops.Record}, Loops.Addressed xs → ∀ {r : Loops.Record}, r ∈ Loops.newestFirst xs ↔ ∃ q, q ∈ xs ∧ r = q.unlinked",
    "module": "Laws.Spec"},
   "Loops.mem_newestFirst":
   {"uses":
@@ -572,6 +602,11 @@
    "states":
    "∀ (x x_1 : List Nat), Loops.lexLt x x_1 = match x, x_1 with | [], [] => false | [], head :: tail => true | head :: tail, [] => false | a :: as, b :: bs => if a < b then true else if a = b then Loops.lexLt as bs else false",
    "module": "Laws.Record"},
+  "Loops.latestOf_unread":
+  {"uses": ["Loops.SlotValue.things.inj"],
+   "states":
+   "∀ (sel : Loops.Record → Bool) (cs : List Loops.Cond) (xs : List Loops.Record) {ts : List (String × List (Nat × Loops.Shown))} {u : Nat}, Loops.latestOf sel cs xs = Loops.SlotValue.things ts u → u = (Loops.idsOf (List.filter (fun r => Loops.chosen sel cs r && Loops.payTest cs r == Loops.Tri.unknown) (List.flatMap (fun x => x.snd.heads) (Loops.perThing xs)))).length",
+   "module": "Laws.Spec"},
   "Loops.latestOf_set_decides":
   {"uses": ["Loops.perThing_set_decides"],
    "states":
@@ -621,6 +656,11 @@
    "states":
    "∀ (xs : List Loops.Record), List.Pairwise (fun x1 x2 => x1 < x2) (Loops.idsOf xs)",
    "module": "Laws.Things"},
+  "Loops.idsOf_length":
+  {"uses": ["Loops.idsOf_sorted", "Loops.mem_idsOf"],
+   "states":
+   "∀ {xs : List Loops.Record}, Loops.Distinct xs → (Loops.idsOf xs).length = xs.length",
+   "module": "Laws.Spec"},
   "Loops.idsOf_ext":
   {"uses": ["Loops.idsOf_sorted", "Loops.mem_idsOf"],
    "states":
@@ -787,6 +827,17 @@
    "states":
    "∀ {cs : List Char} {a b : Int}, Loops.dateDays? cs = some (a, b) → a < b",
    "module": "Laws.Time"},
+  "Loops.collectOf_unread":
+  {"uses":
+   ["Loops.Addressed.filter",
+    "Loops.Addressed.sub",
+    "Loops.SlotValue.heads.inj",
+    "Loops.mem_perThing",
+    "Loops.newestFirst_unread",
+    "Loops.stateIn_heads"],
+   "states":
+   "∀ (sel : Loops.Record → Bool) (cs : List Loops.Cond) (follow : Bool) (limit : Option Nat) {xs : List Loops.Record}, Loops.Addressed xs → ∀ {hs : List (Nat × Loops.Shown)} {u : Nat}, Loops.collectOf sel cs follow limit xs = Loops.SlotValue.heads hs u → u = (Loops.idsOf (List.filter (fun r => Loops.chosen sel cs r && Loops.payTest cs r == Loops.Tri.unknown) (if follow = true then List.flatMap (fun x => x.snd.heads) (Loops.perThing xs) else xs))).length",
+   "module": "Laws.Spec"},
   "Loops.collectOf_set_decides":
   {"uses":
    ["Loops.Addressed.filter",
@@ -2532,6 +2583,11 @@
    "states":
    "∀ {xs : List Loops.Record}, Loops.Distinct xs → Loops.Addressed xs",
    "module": "Laws.Families"},
+  "Loops.Count.select_unread":
+  {"uses": ["Loops.Acc.select_unread"],
+   "states":
+   "∀ (ev : Loops.Record → Loops.Tri) (xs : List Loops.Record), (Loops.Count.acc.select ev xs).unread = (List.filter (fun x => ev x == Loops.Tri.unknown) xs).length",
+   "module": "Laws.Families"},
   "Loops.Count.repeats":
   {"uses": ["Loops.Count.fold_eq"],
    "states":
@@ -2789,6 +2845,11 @@
    "states":
    "∀ {σ : Type} (f : Loops.Acc σ) {xs ys : List Loops.Record}, Loops.Distinct xs → Loops.Distinct ys → (∀ (r : Loops.Record), r ∈ xs ↔ r ∈ ys) → f.fold xs = f.fold ys",
    "module": "Laws.Families"},
+  "Loops.Acc.select_unread":
+  {"uses": [],
+   "states":
+   "∀ {σ : Type} (f : Loops.Acc σ) (ev : Loops.Record → Loops.Tri) (xs : List Loops.Record), (f.select ev xs).unread = (List.filter (fun r => ev r == Loops.Tri.unknown || ev r == Loops.Tri.yes && !f.readable r) xs).length",
+   "module": "Laws.Families"},
   "Loops.Acc.select_set_decides":
   {"uses": ["Loops.Acc.perm", "Loops.perm_of_same"],
    "states":
@@ -2824,6 +2885,11 @@
    "states":
    "∀ {σ : Type} {init : σ} {step : σ → Loops.Record → σ} {comm : ∀ (s : σ) (a b : Loops.Record), step (step s a) b = step (step s b) a} {readable : Loops.Record → Bool} {init_1 : σ} {step_1 : σ → Loops.Record → σ} {comm_1 : ∀ (s : σ) (a b : Loops.Record), step_1 (step_1 s a) b = step_1 (step_1 s b) a} {readable_1 : Loops.Record → Bool}, { init := init, step := step, comm := comm, readable := readable } = { init := init_1, step := step_1, comm := comm_1, readable := readable_1 } → init = init_1 ∧ step = step_1 ∧ readable = readable_1",
    "module": "Loops.Families"},
+  "Loops.Acc.mk.congr_simp":
+  {"uses": [],
+   "states":
+   "∀ {σ : Type} (init init_1 : σ), init = init_1 → ∀ (step step_1 : σ → Loops.Record → σ) (e_step : step = step_1) (comm : ∀ (s : σ) (a b : Loops.Record), step (step s a) b = step (step s b) a) (readable readable_1 : Loops.Record → Bool), readable = readable_1 → { init := init, step := step, comm := comm, readable := readable } = { init := init_1, step := step_1, comm := ⋯, readable := readable_1 }",
+   "module": "Laws.Families"},
   "Loops.Acc.late":
   {"uses": ["Loops.Acc.set_decides"],
    "states":

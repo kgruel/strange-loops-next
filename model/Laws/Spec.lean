@@ -440,6 +440,16 @@ theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Recor
     obtain ⟨hsel, hcond⟩ := chosen_payTest_yes.1 ⟨hch, hpay⟩
     exact ⟨k, stateIn_heads hx (mem_perThing hs' ▸ hk0), hsel, hcond, rfl⟩
 
+/-- Latest-by counts each unknown chosen head once by id, even across things. -/
+theorem latestOf_unread (sel : Record → Bool) (cs : List Cond) (xs : List Record)
+    {ts : List (String × List (Nat × Shown))} {u : Nat}
+    (h : latestOf sel cs xs = .things ts u) :
+    u = (idsOf (((perThing xs).flatMap (·.2.heads)).filter fun r =>
+      chosen sel cs r && payTest cs r == .unknown)).length := by
+  unfold latestOf at h
+  obtain ⟨_, rfl⟩ := SlotValue.things.inj h
+  simp only [flatMap_map, filter_flatMap, filter_filter, Bool.and_comm]
+
 theorem payTest_unlinked (cs : List Cond) (r : Record) :
     payTest cs r.unlinked = payTest cs r := by
   unfold payTest Cond.all
@@ -474,6 +484,77 @@ theorem mem_newestFirst {xs : List Record} (hx : Addressed xs) {r : Record}
   obtain ⟨hm, -⟩ := ((LatestBy.inv_of hx.unlinked).heads_mem r).1 h
   obtain ⟨q, hq, e⟩ := mem_map.1 hm
   exact ⟨q, hq, e.symm⟩
+
+/-- Dropping `prev` makes every input record a head of the ordering fold. -/
+theorem mem_newestFirst_iff {xs : List Record} (hx : Addressed xs) {r : Record} :
+    r ∈ newestFirst xs ↔ ∃ q ∈ xs, r = q.unlinked := by
+  refine ⟨mem_newestFirst hx, ?_⟩
+  rintro ⟨q, hq, rfl⟩
+  apply ((LatestBy.inv_of hx.unlinked).heads_mem q.unlinked).2
+  refine ⟨mem_map.2 ⟨q, hq, rfl⟩, ?_⟩
+  rintro ⟨r, hr, hp⟩
+  obtain ⟨a, _, rfl⟩ := mem_map.1 hr
+  simp [Record.unlinked] at hp
+
+/-- The ordering fold has no repeated ids on addressed input. -/
+theorem newestFirst_distinct {xs : List Record} (hx : Addressed xs) :
+    Distinct (newestFirst xs) := by
+  have inv := LatestBy.inv_of hx.unlinked
+  have ha : Addressed (newestFirst xs) :=
+    hx.unlinked.sub fun r hr => ((inv.heads_mem r).1 hr).1
+  apply pairwise_map.2
+  apply inv.heads_sorted.imp_of_mem
+  intro a b ha' hb' hn e
+  have hab := ha a ha' b hb' e
+  exact Newer.irrefl b (hab ▸ hn)
+
+/-- On a list with distinct ids, canonicalizing the ids preserves length. -/
+theorem idsOf_length {xs : List Record} (hx : Distinct xs) :
+    (idsOf xs).length = xs.length := by
+  have hp : idsOf xs ~ xs.map (·.id) :=
+    (perm_ext_iff_of_nodup ((idsOf_sorted xs).imp Nat.ne_of_lt) hx).2 fun i => by
+      simp only [mem_idsOf, mem_map]
+  simpa using hp.length_eq
+
+/-- Ordering and deduplication count exactly the unknown input ids. -/
+theorem newestFirst_unread (cs : List Cond) {xs : List Record} (hx : Addressed xs) :
+    ((newestFirst xs).filter (payTest cs · == .unknown)).length =
+      (idsOf (xs.filter (payTest cs · == .unknown))).length := by
+  have hd : Distinct ((newestFirst xs).filter (payTest cs · == .unknown)) :=
+    pairwise_map.2 ((pairwise_map.1 (newestFirst_distinct hx)).sublist filter_sublist)
+  rw [← idsOf_length hd]
+  congr 1
+  apply idsOf_ext
+  intro i
+  constructor
+  · rintro ⟨r, hr, hi⟩
+    obtain ⟨hr, hp⟩ := mem_filter.1 hr
+    obtain ⟨q, hq, rfl⟩ := (mem_newestFirst_iff hx).1 hr
+    exact ⟨q, mem_filter.2 ⟨hq, by simpa [payTest_unlinked] using hp⟩, hi⟩
+  · rintro ⟨r, hr, hi⟩
+    obtain ⟨hr, hp⟩ := mem_filter.1 hr
+    exact ⟨r.unlinked,
+      mem_filter.2 ⟨(mem_newestFirst_iff hx).2 ⟨r, hr, rfl⟩,
+        by simpa [payTest_unlinked] using hp⟩, hi⟩
+
+/-- Collect counts unknown chosen ids before ordering or limiting its readable output. -/
+theorem collectOf_unread (sel : Record → Bool) (cs : List Cond) (follow : Bool)
+    (limit : Option Nat) {xs : List Record} (hx : Addressed xs)
+    {hs : List (Nat × Shown)} {u : Nat}
+    (h : collectOf sel cs follow limit xs = .heads hs u) :
+    u = (idsOf (((if follow then (perThing xs).flatMap (·.2.heads) else xs)).filter fun r =>
+      chosen sel cs r && payTest cs r == .unknown)).length := by
+  have hpool : Addressed (if follow then (perThing xs).flatMap (·.2.heads) else xs) := by
+    cases follow
+    · exact hx
+    · apply hx.sub
+      intro r hr
+      obtain ⟨⟨t, s⟩, hts, hr⟩ := mem_flatMap.1 hr
+      exact (stateIn_heads hx (mem_perThing hts ▸ hr)).1
+  unfold collectOf at h
+  obtain ⟨_, rfl⟩ := SlotValue.heads.inj h
+  rw [newestFirst_unread cs (hpool.filter _)]
+  simp only [filter_filter, Bool.and_comm]
 
 /-- Collect following `prev` returns only heads, and only those it was asked
 for: each record it gives is one no record about its thing has superseded,

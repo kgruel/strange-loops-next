@@ -58,7 +58,7 @@ the cached state in both, so there is no partial rewind.
 | `heads.why` | `Max.cannot_follow_prev` | Max can't follow `prev`: no step from Max's state and the next record keeps the current maximum | `fold/heads/01`, `02` |
 | `view.no-resurrection` | `LatestBy.view`, `LatestBy.view_head_ids`, `LatestBy.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
 | `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
-| `result.unread` | `LatestBy.maxHeads_view` | a result counts the covered records it couldn't read: proved for Max over heads, which counts the heads it doesn't hold; the other folds' counts are pinned by vectors | `fold/view/04`, `fold/select/*` |
+| `result.unread` | `LatestBy.maxHeads_view`, `Acc.select_unread`, `Count.select_unread`, `latestOf_unread`, `collectOf_unread` | accumulating folds count unknown tests and selected unreadable records; Count counts only unknown tests; latest-by and collect count distinct chosen records with unknown payload tests, before any limit (per-thing heads for latest-by, heads for collect following `prev`, all records otherwise); Max over heads counts heads whose payload is not held | `fold/view/04`, `fold/select/*`, `spec/run/02`, `spec/run/03` |
 | `result.full` | `Acc.select_full` | when every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold | `fold/select/03` |
 | `select.set` | `Acc.select_set_decides` | what is read and what is unread depend only on the set | `fold/select/*` |
 

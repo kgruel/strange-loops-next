@@ -297,6 +297,22 @@ theorem Where.eval_here (w : Where) {r : Record} (h : r.shown = .here) :
     w.eval r ≠ .unknown := by
   cases w <;> simp [Where.eval, Tri.ofBool, h] <;> split <;> simp
 
+/-- Unread records are exactly unknown tests or selected records the fold cannot read. -/
+theorem Acc.select_unread {σ} (f : Acc σ) (ev : Record → Tri) (xs : List Record) :
+    (f.select ev xs).unread =
+      (xs.filter fun r => ev r == .unknown || (ev r == .yes && !f.readable r)).length := by
+  simp only [Acc.select, filter_filter]
+  induction xs with
+  | nil => rfl
+  | cons r rs ih =>
+    cases he : ev r <;> cases hr : f.readable r <;>
+      simp [he, hr, ih, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+
+/-- Count can read every selected record; only unknown tests are unread. -/
+theorem Count.select_unread (ev : Record → Tri) (xs : List Record) :
+    (Count.acc.select ev xs).unread = (xs.filter (ev · == .unknown)).length := by
+  simp [Acc.select_unread, Count.acc]
+
 /-- When the test answers for every record and the fold can read every
 record, nothing is unread and the result is the plain fold of what is
 selected. -/
