@@ -3,6 +3,7 @@
 
 pub mod base32;
 pub mod batch;
+pub mod binary64;
 pub mod envelope;
 pub mod families;
 pub mod fold;

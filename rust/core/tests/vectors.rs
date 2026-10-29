@@ -1,5 +1,7 @@
-//! Record, occurred, fold, spec, realm, scenario, batch, and lens vectors from model/Gen.
+//! Model vectors and external binary64, JCS, and Ed25519 fixtures.
 
+#[path = "support/standard.rs"]
+mod standard;
 mod support;
 
 use ed25519_dalek::{Signer, SigningKey};
@@ -20,10 +22,8 @@ const IMPLEMENTED: &[(&str, usize)] = &[
     ("scenario", 1),
     ("lens", 10),
     ("batch", 11),
+    ("standard", 12),
 ];
-// Shrink only. Standard includes external non-integer JCS and crypto fixtures;
-// it is not claimed as Lean integer-JSON conformance by this layer.
-const REMAINING: &[&str] = &["standard"];
 
 fn json_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -187,7 +187,6 @@ fn every_registered_vector_and_every_expect() {
         .join("vectors");
     let mut seen = Vec::new();
     let mut checked = 0;
-    let mut deferred = 0;
     for entry in fs::read_dir(&root).expect("repository vectors") {
         let path = entry.expect("vector entry").path();
         if !path.is_dir() {
@@ -211,6 +210,12 @@ fn every_registered_vector_and_every_expect() {
                 *count,
                 "{family} recursive vector count changed; review registry"
             );
+            if family == "standard" {
+                checked += standard::check(&path, &files)
+                    .unwrap_or_else(|error| panic!("{path:?}: {error}"));
+                seen.push(family);
+                continue;
+            }
             for file in files {
                 let source = fs::read_to_string(&file).expect("vector file");
                 let raw = support::parse(&source);
@@ -252,24 +257,16 @@ fn every_registered_vector_and_every_expect() {
                 checked += 1;
             }
         } else {
-            assert!(
-                REMAINING.contains(&family.as_str()),
-                "unknown vector directory {path:?}"
-            );
-            deferred += files.len();
+            panic!("unknown vector directory {path:?}");
         }
         seen.push(family);
     }
     for (family, _) in IMPLEMENTED {
         assert!(seen.iter().any(|s| s == family), "missing {family}");
     }
-    for family in REMAINING {
-        assert!(seen.iter().any(|s| s == family), "stale allowlist {family}");
-    }
-    assert_eq!(checked, 172);
-    assert_eq!(checked + deferred, 184);
+    assert_eq!(checked, 184, "{root:?}: vector registry checked file count");
     assert_eq!(
-        checked + deferred,
+        checked,
         json_files(&root).len(),
         "JSON skipped outside registered families"
     );

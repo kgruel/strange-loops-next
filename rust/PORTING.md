@@ -1,8 +1,9 @@
-# Layers one through three, realm, scenario, batch, and lens: Lean to Rust
+# Layers one through three, realm, scenario, batch, lens, and binary64: Lean to Rust
 
 Lean defines the behavior of this port.
 The port implements record primitives, fold families, per-thing state, specs, settlement, admission, batches, and lenses.
 It checks 11 batch, ten lens, one scenario, nine realm, 70 spec, 37 fold, and 34 record and occurred vectors.
+A separate binary64 module supports the external standards tests.
 The CLI and storage service remain future work.
 
 Layer two uses the closed where types, parser, and evaluation from layer three.
@@ -31,6 +32,7 @@ Paths below start at the repository root. Public Rust docs also identify their L
 | Record, Shown, Val, idDigest, idText, span, Newer; model/Loops/Record.lean:18–77 | record::{Record, Shown, Val, Digest, id_digest, id_text}; Record::{span, newer} |
 | withhold, erase, get, num, withholding; model/Loops/Record.lean:110–131 | Record::{withhold, erase, get, num}; record::withholding |
 | Nat counts and limits; Int payloads and state; model/Loops/{Json,Record,Fold,Families}.lean | number::{Nat, Int}; private num-bigint values, decimal parsing and display |
+| Number, ofScientific, finite, whole?, canon; gaps:model/Loops/Number.lean | binary64::Number; FromStr, TryFrom<f64>, Number::{from_bits, bits, whole, canon} |
 | Count/Sum/Min/Max.step/fold; model/Loops/Fold.lean:16–18,77–91 | fold::{count_step, count_fold, sum_step, sum_fold, min_step, min_fold, max_step, max_fold} |
 | insertId, insertRec, LatestBy, Latest.fold/winner/others; model/Loops/Fold.lean:28–69 | fold::{insert_id, insert_rec, LatestBy, latest_fold}; LatestBy::{step, fold, winner, others}; empty Default |
 | dedup, Tri, Where, Result, Acc.fold/select; model/Loops/Families.lean:26–41,95–129 | families::{dedup, Tri, Where, Result, Acc}; Tri::of_bool; Where::eval; Acc::{fold, select} |
@@ -96,7 +98,29 @@ A checked writer integer fits `i64`, but shared raw types must preserve wider in
 See `model/Gen/Read.lean`, `model/Loops/Spec.lean:346–357`, and `model/Loops/Json.lean:76–89`.
 A shared fixed-width type changes refusal order and raw fold results.
 Counts, unread totals, and limits also remain unbounded.
-The port adds no separate checked numeric type because the writer already defines the required boundary.
+These integer APIs remain unchanged.
+The separate binary64 API does not replace them.
+
+### Binary64 standards boundary
+
+`binary64::Number` holds private binary64 bits and accepts only finite values.
+Its reference is `model/Loops/Number.lean` on branch `gaps`.
+Decimal input follows RFC 8259 syntax and rounds once through Rust's `f64` parser.
+The parser refuses NaN, infinity, malformed tokens, and decimal overflow.
+Underflow can produce signed zero. Bit equality keeps the two zero representations distinct.
+`whole` returns an integer only within ±9007199254740991, after rounding.
+
+`canon` starts with Rust's shortest decimal and uses ECMAScript notation.
+An exact ties-to-even correction resolves Rust's different shortest-digit choice at decimal midpoints.
+Both zero signs render as `0`.
+Fixed notation covers magnitudes from `1e-6` through values below `1e21`.
+Other magnitudes use lowercase `e` and an explicit exponent sign.
+The standard suite checks these results against the external fixtures.
+A full Lean roundtrip proof and a shortest-decimal proof remain deferred.
+
+The standard JSON adapter lives only in the test harness.
+Core JSON, record readers, folds, and specs keep their existing integer behavior.
+The integration run owns the remaining `gaps` changes.
 
 ## Time representation
 
@@ -220,6 +244,34 @@ Vector tests use `sha2` and `ed25519-dalek` for SHA-256 and Ed25519.
 The core adds no crypto dependency or custom crypto implementation.
 Wire signatures and lines follow `Gen.Records.storedJson` and `erasedJson` (`model/Gen/Records.lean:41–56`).
 
+### Standard dependency review
+
+The test manifest pins `ed25519-dalek` to `=2.2.0` for the SUPERCOP check.
+The committed lock already contains that version and `curve25519-dalek` 4.1.3.
+The crate uses the BSD-3-Clause license and declares Rust 1.81 as its minimum version.
+The workspace requires Rust 1.85.
+The default features enable `alloc`, `fast`, `std`, and `zeroize`.
+The runner does not enable `hazmat` or `legacy_compatibility`.
+
+The [upstream repository](https://github.com/dalek-cryptography/curve25519-dalek) remains active and unarchived.
+The latest stable major version is 3; this branch retains the existing version 2 dependency.
+This review does not establish a maintenance guarantee for version 2.
+The pin makes this test dependency choice explicit; future updates need a new review.
+See the [2.2.0 metadata](https://crates.io/api/v1/crates/ed25519-dalek/2.2.0) and [feature list](https://docs.rs/crate/ed25519-dalek/2.2.0/features).
+
+The lock satisfies the patches for [RUSTSEC-2022-0093](https://rustsec.org/advisories/RUSTSEC-2022-0093.html) and [RUSTSEC-2024-0344](https://rustsec.org/advisories/RUSTSEC-2024-0344.html).
+`cargo tree --duplicates` reports no duplicate versions.
+An OSV query checks all 44 locked registry packages and reports one advisory for `block-buffer` 0.10.4.
+[GHSA-qwgh-2vcv-g2f7](https://github.com/RustCrypto/utils/security/advisories/GHSA-qwgh-2vcv-g2f7) concerns cursor corruption during a caught callback panic.
+OSV lists all versions below 0.12.1, but the upstream advisory lists `>=0.11.0,<0.12.1`.
+The locked 0.10.4 source stores its cursor separately from the data buffer.
+Its `digest_blocks` callbacks cannot overwrite that cursor through buffer bytes.
+This source check excludes the described mechanism, not all possible defects.
+The review therefore retains the existing lock.
+
+`cargo audit` and `cargo deny` are unavailable in this environment.
+This review does not claim a clean full-lock audit.
+
 ## Test mapping and checks
 
 Tests precede the original implementation. The initial run fails because the `loops` library does not yet exist.
@@ -237,6 +289,9 @@ Checks include public keys, signatures, both wire lines, and occurred ordering.
 | vectors/realm: nine | Same registry and tests/support/realm.rs; every rotation and complete settled, refused, things, and sum fields |
 | vectors/lens: ten | Same registry and tests/support/lens.rs; complete answers and refusal |
 | vectors/batch: 11 | Same registry and tests/support/batch.rs; complete records or refusal |
+| vectors/standard: 12 JSON files | Same registry and tests/support/standard.rs; six JCS input/output pairs |
+| vectors/standard/es6-numbers.txt: 4,000 rows | Standard helper; exact binary64 formatting |
+| vectors/standard/ed25519.input.gz: 128 rows | Standard helper; both public key copies, exact signatures, attached messages, and strict verification |
 
 The test reader follows `Gen.Read.record`, `recordId`, and `fieldsOf` (`model/Gen/Read.lean:238–248,286–331`).
 It requires payload fields for `Here` and refuses payload fields on hidden forms.
@@ -267,15 +322,20 @@ Two lens harness tests check strict shapes, repeated keys, refusal, and empty do
 The batch core tests cover raw mappings, lookup order, unbounded fuel, refusal rank, and input order.
 The batch reader tests cover strict shapes, canonical base32, raw duplicates, unbounded integers, optional fields, and first held lookup.
 The reader shares one canonical base32 decoder for salts and digests.
-The suite runs 92 test executions. Fifteen shared helper tests run in each of two integration test binaries.
+Fourteen number tests cover rounding, finite bounds, signed zero, notation thresholds, exact decimal ties, and sampled bit roundtrips.
+Five standard harness tests cover strict input, UTF-16 ordering, file pairing, row grammar, and changed keys, signatures, and messages.
+The suite runs 111 ordinary test executions and one documentation test.
+Fifteen shared helper tests run in each of two integration test binaries.
 
-The registry accounts for 184 recursive JSON files: 172 checked and 12 explicitly deferred.
-The remaining allowlist contains only `standard`.
-Layer two removes `fold` from the earlier allowlist. Layer three removes `spec`.
-The realm layer removes `realm`. The scenario layer removes `scenario`.
-The lens layer removes `lens`. The batch layer removes `batch`.
-Unknown families, root JSON, missing or stale registrations, count changes, and files outside accounted families fail.
-`GAPS.md` explains each deferred family and the external standard limits.
+The registry checks all 184 recursive JSON files. No family remains deferred.
+The standard helper requires all six JCS input/output pairs and compares output bytes without trimming.
+It checks exact file paths, including unexpected nested files, and consumes both files in each pair.
+The number and signature corpora have separate required row counts.
+The SUPERCOP runner requires `gzip` on `PATH` and treats a missing decoder or a failed exit as an error.
+It invokes the decoder directly, without a shell. No new compression dependency enters the core or tests.
+
+Unknown families, root JSON, missing registrations, count changes, and files outside registered families fail.
+`GAPS.md` describes the standard adapter's boundary and remaining proof limits.
 
 The local checks use `cargo fmt --check`, `cargo clippy --all-targets --all-features -- -D warnings`, `cargo test`, and `cargo doc --no-deps`.
 `git diff --check` also checks whitespace.

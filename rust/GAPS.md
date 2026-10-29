@@ -1,4 +1,4 @@
-# Layers one through three, realm, scenario, batch, and lens: limits and review points
+# Layers one through three, realm, scenario, batch, lens, and binary64: limits and review points
 
 This port changes no model, vector, protocol, design, or interop files.
 The implemented reader surface follows Lean except for the explicit representation boundaries below.
@@ -119,7 +119,8 @@ Raw folds can therefore receive integers outside the writer range.
 Rust keeps `Int` and `Nat` arbitrary precision for raw JSON, record numbers, fold state, counts, unread totals, and limits.
 A shared fixed-width type rejects raw values before the writer can apply its refusal order.
 It also changes raw fold results.
-A separate checked numeric type adds no required behavior, so this port adds none.
+Those integer APIs remain unchanged.
+The separate `binary64::Number` type serves the standards boundary, not the current record or fold APIs.
 
 ## Differences from JavaScript
 
@@ -138,34 +139,44 @@ Visibility checks belong to `Acc.select` and `maxHeads`, not these raw entry poi
 
 ## External standards data
 
-The Lean numeric JSON model covers integers, not general binary64 values (`model/Loops/Json.lean:12,118–132`).
-Record signatures and stored lines follow `model/Gen/Records.lean:41–56`.
-`vectors/standard/README.md` describes separate JCS, binary64, and SUPERCOP Ed25519 data.
+The local Lean JSON model covers integers (`model/Loops/Json.lean:12,118–132`).
+Branch `gaps` supplies the binary64 reference in `model/Loops/Number.lean`.
+The human ruling permits a separate Rust number module and standard adapter.
+This branch does not port the other `gaps` changes.
+Record signatures and stored lines still follow `model/Gen/Records.lean:41–56`.
 
-**Stopping blocker:** the external binary64 suite has no corresponding Lean value type or formatter.
-RFC 8785 defines the required behavior. Lean mentions these tests but models only integer JSON (`model/Loops/Json.lean:3–7,12–18,76–84`).
-`vectors/standard/jcs/input/values.json:2` includes `333333333.33333329`, `1E30`, and `4.50`.
-`vectors/standard/es6-numbers.txt` adds 4,000 binary64 formatting cases.
+`binary64::Number` preserves the rounded bits and refuses nonfinite values at construction.
+This boundary is narrower than Lean's raw `Number`, which can hold nonfinite bits.
+`whole` accepts only rounded integers within ±9007199254740991.
+Both zero signs render as `0`.
+Rust's shortest decimal printing supplies the digits; the formatter applies ECMAScript notation.
+The external fixtures decide the required output.
+A full Lean roundtrip proof and a shortest-decimal proof remain deferred.
 
-The readings include extending Lean JSON, adding a separate RFC formatter, converting numbers to integers, or deferring the suite.
-Adding floats changes the model domain. Converting numbers to integers loses values.
-A separate RFC formatter needs an explicit boundary outside the Lean port.
-This run stops before making that decision and keeps `standard` on the allowlist.
-Resume after a Lean definition or explicit approval for an external-standard adapter.
-That family includes 12 JCS JSON files, `es6-numbers.txt`, and `ed25519.input.gz`.
-The crypto corpus needs separate dependency checks; its deferral does not follow from the integer restriction.
-Current record tests compare model signatures through maintained crypto dependencies.
-The port claims neither full RFC 8785 coverage nor independent SUPERCOP conformance.
+`tests/support/standard.rs` checks the data in `vectors/standard/README.md`:
 
-| Deferred JSON family | Files |
-| --- | ---: |
-| standard | 12 |
-| Total | 12 |
+| Standard data | Check |
+| --- | --- |
+| JCS: six input files and six output files | Parse input and compare exact canonical output bytes |
+| es6-numbers.txt: 4,000 rows | Convert binary64 bits to exact canonical text |
+| ed25519.input.gz: 128 rows | Derive keys, compare signatures and attached messages, and verify signatures |
+
+The test-only JCS adapter preserves decimal tokens until `Number` parses them.
+It refuses repeated names, invalid Unicode strings, and nonfinite numeric results.
+It reuses core string quoting and UTF-16 key sorting.
+Core JSON, record readers, and numeric folds remain integer-only in this branch.
+Passing these fixtures does not prove all RFC 8785 behavior or all binary64 cases.
+
+The Ed25519 runner uses the pinned `ed25519-dalek` dependency, not custom cryptography.
+`PORTING.md` records its license, maintenance evidence, and audit limits.
+The runner requires `gzip` on `PATH` and checks its exit status.
+A missing decoder or corrupt fixture fails the test; neither skips the corpus.
+This existing fixture boundary avoids a new compression dependency.
 
 The registry checks 26 record, eight occurred, 37 fold, 70 spec, nine realm, one scenario, ten lens, and 11 batch files.
-It checks 172 of 184 recursive JSON files.
+The 12 standard JSON files bring the checked total to all 184 recursive JSON files.
 Spec includes 61 parse files and nine run files.
-The remaining allowlist contains only `standard`.
+No family remains on an allowlist.
 
 ## Canonicalization before validation
 
