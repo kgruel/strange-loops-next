@@ -25,7 +25,7 @@ winner is the newest head, and any other heads are a fork, shown as a conflict.
 -/
 
 /-- Insert into a strictly ascending list, keeping it duplicate-free. -/
-def insertId (n : Nat) : List Nat → List Nat
+def insertId (n : RecordId) : List RecordId → List RecordId
   | [] => [n]
   | m :: ms => if n < m then n :: m :: ms else if n = m then m :: ms else m :: insertId n ms
 
@@ -35,7 +35,7 @@ def insertRec (r : Record) : List Record → List Record
   | h :: t => if Newer r h then r :: h :: t else if r = h then h :: t else h :: insertRec r t
 
 structure LatestBy where
-  named : List Nat
+  named : List RecordId
   heads : List Record
   deriving Repr, DecidableEq, Inhabited
 

@@ -44,9 +44,9 @@ def thingsOf (xs : List Record) : List String := canonSet (xs.flatMap Record.thi
 /-! ## Settling the forms several places hold -/
 
 /-- Ids in ascending order, each once. -/
-def idsOf (xs : List Record) : List Nat := xs.foldl (fun ns r => insertId r.id ns) []
+def idsOf (xs : List Record) : List RecordId := xs.foldl (fun ns r => insertId r.id ns) []
 
-def erasedIn (xs : List Record) (i : Nat) : Bool :=
+def erasedIn (xs : List Record) (i : RecordId) : Bool :=
   xs.any fun e => e.erases.contains i
 
 /-- From the forms of one record: one that is here, or else the withheld form. -/
@@ -56,7 +56,7 @@ def baseForm (forms : List Record) : Option Record :=
   | none => forms.head?.map Record.withhold
 
 /-- The one record a reader keeps for id `i`. -/
-def pick (xs : List Record) (i : Nat) : Option Record :=
+def pick (xs : List Record) (i : RecordId) : Option Record :=
   (baseForm (xs.filter (·.id == i))).map fun r => if erasedIn xs i then r.erase else r
 
 /-- One record per id, from every form the reader's places hold. -/

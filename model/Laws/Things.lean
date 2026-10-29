@@ -31,7 +31,7 @@ theorem idsOf_eq (xs : List Record) :
     idsOf xs = (xs.map (·.id)).foldl (fun ns n => insertId n ns) [] := by
   simp [idsOf, foldl_map]
 
-theorem mem_idsOf {xs : List Record} {i : Nat} : i ∈ idsOf xs ↔ ∃ r ∈ xs, r.id = i := by
+theorem mem_idsOf {xs : List Record} {i : RecordId} : i ∈ idsOf xs ↔ ∃ r ∈ xs, r.id = i := by
   rw [idsOf_eq, mem_insertIds]; simp
 
 theorem idsOf_sorted (xs : List Record) : (idsOf xs).Pairwise (· < ·) := by
@@ -39,10 +39,10 @@ theorem idsOf_sorted (xs : List Record) : (idsOf xs).Pairwise (· < ·) := by
 
 theorem idsOf_ext {xs ys : List Record} (h : ∀ i, (∃ r ∈ xs, r.id = i) ↔ (∃ r ∈ ys, r.id = i)) :
     idsOf xs = idsOf ys :=
-  Perm.eq_of_pairwise (le := (· < ·)) (fun a b _ _ h₁ h₂ => by omega)
+  Perm.eq_of_pairwise (le := (· < ·)) (fun a b _ _ h₁ h₂ => absurd (Fin.lt_trans h₁ h₂) (Fin.lt_irrefl a))
     (idsOf_sorted xs) (idsOf_sorted ys)
-    ((perm_ext_iff_of_nodup ((idsOf_sorted xs).imp Nat.ne_of_lt)
-      ((idsOf_sorted ys).imp Nat.ne_of_lt)).2 fun i => by rw [mem_idsOf, mem_idsOf, h])
+    ((perm_ext_iff_of_nodup ((idsOf_sorted xs).imp Fin.ne_of_lt)
+      ((idsOf_sorted ys).imp Fin.ne_of_lt)).2 fun i => by rw [mem_idsOf, mem_idsOf, h])
 
 /-! ## Settling -/
 
@@ -67,7 +67,7 @@ theorem baseForm_mem {forms : List Record} {r : Record} (h : baseForm forms = so
       subst h
       exact ⟨a, mem_cons_self, withhold_envelope a⟩
 
-theorem pick_id {xs : List Record} {i : Nat} {r : Record} (h : pick xs i = some r) : r.id = i := by
+theorem pick_id {xs : List Record} {i : RecordId} {r : Record} (h : pick xs i = some r) : r.id = i := by
   unfold pick at h
   cases hb : baseForm (xs.filter (·.id == i)) with
   | none => simp [hb] at h
@@ -79,7 +79,7 @@ theorem pick_id {xs : List Record} {i : Nat} {r : Record} (h : pick xs i = some 
     split <;> simp [Record.erase, he.id, hai]
 
 /-- Forms of one id, held in two lists with the same members, give the same base form. -/
-theorem baseForm_eq {F G : List Record} {i : Nat} (hF : Forms F) (hid : ∀ a ∈ F, a.id = i)
+theorem baseForm_eq {F G : List Record} {i : RecordId} (hF : Forms F) (hid : ∀ a ∈ F, a.id = i)
     (h : ∀ r, r ∈ F ↔ r ∈ G) : baseForm F = baseForm G := by
   unfold baseForm
   cases hf : F.find? (·.shown == .here) with
@@ -113,7 +113,7 @@ theorem baseForm_eq {F G : List Record} {i : Nat} (hF : Forms F) (hid : ∀ a �
         have hb : b ∈ F := (h b).2 (hG' ▸ mem_cons_self)
         exact withhold_congr (hF a ha b hb ((hid a ha).trans (hid b hb).symm)).1
 
-theorem erasedIn_eq {xs ys : List Record} (h : ∀ r, r ∈ xs ↔ r ∈ ys) (i : Nat) :
+theorem erasedIn_eq {xs ys : List Record} (h : ∀ r, r ∈ xs ↔ r ∈ ys) (i : RecordId) :
     erasedIn xs i = erasedIn ys i := by
   unfold erasedIn
   apply Bool.eq_iff_iff.2
@@ -138,11 +138,11 @@ theorem settle_distinct (xs : List Record) : Distinct (settle xs) := by
   have hp : (settle xs).Pairwise (fun a b => a.id < b.id) :=
     (idsOf_sorted xs).filterMap (pick xs) fun a a' h b hb b' hb' => by
       rw [pick_id (Option.mem_def.1 hb), pick_id (Option.mem_def.1 hb')]; exact h
-  exact (pairwise_map.2 hp).imp Nat.ne_of_lt
+  exact (pairwise_map.2 hp).imp Fin.ne_of_lt
 
 /-- Erasure sticks: once a record whose `erases` names `i` is held, the record kept
 for `i` is erased, whichever forms the places hold. -/
-theorem settle_erased {xs : List Record} {i : Nat} (he : erasedIn xs i = true) {r : Record}
+theorem settle_erased {xs : List Record} {i : RecordId} (he : erasedIn xs i = true) {r : Record}
     (hr : r ∈ settle xs) (hi : r.id = i) : r.shown = .erased := by
   obtain ⟨j, -, hj⟩ := mem_filterMap.1 hr
   have hji : j = i := (pick_id hj).symm.trans hi

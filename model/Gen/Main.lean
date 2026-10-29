@@ -33,50 +33,50 @@ def jOutcome : Outcome → J
 
 /-! ## Records used by the fold cases -/
 
-def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
-    (prev : List Nat := []) (value : String := s!"v{id}")
+def rec (id : RecordId) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
+    (prev : List RecordId := []) (value : String := s!"v{id}")
     (okO : Reads occurred := by decide) (okE : Reads emitted := by decide) : Record :=
   { id, kind := "decision", observer := "sl:kyle", about := [thing], value, prev, occurred := some (claimAt occurred okO),
     emitted := stampAt emitted okE }
 
-def r1 := rec 0x11 "topic:auth" 100
-def r2 := rec 0x12 "topic:auth" 200 (prev := [0x11])
-def r3 := rec 0x13 "topic:auth" 150
-def r4 := rec 0x14 "topic:auth" 300 (prev := [0x12, 0x13])
-def r5 := rec 0x15 "topic:cache" 120
-def r6 := rec 0x16 "topic:auth" 200 (emitted := 210)
+def r1 := rec (fixtureId 0x11) "topic:auth" 100
+def r2 := rec (fixtureId 0x12) "topic:auth" 200 (prev := [fixtureId 0x11])
+def r3 := rec (fixtureId 0x13) "topic:auth" 150
+def r4 := rec (fixtureId 0x14) "topic:auth" 300 (prev := [fixtureId 0x12, fixtureId 0x13])
+def r5 := rec (fixtureId 0x15) "topic:cache" 120
+def r6 := rec (fixtureId 0x16) "topic:auth" 200 (emitted := 210)
 -- r6's times, each spelled another way, and a greater digest whose text sorts
 -- first: only the id, read as digest bytes, puts r7 first
-def r7 := { rec 0x37 "topic:auth" 200 (emitted := 210) with
+def r7 := { rec (fixtureId 0x37) "topic:auth" 200 (emitted := 210) with
   occurred := some (claim "2026-10-01T01:03:20+01:00"), emitted := stamp "2026-10-01T00:03:30.000Z" }
-def r8 := rec 0x18 "topic:cache" 400 (prev := [0x99])
+def r8 := rec (fixtureId 0x18) "topic:cache" 400 (prev := [fixtureId 0x99])
 -- r6's span spelled another way, an earlier `emitted` and a later id: only
 -- `emitted` puts r6 first
-def r9 := { rec 0x19 "topic:auth" 200 (emitted := 205) with
+def r9 := { rec (fixtureId 0x19) "topic:auth" 200 (emitted := 205) with
   occurred := some (claim "2026-10-01T01:03:20+01:00") }
 
 -- content order on real times: without `occurred`, a record sits at its
 -- `emitted`, between records with one, whatever its id
-def t1 := rec 0x31 "topic:auth" 500 (emitted := 520)
-def t2 := { rec 0x34 "topic:auth" 0 (emitted := 420) with occurred := none }
-def t3 := rec 0x32 "topic:auth" 300 (emitted := 900)
-def t4 := { rec 0x33 "topic:auth" 0 (emitted := 100) with occurred := none }
+def t1 := rec (fixtureId 0x31) "topic:auth" 500 (emitted := 520)
+def t2 := { rec (fixtureId 0x34) "topic:auth" 0 (emitted := 420) with occurred := none }
+def t3 := rec (fixtureId 0x32) "topic:auth" 300 (emitted := 900)
+def t4 := { rec (fixtureId 0x33) "topic:auth" 0 (emitted := 100) with occurred := none }
 -- at one start, an instant, then a month, then an open span; a year that
 -- starts earlier is oldest, though it ends last
-def u1 := { rec 0x41 "topic:auth" 0 (emitted := 60) with occurred := some (claim "2026-10-01T00:00:00Z") }
-def u2 := { rec 0x42 "topic:auth" 0 (emitted := 30) with occurred := some (claim "2026-10") }
-def u3 := { rec 0x43 "topic:auth" 0 (emitted := 10) with occurred := some (claim "2026-10-01/..") }
-def u4 := { rec 0x44 "topic:auth" 0 (emitted := 20) with occurred := some (claim "2026") }
+def u1 := { rec (fixtureId 0x41) "topic:auth" 0 (emitted := 60) with occurred := some (claim "2026-10-01T00:00:00Z") }
+def u2 := { rec (fixtureId 0x42) "topic:auth" 0 (emitted := 30) with occurred := some (claim "2026-10") }
+def u3 := { rec (fixtureId 0x43) "topic:auth" 0 (emitted := 10) with occurred := some (claim "2026-10-01/..") }
+def u4 := { rec (fixtureId 0x44) "topic:auth" 0 (emitted := 20) with occurred := some (claim "2026") }
 
-def n1 := { rec 0x21 "load" 100 with n := 5 }
-def n2 := { rec 0x22 "load" 110 with n := -3 }
-def n3 := { rec 0x23 "load" 120 with n := 40 }
-def n4 := { rec 0x24 "load" 130 with n := 40 }
+def n1 := { rec (fixtureId 0x21) "load" 100 with n := 5 }
+def n2 := { rec (fixtureId 0x22) "load" 110 with n := -3 }
+def n3 := { rec (fixtureId 0x23) "load" 120 with n := 40 }
+def n4 := { rec (fixtureId 0x24) "load" 130 with n := 40 }
 
 -- the current load per host: `h3` supersedes `h2`
-def h1 := { rec 0x31 "host:a" 100 with n := 5 }
-def h2 := { rec 0x32 "host:b" 110 with n := 9 }
-def h3 := { rec 0x33 "host:b" 120 (prev := [0x32]) with n := 1 }
+def h1 := { rec (fixtureId 0x31) "host:a" 100 with n := 5 }
+def h2 := { rec (fixtureId 0x32) "host:b" 110 with n := 9 }
+def h3 := { rec (fixtureId 0x33) "host:b" 120 (prev := [fixtureId 0x32]) with n := 1 }
 
 /-! ## Fold cases -/
 
@@ -156,14 +156,14 @@ structure ViewCase where
   /-- How the reader sees each record. -/
   view : Record → Record
 
-def hideIds (ids : List Nat) : Record → Record := withholding (ids.contains ·.id)
-def eraseIds (ids : List Nat) (r : Record) : Record := if ids.contains r.id then r.erase else r
+def hideIds (ids : List RecordId) : Record → Record := withholding (ids.contains ·.id)
+def eraseIds (ids : List RecordId) (r : Record) : Record := if ids.contains r.id then r.erase else r
 
 def viewCases : List ViewCase := [
-  ⟨"01-withheld-head-still-supersedes", ["view.no-resurrection"], [r1, r2], hideIds [0x12]⟩,
-  ⟨"02-erased-head-still-supersedes", ["view.no-resurrection"], [r1, r2, r3, r4], eraseIds [0x14]⟩,
-  ⟨"03-withheld-ancestor", ["view.no-resurrection"], [r1, r2, r3, r4], hideIds [0x11, 0x12]⟩,
-  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [0x33]⟩
+  ⟨"01-withheld-head-still-supersedes", ["view.no-resurrection"], [r1, r2], hideIds [fixtureId 0x12]⟩,
+  ⟨"02-erased-head-still-supersedes", ["view.no-resurrection"], [r1, r2, r3, r4], eraseIds [fixtureId 0x14]⟩,
+  ⟨"03-withheld-ancestor", ["view.no-resurrection"], [r1, r2, r3, r4], hideIds [fixtureId 0x11, fixtureId 0x12]⟩,
+  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [fixtureId 0x33]⟩
 ]
 
 def jViewState (s : LatestBy) : J :=

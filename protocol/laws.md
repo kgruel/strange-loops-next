@@ -4,6 +4,18 @@ Each law is a theorem in `model/Laws/`, checked by Lean on every build, and
 illustrated by vectors in `vectors/`. Implementations are tested against the
 vectors; the model is what the vectors come from.
 
+## Id digests (`model/Laws/Id.lean`, `model/Laws/IdText.lean`, `model/Laws/IdSource.lean`)
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `id.digest` | `idDigest_length`, `idDigest_byte`, `idDigest_roundtrip`, `idDigest_bytes_roundtrip`, `idText_injective`, `bytes_bounded`, `bytes_idDigest`, `idOf_eq_idText`, `Gen.sha256_length`, `Gen.sha256_bounded`, `Gen.sha256_idOf_eq_idText`, `Gen.Read.recordId_bounded` | An id's digest has exactly 32 bytes. Reading these bytes gives the same id. Two ids have the same text only when they are equal. Reading any 32 bytes gives an id below 2^256. Writing that id back gives the same 32 bytes. | (proved) |
+
+The model keeps every record id and reference below 2^256.
+The id reader returns only ids below 2^256.
+
+The model's SHA-256 returns 32 bytes.
+With the model's SHA-256, an id written from bytes equals the id written from the number.
+
 ## Folds (`model/Laws/Fold.lean`)
 
 | Law | Theorem | Says | Vectors |
@@ -58,9 +70,15 @@ the cached state in both, so there is no partial rewind.
 | `heads.why` | `Max.cannot_follow_prev` | Max can't follow `prev`: no step from Max's state and the next record keeps the current maximum | `fold/heads/01`, `02` |
 | `view.no-resurrection` | `LatestBy.view`, `LatestBy.view_head_ids`, `LatestBy.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
 | `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
-| `result.unread` | `LatestBy.maxHeads_view` | a result counts the covered records it couldn't read: proved for Max over heads, which counts the heads it doesn't hold; the other folds' counts are pinned by vectors | `fold/view/04`, `fold/select/*` |
+| `result.unread` | `LatestBy.maxHeads_view`, `Acc.select_unread`, `Count.select_unread`, `latestOf_unread`, `collectOf_unread` | A fold does not guess. It counts the records whose test is unknown and the selected records it cannot read. | `fold/view/04`, `fold/select/*`, `spec/run/02`, `spec/run/03` |
 | `result.full` | `Acc.select_full` | when every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold | `fold/select/03` |
 | `select.set` | `Acc.select_set_decides` | what is read and what is unread depend only on the set | `fold/select/*` |
+
+Count can read every selected record.
+Latest-by counts each head once when its payload tests are unknown, after the source and envelope tests select it.
+Collect counts each unknown record once, before its limit.
+It counts heads when it follows replacements, and all records otherwise.
+Max over heads counts heads whose payload the reader does not hold.
 
 `view.no-resurrection` holds because `prev`, ids and times are on the
 envelope, which every reader holds. A `where` test on the envelope always
@@ -160,7 +178,7 @@ pinned by the vectors rather than proved.
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
 | `spec.from-thing` | `Source.takes_about` | `from`'s `about` takes exactly the records about the thing, and a record about nothing is about its own id and nothing else | `spec/run/09` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
-| `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads, records no record about their thing has superseded, and only those `from` takes and every test holds for, so selection never brings back what was superseded; under a view, and a rule that reads only envelopes, each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
+| `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | A slot over heads returns only heads that its source selects and that pass every test. If the store's replacement rule reads only envelopes, a view keeps each thing's heads. Each head then shows only what the view shows. | `spec/run/03`, `04`, `08` |
 | `spec.parse` | `Spec.ofJson_fits`, `Spec.ofJson_toJson`, `Spec.reparse`, `Spec.parsed_iff`, `Spec.ofJson_repeat`, `Json.repeatAt_none` | the specs the parser gives are exactly those that fit, so none runs without a source; an accepted spec's parsed form parses back to itself; a spec with a repeated key is refused, at the path `Json.repeatAt` gives, and one without is never refused for repeating | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
@@ -242,11 +260,12 @@ records. None says the set is complete, current, trusted or well dated:
 
 ## Simplifications in the model
 
-* An id is its 32-byte digest read as a number, most significant byte
-  first, and written as layer 0 writes one (`r:` and base32). The digests
-  are made up: nothing yet connects these records to layer 0's real ones,
-  so nothing yet proves a fold record holds the times its envelope was
-  checked with.
+* The model stores each id as a natural number.
+  The digest laws require each id to be less than 2^256.
+  This bound applies to a record's id and each id that it references.
+  The protocol supplies the bound through its 32-byte SHA-256 digests.
+  The model does not derive fold records from stored records.
+  No theorem connects a fold record's times to the checks on a stored record's envelope.
 * The payload is `value`, `n` and named `fields`.
 * Fold records carry their times as text with what each reads as (`Stamp`,
   `Claim`); a record's other envelope fields are as written, not read from

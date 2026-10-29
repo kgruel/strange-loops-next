@@ -235,15 +235,18 @@ def unbase32 (s : String) : Except String (List UInt8) := do
 
 /-- A record id: `r:` and the base32 of a 32-byte digest, read as a number
 the way `idText` writes one. -/
-def recordId (path : String) (j : Json) : Dec Nat := do
+def recordId (path : String) (j : Json) : Dec RecordId := do
   let s ← text path j
-  let bytes ← match s.toList with
-    | 'r' :: ':' :: rest => match unbase32 (String.ofList rest) with
-      | .ok bs => if bs.length == 32 then pure bs else bad path s!"\"{s}\" is not a 32-byte digest"
-      | .error why => bad path s!"\"{s}\" {why}"
-    | _ => bad path s!"\"{s}\" is not a record id (r:<base32 digest>)"
-  let n := bytes.foldl (fun n b => 256 * n + b.toNat) 0
-  if idText n == s then pure n else bad path s!"\"{s}\" does not read back as itself"
+  match s.toList with
+  | 'r' :: ':' :: rest =>
+    match unbase32 (String.ofList rest) with
+    | .ok bs =>
+      if h : bs.length = 32 then
+        let n : RecordId := ⟨bs.foldl (fun n b => 256 * n + b.toNat) 0, bytes_bounded bs h⟩
+        if idText n == s then pure n else bad path s!"\"{s}\" does not read back as itself"
+      else bad path s!"\"{s}\" is not a 32-byte digest"
+    | .error why => bad path s!"\"{s}\" {why}"
+  | _ => bad path s!"\"{s}\" is not a record id (r:<base32 digest>)"
 
 /-- Bytes written in base32: a salt, a seed. -/
 def bytes (path : String) (j : Json) : Dec (List UInt8) := do

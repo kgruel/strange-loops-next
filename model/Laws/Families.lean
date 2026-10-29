@@ -144,11 +144,11 @@ theorem OverHeads.late {σ} (answer : LatestBy → σ) {xs ys : List Record} (r 
 /-! ## Why there are two families -/
 
 def cx.a : Record :=
-  { id := 1, kind := "load", observer := "sl:x", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
+  { id := ⟨1, by decide⟩, kind := "load", observer := "sl:x", about := ["k1"], value := "", prev := [], emitted := default, n := 5 }
 def cx.b : Record :=
-  { id := 2, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
+  { id := ⟨2, by decide⟩, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [], emitted := default, n := 9 }
 def cx.c : Record :=
-  { id := 3, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [2], emitted := default, n := 1 }
+  { id := ⟨3, by decide⟩, kind := "load", observer := "sl:x", about := ["k2"], value := "", prev := [⟨2, by decide⟩], emitted := default, n := 1 }
 
 /-- Max can't follow `prev`. Max holds 9 after `[a, b]` and after
 `[b]`, but once `c` supersedes `b`, the current maximum is 5 in one history and
@@ -296,6 +296,22 @@ theorem Where.eval_view {f : Record → Record} (hf : View f) (w : Where) (r : R
 theorem Where.eval_here (w : Where) {r : Record} (h : r.shown = .here) :
     w.eval r ≠ .unknown := by
   cases w <;> simp [Where.eval, Tri.ofBool, h] <;> split <;> simp
+
+/-- Unread records are exactly unknown tests or selected records the fold cannot read. -/
+theorem Acc.select_unread {σ} (f : Acc σ) (ev : Record → Tri) (xs : List Record) :
+    (f.select ev xs).unread =
+      (xs.filter fun r => ev r == .unknown || (ev r == .yes && !f.readable r)).length := by
+  simp only [Acc.select, filter_filter]
+  induction xs with
+  | nil => rfl
+  | cons r rs ih =>
+    cases he : ev r <;> cases hr : f.readable r <;>
+      simp [he, hr, ih, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+
+/-- Count can read every selected record; only unknown tests are unread. -/
+theorem Count.select_unread (ev : Record → Tri) (xs : List Record) :
+    (Count.acc.select ev xs).unread = (xs.filter (ev · == .unknown)).length := by
+  simp [Acc.select_unread, Count.acc]
 
 /-- When the test answers for every record and the fold can read every
 record, nothing is unread and the result is the plain fold of what is

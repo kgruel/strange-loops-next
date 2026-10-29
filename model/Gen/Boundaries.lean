@@ -27,7 +27,7 @@ structure Case where
   holds : String × String
   removed : String × String
 
-def r (id : Nat) (value : String) (fields : List (String × Val) := []) : Record :=
+def r (id : RecordId) (value : String) (fields : List (String × Val) := []) : Record :=
   { id, kind := "task", observer := "sl:ada", about := ["task:1"], value, prev := [],
     emitted := stampAt 100, fields }
 
@@ -53,21 +53,21 @@ def ids (rs : List Record) : String := ", ".intercalate (rs.map fun x => s!"{x.v
 def cases : Except String (List Case) := do
   -- result.full: every record readable to the fold
   let est := Sum.on "est"
-  let full := est.select (fun _ => .yes) [r 1 "a" [("est", .int 3)]]
-  let short := est.select (fun _ => .yes) [r 1 "a" []]
+  let full := est.select (fun _ => .yes) [r (fixtureId 1) "a" [("est", .int 3)]]
+  let short := est.select (fun _ => .yes) [r (fixtureId 1) "a" []]
   unless full.unread == 0 && full.value == 3 do throw "result.full: held side isn't the plain fold"
   if sel full == sel short then throw "result.full: removing the premise changes nothing"
   -- where.complements: the test answers
   let is := (⟨.payload "value", .is (.val (.str "yes"))⟩ : Cond)
   let isNot := (⟨.payload "value", .not (.val (.str "yes"))⟩ : Cond)
-  let here := r 2 "yes"
+  let here := r (fixtureId 2) "yes"
   let pair (x : Record) := s!"is {tri (is.eval x)} · not {tri (isNot.eval x)}"
   unless (is.eval here == .yes && isNot.eval here == .no) do throw "where.complements: held side isn't one of each"
   if pair here == pair here.withhold then throw "where.complements: removing the premise changes nothing"
   -- latest-by.set: within one store an id names one record
-  let one := r 7 "first"
-  let other := r 8 "second"
-  let twin := { r 7 "second" with }
+  let one := r (fixtureId 7) "first"
+  let other := r (fixtureId 8) "second"
+  let twin := { r (fixtureId 7) "second" with }
   let winner (xs : List Record) : String :=
     match (LatestBy.fold .empty xs).winner with
     | some w => s!"winner {w.value}"

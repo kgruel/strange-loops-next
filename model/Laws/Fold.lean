@@ -46,7 +46,7 @@ theorem Count.repeats (xs : List Record) : Count.fold 0 (xs ++ xs) = 2 * Count.f
 
 /-! ## LatestBy: building blocks -/
 
-theorem mem_insertId {x n : Nat} {l : List Nat} : x ∈ insertId n l ↔ x = n ∨ x ∈ l := by
+theorem mem_insertId {x n : RecordId} {l : List RecordId} : x ∈ insertId n l ↔ x = n ∨ x ∈ l := by
   induction l with
   | nil => simp [insertId]
   | cons m ms ih =>
@@ -57,7 +57,7 @@ theorem mem_insertId {x n : Nat} {l : List Nat} : x ∈ insertId n l ↔ x = n �
       · subst_vars; simp
       · simp only [mem_cons, ih]; grind
 
-theorem sorted_insertId {n : Nat} {l : List Nat} (h : l.Pairwise (· < ·)) :
+theorem sorted_insertId {n : RecordId} {l : List RecordId} (h : l.Pairwise (· < ·)) :
     (insertId n l).Pairwise (· < ·) := by
   induction l with
   | nil => simp [insertId]
@@ -70,22 +70,23 @@ theorem sorted_insertId {n : Nat} {l : List Nat} (h : l.Pairwise (· < ·)) :
       intro a ha
       rcases mem_cons.1 ha with rfl | ha
       · exact hlt
-      · exact Nat.lt_trans hlt (h.1 a ha)
+      · exact Fin.lt_trans hlt (h.1 a ha)
     · split
       · exact pairwise_cons.2 h
       · refine pairwise_cons.2 ⟨?_, ih h.2⟩
         intro a ha
         rcases mem_insertId.1 ha with rfl | ha
-        · omega
+        · simp only [Fin.lt_def, Fin.ext_iff] at *
+          omega
         · exact h.1 a ha
 
-theorem mem_insertIds {x : Nat} {ps l : List Nat} :
+theorem mem_insertIds {x : RecordId} {ps l : List RecordId} :
     x ∈ ps.foldl (fun ns n => insertId n ns) l ↔ x ∈ ps ∨ x ∈ l := by
   induction ps generalizing l with
   | nil => simp
   | cons p ps ih => simp only [foldl_cons, ih, mem_insertId, mem_cons]; grind
 
-theorem sorted_insertIds {ps l : List Nat} (h : l.Pairwise (· < ·)) :
+theorem sorted_insertIds {ps l : List RecordId} (h : l.Pairwise (· < ·)) :
     (ps.foldl (fun ns n => insertId n ns) l).Pairwise (· < ·) := by
   induction ps generalizing l with
   | nil => simpa
@@ -226,9 +227,9 @@ theorem LatestBy.inv_fold {s : LatestBy} {ys : List Record} (xs : List Record)
 theorem LatestBy.inv_ext {s t : LatestBy} {xs ys : List Record}
     (hs : LatestBy.Inv s xs) (ht : LatestBy.Inv t ys) (hset : ∀ r, r ∈ xs ↔ r ∈ ys) : s = t := by
   have hn : s.named = t.named := by
-    apply Perm.eq_of_pairwise (le := (· < ·)) (fun a b _ _ h₁ h₂ => by omega)
+    apply Perm.eq_of_pairwise (le := (· < ·)) (fun a b _ _ h₁ h₂ => absurd (Fin.lt_trans h₁ h₂) (Fin.lt_irrefl a))
       hs.named_sorted ht.named_sorted
-    apply (perm_ext_iff_of_nodup (hs.named_sorted.imp Nat.ne_of_lt) (ht.named_sorted.imp Nat.ne_of_lt)).2
+    apply (perm_ext_iff_of_nodup (hs.named_sorted.imp Fin.ne_of_lt) (ht.named_sorted.imp Fin.ne_of_lt)).2
     intro n; rw [hs.named_mem, ht.named_mem]
     exact ⟨fun ⟨q, hq, h⟩ => ⟨q, (hset q).1 hq, h⟩, fun ⟨q, hq, h⟩ => ⟨q, (hset q).2 hq, h⟩⟩
   have hh : s.heads = t.heads := by

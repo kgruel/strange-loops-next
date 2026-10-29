@@ -9,3 +9,5 @@ import Laws.Batch
 import Laws.Write
 import Laws.Time
 import Laws.Order
+import Laws.IdText
+import Laws.IdSource

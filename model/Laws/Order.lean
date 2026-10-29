@@ -43,7 +43,8 @@ theorem digestDigits_lt (k a b : Nat) :
     rw [List.cons_lt_cons_iff, ih, lt_iff_div_mod (a := a) (P := 256 ^ (k + 1)) (Nat.pow_pos (by decide))]
 
 /-- Ids compare as their digests do, byte by byte, most significant first. -/
-theorem id_order (a b : Nat) : idDigest a < idDigest b ↔ a < b := digestDigits_lt 31 a b
+theorem id_order (a b : RecordId) : idDigest a < idDigest b ↔ a < b :=
+  digestDigits_lt 31 a.val b.val
 
 /-- Content order reads only a record's span, its `emitted` moment and its id:
 not how its times are spelled, its payload, or anything else. -/
@@ -69,7 +70,7 @@ theorem Newer.trans {a b c : Record} (h₁ : Newer a b) (h₂ : Newer b c) : New
     · exact .inl (List.lt_trans m2 m1)
     · exact .inl (f2 ▸ m1)
     · exact .inl (f1 ▸ m2)
-    · exact .inr ⟨f1.trans f2, Nat.lt_trans i2 i1⟩
+    · exact .inr ⟨f1.trans f2, Fin.lt_trans i2 i1⟩
 
 theorem Newer.asymm {a b : Record} (h : Newer a b) : ¬ Newer b a :=
   fun h' => Newer.irrefl a (Newer.trans h h')
@@ -81,7 +82,7 @@ theorem Newer.total (a b : Record) : Newer a b ∨ Newer b a ∨ a.id = b.id := 
   · exact .inr (.inl (.inl s))
   · rcases Std.lt_trichotomy a.emitted.moment b.emitted.moment with m | m | m
     · exact .inr (.inl (.inr ⟨s.symm, .inl m⟩))
-    · rcases Nat.lt_trichotomy a.id b.id with i | i | i
+    · rcases Std.lt_trichotomy a.id b.id with i | i | i
       · exact .inr (.inl (.inr ⟨s.symm, .inr ⟨m.symm, i⟩⟩))
       · exact .inr (.inr i)
       · exact .inl (.inr ⟨s, .inr ⟨m, i⟩⟩)

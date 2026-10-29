@@ -23,20 +23,20 @@ def s (x : String) : Json := .str x
 def a (xs : List Json) : Json := .arr xs
 
 /-- A decision about `decision:auth`, at `t` seconds into 2026-10-01. -/
-def decision (id : Nat) (observer : String) (t : Nat) (value : String) (prev : List Nat := [])
-    (erases : List Nat := []) (ok : Reads t := by decide) : Record :=
+def decision (id : RecordId) (observer : String) (t : Nat) (value : String) (prev : List RecordId := [])
+    (erases : List RecordId := []) (ok : Reads t := by decide) : Record :=
   { id, kind := "decision", observer, about := ["decision:auth"], value, prev, erases,
     emitted := stampAt t ok }
 
 -- Ada writes a decision, then revises it; Bo, holding only the first, revises
 -- it too; Ada merges both; her next revision erases the first, which had a
 -- secret pasted in; a lens edit by Bo revises that.
-def dA := decision 0xA1 "sl:ada" 32400 "Device flow. Client secret: 9f3c…"
-def dB := decision 0xB2 "sl:ada" 33000 "Device flow; revisit in Q3." [0xA1]
-def dC := decision 0xC3 "sl:bo" 33120 "Use passkeys." [0xA1]
-def dM := decision 0xD4 "sl:ada" 34200 "Passkeys; device flow on TVs." [0xB2, 0xC3]
-def dE := decision 0xE5 "sl:ada" 34800 "Passkeys; device flow on TVs." [0xD4] [0xA1]
-def dF := decision 0xF6 "sl:bo" 36300 "Passkeys everywhere." [0xE5]
+def dA := decision (fixtureId 0xA1) "sl:ada" 32400 "Device flow. Client secret: 9f3c…"
+def dB := decision (fixtureId 0xB2) "sl:ada" 33000 "Device flow; revisit in Q3." [fixtureId 0xA1]
+def dC := decision (fixtureId 0xC3) "sl:bo" 33120 "Use passkeys." [fixtureId 0xA1]
+def dM := decision (fixtureId 0xD4) "sl:ada" 34200 "Passkeys; device flow on TVs." [fixtureId 0xB2, fixtureId 0xC3]
+def dE := decision (fixtureId 0xE5) "sl:ada" 34800 "Passkeys; device flow on TVs." [fixtureId 0xD4] [fixtureId 0xA1]
+def dF := decision (fixtureId 0xF6) "sl:bo" 36300 "Passkeys everywhere." [fixtureId 0xE5]
 
 def records : List Record := [dA, dB, dC, dM, dE, dF]
 
