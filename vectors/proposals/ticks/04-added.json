@@ -1,0 +1,24 @@
+{
+  "vector": "04-added",
+  "layer": "proposals/ticks",
+  "laws": ["proposal.tick-cover"],
+  "source": "model",
+  "input": {
+    "old": [],
+    "new": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq"]
+  },
+  "expect": {
+    "old": {
+      "cover": [],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a",
+      "hash": "h:mnglwkoozcicp652cwdr2lb26zvna5dms3lnj7cm7yvtviyxlpyq"
+    },
+    "new": {
+      "cover": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabq"],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003",
+      "hash": "h:la72wjft3lnnw7azdip2bihdpysmxdfoh5x2nwmja7xws7uh5cmq"
+    },
+    "added": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabq"],
+    "removed": []
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "vector": "01-empty",
+  "layer": "proposals/as-of",
+  "laws": ["proposal.as-of"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "tasks",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "open": {
+          "latest-by": "about",
+          "follow": "prev",
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        },
+        "newest": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 1
+        },
+        "every": {
+          "collect": true
+        },
+        "observations": {
+          "count": true
+        },
+        "open-observations": {
+          "count": true,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "est": {
+          "sum": "est"
+        },
+        "blocked": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "present": true
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      []
+    ],
+    "queries": [
+      {
+        "name": "no-cutoff",
+        "emittedThrough": null,
+        "occurredThrough": null
+      },
+      {
+        "name": "belief-2019",
+        "emittedThrough": "2019-12-31T23:59:59Z",
+        "occurredThrough": null
+      },
+      {
+        "name": "occurrence-2009",
+        "emittedThrough": null,
+        "occurredThrough": "2009-12-31T23:59:59Z"
+      },
+      {
+        "name": "belief-2019-about-through-2009",
+        "emittedThrough": "2019-12-31T23:59:59Z",
+        "occurredThrough": "2009-12-31T23:59:59Z"
+      },
+      {
+        "name": "before-claim",
+        "emittedThrough": "2017-12-31T23:59:59Z",
+        "occurredThrough": "2009-12-31T23:59:59Z"
+      }
+    ]
+  },
+  "expect": {
+    "queries": [
+      {
+        "name": "no-cutoff",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "belief-2019",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "occurrence-2009",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "belief-2019-about-through-2009",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "before-claim",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      }
+    ]
+  }
+}

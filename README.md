@@ -23,6 +23,17 @@ Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
 `xtask` checking token and surface budgets); more end-to-end scenarios (`vectors/scenario/` holds the first),
 `.loops/` (this repo's own decision store).
 
+## Proposals
+
+`model/Proposals/` holds separate models and proofs for proposed behavior.
+`model/Gen/Proposals.lean` generates their vectors under `vectors/proposals/`.
+The Lean runner and JS checker test these vectors separately from the adopted families.
+These checks do not adopt the proposals or activate carried spec fields.
+The main laws page excludes proposal laws and vectors.
+
+See [as-of folds](protocol/proposals/as-of.md) and [tick covers](protocol/proposals/ticks.md) for options and recommendations.
+The human decides whether to adopt them.
+
 ## Checking
 
 ```sh
@@ -44,6 +55,7 @@ fails CI. Then:
 
 ```sh
 node interop/js/check.mjs vectors   # the JS implementation passes every vector
+node --test interop/js/*.test.mjs design/*.test.mjs   # reader guards and proposal isolation
 ```
 
 ## The design page

@@ -59,13 +59,16 @@ export function lawTable(root) {
   return { rows, notes };
 }
 
-// Every vector file, by its path under vectors/ without .json, with what it says of itself.
+// Adopted vectors only. Proposal vectors do not define laws or refusal codes for these pages.
+// Each key is a path under vectors/ without .json.
 export function vectorFiles(root) {
   const out = new Map();
   const dir = (d, rel) => {
     for (const e of readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       const p = join(d, e.name), r = rel ? `${rel}/${e.name}` : e.name;
-      if (e.isDirectory()) dir(p, r);
+      if (e.isDirectory()) {
+        if (r !== "proposals") dir(p, r);
+      }
       else if (e.name.endsWith(".json")) out.set(r.slice(0, -5), JSON.parse(readFileSync(p, "utf8")));
     }
   };

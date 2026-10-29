@@ -7,7 +7,7 @@
 // skipped file fails rather than passing unchecked. The last line is the total.
 // Usage: node check.mjs <vectors dir>
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 import * as L from "./loops.mjs";
@@ -18,6 +18,7 @@ import * as batch from "./check-batch.mjs";
 import * as spec from "./check-spec.mjs";
 import * as realm from "./check-realm.mjs";
 import * as scenario from "./check-scenario.mjs";
+import * as proposals from "./check-proposals.mjs";
 
 // Layer 0 compares strings exactly, as it always has, rather than canonical JSON.
 function exact() {
@@ -129,6 +130,7 @@ const FAMILIES = [
   ["record", checkRecord], ["occurred", checkOccurred],
   ["fold", fold.check], ["lens", lens.check], ["batch", batch.check],
   ["spec", spec.check], ["realm", realm.check], ["scenario", scenario.check],
+  ["proposals", proposals.check],
 ];
 // Not written by the model: its files aren't all vectors, so it isn't counted.
 const STANDARD = "standard";
@@ -148,7 +150,8 @@ const row = (name, files, onDisk, t) =>
 for (const [name, check] of [...FAMILIES, [STANDARD, checkStandard]]) {
   let t;
   try { t = check(dir); } catch (e) { t = { passed: 0, failures: [`${name}: threw ${e.stack}`], files: 0 }; }
-  const onDisk = name === STANDARD ? "-" : countJson(join(dir, name));
+  const optionalProposal = name === "proposals" && !existsSync(join(dir, name));
+  const onDisk = name === STANDARD ? "-" : optionalProposal ? 0 : countJson(join(dir, name));
   if (name !== STANDARD && t.files !== onDisk) t.failures.push(`${name}: read ${t.files} vector files of ${onDisk}`);
   row(name, t.files, onDisk, t);
   passed += t.passed;

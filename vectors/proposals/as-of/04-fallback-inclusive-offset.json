@@ -1,0 +1,1012 @@
+{
+  "vector": "04-fallback-inclusive-offset",
+  "layer": "proposals/as-of",
+  "laws": ["proposal.as-of"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "tasks",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "open": {
+          "latest-by": "about",
+          "follow": "prev",
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        },
+        "newest": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 1
+        },
+        "every": {
+          "collect": true
+        },
+        "observations": {
+          "count": true
+        },
+        "open-observations": {
+          "count": true,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "est": {
+          "sum": "est"
+        },
+        "blocked": {
+          "count": true,
+          "where": {
+            "blocked": {
+              "present": true
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:offset"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T01:01:40+01:00",
+          "occurred": "2026-10-01T00:01:40.000Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:later"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:41Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:later"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:41Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:offset"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T01:01:40+01:00",
+          "occurred": "2026-10-01T00:01:40.000Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:offset"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T01:01:40+01:00",
+          "occurred": "2026-10-01T00:01:40.000Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:later"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:41Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:offset"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T01:01:40+01:00",
+          "occurred": "2026-10-01T00:01:40.000Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:later"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:41Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:offset"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T01:01:40+01:00",
+          "occurred": "2026-10-01T00:01:40.000Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:later"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:41Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:later"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:41Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:fallback"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["event:offset"],
+          "value": "claim",
+          "prev": [],
+          "emitted": "2026-10-01T01:01:40+01:00",
+          "occurred": "2026-10-01T00:01:40.000Z",
+          "n": 1,
+          "fields": {
+            "status": "open",
+            "est": 1
+          }
+        }
+      ]
+    ],
+    "queries": [
+      {
+        "name": "no-cutoff",
+        "emittedThrough": null,
+        "occurredThrough": null
+      },
+      {
+        "name": "emitted-exact",
+        "emittedThrough": "2026-10-01T00:01:40Z",
+        "occurredThrough": null
+      },
+      {
+        "name": "occurred-exact-fallback",
+        "emittedThrough": null,
+        "occurredThrough": "2026-10-01T00:01:40Z"
+      },
+      {
+        "name": "both-exact",
+        "emittedThrough": "2026-10-01T00:01:40Z",
+        "occurredThrough": "2026-10-01T00:01:40Z"
+      },
+      {
+        "name": "before-all",
+        "emittedThrough": "2026-09-30T23:59:59.999Z",
+        "occurredThrough": "2026-09-30T23:59:59.999Z"
+      },
+      {
+        "name": "offset-emitted",
+        "emittedThrough": "2026-10-01T01:01:40+01:00",
+        "occurredThrough": null
+      },
+      {
+        "name": "offset-occurred",
+        "emittedThrough": null,
+        "occurredThrough": "2026-10-01T01:01:40+01:00"
+      },
+      {
+        "name": "just-before",
+        "emittedThrough": "2026-10-01T00:01:39.999Z",
+        "occurredThrough": null
+      }
+    ]
+  },
+  "expect": {
+    "queries": [
+      {
+        "name": "no-cutoff",
+        "selected": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+            "shown": "here"
+          }
+        ],
+        "result": {
+          "open": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:later": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:later": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "newest": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "every": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaerq",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "observations": {
+            "value": 3,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 3,
+            "unread": 0
+          },
+          "est": {
+            "value": 3,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "emitted-exact",
+        "selected": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+            "shown": "here"
+          }
+        ],
+        "result": {
+          "open": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "newest": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "every": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "est": {
+            "value": 2,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "occurred-exact-fallback",
+        "selected": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+            "shown": "here"
+          }
+        ],
+        "result": {
+          "open": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "newest": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "every": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "est": {
+            "value": 2,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "both-exact",
+        "selected": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+            "shown": "here"
+          }
+        ],
+        "result": {
+          "open": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "newest": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "every": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "est": {
+            "value": 2,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "before-all",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "offset-emitted",
+        "selected": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+            "shown": "here"
+          }
+        ],
+        "result": {
+          "open": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "newest": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "every": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "est": {
+            "value": 2,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "offset-occurred",
+        "selected": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+            "shown": "here"
+          }
+        ],
+        "result": {
+          "open": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "event:fallback": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                  "shown": "here"
+                }
+              ],
+              "event:offset": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "newest": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "every": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaera",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeqq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 2,
+            "unread": 0
+          },
+          "est": {
+            "value": 2,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "name": "just-before",
+        "selected": [],
+        "result": {
+          "open": {
+            "things": {},
+            "unread": 0
+          },
+          "current": {
+            "things": {},
+            "unread": 0
+          },
+          "newest": {
+            "heads": [],
+            "unread": 0
+          },
+          "every": {
+            "heads": [],
+            "unread": 0
+          },
+          "observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "open-observations": {
+            "value": 0,
+            "unread": 0
+          },
+          "est": {
+            "value": 0,
+            "unread": 0
+          },
+          "blocked": {
+            "value": 0,
+            "unread": 0
+          }
+        }
+      }
+    ]
+  }
+}

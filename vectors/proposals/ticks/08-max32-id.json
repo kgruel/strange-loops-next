@@ -1,0 +1,24 @@
+{
+  "vector": "08-max32-id",
+  "layer": "proposals/ticks",
+  "laws": ["proposal.tick-cover"],
+  "source": "model",
+  "input": {
+    "old": ["r:777777777777777777777777777777777777777777777777777q", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+    "new": ["r:777777777777777777777777777777777777777777777777777q", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:777777777777777777777777777777777777777777777777777q"]
+  },
+  "expect": {
+    "old": {
+      "cover": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "r:777777777777777777777777777777777777777777777777777q"],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "hash": "h:5qyr2zgqjourl5rr4hru3boomba5d65owomjc4xewqiiefseswca"
+    },
+    "new": {
+      "cover": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:777777777777777777777777777777777777777777777777777q"],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a0000000000000000000000000000000000000000000000000000000000000001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "hash": "h:njlvtpyfwspgksilngixzychzluqp6sdft7eej4bdqkw6u6qebua"
+    },
+    "added": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq"],
+    "removed": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+  }
+}

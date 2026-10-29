@@ -1,0 +1,24 @@
+{
+  "vector": "10-zero-is-a-full-digest",
+  "layer": "proposals/ticks",
+  "laws": ["proposal.tick-cover"],
+  "source": "model",
+  "input": {
+    "old": [],
+    "new": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+  },
+  "expect": {
+    "old": {
+      "cover": [],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a",
+      "hash": "h:mnglwkoozcicp652cwdr2lb26zvna5dms3lnj7cm7yvtviyxlpyq"
+    },
+    "new": {
+      "cover": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "h:ibfewqq3mcfuzyybsmcibcxpgx5nt2pay4piphyd6i6kpbc5mzeq"
+    },
+    "added": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+    "removed": []
+  }
+}

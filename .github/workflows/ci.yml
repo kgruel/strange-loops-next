@@ -57,7 +57,7 @@ jobs:
       - name: The JS implementation agrees on every vector
         run: node interop/js/check.mjs vectors
       - name: The JS reader guards hold
-        run: node --test interop/js/regression.test.mjs
+        run: node --test interop/js/*.test.mjs
 
   design:
     runs-on: ubuntu-latest
@@ -73,3 +73,5 @@ jobs:
           test -z "$(git status --porcelain -- out)"
       - name: The design build refuses every mutant it should
         run: node design/mutants.mjs
+      - name: Proposal vectors stay outside adopted pages
+        run: node --test design/*.test.mjs

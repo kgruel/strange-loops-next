@@ -7,6 +7,7 @@ import Gen.Batch
 import Gen.Realm
 import Gen.Scenario
 import Gen.Read
+import Gen.Proposals
 
 /-!
 # Run: the model's answer for an input
@@ -22,9 +23,9 @@ written input back, as an implementation receives it, so CI checks that each
 input as written gives its `expect`.
 
 It reads `fold/*`, `lens/section`, `spec/parse`, `spec/run`, `record`,
-`batch`, `realm` and `scenario`. Not `occurred`: its span vectors and its
-order vector share one input shape, a list of texts, so the input doesn't
-say which question it asks.
+`batch`, `realm`, `scenario`, `proposals/as-of`, and `proposals/ticks`.
+It does not read `occurred`. Its span vectors and order vector share one
+input shape, a list of texts. The input does not identify the question.
 
 Where an input lists several arrival orders, each must give the answer the
 first does, as gen requires before writing one: a vector has one `expect`.
@@ -272,7 +273,7 @@ def scenarioRun (input : Json) : Dec J := do
 /-! ## Dispatch -/
 
 /-- The layers `run` reads, and the directories under a vectors dir that hold them. -/
-def layerDirs : List String := ["fold", "lens", "spec", "record", "batch", "realm", "scenario"]
+def layerDirs : List String := ["fold", "lens", "spec", "record", "batch", "realm", "scenario", "proposals"]
 
 def answer (layer : String) (input : Json) : Dec J :=
   match foldAnswer layer with
@@ -286,6 +287,8 @@ def answer (layer : String) (input : Json) : Dec J :=
     | "batch" => batchRun input
     | "realm" => realmRun input
     | "scenario" => scenarioRun input
+    | "proposals/as-of" => ProposalVectors.asOfRun input
+    | "proposals/ticks" => ProposalVectors.tickRun input
     | _ => bad "layer" s!"\"{layer}\" is not a layer run reads"
 
 /-- A vector's answer computed from its input, and the `expect` it carries, if any. -/

@@ -1,0 +1,24 @@
+{
+  "vector": "06-disjoint",
+  "layer": "proposals/ticks",
+  "laws": ["proposal.tick-cover"],
+  "source": "model",
+  "input": {
+    "old": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq"],
+    "new": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaca", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaba"]
+  },
+  "expect": {
+    "old": {
+      "cover": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabq"],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003",
+      "hash": "h:la72wjft3lnnw7azdip2bihdpysmxdfoh5x2nwmja7xws7uh5cmq"
+    },
+    "new": {
+      "cover": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaba", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaca"],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000004",
+      "hash": "h:5ztrjm3ia4hyzarehpjiszyhkctiuxknojf4oxeruq74amxrn5mq"
+    },
+    "added": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaba", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaca"],
+    "removed": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabq"]
+  }
+}

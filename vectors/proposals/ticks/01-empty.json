@@ -1,0 +1,24 @@
+{
+  "vector": "01-empty",
+  "layer": "proposals/ticks",
+  "laws": ["proposal.tick-cover"],
+  "source": "model",
+  "input": {
+    "old": [],
+    "new": []
+  },
+  "expect": {
+    "old": {
+      "cover": [],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a",
+      "hash": "h:mnglwkoozcicp652cwdr2lb26zvna5dms3lnj7cm7yvtviyxlpyq"
+    },
+    "new": {
+      "cover": [],
+      "bytes": "6c6f6f70732f7469636b2d636f7665722f76313a",
+      "hash": "h:mnglwkoozcicp652cwdr2lb26zvna5dms3lnj7cm7yvtviyxlpyq"
+    },
+    "added": [],
+    "removed": []
+  }
+}
