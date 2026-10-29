@@ -19,9 +19,11 @@ prose and checked against every vector.
 | `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `build.mjs` renders all four |
 | `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/` | the pages, written by `node design/build.mjs`, never by hand |
 
-Planned, filled step by step: the Rust core and CLI (a Cargo workspace, with
-`xtask` checking token and surface budgets); more end-to-end scenarios (`vectors/scenario/` holds the first),
-`.loops/` (this repo's own decision store).
+End-to-end scenarios live in `vectors/scenario/`.
+[`protocol/horizons.md`](protocol/horizons.md) maps the horizon cases to model checks and missing steps.
+
+The Rust core, CLI, and `.loops/` decision store remain planned.
+The Rust workspace will use `xtask` to check token and surface budgets.
 
 ## Checking
 
@@ -44,6 +46,7 @@ fails CI. Then:
 
 ```sh
 node interop/js/check.mjs vectors   # the JS implementation passes every vector
+node --test interop/js/*.test.mjs   # the JS reader guards hold
 ```
 
 ## The design page
