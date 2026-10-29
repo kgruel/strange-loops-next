@@ -265,6 +265,13 @@ def taskSpec : Json := o [("vertex", s "tasks"),
     ("est", o [("sum", s "est")]),
     ("blocked", o [("count", .bool true), ("where", o [("blocked", o [("present", .bool true)])])])])]
 
+-- Hidden payloads must not supply numbers, even though their placeholder is zero.
+def hiddenNumbersSpec : Json := o [("vertex", s "hidden-numbers"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
+  ("fold", o [("count", o [("count", .bool true)]),
+    ("sum", o [("sum", s "n")]), ("min", o [("min", s "n")]),
+    ("max", o [("max", s "n")])])]
+
 -- a record about nothing anchors the thing named by its id: `from` takes it
 -- and its revision, while `env.about` reads only what each envelope says
 def x1 : Record := { said 0x71 "sl:alice" [] 100 with kind := "note" }
@@ -300,7 +307,11 @@ def runCases : List RunCase := [
       task 0x4a "task:6" 195 [("est", .str "5")]]⟩,
   ⟨"08-envelope-fields", ["spec.set", "where.fields", "where.time", "where.total",
       "spec.after-supersession"], envSpec, [a1, a2, a3, a4, a5, a6]⟩,
-  ⟨"09-from-about-anchor", ["spec.set", "spec.from-thing", "where.fields"], anchorSpec, [x1, x2, x3]⟩
+  ⟨"09-from-about-anchor", ["spec.set", "spec.from-thing", "where.fields"], anchorSpec, [x1, x2, x3]⟩,
+  ⟨"10-unread-shared-head", ["spec.set", "result.unread", "thing.local"], taskSpec,
+    [({ t3 with about := ["task:2", "task:9"] }).withhold]⟩,
+  ⟨"11-hidden-numbers", ["spec.set", "result.unread"], hiddenNumbersSpec,
+    [(task 0x76 "task:6" 100 []).withhold, (task 0x77 "task:7" 200 []).erase]⟩
 ]
 
 def jShownIds (hs : List (Nat × Shown)) : J :=

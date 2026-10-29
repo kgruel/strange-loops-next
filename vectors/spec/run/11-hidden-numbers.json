@@ -1,0 +1,95 @@
+{
+  "vector": "11-hidden-numbers",
+  "layer": "spec/run",
+  "laws": ["spec.set", "result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "hidden-numbers",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        }
+      ],
+      "fold": {
+        "count": {
+          "count": true
+        },
+        "sum": {
+          "sum": "n"
+        },
+        "min": {
+          "min": "n"
+        },
+        "max": {
+          "max": "n"
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab3a",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:6"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab3q",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:7"],
+          "prev": [],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "shown": "erased"
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab3q",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:7"],
+          "prev": [],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "shown": "erased"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab3a",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:6"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "shown": "withheld"
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "count": {
+      "value": 2,
+      "unread": 0
+    },
+    "sum": {
+      "value": 0,
+      "unread": 2
+    },
+    "min": {
+      "value": null,
+      "unread": 2
+    },
+    "max": {
+      "value": null,
+      "unread": 2
+    }
+  }
+}
