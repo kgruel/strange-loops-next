@@ -38,7 +38,8 @@ def main (args : List String) : IO Unit := do
       ("9007199254740990.5", 9007199254740990)] do
     let j ← parsed text
     ensure (match j with | .int i => i == expected | _ => false) s!"safe-whole normalization {text}"
-  for text in ["01", "+1", "1.", "1e", "1e+", ".5", "NaN", "Infinity"] do
+  for text in ["01", "+1", "1.", "1e", "1e+", ".5",
+      "NaN", "-NaN", "+NaN", "Infinity", "-Infinity", "+Infinity"] do
     ensure (refused (Read.parseJson text)) s!"invalid RFC number survives: {text}"
   let env : Env := { kind := "note", observer := "o:test", emitted := timeText 0 }
   let salt := List.replicate 16 (0 : UInt8)

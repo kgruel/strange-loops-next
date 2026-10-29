@@ -2,6 +2,8 @@ import Laws.Fold
 import Laws.Lens
 import Laws.Record
 import Laws.Numeric
+import Laws.Number
+import Laws.NumberRead
 import Laws.Families
 import Laws.Spec
 import Laws.Parse

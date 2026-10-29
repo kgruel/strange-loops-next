@@ -209,6 +209,32 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15`, `17` |
 | `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
 
+## Number text (`model/Laws/Number.lean`, `model/Laws/NumberRead.lean`)
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `number.zero` | `Number.canon_zero` | A number with zero magnitude writes as `0`, for either sign. | (standard binary64 cases) |
+| `number.nonfinite` | `Number.canon_nonfinite` | A nonfinite number writes as `null`. | (the formatter guard) |
+| `number.round-trip-limit` | `Number.no_exact_canon_reader` | No text reader recovers every finite number's original bits from canonical text. | (the two signs of zero) |
+| `number.characters` | `Number.canon_chars` | A finite number's text contains only decimal digits, minus, plus, a decimal point, and lowercase `e`. | (standard binary64 cases) |
+| `number.no-special-text` | `Number.canon_not_special` | No number writes as `NaN`, `Infinity`, `-Infinity`, or `+Infinity`. | (the formatter's output characters) |
+| `number.refuse-tokens` | `Gen.Read.number_rejects_nonfinite_tokens` | The number reader refuses `NaN` and `Infinity`, with no sign, a minus sign, or a plus sign. | (the total number reader) |
+| `number.overflow` | `Gen.Read.number_overflow` | The number reader accepts `1e400` and `-1e400` as positive and negative infinity. | (the total number reader) |
+
+These laws keep the model's current behavior.
+Both zero signs write as `0`, so exact bit recovery fails for negative zero.
+A useful round-trip goal must normalize zero or exclude negative zero.
+
+The token and overflow proofs cover `Gen.Read.number.run`, not the full JSON reader.
+The full reader calls the partial function `Gen.Read.value`, which has no kernel reduction equation.
+Runtime checks cover the six nonfinite tokens through `Gen.Read.parseJson`.
+Overflow is different from a nonfinite token: the number reader accepts `1e400` and `-1e400`.
+The payload decoder refuses those results.
+
+The character law does not prove JSON number grammar or ECMAScript notation thresholds.
+Normalized round trip, complete spelling, and shortest text remain open proof goals.
+The 4,000 binary64 cases still check formatting and zero-normalized round trip at runtime.
+
 ## Occurred (`model/Laws/Time.lean`)
 
 | Law | Theorem | Says | Vectors |

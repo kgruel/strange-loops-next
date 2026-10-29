@@ -1740,6 +1740,11 @@
    "module": "Laws.Spec"},
   "Loops.Op.absent.sizeOf_spec":
   {"uses": [], "states": "sizeOf Loops.Op.absent = 1", "module": "Loops.Spec"},
+  "Loops.Number.no_exact_canon_reader":
+  {"uses": ["Loops.Number.canon_zero"],
+   "states":
+   "¬∃ read, ∀ (n : Loops.Number), n.finite = true → read n.canon = n",
+   "module": "Laws.Number"},
   "Loops.Number.mk.sizeOf_spec":
   {"uses": [],
    "states": "∀ (bits : UInt64), sizeOf { bits := bits } = 1 + sizeOf bits",
@@ -1754,6 +1759,24 @@
    "states":
    "∀ {bits bits_1 : UInt64}, { bits := bits } = { bits := bits_1 } → bits = bits_1",
    "module": "Loops.Number"},
+  "Loops.Number.canon_zero":
+  {"uses": [],
+   "states": "∀ (n : Loops.Number), n.magnitude = 0 → n.canon = \"0\"",
+   "module": "Laws.Number"},
+  "Loops.Number.canon_not_special":
+  {"uses": ["Loops.Number.canon_chars", "Loops.Number.canon_nonfinite"],
+   "states":
+   "∀ (n : Loops.Number), n.canon ≠ \"NaN\" ∧ n.canon ≠ \"Infinity\" ∧ n.canon ≠ \"-Infinity\" ∧ n.canon ≠ \"+Infinity\"",
+   "module": "Laws.Number"},
+  "Loops.Number.canon_nonfinite":
+  {"uses": [],
+   "states": "∀ (n : Loops.Number), n.finite = false → n.canon = \"null\"",
+   "module": "Laws.Number"},
+  "Loops.Number.canon_chars":
+  {"uses": [],
+   "states":
+   "∀ (n : Loops.Number), n.finite = true → ∀ (c : Char), c ∈ n.canon.toList → c.isDigit = true ∨ c = '-' ∨ c = '+' ∨ c = '.' ∨ c = 'e'",
+   "module": "Laws.Number"},
   "Loops.Newer.trans":
   {"uses": ["Loops.Span.before_trans"],
    "states":
@@ -3020,4 +3043,14 @@
   {"uses": [],
    "states":
    "∀ {α : Type u} {β : Type v} [inst : BEq α] (x : α) (x_1 : List (α × β)), List.lookup x x_1 = match x, x_1 with | x, [] => none | a, (k, b) :: as => match a == k with | true => some b | false => List.lookup a as",
-   "module": "Laws.Parse"}}}
+   "module": "Laws.Parse"},
+  "Gen.Read.number_rejects_nonfinite_tokens":
+  {"uses": [],
+   "states":
+   "StateT.run Gen.Read.number \"NaN\".toList = Except.error (3, \"expected a value\") ∧ StateT.run Gen.Read.number \"Infinity\".toList = Except.error (8, \"expected a value\") ∧ StateT.run Gen.Read.number \"-Infinity\".toList = Except.error (9, \"expected a value\") ∧ StateT.run Gen.Read.number \"+Infinity\".toList = Except.error (9, \"expected a value\") ∧ StateT.run Gen.Read.number \"-NaN\".toList = Except.error (4, \"expected a value\") ∧ StateT.run Gen.Read.number \"+NaN\".toList = Except.error (4, \"expected a value\")",
+   "module": "Laws.NumberRead"},
+  "Gen.Read.number_overflow":
+  {"uses": [],
+   "states":
+   "StateT.run Gen.Read.number \"1e400\".toList = Except.ok (Loops.Json.number { bits := 9218868437227405312 }, []) ∧ StateT.run Gen.Read.number \"-1e400\".toList = Except.ok (Loops.Json.number { bits := 18442240474082181120 }, [])",
+   "module": "Laws.NumberRead"}}}
