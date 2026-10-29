@@ -32,7 +32,8 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install Lean
         run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+          base=https://raw.githubusercontent.com/leanprover/elan/master
+          curl -sSfL "$base/elan-init.sh" \
             | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Proofs check
@@ -77,7 +78,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: The design pages are a pure render of design/, protocol/ and vectors/
+      - name: >-
+          The design pages are a pure render of design/, protocol/ and vectors/
         run: |
           node design/build.mjs
           git diff --exit-code -- out

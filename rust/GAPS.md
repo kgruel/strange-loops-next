@@ -1,8 +1,52 @@
-# Layer-one boundaries, quirks and deferrals
+# Layers one and two: boundaries, quirks and deferrals
 
 No model, vector, protocol, design or interop files were changed. No known
 behavioral deviation within the implemented parser/record surface is being
 accepted silently. These are review points, not proposed new laws.
+
+## Fold premises, unchecked inputs and selection boundary
+
+- Layer two is complete for its 37 fold vectors; layer three is not. Only
+  Spec's closed where grammar/evaluation is pulled forward for fold/select.
+  Full Spec.ofJson/toJson/run, slots and remaining refusal codes are deferred.
+  Realm settle/admit is NOT implemented (model/Loops/Things.lean:46–92).
+- Acc.comm and Where.envelope.only are proof-bearing fields
+  (model/Loops/Families.lean:33–39,108–110). Rust closures must remain pure,
+  steps commute, and envelope predicates depend only on SameEnvelope; none of
+  these are enforced at runtime. The library does not claim Rust proofs.
+- Set/order results require their actual premises: LatestBy.perm/repeats and
+  converge require Addressed (model/Laws/Fold.lean:247–267); Acc.set_decides
+  requires Distinct input (model/Laws/Families.lean:109–112). Raw Count/Sum
+  still count repeats (model/Laws/Fold.lean:44–45,
+  model/Laws/Numeric.lean:43–44). No pre-fold dedup is introduced.
+- LatestBy Vec fields stay public/unchecked. insertRec tests full equality,
+  not id or order-key equality (model/Loops/Fold.lean:33–35); distinct payloads
+  or time spellings with identical order keys may both survive. Unsorted and
+  repeated tails stay as Lean's recursion leaves them. A validated-state
+  wrapper or a Record::Ord would incorrectly narrow this executable domain.
+- parseWhere itself permits duplicate fields/operators, preserving written
+  order and first-error path (model/Loops/Spec.lean:380–396). Recursive duplicate
+  checks belong to Spec.ofJson (model/Loops/Spec.lean:554–555), or selectRun's
+  outer input boundary (model/Gen/Run.lean:114–118). RefusalCode currently has
+  only WhereInvalid, with exact code() spelling, Display/Error and a path;
+  extending the complete layer-three vocabulary remains explicit.
+- Test-only Gen.Read decoding preserves strict shapes and rejection behavior,
+  but its diagnostic prose is Rust-specific, not a claim of byte-identical
+  Gen.Read error messages. Core parseWhere refusal code/path IS exact.
+
+## JS differences — Lean behavior deliberately retained
+
+- interop/js/fold.mjs:47–51 distinct retains the FIRST repeated id.
+  model/Loops/Families.lean:26–28 dedup retains the LAST. The Rust port follows
+  Lean, including differing reader forms; it does not silently import JS policy.
+- interop/js/fold.mjs:84–93 sums in signed 128 bits and throws sum-overflow.
+  model/Loops/Fold.lean:77–79 and model/Loops/Families.lean:60–61 accumulate
+  unbounded Int. Rust keeps unbounded arithmetic and integer fixture answers,
+  with tests beyond 128 bits; it deliberately has no JS sum-overflow limit.
+- JS exported numeric folds select readable numbers; Lean Gen.Run.foldAnswer
+  raw Count/Sum/Min/Max do NOT select/dedup first (model/Gen/Run.lean:75–90).
+  Visibility applies at Acc.select/maxHeads, not primitive/raw Acc.fold.
+  These are different entry points, not grounds to change Lean's definitions.
 
 ## Integer JSON versus external standards data
 
@@ -17,9 +61,10 @@ accepted silently. These are review points, not proposed new laws.
   crypto corpus is a separate deferred dependency-verification task, not an
   integer restriction; all model record signatures are compared now using
   maintained crypto dependencies.
-- The other deferred JSON counts are fold 37, spec 70, realm 9, scenario 1,
-  batch 11, lens 10. Total deferred JSON: 150. No full RFC 8785 or independent
-  SUPERCOP conformance claim is made.
+- The other deferred JSON counts are spec 70, realm 9, scenario 1,
+  batch 11, lens 10. With standard 12, total deferred JSON is 113;
+  record 26 + occurred 8 + fold 37 = 71 are checked. No full RFC 8785 or
+  independent SUPERCOP conformance claim is made.
 
 ## Unbounded ids versus finite wire ids — preserved
 

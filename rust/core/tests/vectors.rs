@@ -1,4 +1,4 @@
-//! Layer-one vectors: Gen.Records and Gen.OccurredVectors (model/Gen/{Records,Occurred}.lean).
+//! Record, occurred and fold vectors (model/Gen/{Records,Occurred,Run,Read,Encode}.lean).
 
 mod support;
 
@@ -11,12 +11,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
-const IMPLEMENTED: &[(&str, usize)] = &[("record", 26), ("occurred", 8)];
+const IMPLEMENTED: &[(&str, usize)] = &[("record", 26), ("occurred", 8), ("fold", 37)];
 // Shrink only. Standard includes external non-integer JCS and crypto fixtures;
 // it is not claimed as Lean integer-JSON conformance by this layer.
-const REMAINING: &[&str] = &[
-    "fold", "spec", "realm", "scenario", "batch", "lens", "standard",
-];
+const REMAINING: &[&str] = &["spec", "realm", "scenario", "batch", "lens", "standard"];
 
 fn json_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -207,7 +205,18 @@ fn every_registered_vector_and_every_expect() {
             for file in files {
                 let source = fs::read_to_string(&file).expect("vector file");
                 let vector: Value = serde_json::from_str(&source).expect("vector JSON");
-                assert_eq!(text(&vector["layer"]), family, "{file:?}");
+                let layer = text(&vector["layer"]);
+                if family == "fold" {
+                    let raw = support::parse(&source);
+                    let answers = support::fold::answers(layer, member(&raw, "input"))
+                        .unwrap_or_else(|e| panic!("{file:?}: {e}"));
+                    for (i, got) in answers.iter().enumerate() {
+                        assert_eq!(got, member(&raw, "expect"), "{file:?} order {i}");
+                    }
+                    checked += 1;
+                    continue;
+                }
+                assert_eq!(layer, family, "{file:?}");
                 let got = match family.as_str() {
                     "record" => {
                         let raw = support::parse(&source);
@@ -234,7 +243,7 @@ fn every_registered_vector_and_every_expect() {
     for family in REMAINING {
         assert!(seen.iter().any(|s| s == family), "stale allowlist {family}");
     }
-    assert_eq!(checked, 34);
+    assert_eq!(checked, 71);
     assert_eq!(
         checked + deferred,
         json_files(&root).len(),

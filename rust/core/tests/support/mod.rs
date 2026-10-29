@@ -1,4 +1,6 @@
-//! Test-only vector ingestion and Gen.OccurredVectors.utc rendering.
+//! Test-only Gen.Read fixture ingestion and Gen.OccurredVectors.utc rendering.
+pub(super) mod fold;
+mod reader;
 use loops::{json::Json, time::Moment};
 use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use std::fmt;
@@ -6,7 +8,21 @@ use std::fmt;
 struct Raw(Json);
 impl<'de> Deserialize<'de> for Raw {
     fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        d.deserialize_any(RawVisitor)
+        // Gen.Read.number keeps arbitrary Ints and rejects fraction/exponent spellings.
+        // RawValue preserves each number's lexeme without the arbitrary_precision
+        // visitor's reserved-map-key collision, which would alter raw object members.
+        let raw = Box::<serde_json::value::RawValue>::deserialize(d)?;
+        let text = raw.get();
+        if matches!(text.as_bytes().first(), Some(b'-' | b'0'..=b'9')) {
+            return text
+                .parse()
+                .map(|i| Self(Json::Int(i)))
+                .map_err(de::Error::custom);
+        }
+        let mut parser = serde_json::Deserializer::from_str(text);
+        parser
+            .deserialize_any(RawVisitor)
+            .map_err(de::Error::custom)
     }
 }
 struct RawVisitor;
@@ -20,12 +36,6 @@ impl<'de> Visitor<'de> for RawVisitor {
     }
     fn visit_bool<E: de::Error>(self, v: bool) -> Result<Raw, E> {
         Ok(Raw(Json::Bool(v)))
-    }
-    fn visit_i64<E: de::Error>(self, v: i64) -> Result<Raw, E> {
-        Ok(Raw(Json::Int(v.into())))
-    }
-    fn visit_u64<E: de::Error>(self, v: u64) -> Result<Raw, E> {
-        Ok(Raw(Json::Int(v.into())))
     }
     fn visit_str<E: de::Error>(self, v: &str) -> Result<Raw, E> {
         Ok(Raw(Json::Str(v.into())))
@@ -45,12 +55,14 @@ impl<'de> Visitor<'de> for RawVisitor {
         Ok(Raw(Json::Obj(xs)))
     }
 }
+/// Gen.Read.parseJson (model/Gen/Read.lean), integer-only with raw member order.
 pub(super) fn parse(text: &str) -> Json {
     let mut d = serde_json::Deserializer::from_str(text);
     let raw = Raw::deserialize(&mut d).expect("integer JSON vector");
     d.end().expect("no trailing JSON");
     raw.0
 }
+/// Gen.Read.unbase32 (model/Gen/Read.lean), test-fixture byte ingestion.
 pub(super) fn decode(text: &str) -> Vec<u8> {
     let mut acc = 0_u32;
     let mut bits = 0;
@@ -71,6 +83,7 @@ pub(super) fn decode(text: &str) -> Vec<u8> {
     assert_eq!(acc, 0, "nonzero padding bits");
     out
 }
+/// Gen.OccurredVectors.utc (model/Gen/Occurred.lean), exact fixture time text.
 pub(super) fn utc(moment: &Moment) -> String {
     // Lean: Gen.OccurredVectors.{civil,utc}, model/Gen/Occurred.lean.
     let seconds = moment.seconds();
