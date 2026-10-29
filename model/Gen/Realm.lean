@@ -16,37 +16,37 @@ namespace Gen.RealmVectors
 
 open Loops
 
-def r (id : Nat) (kind : String) (about : List String) (t : Nat) (prev : List Nat := [])
+def r (id : RecordId) (kind : String) (about : List String) (t : Nat) (prev : List RecordId := [])
     (ok : Reads t := by decide) : Record :=
   { id, kind, observer := "sl:kyle", about, value := "", prev, occurred := some (claimAt t ok), emitted := stampAt t ok }
 
 -- one record, held in full in one place and erased in another
-def full : Record := { r 0x51 "load" ["host:a"] 100 with n := 40 }
-def eraseRec : Record := { r 0x52 "erase" [] 110 with erases := [0x51] }
+def full : Record := { r (fixtureId 0x51) "load" ["host:a"] 100 with n := 40 }
+def eraseRec : Record := { r (fixtureId 0x52) "erase" [] 110 with erases := [fixtureId 0x51] }
 
 -- a record about thing B naming one about thing A in `prev`
-def a1 := r 0x61 "facet" ["thing:A"] 1
-def b1 := r 0x62 "facet" ["thing:B"] 2 [0x61]
+def a1 := r (fixtureId 0x61) "facet" ["thing:A"] 1
+def b1 := r (fixtureId 0x62) "facet" ["thing:B"] 2 [fixtureId 0x61]
 
 -- a record about two things, then a revision about one of them
-def d1 := r 0x71 "status" ["svc:auth", "svc:billing"] 1
-def d2 := r 0x72 "status" ["svc:auth"] 2 [0x71]
+def d1 := r (fixtureId 0x71) "status" ["svc:auth", "svc:billing"] 1
+def d2 := r (fixtureId 0x72) "status" ["svc:auth"] 2 [fixtureId 0x71]
 
 -- a note about nothing anchors its own thing; its revision is about it, and an
 -- unrelated note about nothing is no fork of either
-def m1 := r 0x81 "note" [] 1
-def m2 := r 0x82 "note" [idText 0x81] 2 [0x81]
-def m3 := r 0x83 "config" [] 3
+def m1 := r (fixtureId 0x81) "note" [] 1
+def m2 := r (fixtureId 0x82) "note" [idText (fixtureId 0x81)] 2 [fixtureId 0x81]
+def m3 := r (fixtureId 0x83) "config" [] 3
 -- a revision about nothing names a record in another thing
-def m4 := r 0x84 "note" [] 4 [0x81]
+def m4 := r (fixtureId 0x84) "note" [] 4 [fixtureId 0x81]
 
 -- a revision that erases what it replaces: any kind may erase
-def x1 := { r 0xa1 "note" ["person:alice"] 1 with n := 7 }
-def x2 := { r 0xa2 "note" ["person:alice"] 2 [0xa1] with erases := [0xa1] }
+def x1 := { r (fixtureId 0xa1) "note" ["person:alice"] 1 with n := 7 }
+def x2 := { r (fixtureId 0xa2) "note" ["person:alice"] 2 [fixtureId 0xa1] with erases := [fixtureId 0xa1] }
 
 -- a task finished by a record of another kind
-def t1 := r 0x91 "task" ["task:1"] 1
-def t2 := r 0x92 "task-done" ["task:1"] 2 [0x91]
+def t1 := r (fixtureId 0x91) "task" ["task:1"] 1
+def t2 := r (fixtureId 0x92) "task-done" ["task:1"] 2 [fixtureId 0x91]
 
 structure Case where
   name : String

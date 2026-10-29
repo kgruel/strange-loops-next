@@ -1,4 +1,4 @@
-import Laws.Id
+import Laws.IdText
 import Gen.Read
 import Gen.Sha2
 
@@ -38,34 +38,23 @@ theorem sha256_length (msg : List UInt8) : (sha256 msg).length = 32 := by
 
 /-- Interpreting the actual SHA-256 output as a big-endian number is bounded. -/
 theorem sha256_bounded (msg : List UInt8) :
-    Loops.BoundedId ((sha256 msg).foldl (fun a b => 256 * a + b.toNat) 0) :=
+    (sha256 msg).foldl (fun a b => 256 * a + b.toNat) 0 < 256 ^ 32 :=
   Loops.bytes_bounded _ (sha256_length msg)
+
+/-- SHA-256 gives the same id text through bytes or through a number. -/
+theorem sha256_idOf_eq_idText (env : Loops.Env) (commit : String) :
+    Loops.idOf sha256 env commit =
+      Loops.idText ⟨(sha256 (Loops.utf8 (Loops.idPreimage env commit))).foldl
+        (fun a b => 256 * a + b.toNat) 0,
+        Loops.bytes_bounded _ (sha256_length _)⟩ :=
+  Loops.idOf_eq_idText sha256 env commit (sha256_length _)
 
 end Gen
 
 namespace Gen.Read
 
 /-- Every successful record-id decode fits in the checked 32-byte width. -/
-theorem recordId_bounded {path : String} {j : Loops.Json} {n : Nat}
-    (h : recordId path j = .ok n) : Loops.BoundedId n := by
-  unfold recordId at h
-  cases ht : text path j with
-  | error why => simp [ht, Bind.bind, Except.bind] at h
-  | ok s =>
-    simp only [ht, Bind.bind, Pure.pure, Except.bind, Except.pure] at h
-    split at h
-    · rename_i rest he
-      split at h
-      · rename_i bs hb
-        split at h
-        · rename_i hlen
-          split at h
-          · simp only [Except.ok.injEq] at h
-            subst n
-            exact Loops.bytes_bounded bs (by simpa using hlen)
-          · simp [bad] at h
-        · simp [bad] at h
-      · simp [bad] at h
-    · simp [bad] at h
+theorem recordId_bounded {path : String} {j : Loops.Json} {n : Loops.RecordId}
+    (_h : recordId path j = .ok n) : n.val < 256 ^ 32 := n.isLt
 
 end Gen.Read

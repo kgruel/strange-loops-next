@@ -23,6 +23,8 @@ the closed vocabulary with an optional `where`.
   (`Loops.Things`); `from` and the envelope tests then choose heads, and the
   payload tests filter them. Selecting first would bring back a record whose
   successor is of another kind, or no longer matches, or is withheld.
+  When the store's rule for who may replace whom reads only envelopes, a view
+  preserves each thing's heads. Each head shows only what the view shows.
 * **`from` chooses by thing.** `"about": "t"` takes the records about `t`,
   so `"about": "r:X"` takes X, the record about nothing that anchors it, as
   well as its revisions. `env.about` tests the field as written, which holds
@@ -239,9 +241,9 @@ inductive SlotValue where
   | int (r : Result Int)
   | opt (r : Result (Option Int))
   /-- Latest-by: each thing with its current records (more than one is a fork). -/
-  | things (ts : List (String × List (Nat × Shown))) (unread : Nat)
+  | things (ts : List (String × List (RecordId × Shown))) (unread : Nat)
   /-- Collect: records newest first. -/
-  | heads (hs : List (Nat × Shown)) (unread : Nat)
+  | heads (hs : List (RecordId × Shown)) (unread : Nat)
   deriving Repr, DecidableEq
 
 def Record.unlinked (r : Record) : Record := { r with prev := [] }
@@ -254,7 +256,7 @@ def limitTo {α : Type} : Option Nat → List α → List α
   | some k, xs => xs.take k
   | none, xs => xs
 
-def shownIds (hs : List Record) : List (Nat × Shown) := hs.map fun h => (h.id, h.shown)
+def shownIds (hs : List Record) : List (RecordId × Shown) := hs.map fun h => (h.id, h.shown)
 
 /-- A head the slot asks about: `from` takes it and its envelope tests hold. -/
 def chosen (sel : Record → Bool) (cs : List Cond) (h : Record) : Bool :=

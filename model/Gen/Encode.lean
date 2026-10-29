@@ -7,6 +7,9 @@ import Gen.Json
 
 open Loops Gen
 
+/-- A fixture id, with its actual bound checked where it is written. -/
+def fixtureId (n : Nat) (h : n < 256 ^ 32 := by decide) : RecordId := ⟨n, h⟩
+
 /-! ## Fixture times
 
 A fixture's time `t` is `t` seconds into 2026-10-01, UTC: a stamp for

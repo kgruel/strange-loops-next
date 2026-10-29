@@ -1,4 +1,4 @@
-import Loops.Base32
+import Loops.Id
 import Loops.Occurred
 
 /-!
@@ -29,22 +29,22 @@ inductive Val where
   deriving Repr, DecidableEq, Inhabited
 
 structure Record where
-  id       : Nat
+  id       : RecordId
   kind     : String
   /-- Who says so. -/
   observer : String
   /-- The things this record is about: a set. -/
   about    : List String := []
   value    : String
-  prev     : List Nat
+  prev     : List RecordId
   /-- The grant this record acts on, if any. -/
-  under    : Option Nat := none
+  under    : Option RecordId := none
   /-- The claimed past, if the observer gave one. -/
   occurred : Option Claim := none
   /-- The observer's now. -/
   emitted  : Stamp
   /-- The ids whose payloads this record erases, whatever its kind. -/
-  erases   : List Nat := []
+  erases   : List RecordId := []
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
   n        : Int := 0
   /-- Further payload fields, by name. -/
@@ -52,18 +52,6 @@ structure Record where
   /-- Whether the payload (`value`, `n`, `fields`) is here for this reader. -/
   shown    : Shown := .here
   deriving Repr, DecidableEq, Inhabited
-
-/-- The last `k` base-256 digits of `n`, most significant first; the first
-holds whatever is above them. -/
-def digestDigits : Nat → Nat → List Nat
-  | 0, _ => []
-  | k + 1, n => n / 256 ^ k :: digestDigits k (n % 256 ^ k)
-
-/-- An id's digest: its 32 bytes, most significant first. -/
-def idDigest (n : Nat) : List Nat := digestDigits 32 n
-
-/-- An id as text: `r:` and its digest in base32. -/
-def idText (n : Nat) : String := "r:" ++ base32 ((idDigest n).map Nat.toUInt8)
 
 /-- The span content order reads: `occurred`'s, or without one, `emitted` as
 a span of no length. -/

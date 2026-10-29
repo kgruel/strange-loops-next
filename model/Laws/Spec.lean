@@ -418,9 +418,9 @@ theorem chosen_payTest_yes {sel : Record → Bool} {cs : List Cond} {r : Record}
 record it gives for a thing is one no record about that thing has
 superseded, that `from` takes, and that every test holds for. -/
 theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Record}
-    (hx : Addressed xs) {ts : List (String × List (Nat × Shown))} {u : Nat}
-    (h : latestOf sel cs xs = .things ts u) {t : String} {ps : List (Nat × Shown)}
-    (ht : (t, ps) ∈ ts) {p : Nat × Shown} (hp : p ∈ ps) :
+    (hx : Addressed xs) {ts : List (String × List (RecordId × Shown))} {u : Nat}
+    (h : latestOf sel cs xs = .things ts u) {t : String} {ps : List (RecordId × Shown)}
+    (ht : (t, ps) ∈ ts) {p : RecordId × Shown} (hp : p ∈ ps) :
     ∃ r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = .yes ∧ (r.id, r.shown) = p := by
   unfold latestOf at h
   simp only [SlotValue.things.injEq] at h
@@ -442,7 +442,7 @@ theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Recor
 
 /-- Latest-by counts each unknown chosen head once by id, even across things. -/
 theorem latestOf_unread (sel : Record → Bool) (cs : List Cond) (xs : List Record)
-    {ts : List (String × List (Nat × Shown))} {u : Nat}
+    {ts : List (String × List (RecordId × Shown))} {u : Nat}
     (h : latestOf sel cs xs = .things ts u) :
     u = (idsOf (((perThing xs).flatMap (·.2.heads)).filter fun r =>
       chosen sel cs r && payTest cs r == .unknown)).length := by
@@ -512,7 +512,7 @@ theorem newestFirst_distinct {xs : List Record} (hx : Addressed xs) :
 theorem idsOf_length {xs : List Record} (hx : Distinct xs) :
     (idsOf xs).length = xs.length := by
   have hp : idsOf xs ~ xs.map (·.id) :=
-    (perm_ext_iff_of_nodup ((idsOf_sorted xs).imp Nat.ne_of_lt) hx).2 fun i => by
+    (perm_ext_iff_of_nodup ((idsOf_sorted xs).imp Fin.ne_of_lt) hx).2 fun i => by
       simp only [mem_idsOf, mem_map]
   simpa using hp.length_eq
 
@@ -540,7 +540,7 @@ theorem newestFirst_unread (cs : List Cond) {xs : List Record} (hx : Addressed x
 /-- Collect counts unknown chosen ids before ordering or limiting its readable output. -/
 theorem collectOf_unread (sel : Record → Bool) (cs : List Cond) (follow : Bool)
     (limit : Option Nat) {xs : List Record} (hx : Addressed xs)
-    {hs : List (Nat × Shown)} {u : Nat}
+    {hs : List (RecordId × Shown)} {u : Nat}
     (h : collectOf sel cs follow limit xs = .heads hs u) :
     u = (idsOf (((if follow then (perThing xs).flatMap (·.2.heads) else xs)).filter fun r =>
       chosen sel cs r && payTest cs r == .unknown)).length := by
@@ -560,8 +560,8 @@ theorem collectOf_unread (sel : Record → Bool) (cs : List Cond) (follow : Bool
 for: each record it gives is one no record about its thing has superseded,
 that `from` takes, and that every test holds for. -/
 theorem collectOf_heads (sel : Record → Bool) (cs : List Cond) (limit : Option Nat)
-    {xs : List Record} (hx : Addressed xs) {hs : List (Nat × Shown)} {u : Nat}
-    (h : collectOf sel cs true limit xs = .heads hs u) {p : Nat × Shown} (hp : p ∈ hs) :
+    {xs : List Record} (hx : Addressed xs) {hs : List (RecordId × Shown)} {u : Nat}
+    (h : collectOf sel cs true limit xs = .heads hs u) {p : RecordId × Shown} (hp : p ∈ hs) :
     ∃ t r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = .yes ∧ (r.id, r.shown) = p := by
   unfold collectOf at h
   simp only [↓reduceIte, SlotValue.heads.injEq] at h

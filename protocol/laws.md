@@ -8,11 +8,13 @@ vectors; the model is what the vectors come from.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `id.digest` | `idDigest_length`, `idDigest_byte`, `idDigest_roundtrip`, `idDigest_bytes_roundtrip`, `idText_injective`, `bytes_bounded`, `bytes_idDigest`, `idOf_eq_idText`, `Gen.sha256_length`, `Gen.sha256_bounded`, `Gen.Read.recordId_bounded` | For ids below 2^256, each digest contains exactly 32 bytes. Reading these bytes gives the same id. Two such ids have the same text only when they are equal. Reading any 32 bytes gives an id below 2^256. SHA-256 returns 32 bytes. The id reader returns only ids below 2^256. | (proved) |
+| `id.digest` | `idDigest_length`, `idDigest_byte`, `idDigest_roundtrip`, `idDigest_bytes_roundtrip`, `idText_injective`, `bytes_bounded`, `bytes_idDigest`, `idOf_eq_idText`, `Gen.sha256_length`, `Gen.sha256_bounded`, `Gen.sha256_idOf_eq_idText`, `Gen.Read.recordId_bounded` | An id's digest has exactly 32 bytes. Reading these bytes gives the same id. Two ids have the same text only when they are equal. Reading any 32 bytes gives an id below 2^256. Writing that id back gives the same 32 bytes. | (proved) |
 
-The bound applies separately to a record's id and each id that it references.
-The model takes the hash as an input.
-If the hash result contains 32 bytes, its text matches the number's text.
+The model keeps every record id and reference below 2^256.
+The id reader returns only ids below 2^256.
+
+The model's SHA-256 returns 32 bytes.
+With the model's SHA-256, an id written from bytes equals the id written from the number.
 
 ## Folds (`model/Laws/Fold.lean`)
 
@@ -68,9 +70,15 @@ the cached state in both, so there is no partial rewind.
 | `heads.why` | `Max.cannot_follow_prev` | Max can't follow `prev`: no step from Max's state and the next record keeps the current maximum | `fold/heads/01`, `02` |
 | `view.no-resurrection` | `LatestBy.view`, `LatestBy.view_head_ids`, `LatestBy.no_false_resurrection` | a view (withheld or erased payloads) folds to the same heads; a superseded record is never current | `fold/view/*` |
 | `view.refines` | `Where.eval_view` | a view only loses information: a `where` answer stays or becomes unknown | `fold/select/01` |
-| `result.unread` | `LatestBy.maxHeads_view`, `Acc.select_unread`, `Count.select_unread`, `latestOf_unread`, `collectOf_unread` | A fold counts what it can't read instead of guessing: records whose test is unknown, and selected records it can't read. Count can read every selected record. Latest-by counts each head once when its payload tests are unknown, after the source and envelope tests select it. Collect counts these unknown tests once per record before its limit, using heads when it follows replacements and all records otherwise. Max over heads counts heads whose payload the reader does not hold. | `fold/view/04`, `fold/select/*`, `spec/run/02`, `spec/run/03` |
+| `result.unread` | `LatestBy.maxHeads_view`, `Acc.select_unread`, `Count.select_unread`, `latestOf_unread`, `collectOf_unread` | A fold does not guess. It counts the records whose test is unknown and the selected records it cannot read. | `fold/view/04`, `fold/select/*`, `spec/run/02`, `spec/run/03` |
 | `result.full` | `Acc.select_full` | when every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold | `fold/select/03` |
 | `select.set` | `Acc.select_set_decides` | what is read and what is unread depend only on the set | `fold/select/*` |
+
+Count can read every selected record.
+Latest-by counts each head once when its payload tests are unknown, after the source and envelope tests select it.
+Collect counts each unknown record once, before its limit.
+It counts heads when it follows replacements, and all records otherwise.
+Max over heads counts heads whose payload the reader does not hold.
 
 `view.no-resurrection` holds because `prev`, ids and times are on the
 envelope, which every reader holds. A `where` test on the envelope always
