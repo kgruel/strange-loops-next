@@ -1,9 +1,9 @@
-# Layers one through three, realm, and scenario: Lean to Rust
+# Layers one through three, realm, scenario, and lens: Lean to Rust
 
 Lean defines the behavior of this port.
 The port implements record primitives, fold families, per-thing state, specs, settlement, and admission.
-It checks one scenario, nine realm, 70 spec, 37 fold, and 34 record and occurred vectors.
-The scenario fixture is checked. Batches, lens vectors, the CLI, and storage service remain future work.
+It checks ten lens, one scenario, nine realm, 70 spec, 37 fold, and 34 record and occurred vectors.
+Batches, the CLI, and storage service remain future work.
 
 Layer two uses the closed where types, parser, and evaluation from layer three.
 Fold selection calls `parseWhere` and `Cond.all` directly (`model/Gen/Run.lean:112–122`).
@@ -231,6 +231,7 @@ Checks include public keys, signatures, both wire lines, and occurred ordering.
 | vectors/spec/parse: 61; run: nine | Same registry and tests/support/spec.rs; every refusal, parsed result, and arrival order |
 | vectors/scenario: one | Same registry and tests/support/scenario.rs; all steps and arrival orders |
 | vectors/realm: nine | Same registry and tests/support/realm.rs; every rotation and complete settled, refused, things, and sum fields |
+| vectors/lens: ten | Same registry and tests/support/lens.rs; complete answers and refusal |
 
 The test reader follows `Gen.Read.record`, `recordId`, and `fieldsOf` (`model/Gen/Read.lean:238–248,286–331`).
 It requires payload fields for `Here` and refuses payload fields on hidden forms.
@@ -256,12 +257,15 @@ They also check empty-key paths, hidden duplicate metadata, original-input admis
 Eight realm tests cover first-form choices, raw conflicting forms, erasure before admission, sorted ids, absent targets, duplicate predecessors, and refusal precedence.
 Two realm harness tests check strict input shapes, empty forms, every rotation, and unbounded answers.
 The registry test also checks vector accounting.
-The suite runs 64 tests. Nine shared helper tests run in each of two integration test binaries.
+Three lens tests check law premises, counterexamples, first matches, and arbitrary character lists.
+Two lens harness tests check strict shapes, repeated keys, refusal, and empty documents.
+The suite runs 71 tests. Eleven shared helper tests run in each of two integration test binaries.
 
-The registry accounts for 184 recursive JSON files: 151 checked and 33 explicitly deferred.
-The remaining allowlist stays `batch`, `lens`, and `standard`.
+The registry accounts for 184 recursive JSON files: 161 checked and 23 explicitly deferred.
+The remaining allowlist stays `batch` and `standard`.
 Layer two removes `fold` from the earlier allowlist. Layer three removes `spec`.
 The realm layer removes `realm`. The scenario layer removes `scenario`.
+The lens layer removes `lens`.
 Unknown families, root JSON, missing or stale registrations, count changes, and files outside accounted families fail.
 `GAPS.md` explains each deferred family and the external standard limits.
 
@@ -276,9 +280,13 @@ The scenario harness follows `model/Gen/Run.lean` and `model/Gen/Scenario.lean`.
 It settles forms, admits them, and runs the spec on settled forms.
 Each listed arrival order must produce the canonical forms outcome.
 The scenario layer adds the core lens dependency before the lens vector layer.
-Lens vector dispatch remains deferred.
+The lens registry compares the full answer, including every expected field.
 Each line is a string that represents a Lean character list. This module does not split files into lines.
 The lens keeps section order, duplicate ids, and first-match lookup.
 Arbitrary ids and embedded line breaks remain valid model values.
-`parse_render` applies to every document (`model/Laws/Lens.lean`).
-The no-op law requires unique base ids. The put-get law also requires equal id order.
+`parse_render` applies to every document (`model/Laws/Lens.lean:90–91`).
+`normalize_idem` requires successful normalization (`model/Laws/Lens.lean:99–103`).
+The no-op law requires unique base ids (`model/Laws/Lens.lean:143–144`).
+The put-get law also requires equal ordered ids (`model/Laws/Lens.lean:250–252`).
+Absent outcomes do not change the base (`model/Laws/Lens.lean:282–284`).
+Unknown outcomes also do not change it (`model/Loops/Lens.lean:93–101`).

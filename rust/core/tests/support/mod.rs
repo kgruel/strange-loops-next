@@ -1,6 +1,6 @@
 //! Test-only Gen.Read fixture ingestion and Gen.OccurredVectors.utc rendering.
 pub(super) mod fold;
-mod lens;
+pub(super) mod lens;
 mod reader;
 pub(super) mod realm;
 pub(super) mod scenario;
