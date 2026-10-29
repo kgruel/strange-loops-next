@@ -10,7 +10,7 @@ vectors; the model is what the vectors come from.
 |---|---|---|---|
 | incremental = batch | `Count.batch`, `LatestBy.batch` | folding `xs` then `ys` is folding `xs ++ ys` | every fold vector |
 | `count.perm` | `Count.perm` | arrival order doesn't change a count | `fold/count/01`, `02` |
-| `count.repeats` | `Count.repeats` | a repeated delivery is counted again, so the store must hand each id over once | `fold/count/03` |
+| `count.repeats` | `Count.repeats` | a repeated delivery is counted again, which is why the read path hands each id over once | `fold/count/03` |
 | `latest-by.set` | `LatestBy.set_decides` | the state depends only on the set of records folded | `fold/latest-by/*` |
 | `latest-by.order` | `LatestBy.winner_newer` | the winner is a head, newer than every other head: winners follow content order, `prev` first, then the span, `emitted`, id | `fold/latest-by/02`, `05`, `06`, `12`, `13` |
 | content order | `Newer.irrefl`, `Newer.trans`, `Newer.total`, `Newer.congr`, `id_order` (`Laws/Order.lean`) | records order by span (`occurred`'s, or `emitted` as an instant), then `emitted`, then id as digest bytes: a strict total order on distinct ids that reads only those three, never how a time is spelled | `fold/latest-by/05`, `06`, `12`, `13` |
@@ -19,7 +19,7 @@ vectors; the model is what the vectors come from.
 
 | `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is LatestBy over one thing, so it inherits LatestBy's laws | `fold/latest/*` |
 | `sum.perm` | `Sum.perm` | arrival order doesn't change a sum | `fold/sum/01`, `02` |
-| `sum.repeats` | `Sum.repeats` | a repeated delivery is added again, so the store must hand each id over once | `fold/sum/03` |
+| `sum.repeats` | `Sum.repeats` | a repeated delivery is added again, which is why the read path hands each id over once | `fold/sum/03` |
 | `extrema.set` | `Max.set_decides`, `Min.set_decides` | Min and Max depend only on the set of records | `fold/extrema/*` |
 
 Incremental = batch holds for every step fold by construction. The law with
@@ -49,7 +49,7 @@ the cached state in both, so there is no partial rewind.
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `input.distinct` | `Distinct.addressed`, `distinct_dedup`, `mem_dedup` | a fold is handed each id once; `dedup` is the realm's union | (the read path) |
+| `input.distinct` | `Distinct.addressed`, `distinct_dedup`, `mem_dedup` | the read path hands a fold each id once; `dedup`, the realm's union, leaves each id once and, where an id names one record, keeps the same records | (the read path) |
 | `input.union` | `dedup_union` | the union doesn't depend on which place is read first | (the read path) |
 | `acc.set` | `Acc.set_decides` | any step that commutes gives the same state for the same set | every count, sum, extrema vector |
 | `acc.late` | `Acc.late` | a late record folds onto the cached state | (follows from `acc.set`) |
@@ -100,7 +100,7 @@ everything left:
 | `admit.set` | `admit_same`, `refusalOf_none` | admission depends only on the set; a record is refused exactly when it isn't entitled to its `prev` | `realm/04` |
 | `admit.no-cross` | `admit_no_cross` | every held record an admitted record's `prev` names shares a thing with it and may be replaced by it; a `prev` naming a record the reader doesn't hold is admitted, since the reader can't judge it | `realm/04`, `08` |
 | `thing.local` | `stateIn_local`, `perThing_set_decides` | a thing's state depends only on the records about it; the set decides per thing | `realm/04`–`08`, `fold/latest-by/*` |
-| `view.no-resurrection` (things) | `admit_view`, `stateIn_view`, `stateIn_no_false_resurrection` | a view admits the same records and folds each thing to the full reader's state, each record in the view's form; a record superseded in a thing is never current there | `fold/view/*`, `spec/run/03` |
+| `view.no-resurrection` (things) | `admit_view`, `stateIn_view`, `stateIn_no_false_resurrection` | for a rule that reads only envelopes, a view admits the same records and folds each thing to the full reader's state, each record in the view's form; a record superseded in a thing is never current there | `fold/view/*`, `spec/run/03` |
 
 Writing checks `prev` too: you can only replace what you hold. `emit`
 refuses a `prev` naming a record neither in the batch nor in the store
@@ -118,8 +118,8 @@ on a payload field answers unknown when the reader doesn't hold the payload.
 A record about nothing has an empty `env.about`, though it anchors a thing
 named by its own id. `about`, `prev`, `under` and `erases` are sets (`under`
 of at most one): `is` asks whether the set holds the value, `not` whether it
-doesn't, and `present` whether it holds anything. A time is tested by what
-it reads as: `is` asks for the same span however either is spelled,
+doesn't, and `present` whether it holds anything. A time field (`emitted`,
+`occurred`) is tested by what it reads as: `is` asks for the same span however either is spelled,
 `at-least` and `below` compare starts, and a record without `occurred`
 passes neither.
 
@@ -152,22 +152,22 @@ pinned by the vectors rather than proved.
 |---|---|---|---|
 | `where.complements` | `Op.not_is`, `Op.absent_present`, `Op.atLeast_below`, `Op.atLeast_below_time` | `not` is the complement of `is`, `absent` of `present`; on a number, or a time, exactly one of `at-least` and `below` holds | `spec/run/06`, `07` |
 | `where.typed` | `Op.ordered_like_only`, `parseOp_ok_iff`, `parseArg_ok_iff`, `parseBound_ok_iff` | `at-least` and `below` compare numbers with numbers and times with times, and hold for nothing else; a test is accepted exactly when its argument fits its field (`Op.Fits`), and renders back to what was written | `spec/run/07`, `spec/parse/22`–`37` |
-| `where.fields` | `Cond.text_is`, `Cond.about_is`, `Cond.id_is`, `Cond.set_present`, `Cond.emitted_is`, `Cond.emitted_atLeast`, `Cond.emitted_below` | each envelope field reads as what it holds: `kind` and `observer` as their text, a set as its members (`is`) and whether it holds any (`present`), `emitted` as its own instant | `spec/run/08`, `09` |
-| `where.time` | `Cond.occurred_is`, `Cond.occurred_atLeast`, `Cond.occurred_below`, `Cond.occurred_missing`, `Cond.time_meaning`, `Op.time_arg_meaning` | a test on a time reads its span, never its spelling, the record's or the argument's: `is` asks for the same span, `at-least` and `below` compare starts, and a record without `occurred` passes neither | `spec/run/06`, `08` |
+| `where.fields` | `Cond.text_is`, `Cond.about_is`, `Cond.id_is`, `Cond.set_present`, `Cond.emitted_is`, `Cond.emitted_atLeast`, `Cond.emitted_below` | `kind` and `observer` read as their text; `about`, `prev`, `under` and `erases` as their members (`is`) and whether they hold any (`present`); `emitted` as its own instant. `occurred` is `where.time`'s | `spec/run/08`, `09` |
+| `where.time` | `Cond.occurred_is`, `Cond.occurred_atLeast`, `Cond.occurred_below`, `Cond.occurred_missing`, `Cond.time_meaning`, `Op.time_arg_meaning` | a test on an envelope time (`emitted`, `occurred`) reads what it means, never how it is spelled, in the record or in the argument: `is` asks for the same span, `at-least` and `below` compare starts, and a record without `occurred` passes neither | `spec/run/06`, `08` |
 | `where.total` | `Cond.eval_here`, `Cond.eval_envelope` | a test answers for every record whose payload is here, and an envelope test for every record, withheld or not | every `spec/run` vector |
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` (where) | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
 | `spec.from-thing` | `Source.takes_about` | `from`'s `about` takes exactly the records about the thing, and a record about nothing is about its own id and nothing else | `spec/run/09` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
-| `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads, records no record about their thing has superseded, and only those `from` takes and every test holds for, so selection never brings back what was superseded; under a view each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
+| `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads, records no record about their thing has superseded, and only those `from` takes and every test holds for, so selection never brings back what was superseded; under a view, and a rule that reads only envelopes, each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
 | `spec.parse` | `Spec.ofJson_fits`, `Spec.ofJson_toJson`, `Spec.reparse`, `Spec.parsed_iff`, `Spec.ofJson_repeat`, `Json.repeatAt_none` | the specs the parser gives are exactly those that fit, so none runs without a source; an accepted spec's parsed form parses back to itself; a spec with a repeated key is refused, at the path `Json.repeatAt` gives, and one without is never refused for repeating | `spec/parse/*` |
 
 ## A batch with labels (`model/Laws/Batch.lean`)
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `batch.meaning` | `Meaning.unique` | an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`–`03` |
+| `batch.meaning` | `Meaning.unique` | an acyclic batch has at most one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters | `batch/01`–`03` |
 | `batch.refuse` | (by construction) | a label given twice, used but never given, or in a cycle is refused; so is a draft `write` refuses, a `prev` naming a record not held, or one about other things | `batch/10`–`17` |
 | `batch.refuse-order` | `firstRefusal_set`, `writeProblem_codes` | the refusal reported depends only on which refusals there are: across the batch, labels, then writing, then `prev-unknown`, then `prev-unrelated`. Proved for writing's refusals (`firstRefusal_set`); the order across stages is by construction | `batch/15`, `16` |
 
@@ -186,7 +186,7 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `lens.no-op` | `no_op` | the unedited render gives no outcomes | `lens/section/03` |
 | `lens.put-get` | `put_get`, `put_get_text` | an edit that keeps the sections in order applies exactly, up to normal form | `lens/section/04`, `10` |
 | `lens.nothing-dropped` | `nothing_dropped`, `absence_reported` | every section is unchanged, accepted or reported; every dropped one is reported | `lens/section/05`, `06` |
-| `lens.absence-not-edit` | `absence_not_edit` | a dropped section changes nothing | `lens/section/06` |
+| `lens.absence-not-edit` | `absence_not_edit` | a dropped section leaves that section in the state as it was; the other sections' accepted edits still apply | `lens/section/06` |
 | normal form | `normalize_idem` | normalizing twice is normalizing once | every lens vector |
 | `lens.refuse` | (by construction) | malformed text is refused, not guessed at | `lens/section/07`–`09` |
 
@@ -210,7 +210,7 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `occurred.span` | `occurred_point`, `occurred_open`, `occurred_interval`, `point_le` | every point the reader accepts becomes the span the grammar gives it, alone, with `..` or with a second point starting no earlier; a span's end is never before its start | `occurred/01`–`06` |
 | `occurred.qualifier` | `occurred_qualified`, `occurred_qualified_start`, `occurred_qualified_end` | a qualifier never changes a span, on a date alone or on either end of an interval | `occurred/03`, `05` |
 | `occurred.moment` | `instant_canonical`, `point_canonical`, `moment_lt_iff_scaled`, `stripZeros_replicate_zero` | every moment the reader makes is whole seconds then digits not ending in zero; comparing two as lists is comparing them as exact decimals; trailing zeros never change one | `occurred/04` |
-| `occurred.order` | `Span.before_irrefl`, `Span.before_trans`, `Span.before_total` | spans order by start then end, an open end last: a strict total order, so every store orders them the same | `occurred/08` |
+| `occurred.order` | `Span.before_irrefl`, `Span.before_trans`, `Span.before_total` | spans order by start then end, an open end last: a strict total order with no ties, so any two stores that order by it agree | `occurred/08` |
 | `occurred.refuse` | (by construction) | a text the reader doesn't accept is refused with `occurred-not-span`, never guessed at | `occurred/07`, `record/34` |
 
 Which texts are points is the definition itself (`dateDays?`, `instant?`),
@@ -223,8 +223,8 @@ FIPS 180-4 and RFC 8032 values before it writes anything.
 
 ## What these laws don't promise
 
-Every law is about a given set of records. None says the set is complete,
-current, trusted or well dated:
+The laws about folds, views and specs are each about a given set of
+records. None says the set is complete, current, trusted or well dated:
 
 * **Absence isn't visible.** A reader that hasn't synced a successor sees
   the record it replaces as current, and can't count what it doesn't know
@@ -236,7 +236,7 @@ current, trusted or well dated:
   times, so a skewed clock picks a fork's winner. Every head of a fork is
   still shown.
 * **Trust is step 3.** Nothing here checks signatures or standing; the laws
-  hold for whatever a reader admits.
+  hold for whatever set a reader admits in which an id names one record.
 * **A checkpoint is a set.** "Since" means segments not yet seen, not an
   offset, or a late segment is missed.
 

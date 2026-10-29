@@ -11,9 +11,9 @@ computes both answers; this file checks that the first is what the law
 promises and that the second differs, so a premise shown on the laws page is
 one that matters. CI runs it and fails if the file changed.
 
-These are not vectors. Several inputs here are ones the protocol never
-produces (two records under one id, a JSON object repeating a member), and
-each says so in `input`, so no implementation reads them as cases to pass.
+These are not vectors. Several inputs here are ones the protocol does not
+produce (two records under one id, a JSON object repeating a member, a lens
+base keying two sections alike), and each says so in `input`, so no implementation reads them as cases to pass.
 -/
 
 open Loops Gen
@@ -108,11 +108,11 @@ def cases : Except String (List Case) := do
       holds := ("is and not \"yes\" on a record whose value is yes", pair here),
       removed := ("the same tests, the payload withheld", pair here.withhold) },
     { law := "latest-by.set", premise := "within one store an id names one record",
-      input := "impossible in a store: an id is the hash of what the record says",
+      input := "two records under one id: a reader that doesn't check ids against content could hold them",
       holds := (s!"records {ids [one, other]} under two ids, in either order", distinct),
       removed := (s!"records {ids [one, twin]} under one id: one order, then the other", s!"{a}, then {b}") },
     { law := "lens.no-op", premise := "the base's section ids are distinct",
-      input := "impossible from a state: a lens renders one section per thing",
+      input := "not produced when each thing is rendered once",
       holds := ("parse an unedited render of two sections", lensOut clean),
       removed := ("the same, both sections keyed decision:auth", lensOut dirty) },
     { law := "lens.put-get", premise := "the edit keeps exactly the base's sections",

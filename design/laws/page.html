@@ -9,100 +9,49 @@
 <section class="wrap block" id="sentence" aria-labelledby="h-sentence">
   <div class="side">
     <h2 id="h-sentence">A law is one sentence</h2>
-    <p>Name what may vary, and name what doesn't move when it does. Arrival order, repeats, which payloads a reader holds, how a time is spelled: the answer stays.</p>
-    <p class="hint">It turns on its own while you aren't reading it; Next and Pause are under it.</p>
+    <p>Name what may vary, and name what doesn't move when it does. Arrival order leaves a count, a sum and a state where they were. Repeats leave a winner or an extremum alone, but they move a count or a sum: those are limits. Holding fewer payloads leaves which records are heads alone, though each head comes back with its payload hidden, and an answer that needs a payload can turn unknown or unread. Spelling an envelope time another way, as the same span, leaves a test's answer alone.</p>
+    <p class="hint js-only">Next and Previous step through the invariances, the laws of this shape, one at a time.</p>
   </div>
   <div class="sheet rotor-sheet">
 <!-- build:opening -->
   </div>
 </section>
 
-<section class="wrap block" id="shapes" aria-labelledby="h-shapes">
+<section class="wrap block" id="overview" aria-labelledby="h-overview">
   <div class="side">
-    <h2 id="h-shapes">Six shapes</h2>
-    <p>Every law takes one of six shapes, a closed set like the folds. The last shape matters as much as the first: it is where the guarantees stop, said as plainly as where they hold.</p>
+    <h2 id="h-overview">Every law at once</h2>
+    <p>Each chip is a law, on the row of the layer it governs and marked with its shape. Every law takes one of six shapes; the last, limits, says where a guarantee stops as plainly as the others say where one holds.</p>
+    <p class="hint">Pick a shape to pick out its laws. Pick a law to read its sentence.</p>
   </div>
   <div class="stack">
-<!-- build:bar -->
-    <div class="shapes">
-<!-- build:shapes -->
+<!-- build:filters -->
+    <div class="ov" id="ov">
+<!-- build:overview -->
     </div>
+    <div class="shape-key">
+<!-- build:shape-key -->
+    </div>
+    <h3>By the question they answer</h3>
+    <ol class="q-index">
+<!-- build:question-index -->
+    </ol>
   </div>
 </section>
 
-<section class="wrap block" id="try" aria-labelledby="h-try">
-  <div class="side">
-    <h2 id="h-try">Try to break it</h2>
-    <p>Each card is a vector the model wrote. Press the button to vary what the law says may vary; the answer underneath is the one the model computed for every variant. Nothing here is computed in your browser, and CI regenerates every vector from the model.</p>
-    <p>The last card is a limit: there, the answer does move, and the law says who must account for it.</p>
-  </div>
-  <div class="stack">
-    <div class="demos">
-<!-- build:demos -->
-    </div>
-    <h3 id="without">Without the premise</h3>
-    <p class="note">Most laws hold only given something: an id names one record, a test answers, a section isn't dropped. Each card asks the model the same question with the premise and without it. Some inputs here are ones the protocol never produces; each card says which.</p>
-    <div class="demos">
-<!-- build:boundaries -->
-    </div>
-  </div>
+<section class="wrap" id="unless-said" aria-label="What every question assumes">
+<!-- build:unless-said -->
 </section>
 
-<section class="wrap block" id="coverage" aria-labelledby="h-coverage">
-  <div class="side">
-    <h2 id="h-coverage">Coverage</h2>
-    <p>What evidence each law has: theorems Lean checked, vectors <code>laws.md</code> cites, vectors that name the law themselves, whether those two agree, whether the JS writer runs any of them, a demo, and how many laws it rests on and carries.</p>
-    <p>A filled cell says the evidence exists, not that it is complete: a law cited by one vector is pinned at one point.</p>
-  </div>
-  <div class="stack">
-<!-- build:coverage -->
-  </div>
-</section>
-
-<section class="wrap block" id="chain" aria-labelledby="h-chain">
-  <div class="side">
-    <h2 id="h-chain">From claim to code</h2>
-    <p>A law is a sentence here, a row in <code>protocol/laws.md</code>, a theorem Lean checks, and vectors every implementation must pass. The build joins all four and fails when one doesn't meet the next.</p>
-    <p>A sentence says no more than its theorems: where a premise or a proof's reach needs saying, it follows the sentence. Open a theorem to read exactly what Lean checked.</p>
-    <p>Laws are grouped by the layer they govern, from the ground up.</p>
-  </div>
-  <div class="stack">
-    <div class="tiles">
-<!-- build:chain -->
-    </div>
-<!-- build:laws -->
-  </div>
-</section>
-
-<section class="wrap block" id="map" aria-labelledby="h-map">
-  <div class="side">
-    <h2 id="h-map">What rests on what</h2>
-    <p>A line from one law down to another says a proof of the first uses a theorem of the second, directly or through lemmas no law names. Lean recorded every one of them; <code>lake exe proofs</code> reads them out of the checked proofs.</p>
-    <p>The stack only rests downward: the build fails if a proof ever leans on a layer above its own. A law's layer is declared, not derived; that check is all the proofs say about it.</p>
-    <p>A proof by computation (<code>decide</code>) evaluates definitions and uses no theorem, so it draws no line.</p>
-    <p class="hint">Point at or tap a law to follow it, or a line to see the theorems that make it. Enter, or a second tap, opens the law's card.</p>
-    <p>The map is laid out when the page is built: the same laws and proofs always draw the same map.</p>
-  </div>
-  <div class="map-wrap">
-    <div class="map" id="lawmap">
-<!-- build:map -->
-    </div>
-    <p class="map-note" id="map-note" aria-live="polite"></p>
-<!-- build:alone -->
-  </div>
-</section>
+<div id="questions">
+<!-- build:questions -->
+</div>
 
 <section class="wrap block" id="stop" aria-labelledby="h-stop">
   <div class="side">
-    <h2 id="h-stop">Where the laws stop</h2>
-    <p>Every law is about a given set of records. None says the set is complete, current, trusted or well dated. These are the edges, from <code>protocol/laws.md</code> as written.</p>
+    <h2 id="h-stop">What the laws don't promise</h2>
+    <p>The laws about folds, views and specs are each about a given set of records. None says the set is complete, current, trusted or well dated. These are the edges, and the model's own simplifications, from <code>protocol/laws.md</code> as written.</p>
   </div>
   <div class="stack">
-    <h3>Limits</h3>
-    <div class="rows">
-<!-- build:limits -->
-    </div>
-    <h3>What these laws don't promise</h3>
     <div class="rows">
 <!-- build:no-promise -->
     </div>
@@ -115,5 +64,5 @@
 </main>
 
 <footer class="wrap foot">
-  <p>Built from <code>design/laws/</code> and <code>protocol/laws.md</code> by <code>node design/build.mjs</code>; the proof graph is <code>design/laws/proofs.json</code>, written by <code>lake exe proofs</code>.</p>
+  <p>Built from <code>design/laws/</code> and <code>protocol/laws.md</code> by <code>node design/build.mjs</code>. The theorems, vectors and proof map behind each law are on <a href="../evidence/">the evidence page</a>.</p>
 </footer>

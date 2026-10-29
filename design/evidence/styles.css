@@ -1,0 +1,101 @@
+/* The evidence page, on design/register.css and design/laws/sentence.css: the law cards, the
+   coverage table and the proof map. */
+
+/* claim to code */
+.tiles{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.tile{flex:1 1 120px;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:12px 14px;display:grid;gap:2px;align-content:start}
+.tile-n{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile-k{font-size:13px;font-weight:500}
+.tile-w{font-size:12px;color:var(--muted)}
+.tile-arrow{align-self:center;color:var(--faint)}
+@media (max-width:560px){.tile-arrow{display:none}}
+.layer-group{display:grid;gap:10px;margin-top:18px}
+.layer-group h3{font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);display:flex;gap:10px;align-items:baseline;margin:0}
+.layer-group h3 span{text-transform:none;letter-spacing:0;font-family:var(--mono);font-size:11px}
+.laws-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+@media (max-width:420px){.laws-grid{grid-template-columns:minmax(0,1fr)}}
+.law{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:14px;display:grid;gap:9px;align-content:start;min-width:0;scroll-margin-top:80px;transition:box-shadow .3s}
+.law.is-limit{box-shadow:var(--lift-1),0 0 0 1px var(--hair),inset 3px 0 0 var(--alert)}
+.law:target,.law.flash{box-shadow:var(--lift-3),0 0 0 1.5px var(--ink)}
+.law-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.law-h h4{margin:0;font-family:var(--mono);font-weight:500;font-size:13.5px;overflow-wrap:anywhere}
+.law-s{font-size:14px;line-height:1.55}
+.law-md{font-size:12.5px;color:var(--muted);line-height:1.5}
+.law-md span{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:4px}
+.law-md code,.chain code{font-size:11px}
+.chain{margin:0;display:grid;grid-template-columns:70px minmax(0,1fr);gap:5px 10px;font-size:12.5px;border-top:1px solid var(--hair);padding-top:9px}
+.chain dt{font-size:11px;color:var(--faint);padding-top:1px}
+.chain dd{margin:0;display:flex;flex-wrap:wrap;gap:4px;align-items:baseline;color:var(--muted);min-width:0}
+.chain dd>code{background:var(--ground);padding:1px 5px;border-radius:4px;color:var(--ink)}
+.chain code.not{color:var(--muted);text-decoration:underline dotted}
+.files{display:flex;flex-wrap:wrap;gap:4px;width:100%}
+.files a,.chain details a{text-decoration:none}
+.files code,.chain details code{background:var(--ground);padding:1px 5px;border-radius:4px;color:var(--muted)}
+.files.also{color:var(--faint);font-size:11.5px}
+.chain details{width:100%}
+.chain summary{cursor:pointer;font-size:12px}
+.chain details[open]{display:flex;flex-wrap:wrap;gap:4px}
+.law-back{display:flex;flex-wrap:wrap;gap:4px 14px}
+.law-back a{font-size:12.5px;font-weight:500;text-decoration:none}
+.law-back a:hover{text-decoration:underline}
+.law-back a::after{content:" \2192";color:var(--faint)}
+
+/* the theorem as Lean states it */
+.chain .thm{width:100%}
+.chain .thm summary{cursor:pointer;list-style:none;display:inline-flex}
+.chain .thm summary::-webkit-details-marker{display:none}
+.chain .thm summary code{background:var(--ground);padding:1px 5px;border-radius:4px;color:var(--ink)}
+.chain .thm[open] summary code{box-shadow:inset 0 0 0 1px var(--hair-2)}
+.chain .thm pre{margin:6px 0 4px;padding:8px 10px;background:var(--ground);border-radius:8px;font-size:11px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
+.chain .thm-m{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px}
+
+/* coverage: as tall as its rows, so the page scrolls it and nothing inside does; wider than a phone, it pans, its law column kept */
+.cov-sum{font-size:13.5px;color:var(--muted)}
+.cov-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
+.cov{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+.cov th,.cov td{padding:5px 10px;text-align:center;border-top:1px solid var(--hair);white-space:nowrap}
+.cov thead th{background:var(--sheet);font-weight:500;font-size:11.5px;color:var(--muted);border-top:0;cursor:help}
+.cov tbody th{text-align:left;font-weight:400;position:sticky;left:0;background:var(--sheet);z-index:1}
+/* the law column stays as the rest scrolls under it, behind an edge that says so */
+.cov thead th:first-child{text-align:left;position:sticky;left:0;z-index:3}
+.cov tbody tr:not(.cov-band) th,.cov thead th:first-child{box-shadow:inset -1px 0 0 var(--hair-2)}
+.cov tbody th a{text-decoration:none}
+.cov tbody th code{font-size:11.5px}
+.cov .sh{color:var(--muted);text-align:left}
+.cov .cov-band th{text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground);position:static}
+/* a layer's name stays in sight as its row scrolls */
+.cov .cov-band th span{position:sticky;left:10px}
+.cov tbody tr:not(.cov-band):hover td,.cov tbody tr:not(.cov-band):hover th{background:color-mix(in srgb,var(--ground) 50%,var(--sheet))}
+.cov .z{color:var(--faint)}
+.cov .ok{color:var(--ink)}
+.cov .c{font-family:var(--mono);color:var(--muted);cursor:help}
+.cov .off{font-family:var(--mono);color:var(--alert);cursor:help}
+
+/* the map */
+.map-wrap{display:grid;gap:10px;min-width:0}
+.map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;position:relative}
+/* The map shrinks to 85% of its natural width and no further; on a phone it keeps its natural
+   width, so a label stays at 11px, and pans. */
+.map-pan{--pan-r:14px}
+.map svg{display:block;height:auto;min-width:calc(var(--w) * .85);max-width:var(--w)}
+@media (max-width:560px){.map svg{min-width:var(--w)}}
+.map .band{fill:var(--ground);opacity:.55}
+.map .band.alt{opacity:0}
+.map .band-l{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;fill:var(--faint)}
+.map .edge .line{fill:none;stroke:var(--hair-2);stroke-width:1.2;transition:stroke .2s,opacity .2s}
+.map .edge .hit{fill:none;stroke:transparent;stroke-width:10;cursor:pointer}
+.map .node rect{fill:var(--sheet);stroke:var(--hair-2);stroke-width:1;transition:stroke .2s,opacity .2s}
+.map .node text{font-family:var(--mono);font-size:11px;fill:var(--ink)}
+.map .node{cursor:pointer;outline:none}
+.map .node:focus-visible rect{stroke:var(--ink);stroke-width:2}
+.map .node.limit rect{stroke:var(--alert)}
+.map.focus .node,.map.focus .edge{opacity:.18}
+.map.focus .node.on,.map.focus .edge.on{opacity:1}
+.map .node.me rect{stroke:var(--ink);stroke-width:1.8}
+.map .edge.on .line{stroke:var(--ink)}
+.map .edge.up .line{stroke:var(--muted);stroke-dasharray:3 3}
+.map .edge.me .line{stroke-width:2.2}
+.map-note .via{font-family:var(--mono);font-size:12px;color:var(--ink)}
+.map-note{font-size:13.5px;color:var(--muted);min-height:3em}
+.map-note b{color:var(--ink);font-family:var(--mono);font-weight:500;font-size:12.5px}
+

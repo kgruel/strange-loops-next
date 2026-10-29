@@ -130,7 +130,8 @@ export function layoutMap({ layers, nodes, edges }) {
     return `<a class="node${n.shape === "limit" ? " limit" : ""}" href="#${k}" data-id="${k}" transform="translate(${px(LEFT + x.get(k))} ${px(y.get(k))})">` +
       `<title>${esc(n.label)}</title><rect width="${n.w}" height="${H}" rx="7"/><text x="10" y="17">${esc(n.label)}</text></a>`;
   });
-  return `<svg viewBox="0 0 ${px(total)} ${px(height)}" width="100%" style="min-width:${Math.round(total * 0.85)}px;max-width:${Math.round(total)}px" ` +
+  // Its natural width goes to the page's styles (--w), which say how far it may shrink.
+  return `<svg viewBox="0 0 ${px(total)} ${px(height)}" width="100%" style="--w:${Math.round(total)}px" ` +
     `role="group" aria-label="Which laws each law's proof rests on">\n` +
     `<g class="bands">${bandRects.join("")}</g>\n<g class="edges">\n${paths.join("\n")}\n</g>\n<g class="nodes">\n${nodeEls.join("\n")}\n</g>\n</svg>\n`;
 }

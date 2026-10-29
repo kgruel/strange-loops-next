@@ -14,9 +14,6 @@
 .caption{font-size:13px;color:var(--muted)}
 
 /* verbs */
-.stack{display:grid;gap:12px;align-content:start}
-.stack h3{margin-top:14px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
-.stack h3:first-child{margin-top:0}
 #provenance .row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
 @media (max-width:560px){#provenance .row{grid-template-columns:1fr}}
 
@@ -37,16 +34,19 @@
 .plate{position:absolute;inset:0;border-radius:14px;background:var(--sheet);box-shadow:0 0 0 1px var(--hair-2);transform:translateZ(calc(var(--z) * var(--gap) + var(--lift)));cursor:pointer}
 .plate[data-layer="5"]{background:var(--sunk);box-shadow:0 0 0 1px var(--hair)}
 .plate.is-settled{background:color-mix(in srgb,var(--sheet) 55%,transparent);border:1px dashed var(--hair-2);box-shadow:none}
-.plate span{display:none}
-.plate-label{position:absolute;transform:translate(-100%,-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
-.plate-label.hot{color:var(--ink);font-weight:500}
+/* A layer's name is in the markup, stood upright at the plate's left corner: it turns the plate's tilt back, so it lifts with the plate and needs no script to place. */
+.plate{transform-style:preserve-3d}
+.plate span{position:absolute;left:0;top:0;transform-origin:0 0;transform:rotateZ(40deg) rotateX(-58deg) translate(calc(-100% - 10px),-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
+.plate.hot span{color:var(--ink);font-weight:500}
+.stack3d .plate span{transition:color .18s,opacity .3s}.stack3d.is-settling .plate span{opacity:0}
 .plate.hot{box-shadow:0 0 0 1.5px var(--ink)}
 .plate::after{content:"";position:absolute;inset:14px 18px auto;height:6px;border-radius:3px;background:var(--hair);box-shadow:0 12px 0 var(--hair),0 24px 0 var(--hair)}
 .plate[data-layer="5"]::after{display:none}
 .stack3d .loop{position:absolute;right:2%;top:8%;height:76%;width:44px;color:var(--faint);overflow:visible}
 .stack3d .loop path{fill:none;stroke:currentColor;stroke-width:1.2;vector-effect:non-scaling-stroke}
-.loop-t{position:absolute;right:calc(2% + 50px);top:50%;transform:translateY(-50%);font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
-@media (max-width:560px){.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
+/* Above the plates, at every width: beside them it sits on their right corners whenever the figure is narrow (1240-1400) or the stack is centred (560-1240). */
+.loop-t{position:absolute;right:calc(2% + 50px);top:-38px;font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
+@media (max-width:560px){.env{white-space:pre-wrap;overflow-wrap:anywhere}.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
 
 .layer-table{width:100%;border-collapse:collapse;font-size:13.5px}
 .layer-table th,.layer-table td{text-align:left;vertical-align:top;padding:9px 10px 9px 0;border-top:1px solid var(--hair)}
@@ -57,7 +57,7 @@
 .layer-table tr{transition:background .18s}
 .layer-table tbody tr{cursor:pointer}
 .layer-table tbody tr.hot th,.layer-table tbody tr.hot td{color:var(--ink)}
-@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}}
+@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}.layer-table td::before{content:attr(data-label);display:block;font-size:11px;color:var(--faint)}}
 
 /* the walk */
 .steps{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:1px;counter-reset:s}
@@ -82,18 +82,8 @@
 .edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .edges path{fill:none;stroke:var(--hair-2);stroke-width:1.5}
 .edges path.erase{stroke:var(--alert);stroke-dasharray:4 4;stroke-width:1.3}
-.rec{position:relative;z-index:1;justify-self:center;width:min(100%,116px);background:var(--sheet);border-radius:10px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:8px 9px;display:grid;gap:3px;font-size:12px;min-width:0;transition:box-shadow .3s,background .3s,opacity .3s}
-.rec .rid{display:flex;justify-content:space-between;gap:4px;font-family:var(--mono);font-size:11.5px;font-weight:500}
-.rec .rid span{color:var(--faint);font-weight:400}
-.rec .who{color:var(--muted);font-size:11px}
-.rec .val{font-size:12px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.rec .tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--faint)}
-.rec.super{box-shadow:var(--lift-1),0 0 0 1px var(--hair);opacity:.72}
-.rec.head{box-shadow:var(--lift-3),0 0 0 1.5px var(--ink)}
-.rec.fork{box-shadow:var(--lift-3),0 0 0 1.5px var(--alert)}
-.rec.fork .tag{color:var(--alert)}
-.rec .val.erased,.rec .val.withheld{font-family:var(--mono);font-size:11px;color:var(--faint);font-style:normal}
-.rec .val.erased{color:var(--alert)}
+/* the record chip itself is in design/register.css; here it sits on the walk's grid */
+.dag .rec{position:relative;z-index:1;justify-self:center;width:min(100%,116px)}
 @media (max-width:640px){.dag{gap:10px 8px}.rec{padding:6px}.rec .who,.rec .val{display:none}.rec .rid span{display:none}}
 
 .panes{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
@@ -115,7 +105,7 @@
 
 /* matrix */
 .matrix-wrap{display:grid;gap:10px;min-width:0}
-.matrix-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
+.matrix-scroll{position:relative;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto}
 .matrix{border-collapse:separate;border-spacing:0;width:100%}
 .matrix th,.matrix td{padding:0;text-align:center;border-top:1px solid var(--hair);height:34px;min-width:34px}
 .matrix thead th{border-top:0;height:96px;vertical-align:bottom;padding-bottom:8px;font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted)}
@@ -132,14 +122,13 @@
 .matrix-note b{color:var(--ink);font-family:var(--mono);font-weight:500}
 
 
-/* Narrow screens: the steps become a row above the stage, and the step's words follow it,
-   so a tap and its result are on screen together. */
+/* Narrow screens: the steps wrap into rows above the stage, every one in sight, and the step's
+   words follow the stage, so a tap and its result are on screen together. */
 @media (max-width:899px){
   #walk .side{display:contents}
   #walk .side>h2{order:0}
   #walk .side>p{order:1}
-  #walk .steps{order:2;display:flex;overflow-x:auto;scrollbar-width:none;gap:4px 14px;margin:0;padding-bottom:2px}
-  #walk .steps::-webkit-scrollbar{display:none}
+  #walk .steps{order:2;display:flex;flex-wrap:wrap;gap:2px 16px;margin:0}
   #walk .steps button{white-space:nowrap}
   #walk .stage{order:3;min-height:0}
   #walk .step-text{order:4;min-height:0;margin-top:-8px}

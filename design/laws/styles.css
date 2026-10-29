@@ -1,10 +1,5 @@
-/* The laws page, on the register in design/register.css. What may vary is underlined, dashed;
-   what stays rests on its own small sheet. Shapes are told apart by tone, not colour: the one
-   colour stays for limits, where an answer moves. */
-
-.var{text-decoration:underline dashed var(--muted);text-decoration-thickness:1px;text-underline-offset:4px}
-.inv{background:var(--sheet);box-shadow:0 0 0 1px var(--hair-2),var(--lift-1);border-radius:6px;padding:1px 6px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.muted{color:var(--muted)}
+/* The laws page, on design/register.css and design/laws/sentence.css. Shapes are told apart
+   by tone and by mark, not by colour: the one colour stays for limits, where an answer moves. */
 
 /* the sentence */
 .rotor-sheet{display:grid;gap:14px;min-height:180px;align-content:center}
@@ -13,61 +8,109 @@
 .big-s .slot{display:inline}
 .big-s .inv{padding:2px 10px;border-radius:8px}
 .rotor-law{font-size:13px;color:var(--muted)}
-.lawref{text-decoration:none}
-.lawref code{white-space:nowrap;font-size:11.5px;color:var(--muted);background:var(--ground);padding:2px 6px;border-radius:5px;transition:color .15s}
-.lawref:hover code{color:var(--ink)}
+.rotor-at{align-self:center;min-width:6.5em;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+html:not(.js) .rotor-ctl,html:not(.js) .js-only{display:none}
 
-/* shapes */
-.bar{display:flex;gap:3px;height:12px;border-radius:6px;overflow:hidden}
-.bar span{display:block;min-width:4px}
-.seg-invariance{background:var(--ink)}
-.seg-round-trip{background:color-mix(in srgb,var(--ink) 70%,var(--ground))}
-.seg-refinement{background:color-mix(in srgb,var(--ink) 50%,var(--ground))}
-.seg-order{background:color-mix(in srgb,var(--ink) 34%,var(--ground))}
-.seg-exactness{background:color-mix(in srgb,var(--ink) 20%,var(--ground))}
-.seg-limit{background:var(--alert)}
-.shapes{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
-.shape{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:14px;display:grid;gap:6px;align-content:start;position:relative;overflow:hidden}
-.shape::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
-.shape[data-shape="invariance"]::before{background:var(--ink)}
-.shape[data-shape="round-trip"]::before{background:color-mix(in srgb,var(--ink) 70%,var(--ground))}
-.shape[data-shape="refinement"]::before{background:color-mix(in srgb,var(--ink) 50%,var(--ground))}
-.shape[data-shape="order"]::before{background:color-mix(in srgb,var(--ink) 34%,var(--ground))}
-.shape[data-shape="exactness"]::before{background:color-mix(in srgb,var(--ink) 20%,var(--ground))}
-.shape[data-shape="limit"]::before{background:var(--alert)}
-.shape-h{display:flex;justify-content:space-between;font-size:14px}
-.shape-h span{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.shape-t{font-size:14.5px;line-height:1.45}
-.shape-g{font-size:12.5px;color:var(--muted)}
+/* a shape: its tone, a bar at a law's edge, and its mark, so no shape is told by tone alone */
+[data-shape="invariance"]{--tone:var(--ink)}
+[data-shape="round-trip"]{--tone:color-mix(in srgb,var(--ink) 70%,var(--ground))}
+[data-shape="refinement"]{--tone:color-mix(in srgb,var(--ink) 50%,var(--ground))}
+[data-shape="order"]{--tone:color-mix(in srgb,var(--ink) 34%,var(--ground))}
+[data-shape="exactness"]{--tone:color-mix(in srgb,var(--ink) 20%,var(--ground))}
+[data-shape="limit"]{--tone:var(--alert)}
+.mk{font-family:var(--mono);font-weight:500;color:var(--muted)}
+.is-limit .mk{color:var(--alert)}
+
+/* the overview: the shapes, every law on its layer's row, the questions */
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.sf{display:inline-flex;gap:7px;align-items:baseline;text-decoration:none;background:var(--sheet);border-radius:9px;padding:6px 10px 6px 12px;font-size:13.5px;box-shadow:var(--lift-1),0 0 0 1px var(--hair),inset 3px 0 0 var(--tone,transparent);transition:box-shadow .2s}
+.sf b{font-weight:600}
+.sf .n{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.sf[data-shape="limit"] .mk{color:var(--alert)}
+.sf:hover{box-shadow:var(--lift-2),0 0 0 1px var(--hair-2),inset 3px 0 0 var(--tone,transparent)}
+.sf[aria-pressed="true"],html:not(.js) .sf:target{box-shadow:var(--lift-2),0 0 0 1.5px var(--ink),inset 3px 0 0 var(--tone,transparent)}
+.shape-key{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.shape-key>div{display:grid;gap:6px;align-content:start;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair),inset 3px 0 0 var(--tone);padding:12px 14px 12px 16px;min-width:0}
+.sk-fig{min-height:0}
+.sk-n{font-weight:600;font-size:13.5px;display:flex;gap:6px}
+.sk-t{color:var(--muted);font-size:12.5px;line-height:1.45}
+.ov{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair)}
+.ov-row{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;padding:11px 14px;border-top:1px solid var(--hair)}
+.ov-row:first-child{border-top:0}
+.ov-l{font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);padding-top:4px;display:flex;gap:6px;align-items:baseline}
+.ov-l span{font-family:var(--mono);letter-spacing:0}
+.ov-chips{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.ov-none{font-size:12.5px;color:var(--faint);padding-top:3px}
+.lc{display:inline-flex;gap:5px;align-items:baseline;font-family:var(--mono);font-size:11.5px;line-height:1.1;text-decoration:none;color:var(--ink);background:var(--ground);border-radius:6px;padding:5px 7px 5px 9px;box-shadow:inset 3px 0 0 var(--tone);transition:opacity .2s,background .2s;overflow-wrap:anywhere}
+.lc:hover{background:var(--sunk)}
+.lc.off{opacity:.2}
+/* Without scripts, a shape reached by its own link picks out its laws. */
+html:not(.js) #overview:has(#shape-invariance:target) .lc:not([data-shape="invariance"]),
+html:not(.js) #overview:has(#shape-round-trip:target) .lc:not([data-shape="round-trip"]),
+html:not(.js) #overview:has(#shape-refinement:target) .lc:not([data-shape="refinement"]),
+html:not(.js) #overview:has(#shape-order:target) .lc:not([data-shape="order"]),
+html:not(.js) #overview:has(#shape-exactness:target) .lc:not([data-shape="exactness"]),
+html:not(.js) #overview:has(#shape-limit:target) .lc:not([data-shape="limit"]){opacity:.2}
+.q-index{margin:0;padding:0;list-style:none;counter-reset:q;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair)}
+.q-index li{counter-increment:q;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 14px;border-top:1px solid var(--hair);font-size:14.5px}
+.q-index li:first-child{border-top:0}
+.q-index li::before{content:counter(q);font-family:var(--mono);font-size:12px;color:var(--faint)}
+.q-index a{text-decoration:none}
+.q-index a:hover{text-decoration:underline;text-decoration-color:var(--hair-2)}
+.q-index span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+@media (max-width:560px){.ov-row{grid-template-columns:minmax(0,1fr);gap:6px}}
+
+/* a question and the laws that answer it */
+.q-k{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.q .side h2{font-size:23px;line-height:1.25}
+.q-tally{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:12.5px}
+.q-tally span{white-space:nowrap}
+.q-tally .mk{margin-right:4px}
+.q-laws{margin:0;padding:0;list-style:none;background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair)}
+.q-law{padding:14px 18px 12px;border-top:1px solid var(--hair);display:grid;gap:7px;scroll-margin-top:80px;transition:background .3s,box-shadow .3s}
+.q-law:first-child{border-top:0;border-radius:14px 14px 0 0}
+.q-law:last-child{border-radius:0 0 14px 14px}
+.q-law:only-child{border-radius:14px}
+.q-law:target,.q-law.flash{background:color-mix(in srgb,var(--ground) 55%,var(--sheet));box-shadow:inset 3px 0 0 var(--ink)}
+.q-s{font-size:16px;line-height:1.6;max-width:62ch}
+.q-f{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-size:12px;color:var(--muted)}
+.q-f code{font-size:11px;color:var(--faint);overflow-wrap:anywhere}
+.q-shape{display:inline-flex;gap:5px}
+.q-law.is-limit .q-shape{color:var(--alert)}
+.q-go{display:inline-flex;flex-wrap:wrap;gap:4px 12px;margin-left:auto}
+.q-go a{font-weight:500;color:var(--ink);text-decoration:none}
+.q-go a:hover{text-decoration:underline}
+.q-go a::after{content:" \2192";color:var(--faint)}
+.q-go a[href^="#"]::after{content:" \2193"}
+@media (max-width:560px){.q-law{padding:12px 14px 10px}.q-s{font-size:15.5px}.q-go{margin-left:0}}
 
 /* try to break it */
 .demos{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));align-items:start}
 @media (max-width:420px){.demos{grid-template-columns:minmax(0,1fr)}}
-.demo{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:16px;display:grid;gap:12px;min-width:0}
-.demo.is-limit{box-shadow:var(--lift-2),0 0 0 1px var(--alert-soft),inset 3px 0 0 var(--alert)}
-.demo-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.demo-h a{text-decoration:none;font-weight:500}
-.demo-h code{font-size:13px}
-.chip{color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair-2)}
+.demo{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);padding:16px;display:grid;gap:12px;min-width:0;transition:box-shadow .3s}
+.demo.is-limit,.demo.is-removed{box-shadow:var(--lift-2),0 0 0 1px var(--alert-soft),inset 3px 0 0 var(--alert)}
+.demo,.premise{scroll-margin-top:80px}
 .demo-s{font-size:14.5px;line-height:1.55}
-.demo-in{background:var(--ground);border-radius:10px;padding:10px 12px;min-height:84px;display:grid;align-content:start;overflow:hidden}
+.demo-fig{padding:2px 0}
+.demo-in{background:var(--ground);border-radius:10px;padding:10px 12px;min-height:84px;display:grid;align-content:start;gap:10px;overflow:hidden}
 .variant{display:grid;gap:6px;min-width:0}
 .variant-l,.out-l{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
-.rcs{display:flex;flex-wrap:wrap;gap:6px}
-.rc{display:inline-grid;gap:1px;background:var(--sheet);border-radius:8px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:5px 8px;font-size:11px;min-width:58px}
-.rc b{font-family:var(--mono);font-weight:500;font-size:11.5px}
-.rc i{font-style:normal;color:var(--muted)}
-.rc em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--faint)}
-.rc.withheld,.rc.erased{background:transparent;box-shadow:none;border:1px dashed var(--hair-2)}
+.rcs{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start}
+.rcs .rec{width:auto;min-width:78px;max-width:132px;padding:6px 9px}
+.rec.withheld,.rec.erased{background:transparent;box-shadow:none;border:1px dashed var(--hair-2)}
+.rec .tag{text-transform:none;letter-spacing:0;font-weight:400;font-family:var(--mono);font-size:10px}
 .jv{margin:0;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
 .jv span{display:inline-block}
 .jv b{font-weight:500}
 .jv.big{font-size:20px;line-height:1.3}
-.demo-ctl{display:flex}
-.poke{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:var(--sheet);border:0;border-radius:9px;padding:7px 12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair-2);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
-.poke:hover{box-shadow:var(--lift-3),0 0 0 1px var(--hair-2)}
-.poke:active{transform:translateY(1px)}
-.poke code{font-size:.9em}
+.rcs .jv{align-self:center}
+.demo-ctl{display:flex;flex-wrap:wrap;gap:8px}
+.poke,.unpremise{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:var(--sheet);border:0;border-radius:9px;padding:7px 12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair-2);cursor:pointer;display:inline-flex;gap:8px;align-items:center;text-align:left}
+.unpremise{color:var(--alert);box-shadow:var(--lift-2),0 0 0 1px var(--alert-soft)}
+.unpremise[aria-pressed="true"]{background:var(--alert-soft)}
+.poke:hover,.unpremise:hover{box-shadow:var(--lift-3),0 0 0 1px var(--hair-2)}
+.poke:active,.unpremise:active{transform:translateY(1px)}
+html:not(.js) .unpremise,html:not(.js) .poke{display:none}
 .demo-out{display:grid;gap:6px}
 .answer{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;font-size:13px;padding:9px 12px;border-radius:10px;box-shadow:inset 0 0 0 1.5px var(--ink)}
 .demo.is-limit .answer{box-shadow:inset 0 0 0 1.5px var(--alert)}
@@ -77,102 +120,28 @@
 .demo-n{font-size:12.5px;color:var(--muted)}
 .demo-src{font-size:11.5px;color:var(--faint)}
 .demo-src a{text-decoration:none}
+.demo-src code{font-size:11px}
 
-/* claim to code */
-.tiles{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
-.tile{flex:1 1 120px;background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:12px 14px;display:grid;gap:2px;align-content:start}
-.tile-n{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.tile-k{font-size:13px;font-weight:500}
-.tile-w{font-size:12px;color:var(--muted)}
-.tile-arrow{align-self:center;color:var(--faint)}
-@media (max-width:560px){.tile-arrow{display:none}}
-.layer-group{display:grid;gap:10px;margin-top:18px}
-.layer-group h3{font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);display:flex;gap:10px;align-items:baseline;margin:0}
-.layer-group h3 span{text-transform:none;letter-spacing:0;font-family:var(--mono);font-size:11px}
-.laws-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-@media (max-width:420px){.laws-grid{grid-template-columns:minmax(0,1fr)}}
-.law{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-1),0 0 0 1px var(--hair);padding:14px;display:grid;gap:9px;align-content:start;min-width:0;scroll-margin-top:80px;transition:box-shadow .3s}
-.law.is-limit{box-shadow:var(--lift-1),0 0 0 1px var(--hair),inset 3px 0 0 var(--alert)}
-.law:target,.law.flash{box-shadow:var(--lift-3),0 0 0 1.5px var(--ink)}
-.law-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.law-h h4{margin:0;font-family:var(--mono);font-weight:500;font-size:13.5px;overflow-wrap:anywhere}
-.law-s{font-size:14px;line-height:1.55}
-.law-md{font-size:12.5px;color:var(--muted);line-height:1.5}
-.law-md span{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:4px}
-.law-md code,.chain code{font-size:11px}
-.chain{margin:0;display:grid;grid-template-columns:70px minmax(0,1fr);gap:5px 10px;font-size:12.5px;border-top:1px solid var(--hair);padding-top:9px}
-.chain dt{font-size:11px;color:var(--faint);padding-top:1px}
-.chain dd{margin:0;display:flex;flex-wrap:wrap;gap:4px;align-items:baseline;color:var(--muted);min-width:0}
-.chain dd>code{background:var(--ground);padding:1px 5px;border-radius:4px;color:var(--ink)}
-.chain code.not{color:var(--muted);text-decoration:underline dotted}
-.files{display:flex;flex-wrap:wrap;gap:4px;width:100%}
-.files a,.chain details a{text-decoration:none}
-.files code,.chain details code{background:var(--ground);padding:1px 5px;border-radius:4px;color:var(--muted)}
-.files.also{color:var(--faint);font-size:11.5px}
-.chain details{width:100%}
-.chain summary{cursor:pointer;font-size:12px}
-.chain details[open]{display:flex;flex-wrap:wrap;gap:4px}
-.law-try a{font-size:12.5px;font-weight:500;text-decoration:none}
-.law-try a::after{content:" \2191"}
+/* the trail: what the card has shown, one answer for each variant, so the card can say what was checked */
+.trail{margin:0;padding:10px 0 0;list-style:none;border-top:1px solid var(--hair);display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+.trail li{min-width:0}
+.trail .t-k{font-weight:500;color:var(--ink)}
+.trail .t-v{font-family:var(--mono);font-size:12px;color:var(--ink);overflow-wrap:anywhere}
+.trail .t-v code{font-size:1em}
+.trail .gone{flex-basis:100%;color:var(--alert);padding-left:9px;box-shadow:inset 2px 0 0 var(--alert)}
+.trail .gone .t-k,.trail .gone .t-v{color:var(--alert)}
+.trail .gone .t-n,.trail .gone .t-in{display:block;font-size:12px;color:var(--muted)}
+.trail .gone .t-in{font-weight:500;color:var(--alert)}
+.trail-done{font-size:12.5px;color:var(--ink);font-weight:500}
+.premise{font-size:13px;line-height:1.45;color:var(--muted)}
+.premise span{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:6px}
+.demo .given{font-size:13px;line-height:1.45}
+.demo.is-compact .demo-in{min-height:0}
 
-/* the map */
-.map-wrap{display:grid;gap:10px;min-width:0}
-.map{background:var(--sheet);border-radius:14px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;position:relative}
-.map svg{display:block;height:auto}
-.map .band{fill:var(--ground);opacity:.55}
-.map .band.alt{opacity:0}
-.map .band-l{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;fill:var(--faint)}
-.map .edge .line{fill:none;stroke:var(--hair-2);stroke-width:1.2;transition:stroke .2s,opacity .2s}
-.map .edge .hit{fill:none;stroke:transparent;stroke-width:10;cursor:pointer}
-.map .node rect{fill:var(--sheet);stroke:var(--hair-2);stroke-width:1;transition:stroke .2s,opacity .2s}
-.map .node text{font-family:var(--mono);font-size:11px;fill:var(--ink)}
-.map .node{cursor:pointer;outline:none}
-.map .node:focus-visible rect{stroke:var(--ink);stroke-width:2}
-.map .node.limit rect{stroke:var(--alert)}
-.map.focus .node,.map.focus .edge{opacity:.18}
-.map.focus .node.on,.map.focus .edge.on{opacity:1}
-.map .node.me rect{stroke:var(--ink);stroke-width:1.8}
-.map .edge.on .line{stroke:var(--ink)}
-.map .edge.up .line{stroke:var(--muted);stroke-dasharray:3 3}
-.map .edge.me .line{stroke-width:2.2}
-.map-note .via{font-family:var(--mono);font-size:12px;color:var(--ink)}
-.map-note{font-size:13.5px;color:var(--muted);min-height:3em}
-.map-note b{color:var(--ink);font-family:var(--mono);font-weight:500;font-size:12.5px}
-
-/* a sentence's premises and reach, and the theorem as Lean states it */
-.law-scope{font-size:12.5px;color:var(--muted);border-left:2px solid var(--hair-2);padding-left:8px;line-height:1.5}
-.law-scope code{font-size:11px}
-.chain .thm{width:100%}
-.chain .thm summary{cursor:pointer;list-style:none;display:inline-flex}
-.chain .thm summary::-webkit-details-marker{display:none}
-.chain .thm summary code{background:var(--ground);padding:1px 5px;border-radius:4px;color:var(--ink)}
-.chain .thm[open] summary code{box-shadow:inset 0 0 0 1px var(--hair-2)}
-.chain .thm pre{margin:6px 0 4px;padding:8px 10px;background:var(--ground);border-radius:8px;font-size:11px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
-.chain .thm-m{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px}
 .rotor-ctl{display:flex;gap:6px}
 .rotor-ctl button{font:inherit;font-size:12.5px;color:var(--ink);background:var(--ground);border:0;border-radius:8px;padding:5px 10px;box-shadow:inset 0 0 0 1px var(--hair-2);cursor:pointer}
 .rotor-ctl button:hover{background:var(--sheet)}
 
-/* coverage */
-.cov-sum{font-size:13.5px;color:var(--muted)}
-.cov-scroll{background:var(--sheet);border-radius:12px;box-shadow:var(--lift-2),0 0 0 1px var(--hair);overflow-x:auto;max-height:640px;overflow-y:auto}
-.cov{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
-.cov th,.cov td{padding:5px 10px;text-align:center;border-top:1px solid var(--hair);white-space:nowrap}
-.cov thead th{position:sticky;top:0;background:var(--sheet);z-index:2;font-weight:500;font-size:11.5px;color:var(--muted);border-top:0;cursor:help}
-.cov tbody th{text-align:left;font-weight:400;position:sticky;left:0;background:var(--sheet);z-index:1}
-.cov tbody th a{text-decoration:none}
-.cov tbody th code{font-size:11.5px}
-.cov .sh{color:var(--muted);text-align:left}
-.cov .cov-band th{text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--ground);position:static}
-.cov tbody tr:not(.cov-band):hover td,.cov tbody tr:not(.cov-band):hover th{background:color-mix(in srgb,var(--ground) 50%,var(--sheet))}
-.cov .z{color:var(--faint)}
-.cov .ok{color:var(--ink)}
-.cov .c{font-family:var(--mono);color:var(--muted);cursor:help}
-.cov .off{font-family:var(--mono);color:var(--alert);cursor:help}
-
-/* without the premise */
-.premise{font-size:13px;line-height:1.45}
-.premise span{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-right:6px}
-.demo .given{font-size:13px;line-height:1.45}
-.answer .said{font-family:var(--mono);font-size:12px;line-height:1.5}
-.answer.moved{box-shadow:inset 0 0 0 1.5px var(--alert)}
+/* what every question assumes */
+#unless-said{padding-block:6px 0}
+#unless-said .note{margin:0;font-size:14.5px;max-width:68ch}

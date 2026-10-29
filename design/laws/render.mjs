@@ -1,139 +1,113 @@
-// The laws page, from design/laws/: each law as a sentence and a shape (laws.json, ours to
-// write), joined to what the protocol says of it (protocol/laws.md), what proves it (the
-// proof graph `lake exe proofs` writes, proofs.json) and what pins it (the vectors).
-// Every join is checked: a law, theorem, vector or edge the page can't place fails the build.
+// The laws page, from design/laws/: each law as a sentence, under the question a reader
+// would ask that it answers (laws.json), with the demos that let a reader try one. What
+// proves and pins each law is on the evidence page (design/evidence/); both pages are built
+// on join.mjs, which checks every join.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { documentOf, fill, header } from "../page.mjs";
-import { inline, lawEdges, lawTable, proofs, resolveTheorem, resolveVectors, slug, vectorFiles } from "../protocol.mjs";
-import { layoutMap } from "./layout.mjs";
+import { inline, slug } from "../protocol.mjs";
+import { REPO, anchor, esc, joinLaws, sentence, verbOf } from "./join.mjs";
+import { shapeFigure } from "./shapes.mjs";
 
-const REPO = "https://github.com/kgruel/strange-loops-next/blob/main";
-const NUMBER = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
-const count = (n) => NUMBER[n] ?? String(n);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const tail = (id) => `…${id.slice(-4)}`;
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const short = (s, n = 22) => (s.length > n ? `${s.slice(0, n - 8)}…${s.slice(-6)}` : s);
+// A sentence as an attribute: its marks dropped, its quotes escaped.
+const plain = (html) => esc(html.replace(/<[^>]+>/g, "")).replace(/"/g, "&quot;");
 
 export function renderLaws(root) {
   const read = (...p) => readFileSync(join(root, "design", "laws", ...p), "utf8");
-  const data = JSON.parse(read("laws.json"));
-  const { rows, notes } = lawTable(root);
-  const files = vectorFiles(root);
-  const graph = proofs(root);
-  const layers = JSON.parse(readFileSync(join(root, "design", "grammar", "words.json"), "utf8")).layers.map((l) => l.name);
-  const fail = (msg) => { throw new Error(`laws: ${msg}`); };
-
-  // Every row of laws.md has a sentence here, and nothing here lacks a row.
-  const keys = new Set(rows.map((r) => r.key));
-  for (const r of rows) if (!data.laws[r.key]) fail(`no entry in laws.json for ${r.key}`);
-  for (const k of Object.keys(data.laws)) if (!keys.has(k)) fail(`laws.json has ${k}, which isn't a row of protocol/laws.md`);
-  for (const [k, l] of Object.entries(data.laws)) {
-    for (const f of Object.keys(l)) if (!["shape", "layer", "change", "stays", "says", "scope"].includes(f)) fail(`${k}: unknown key ${f}`);
-    if (!data.shapes[l.shape]) fail(`${k}: unknown shape ${l.shape}`);
-    if (!layers.includes(l.layer)) fail(`${k}: ${l.layer} isn't a layer on the grammar page`);
-    const inv = l.shape === "invariance";
-    if (inv !== Boolean(l.change && l.stays) || inv === Boolean(l.says)) fail(`${k}: an invariance says what changes and what stays; any other shape says its sentence`);
-  }
-
-  // Each theorem laws.md names is one declaration in the proof graph. A name that isn't one
-  // is listed in notTheorems with why; one that becomes resolvable must leave the list.
-  const resolved = new Map();
-  const unresolved = new Set();
-  for (const r of rows) {
-    const ts = [];
-    for (const t of r.theorems) {
-      if (t.includes("/")) continue; // a file, as in "(`Laws/Order.lean`)"
-      const n = resolveTheorem(t, graph);
-      if (n) ts.push(n);
-      else if (data.notTheorems[t]) unresolved.add(t);
-      else fail(`${r.key}: ${t} is no theorem in proofs.json (run lake exe proofs, or list it in notTheorems)`);
-    }
-    resolved.set(r.key, ts);
-  }
-  for (const t of Object.keys(data.notTheorems))
-    if (!unresolved.has(t)) fail(`notTheorems: ${t} is no longer named, or now resolves; take it off the list`);
-
-  // The vectors each law cites, and the ones that name the law themselves.
-  const cited = new Map(rows.map((r) => [r.key, resolveVectors(r.vectors, files)]));
-  const nameOf = new Map(rows.flatMap((r) => r.names.map((n) => [n, r.key])));
-  const naming = new Map(rows.map((r) => [r.key, []]));
-  const usedTags = new Set();
-  for (const [path, v] of files) for (const tag of v.laws ?? []) {
-    if (nameOf.has(tag)) naming.get(nameOf.get(tag)).push(path);
-    else if (data.vectorTags[tag]) usedTags.add(tag);
-    else fail(`vector ${path} names ${tag}, which is no law in protocol/laws.md (or list it in vectorTags)`);
-  }
-  for (const t of Object.keys(data.vectorTags)) {
-    if (nameOf.has(t)) fail(`vectorTags: ${t} is now a law; take it off the list`);
-    if (!usedTags.has(t)) fail(`vectorTags: no vector names ${t}; take it off the list`);
-  }
-
-  // Who runs each vector. A checker claiming every directory ("*") holds itself to it: check.mjs
-  // fails on a vectors/ directory no family reads, and CI runs it.
-  for (const impl of data.implementations) if (impl.checker) {
-    const text = readFileSync(join(root, impl.checker), "utf8");
-    if (impl.dirs === "*" && !text.includes("no checker reads")) fail(`${impl.checker} claims every vector but doesn't refuse an unread directory`);
-    if (impl.dirs !== "*") for (const d of impl.dirs) if (!text.includes(`join(dir, "${d}")`)) fail(`${impl.checker} doesn't read vectors/${d}`);
-  }
-  const runBy = (paths) => data.implementations.filter((i) => paths.some((p) => i.dirs === "*" || i.dirs.includes(p.split("/")[0])));
-
-  // Law to law, from the proofs. The stack only rests downward: a proof of a law uses
-  // theorems of its own layer or the ones below it, never above.
-  const edges = lawEdges(rows, graph, resolved);
-  const depth = (k) => layers.indexOf(data.laws[k].layer);
-  const upward = edges.filter(([a, b]) => depth(b) < depth(a));
-  if (upward.length) fail(`a proof rests on a law above it: ${upward.map(([a, b]) => `${a} → ${b}`).join(", ")}`);
-  const restsOn = new Map(rows.map((r) => [r.key, []])), carries = new Map(rows.map((r) => [r.key, []]));
-  const via = new Map(edges.map(([a, b, v]) => [`${a}\u0000${b}`, v.map((t) => t.replace(/^Loops\./, "")).join(" → ")]));
-  for (const [a, b] of edges) { restsOn.get(a).push(b); carries.get(b).push(a); }
-
-  // Sentences.
-  const sentence = (l) => l.shape === "invariance"
-    ? `Change <span class="var">${l.change}</span>, and <span class="inv">${l.stays}</span> stays.`
-    : l.says;
-  const label = (r) => r.names.join(", ");
-  const anchor = (k) => `law-${slug(k)}`;
+  const { data, rows, notes, files, layers, fail, keyOf, bounds, tried, unpremised, premises, scopeOf } = joinLaws(root);
+  const law = (k) => data.laws[k];
   const lawLink = (k) => `<a class="lawref" href="#${anchor(k)}"><code>${esc(k)}</code></a>`;
+  const mark = (shape) => `<span class="mk" aria-hidden="true">${data.shapes[shape].mark}</span>`;
 
-  // The demos: a vector that names its law, the inputs it varies, and what the model gave.
+  // Records are lettered as the grammar page's walk letters them: the one written first is A,
+  // then B, C, by `emitted` and then by id. Arrival order is what a card varies, so it can't
+  // be what names a record. (The records here are all in UTC, so their text sorts as time.)
+  const lettering = (...vs) => {
+    const byId = new Map(vs.flatMap((v) => v.input.orders.flat()).map((r) => [r.id, r]));
+    const recs = [...byId.values()];
+    if (recs.some((r) => !r.emitted.endsWith("Z"))) fail("a demo's records aren't all in UTC, so their text doesn't sort as time");
+    if (recs.length > 26) fail("a demo with more records than letters");
+    recs.sort((x, y) => (x.emitted < y.emitted ? -1 : x.emitted > y.emitted ? 1 : x.id < y.id ? -1 : 1));
+    const L = new Map(recs.map((r, i) => [r.id, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i]]));
+    return (id) => L.get(id) ?? fail(`no record ${id} in the demo's vector`);
+  };
+  const heads = (label, ids) => ids.map(label).sort().join(" ");
+
+  // The demos: a vector that names its law, the inputs it varies, and what the model gave. Each
+  // variant has what is shown (html), the model's answer to it (said) and the name it goes by in
+  // the trail; `done` is what the card may say once every variant the vector holds has been shown.
+  // `fig` is what the card's figure draws from the same vector (shapes.mjs, `given`): one lane
+  // per variant, in the card's letters, so the figure never shows other records or orders.
   const demos = data.demos.map((d) => demo(d));
   function demo(d) {
     const v = files.get(d.vector) ?? fail(`demo ${d.law}: no vector ${d.vector}`);
-    const row = rows.find((r) => r.names.includes(d.law)) ?? fail(`demo: no law ${d.law}`);
+    const key = keyOf(d.law, "demo");
     if (!(v.laws ?? []).includes(d.law)) fail(`demo ${d.law}: ${d.vector} doesn't name ${d.law}`);
-    const out = { law: d.law, key: row.key, anchor: anchor(row.key), vector: d.vector, change: d.change, stays: d.stays, shape: data.laws[row.key].shape };
-    const rec = (r) => `<span class="rc${r.shown ? ` ${r.shown}` : ""}" data-k="${r.id}"><b>${tail(r.id)}</b>` +
-      `<i>${r.shown ?? r.value}</i>${r.prev.length ? `<em>prev ${r.prev.map(tail).join(" ")}</em>` : ""}</span>`;
-    const order = (o) => `<div class="rcs">${o.map(rec).join("")}</div>`;
+    const out = { law: d.law, key, anchor: anchor(key), vector: d.vector, change: d.change, stays: d.stays, shape: law(key).shape };
+    // A record as the walk draws one: its letter and when it was written, its value, and the
+    // thing it is about and what it follows. The full id is its title and never its name.
+    const rec = (label, r, again) => {
+      const thing = r.about.map((a) => a.replace(/^[a-z]+:/, "")).join(", ");
+      const after = r.prev.length ? ` · after ${heads(label, r.prev)}` : "";
+      return `<div class="rec${r.shown ? ` ${r.shown}` : ""}" data-k="${label(r.id)}" title="${esc(r.id)}">` +
+        `<div class="rid"><b>${label(r.id)}</b><span>${r.emitted.slice(11, 19)}</span></div>` +
+        `<div class="val${r.shown ? ` ${r.shown}` : ""}">${r.shown ?? esc(r.value)}</div>` +
+        `<div class="tag">${again ? "again · " : ""}${esc(thing)}${after}</div></div>`;
+    };
+    const order = (label, o) => {
+      const seen = new Set();
+      return `<div class="rcs">${o.map((r) => { const again = seen.has(r.id); seen.add(r.id); return rec(label, r, again); }).join("")}</div>`;
+    };
     if (d.kind === "orders") {
       const os = v.input.orders;
       if (os.length < 2) fail(`demo ${d.law}: one order is nothing to vary`);
       // The same records, field for field, in each order: what varies is arrival alone.
       const asSet = (o) => [...o].sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
       if (!os.every((o) => same(asSet(o), asSet(os[0])))) fail(`demo ${d.law}: the orders aren't one set of records`);
-      out.variants = os.map((o, i) => ({ label: `order ${i + 1} of ${os.length}`, html: order(o) }));
-      out.answer = answerOf(d.vector, v.expect);
+      const label = lettering(v);
+      const a = answerOf(d.vector, v.expect, label);
+      out.variants = os.map((o, i) => ({ label: `order ${i + 1} of ${os.length}`, key: `order ${i + 1}`, html: order(label, o), said: a.said }));
+      // A record shown without its payload (withheld, erased) is drawn dashed, as the figures draw one not held.
+      out.fig = { change: d.change, lanes: os.map((o) => o.map((r) => ({ k: label(r.id), mod: r.shown ? "withheld" : "" }))) };
+      out.answer = a.html;
+      out.done = d.done ? d.done.replace("{n}", `all ${os.length}`) : `Same ${d.stays} for all ${os.length} orders the vector holds.`;
+      if (d.note) out.note = d.note;
+      // A quoted sentence is in the file it is quoted from, word for word.
+      if (d.quote && !readFileSync(join(root, d.quote.file), "utf8").replace(/\s+/g, " ").includes(d.quote.text)) fail(`demo ${d.law}: ${d.quote.file} no longer says "${d.quote.text}"`);
     } else if (d.kind === "repeats") {
       const a = files.get(d.against) ?? fail(`demo ${d.law}: no vector ${d.against}`);
       const ids = (vv) => [...new Set(vv.input.orders[0].map((r) => r.id))].sort();
       if (!same(ids(v), ids(a))) fail(`demo ${d.law}: ${d.vector} and ${d.against} aren't the same records`);
       if (same(v.expect, a.expect)) fail(`demo ${d.law}: a limit's answer must move`);
+      const label = lettering(v, a);
+      const once = answerOf(d.against, a.expect, label), twice = answerOf(d.vector, v.expect, label);
       out.variants = [
-        { label: `each once (${d.against})`, html: order(a.input.orders[0]), answer: answerOf(d.against, a.expect) },
-        { label: `delivered again (${d.vector})`, html: order(v.input.orders[0]), answer: answerOf(d.vector, v.expect) },
+        { label: `each once`, key: "each once", html: order(label, a.input.orders[0]), answer: once.html, said: once.said },
+        { label: `delivered again`, key: "delivered again", html: order(label, v.input.orders[0]), answer: twice.html, said: twice.said },
       ];
+      out.done = `On this vector the ${d.stays} moves, ${once.said} to ${twice.said}.`;
+      out.fig = { lane: v.input.orders[0].map((r) => label(r.id)), held: once.said, moved: twice.said };
     } else if (d.kind === "envs") {
       if (v.input.envs.length < 2) fail(`demo ${d.law}: one envelope is nothing to vary`);
       // The spellings may differ only in what the canonical form removes: a set's order and repeats.
       const canon = (e) => Object.fromEntries(Object.entries(e).map(([k, x]) =>
         [k, ["about", "prev", "erases"].includes(k) ? [...new Set(x)].sort() : x]).sort(([a], [b]) => (a < b ? -1 : 1)));
       if (!v.input.envs.every((e) => same(canon(e), canon(v.input.envs[0])))) fail(`demo ${d.law}: the envelopes differ in more than a set's spelling`);
-      out.variants = v.input.envs.map((e, i) => ({ label: `spelling ${i + 1} of ${v.input.envs.length}`,
-        html: `<pre class="jv">about: [${e.about.map((x) => `<span data-k="${esc(x)}">${esc(x)}</span>`).join(", ")}]</pre>` }));
-      out.answer = `<code>${short(v.expect.id, 30)}</code>`;
+      const id = `<code title="${esc(v.expect.id)}">${short(v.expect.id, 30)}</code>`;
+      out.variants = v.input.envs.map((e, i) => ({ label: `record A, spelling ${i + 1} of ${v.input.envs.length}`, key: `spelling ${i + 1}`, said: `id ${id}`,
+        html: `<div class="rcs"><div class="rec" data-k="A"><div class="rid"><b>A</b><span>${esc(e.emitted.slice(11, 19))}</span></div>` +
+          `<div class="val">${esc(e.kind)}</div><div class="tag">about</div></div>` +
+          `<pre class="jv">[${e.about.map((x) => `<span data-k="${esc(x)}">${esc(x)}</span>`).join(", ")}]</pre></div>` }));
+      out.answer = `id ${id}`;
+      out.done = `Same id for all ${v.input.envs.length} spellings the vector holds.`;
+      // The figure spells each thing by its scheme (topic, svc, url), which must tell them apart.
+      const scheme = (x) => x.replace(/:.*$/, "");
+      const things = [...new Set(v.input.envs.flatMap((e) => e.about))];
+      if (new Set(things.map(scheme)).size !== things.length) fail(`demo ${d.law}: two things share a scheme, so the figure can't tell them apart`);
+      out.fig = { change: d.change, lanes: v.input.envs.map((e) => [{ k: "A" }, { t: `[${e.about.map(scheme).join(", ")}]`, code: true }]) };
       out.note = `One id for every spelling: the envelope is written in its canonical form, sorted with repeats removed, before it is hashed. The JS writer computes the same id.`;
     } else if (d.kind === "lines") {
       for (const f of ["line", "erased_line"]) if (!v.expect[f].includes(`"id":"${v.expect.id}"`)) fail(`demo ${d.law}: ${f} doesn't carry the id`);
@@ -141,210 +115,217 @@ export function renderLaws(root) {
         const o = JSON.parse(line);
         return `<pre class="jv">${Object.keys(o).map((k) => `<span data-k="${k}">"${k}": ${esc(short(JSON.stringify(o[k]), 34))}</span>`).join("\n")}</pre>`;
       };
-      out.variants = [{ label: "stored, payload held", html: show(v.expect.line) }, { label: "erased: the commitment kept", html: show(v.expect.erased_line) }];
-      out.answer = `<code>${short(v.expect.id, 30)}</code>`;
+      const id = `<code title="${esc(v.expect.id)}">${short(v.expect.id, 30)}</code>`;
+      out.variants = [
+        { label: "record A, stored, payload held", key: "payload held", html: show(v.expect.line), said: `id ${id}` },
+        { label: "record A, erased: the commitment kept", key: "payload erased", html: show(v.expect.erased_line), said: `id ${id}` },
+      ];
+      out.answer = `id ${id}`;
+      out.done = "Same id for both lines the vector holds.";
+      out.fig = { change: d.change, lanes: [[{ k: "A" }, { t: out.variants[0].key }], [{ k: "A", mod: "withheld" }, { t: out.variants[1].key }]] };
       out.note = "Both lines are the vector's own; each carries this id. The id hashes the commitment, never the payload, so forgetting the opening can't move it.";
     } else if (d.kind === "spans") {
       const picked = d.pick.map((i) => [v.input.occurred[i], v.expect.spans[i]]);
       if (!picked.every(([, s]) => same(s, picked[0][1]))) fail(`demo ${d.law}: the picked texts don't read as one span`);
-      out.variants = picked.map(([t], i) => ({ label: `spelling ${i + 1} of ${picked.length}`, html: `<pre class="jv big">${esc(t)}</pre>` }));
-      out.answer = `<code>${picked[0][1].start}</code> → <code>${picked[0][1].end}</code>`;
+      const span = `<code>${picked[0][1].start}</code> → <code>${picked[0][1].end}</code>`;
+      out.variants = picked.map(([t], i) => ({ label: `spelling ${i + 1} of ${picked.length}`, key: `spelling ${i + 1}`, html: `<pre class="jv big">${esc(t)}</pre>`, said: span }));
+      out.answer = span;
+      out.done = `Same span for all ${picked.length} spellings this card picks from the vector.`;
+      out.fig = { change: d.change, lanes: picked.map(([t]) => [{ t, code: true }]) };
     } else if (d.kind === "lens") {
+      const ids = (ss) => ss.map((s) => s.id).join(", ");
       const sections = (ss) => `<pre class="jv">${ss.map((s) => `<span data-k="${esc(s.id)}"><b>${esc(s.id)}</b>  ${esc(s.body.filter(Boolean).join(" / "))}</span>`).join("\n")}</pre>`;
       const target = v.expect.outcomes.length ? v.expect.applied : v.expect.parsed;
       if (!same(target, v.input.base)) fail(`demo ${d.law}: what came back isn't the base`);
+      const absent = v.expect.outcomes.filter((o) => o.absent).map((o) => o.absent);
       out.variants = [
-        { label: "the state", html: sections(v.input.base) },
-        { label: "the text", html: `<pre class="jv">${v.input.text.map(esc).join("\n")}</pre>` },
+        { label: "the state", key: "the state", html: sections(v.input.base), said: `<code>${esc(ids(v.input.base))}</code>` },
+        { label: "the text", key: "the text, parsed", html: `<pre class="jv">${v.input.text.map(esc).join("\n")}</pre>`,
+          said: `<code>${esc(ids(v.expect.parsed))}</code>${absent.length ? ` · absent <code>${absent.join(", ")}</code>` : ""}` },
       ];
       out.answer = sections(target);
-      const absent = v.expect.outcomes.filter((o) => o.absent).map((o) => o.absent);
-      out.note = absent.length
-        ? `Parsing reports <code>${absent.join(", ")}</code> as absent, and applying changes nothing: the section is still there.`
+      // A round trip draws the form's sections; an invariance, the sections each variant holds.
+      out.fig = { change: d.change, forms: v.input.base.length,
+        lanes: [v.input.base, v.expect.parsed].map((ss) => [{ t: ss.map((s) => s.id).join(", "), code: true }]) };
+      out.done = absent.length
+        ? `Parsing reports ${absent.map((a) => `<code>${a}</code>`).join(", ")} as absent; applying that leaves the section in the state as it was.`
         : "Parsing the render gives the sections back, exactly.";
     } else fail(`demo ${d.law}: unknown kind ${d.kind}`);
     return out;
   }
-  function answerOf(path, e) {
-    if (path.startsWith("fold/count/")) return `<span class="num">${e}</span>`;
-    if (path.startsWith("fold/latest-by/")) return Object.entries(e).map(([thing, s]) =>
-      `<span class="thing"><code>${thing}</code> heads ${s.heads.map(tail).join(" ")} · winner <b>${tail(s.winner)}</b></span>`).join("");
-    if (path.startsWith("fold/view/")) return `<span class="thing">heads ${e.heads.map((h) => `<b>${tail(h.id)}</b>${h.shown ? ` (${h.shown})` : ""}`).join(" ")}</span>` +
-      `<span class="thing">max ${e.max.value ?? "none"} · unread ${e.max.unread}</span>`;
+  // The model's answer in the records' letters: as a box (html) and as a line for the trail (said).
+  function answerOf(path, e, label) {
+    if (path.startsWith("fold/count/")) return { html: `<span class="num">${e}</span>`, said: String(e) };
+    if (path.startsWith("fold/latest-by/")) return {
+      html: Object.entries(e).map(([thing, s]) => `<span class="thing"><code>${thing}</code> heads ${heads(label, s.heads)} · winner <b>${label(s.winner)}</b></span>`).join(""),
+      said: Object.entries(e).map(([thing, s]) => `heads ${heads(label, s.heads)}, winner ${label(s.winner)}`).join("; "),
+    };
+    if (path.startsWith("fold/view/")) {
+      const hs = e.heads.map((h) => `${label(h.id)}${h.shown ? ` (${h.shown})` : ""}`).sort().join(" ");
+      return { html: `<span class="thing">heads <b>${hs}</b></span><span class="thing">max ${e.max.value ?? "none"} · unread ${e.max.unread}</span>`,
+        said: `heads ${hs}, max ${e.max.value ?? "none"}, unread ${e.max.unread}` };
+    }
     fail(`no answer for ${path}`);
   }
 
-  // The page.
-  const invariances = rows.filter((r) => data.laws[r.key].shape === "invariance");
-  const shapeCount = (s) => rows.filter((r) => data.laws[r.key].shape === s).length;
-  const first = data.laws[invariances[0].key];
-  const opening = `    <p class="big-s" id="rotor"><span class="w">Change</span> <span class="slot var" id="rotor-change">${first.change}</span>, ` +
-    `<span class="w">and</span> <span class="slot inv" id="rotor-stays">${first.stays}</span> <span class="w">stays.</span></p>\n` +
-    `    <p class="rotor-law" id="rotor-law">${lawLink(invariances[0].key)}</p>\n` +
-    `    <p class="rotor-ctl"><button type="button" id="rotor-next">Next law</button>` +
-    `<button type="button" id="rotor-pause" aria-pressed="false">Pause</button></p>\n`;
-  const lede = `  <p class="lede">${rows.length} laws, each a theorem Lean checks on every build, or a rule held by construction. ` +
-    `Most say one thing: change this, and that stays. The rest take one of ${count(Object.keys(data.shapes).length - 1)} other shapes. ` +
-    `Every sentence here is joined to the theorem that proves it, the vectors that pin it, and the laws its proof rests on.</p>\n`;
+  // Without the premise: each case asks the model the same question with the premise and without
+  // it. A case whose law has a demo goes on that demo's card; any other has a card of its own.
+  const attached = new Map(), alone = [];
+  bounds.forEach((c) => {
+    const key = keyOf(c.law, "boundaries");
+    const at = demos.findIndex((d) => d.key === key);
+    if (at >= 0) attached.set(at, c); else alone.push(c);
+  });
+  const premise = (c, id) => {
+    const label = c.input[0].toUpperCase() + c.input.slice(1);
+    return { c, label,
+      note: `<p class="premise"${id ? ` id="without-${slug(c.law)}"` : ""} data-boundary="${esc(c.law)}"><span>premise</span> ${esc(c.premise)}</p>\n`,
+      ctl: `<button type="button" class="unpremise" aria-pressed="false">Remove the premise</button>`,
+      gone: `<li class="gone"><span class="t-k">premise removed</span>: <span class="t-v">${esc(c.removed.answer)}</span>` +
+        ` <span class="t-n">Asked of: ${esc(c.removed.given)}. With the premise: ${esc(c.holds.answer)}.</span>` +
+        ` <span class="t-in">${esc(label)}</span></li>` };
+  };
 
-  const shapes = Object.entries(data.shapes).map(([id, s]) =>
-    `    <div class="shape" data-shape="${id}"><p class="shape-h"><b>${s.name}</b><span>${shapeCount(id)}</span></p>` +
-    `<p class="shape-t">${s.template}</p><p class="shape-g">${s.gist}</p></div>\n`).join("");
-  const bar = `    <div class="bar" role="img" aria-label="${Object.entries(data.shapes).map(([id, s]) => `${s.name} ${shapeCount(id)}`).join(", ")}">` +
-    Object.keys(data.shapes).map((id) => `<span class="seg-${id}" style="flex:${shapeCount(id)}" title="${data.shapes[id].name}: ${shapeCount(id)}"></span>`).join("") + "</div>\n";
+  const figure = (key, given) => `      <div class="demo-fig">${shapeFigure(law(key).shape, { ...law(key), key }, given)}</div>\n`;
+  // A card's figure is drawn from its vector: one lane per variant, read off the figure as built.
+  const cardFigure = (d) => {
+    const f = figure(d.key, d.fig);
+    const lanes = [...new Set([...f.matchAll(/ data-lane="(\d+)"/g)].map((m) => Number(m[1])))].sort((a, b) => a - b);
+    if (lanes.length !== d.variants.length || lanes.some((l, i) => l !== i))
+      fail(`demo ${d.law}: its figure draws ${lanes.length} lane${lanes.length === 1 ? "" : "s"} for the card's ${d.variants.length} variants`);
+    return f;
+  };
+  const trailOf = (items, done) =>
+    `      <ol class="trail" aria-label="What this card has shown" aria-live="polite">${items.join("")}</ol>\n` +
+    (done ? `      <p class="trail-done">${done}</p>\n` : "");
 
-  const theoremCount = new Set([...resolved.values()].flat()).size;
-  const vectorCount = new Set([...cited.values()].flat()).size;
-  const chain = [
-    [rows.length, "laws", "rows of <code>protocol/laws.md</code>, each a sentence here"],
-    [theoremCount, "theorems", "the declarations they name, found in the proofs Lean checked"],
-    [vectorCount, "vectors", "the files they cite, every one found on disk"],
-    [data.implementations.length, "implementations", data.implementations.map((i) => i.name).join(" and ")],
-  ].map(([n, k, what]) => `    <div class="tile"><p class="tile-n">${n}</p><p class="tile-k">${k}</p><p class="tile-w">${what}</p></div>\n`).join('    <div class="tile-arrow" aria-hidden="true">→</div>\n');
+  const demoCard = (d, i) => {
+    const p = attached.has(i) ? premise(attached.get(i), true) : null;
+    return `    <article class="demo${d.shape === "limit" ? " is-limit" : ""}" id="try-${slug(d.law)}" data-demo="${i}">\n` +
+      `      <p class="demo-s">${sentence(law(d.key))}</p>\n` +
+      (scopeOf(d.key) ? `      <p class="law-scope">${scopeOf(d.key)}</p>\n` : "") +
+      cardFigure(d) +
+      `      <div class="demo-in">${d.variants.map((x, j) => `<div class="variant" data-v="${j}"><p class="variant-l">${x.label}</p>${x.html}</div>`).join("")}</div>\n` +
+      `      <div class="demo-ctl"><button type="button" class="poke">${d.change} <span aria-hidden="true">↻</span></button>${p ? p.ctl : ""}</div>\n` +
+      (p ? "      " + p.note : "") +
+      `      <div class="demo-out"><p class="out-l">${d.shape === "limit" ? `the ${d.stays} moves` : `the ${d.stays}`}</p>` +
+      (d.answer ? `<div class="answer">${d.answer}</div>` : d.variants.map((x, j) => `<div class="answer" data-v="${j}">${x.answer}</div>`).join("")) +
+      `</div>\n` +
+      trailOf([...d.variants.map((x, j) => `<li data-v="${j}"><span class="t-k">${x.key}</span>: <span class="t-v">${x.said}</span></li>`), ...(p ? [p.gone] : [])], d.done) +
+      (d.note ? `      <p class="demo-n">${d.note}</p>\n` : "") +
+      `      <p class="demo-src"><a href="#${d.anchor}"><code>${d.law}</code></a>, from <a href="${REPO}/vectors/${d.vector}.json"><code>vectors/${d.vector}.json</code></a> as the model wrote it</p>\n` +
+      `    </article>\n`;
+  };
 
-  const demoCards = demos.map((d, i) =>
-    `    <article class="demo${d.shape === "limit" ? " is-limit" : ""}" id="try-${slug(d.law)}" data-demo="${i}">\n` +
-    `      <div class="demo-h"><a href="#${d.anchor}"><code>${d.law}</code></a><span class="chip">${data.shapes[d.shape].name}</span></div>\n` +
-    `      <p class="demo-s">${sentence(data.laws[d.key])}</p>\n` +
-    (data.laws[d.key].scope ? `      <p class="law-scope">${data.laws[d.key].scope}</p>\n` : "") +
-    `      <div class="demo-in">${d.variants.map((x, j) => `<div class="variant" data-v="${j}"${j ? " hidden" : ""}><p class="variant-l">${x.label}</p>${x.html}</div>`).join("")}</div>\n` +
-    `      <div class="demo-ctl"><button type="button" class="poke">${d.change} <span aria-hidden="true">↻</span></button></div>\n` +
-    `      <div class="demo-out"><p class="out-l">${d.shape === "limit" ? `the ${d.stays} moves` : `the ${d.stays}`}</p>` +
-    (d.answer ? `<div class="answer">${d.answer}</div>` : d.variants.map((x, j) => `<div class="answer" data-v="${j}"${j ? " hidden" : ""}>${x.answer}</div>`).join("")) +
-    `</div>\n` +
-    (d.note ? `      <p class="demo-n">${d.note}</p>\n` : "") +
-    `      <p class="demo-src">from <a href="${REPO}/vectors/${d.vector}.json"><code>vectors/${d.vector}.json</code></a>, as the model wrote it</p>\n` +
-    `    </article>\n`).join("");
-
-  // Without the premise: the model's answer with a law's premise and without it, written by
-  // lake exe boundaries, which checks the first keeps the law and the second differs.
-  const bounds = JSON.parse(read("boundaries.json")).cases;
-  const boundCards = bounds.map((c, i) => {
-    const row = rows.find((r) => r.names.includes(c.law)) ?? fail(`boundaries: no law ${c.law}`);
-    const l = data.laws[row.key];
-    const side = (x) => ({ html: `<p class="given">${esc(x.given)}</p>`, answer: `<span class="said">${esc(x.answer)}</span>` });
-    const vs = [side(c.holds), side(c.removed)];
-    return `    <article class="demo is-boundary" id="without-${slug(c.law)}" data-demo="b${i}">\n` +
-      `      <div class="demo-h"><a href="#${anchor(row.key)}"><code>${esc(c.law)}</code></a><span class="chip">${data.shapes[l.shape].name}</span></div>\n` +
-      `      <p class="premise"><span>premise</span> ${esc(c.premise)}</p>\n` +
+  const boundCard = (c) => {
+    const key = keyOf(c.law, "boundaries"), l = law(key), p = premise(c);
+    const sides = [["premise holds", c.holds], ["premise removed", c.removed]];
+    return `    <article class="demo is-compact" id="without-${slug(c.law)}" data-demo="b-${slug(c.law)}">\n` +
       `      <p class="demo-s">${sentence(l)}</p>\n` +
-      `      <div class="demo-in">${vs.map((x, j) => `<div class="variant" data-v="${j}"${j ? " hidden" : ""}><p class="variant-l">${j ? "premise removed" : "premise holds"}</p>${x.html}</div>`).join("")}</div>\n` +
-      `      <div class="demo-ctl"><button type="button" class="poke">Remove the premise, or put it back <span aria-hidden="true">↻</span></button></div>\n` +
-      `      <div class="demo-out"><p class="out-l">what the model gives</p>${vs.map((x, j) => `<div class="answer${j ? " moved" : ""}" data-v="${j}"${j ? " hidden" : ""}>${x.answer}</div>`).join("")}</div>\n` +
-      `      <p class="demo-n">${esc(c.input[0].toUpperCase() + c.input.slice(1))}.</p>\n` +
-      `      <p class="demo-src">from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>\n` +
-      `    </article>\n`;
-  }).join("");
-  const boundOf = new Map(bounds.map((c) => [rows.find((r) => r.names.includes(c.law)).key, c]));
-
-  const demoOf = new Map(demos.map((d) => [d.key, d]));
-  // A Vectors cell says more than its file names when words are left once the names are gone.
-  const words = (cell) => /[a-z]/i.test(cell.replace(/`[^`]*`/g, ""));
-  const fileLinks = (ps) => ps.map((p) => `<a href="${REPO}/vectors/${p}.json"><code>${p}</code></a>`).join(" ");
-  const card = (r) => {
-    const l = data.laws[r.key];
-    const ts = resolved.get(r.key);
-    const listed = cited.get(r.key);
-    const extra = naming.get(r.key).filter((p) => !listed.includes(p));
-    const impl = runBy([...listed, ...extra]);
-    const theorems = ts.length
-      ? ts.map((t) => `<details class="thm"><summary><code>${esc(t.replace(/^Loops\./, ""))}</code></summary>` +
-        `<p class="thm-m">${graph[t].module}</p><pre>${esc(graph[t].states.replace(/\bLoops\./g, ""))}</pre></details>`).join("") +
-        (r.theorems.filter((t) => data.notTheorems[t]).map((t) => ` <code class="not">${t}</code>`).join(""))
-      : r.byConstruction ? "<span class=\"muted\">by construction: no theorem, pinned by vectors</span>" : "<span class=\"muted\">none named</span>";
-    const many = listed.length > 6;
-    return `    <article class="law${l.shape === "limit" ? " is-limit" : ""}" id="${anchor(r.key)}" data-shape="${l.shape}">\n` +
-      `      <div class="law-h"><h4>${esc(label(r))}</h4><span class="chip">${data.shapes[l.shape].name}</span></div>\n` +
-      `      <p class="law-s">${sentence(l)}</p>\n` +
-      (l.scope ? `      <p class="law-scope">${l.scope}</p>\n` : "") +
-      `      <p class="law-md"><span>laws.md</span> ${inline(r.says)}</p>\n` +
-      `      <dl class="chain">\n` +
-      `        <dt>proved by</dt><dd>${theorems}</dd>\n` +
-      `        <dt>pinned by</dt><dd>${words(r.vectors) || !listed.length ? `<span>${inline(r.vectors)}</span>` : ""}${listed.length ? (many ? `<details><summary>${listed.length} files</summary>${fileLinks(listed)}</details>` : `<span class="files">${fileLinks(listed)}</span>`) : ""}` +
-      (extra.length ? `<span class="files also">also naming it: ${fileLinks(extra)}</span>` : "") + `</dd>\n` +
-      (impl.length ? `        <dt>run by</dt><dd>${impl.map((i) => i.name).join(", ")}</dd>\n` : "") +
-      (restsOn.get(r.key).length ? `        <dt>rests on</dt><dd>${restsOn.get(r.key).map((b) =>
-        lawLink(b).replace('<a class="lawref"', `<a class="lawref" title="via ${esc(via.get(`${r.key}\u0000${b}`))}"`)).join(" ")}</dd>\n` : "") +
-      (carries.get(r.key).length ? `        <dt>carries</dt><dd>${carries.get(r.key).map(lawLink).join(" ")}</dd>\n` : "") +
-      `      </dl>\n` +
-      (demoOf.has(r.key) ? `      <p class="law-try"><a href="#try-${slug(demoOf.get(r.key).law)}">Try to break it</a></p>\n` : "") +
-      (boundOf.has(r.key) ? `      <p class="law-try"><a href="#without-${slug(boundOf.get(r.key).law)}">Without its premise</a></p>\n` : "") +
+      (scopeOf(key) ? `      <p class="law-scope">${scopeOf(key)}</p>\n` : "") +
+      figure(key) +
+      `      <div class="demo-in">${sides.map(([k, x], j) => `<div class="variant" data-v="${j}"><p class="variant-l">${k}</p><p class="given">${esc(x.given)}</p></div>`).join("")}</div>\n` +
+      `      <div class="demo-ctl">${p.ctl}</div>\n` +
+      "      " + p.note +
+      trailOf([`<li data-v="0"><span class="t-k">premise holds</span>: <span class="t-v">${esc(c.holds.answer)}</span></li>`, p.gone]) +
+      `      <p class="demo-src"><a href="#${anchor(key)}"><code>${esc(c.law)}</code></a>, from <code>design/laws/boundaries.json</code>, written by <code>lake exe boundaries</code></p>\n` +
       `    </article>\n`;
   };
-  const byLayer = [...layers].reverse().map((layer) => {
-    const rs = rows.filter((r) => data.laws[r.key].layer === layer);
-    return `    <div class="layer-group" id="layer-${slug(layer)}">\n      <h3>${layer} <span>${rs.length ? `${rs.length} law${rs.length === 1 ? "" : "s"}` : "no laws yet"}</span></h3>\n` +
-      (rs.length ? `      <div class="laws-grid">\n${rs.map(card).join("")}      </div>\n` : `      <p class="note">Nothing is built here yet, so nothing is proved.</p>\n`) +
-      `    </div>\n`;
-  }).join("");
 
-  // Coverage: what evidence each law has. A filled cell says the evidence exists, not that
-  // it is complete.
-  const dash = '<span class="z">–</span>';
-  const n = (k) => (k ? String(k) : dash);
-  let disagree = 0;
-  const coverRows = [...layers].reverse().map((layer) => {
-    const rs = rows.filter((r) => data.laws[r.key].layer === layer);
-    if (!rs.length) return "";
-    return `        <tr class="cov-band"><th scope="rowgroup" colspan="9">${layer}</th></tr>\n` + rs.map((r) => {
-      const listed = cited.get(r.key), named = naming.get(r.key);
-      const unnamed = listed.filter((x) => !named.includes(x)), uncited = named.filter((x) => !listed.includes(x));
-      const agree = !listed.length && !named.length ? dash
-        : !unnamed.length && !uncited.length ? '<span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span>'
-        : (disagree++, `<span class="off" title="${esc([unnamed.length ? `cited, not naming it: ${unnamed.join(", ")}` : "", uncited.length ? `naming it, not cited: ${uncited.join(", ")}` : ""].filter(Boolean).join("; "))}">${unnamed.length ? `−${unnamed.length}` : ""}${unnamed.length && uncited.length ? " " : ""}${uncited.length ? `+${uncited.length}` : ""}</span>`);
-      const js = runBy([...listed, ...named]).some((i) => i.checker) ? '<span class="ok">✓</span>' : dash;
-      const proved = resolved.get(r.key).length ? n(resolved.get(r.key).length) : r.byConstruction ? '<span class="c" title="by construction">c</span>' : dash;
-      return `        <tr><th scope="row"><a href="#${anchor(r.key)}"><code>${esc(r.key)}</code></a></th>` +
-        `<td class="sh">${data.shapes[data.laws[r.key].shape].name}</td><td>${proved}</td><td>${n(listed.length)}</td><td>${n(named.length)}</td>` +
-        `<td>${agree}</td><td>${js}</td><td>${demoOf.has(r.key) ? '<span class="ok">✓</span>' : dash}</td>` +
-        `<td>${n(restsOn.get(r.key).length)} / ${n(carries.get(r.key).length)}</td></tr>\n`;
-    }).join("");
-  }).join("");
-  const byTheorem = rows.filter((r) => resolved.get(r.key).length).length;
-  const byConstructionCount = rows.filter((r) => !resolved.get(r.key).length && r.byConstruction).length;
-  const coverage = `    <p class="cov-sum">${byTheorem} laws are theorems and ${byConstructionCount} hold by construction; ` +
-    `for ${disagree}, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>\n` +
-    `    <div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
-    `<th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th>` +
-    `<th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th>` +
-    `<th scope="col" title="the JS implementation runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
-    `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div>\n`;
+  // The page opens on one sentence, then the whole at once, then each question in turn.
+  const questions = Object.entries(data.questions);
+  const shapes = Object.entries(data.shapes);
+  const answering = (q) => rows.filter((r) => law(r.key).question === q);
+  const qOrder = (r) => questions.findIndex(([q]) => q === law(r.key).question);
+  const shapeCount = (s) => rows.filter((r) => law(r.key).shape === s).length;
 
-  const connected = new Set(edges.flat());
-  const alone = rows.filter((r) => !connected.has(r.key));
-  const mapData = {
-    layers,
-    nodes: rows.filter((r) => connected.has(r.key)).map((r) => ({
-      id: anchor(r.key), label: r.names.length > 1 ? `${r.names[0]} …` : r.key, layer: data.laws[r.key].layer,
-      shape: data.laws[r.key].shape, sentence: sentence(data.laws[r.key]),
-    })),
-    edges: edges.map(([a, b, via]) => [anchor(a), anchor(b), via]),
+  const lede = `  <p class="lede">${rows.length} laws, each a theorem Lean checks on every build, or a rule held by construction, or, where its card says so, partly pinned by vectors instead of proved. ` +
+    `They are grouped here by the question they answer, in plain sentences. ` +
+    `What proves each one, the vectors that pin it and what its proof rests on are on <a href="../evidence/">the evidence page</a>.</p>\n`;
+
+  // The sentence: the invariances, one at a time, stepped by the reader and never by a timer.
+  const invariances = rows.filter((r) => law(r.key).shape === "invariance");
+  const first = law(invariances[0].key);
+  // The premises a law alone needs, said with its sentence: the sentence stands by itself in the rotor.
+  const holdsOf = (k) => (premises.holds(k).length ? `<span class="holds">Holds when</span> ${premises.holds(k).join("; ")}.` : "");
+  const opening = `    <p class="big-s" id="rotor" aria-live="polite"><span class="w">Change</span> <span class="slot var" id="rotor-change">${first.change}</span>, ` +
+    `<span class="w">and</span> <span class="slot inv" id="rotor-stays">${first.stays}</span> <span class="w" id="rotor-verb">${verbOf(first)}.</span></p>\n` +
+    `    <p class="rotor-law" id="rotor-law">${lawLink(invariances[0].key)}</p>\n` +
+    `    <p class="law-scope" id="rotor-holds"${holdsOf(invariances[0].key) ? "" : " hidden"}>${holdsOf(invariances[0].key)}</p>\n` +
+    `    <p class="rotor-ctl"><button type="button" id="rotor-prev">Previous</button>` +
+    `<span class="rotor-at" id="rotor-at">1 of ${invariances.length}</span><button type="button" id="rotor-next">Next</button></p>\n`;
+
+  // The overview: every law as a chip on its layer's row, marked with its shape. A shape is a
+  // link to itself, so without scripts :target picks its laws out; with them it is a toggle.
+  const filters = `    <p class="filters" role="group" aria-label="Pick out one shape">` +
+    `<a class="sf all" href="#overview" data-shape=""><b>All</b><span class="n">${rows.length}</span></a>` +
+    shapes.map(([id, s]) => `<a class="sf" id="shape-${id}" href="#shape-${id}" data-shape="${id}">${mark(id)}<b>${s.name}</b>` +
+      `<span class="n">${shapeCount(id)}</span></a>`).join("") + "</p>\n";
+  const shapeKey = shapes.map(([id, s]) =>
+    `      <div data-shape="${id}"${id === "limit" ? ' class="is-limit"' : ""}><div class="sk-fig">${shapeFigure(id)}</div><p class="sk-n">${mark(id)}${s.name}</p><p class="sk-t">${s.template}</p></div>\n`).join("");
+  const chip = (r) => {
+    const l = law(r.key);
+    return `<a class="lc${l.shape === "limit" ? " is-limit" : ""}" href="#${anchor(r.key)}" data-shape="${l.shape}" title="${plain(sentence(l))}">` +
+      `${mark(l.shape)}${esc(r.key)}<span class="sr">, ${data.shapes[l.shape].name}</span></a>`;
   };
-  const mapSvg = layoutMap(mapData);
-  const mapNotes = Object.fromEntries(mapData.nodes.map((n) => [n.id, { label: n.label, sentence: n.sentence }]));
-  const aloneNote = `    <p class="note">${alone.length} laws stand alone: their proofs use no other law's theorem. ${alone.map((r) => lawLink(r.key)).join(" ")}</p>\n`;
+  const overview = layers.map((layer) => {
+    const rs = rows.filter((r) => law(r.key).layer === layer).sort((a, b) => qOrder(a) - qOrder(b));
+    return `      <div class="ov-row"><p class="ov-l">${layer}<span>${rs.length || ""}</span></p>` +
+      `<div class="ov-chips">${rs.length ? rs.map(chip).join("") : '<span class="ov-none">nothing built here yet, so nothing proved</span>'}</div></div>\n`;
+  }).join("");
+  const questionIndex = questions.map(([q, text]) =>
+    `      <li><a href="#q-${q}">${text}</a><span>${answering(q).length}</span></li>\n`).join("");
 
-  const limits = rows.filter((r) => data.laws[r.key].shape === "limit").map((r) =>
-    `      <div class="row"><div class="row-k">${lawLink(r.key)}</div><div class="row-v"><p>${data.laws[r.key].says}</p></div></div>\n`).join("");
+  // A question, its laws as sentences, and the demos of those laws.
+  const entry = (r) => {
+    const l = law(r.key);
+    const links = [`<a href="../evidence/#${anchor(r.key)}">Evidence</a>`,
+      tried.has(r.key) ? `<a href="#try-${slug(tried.get(r.key))}">Try it</a>` : "",
+      unpremised.has(r.key) ? `<a href="#without-${slug(unpremised.get(r.key))}">Without its premise</a>` : ""].filter(Boolean);
+    return `      <li class="q-law${l.shape === "limit" ? " is-limit" : ""}" id="${anchor(r.key)}" data-shape="${l.shape}">\n` +
+      `        <p class="q-s">${sentence(l)}</p>\n` +
+      (scopeOf(r.key) ? `        <p class="law-scope">${scopeOf(r.key)}</p>\n` : "") +
+      `        <p class="q-f"><span class="q-shape">${mark(l.shape)}${data.shapes[l.shape].name}</span><code>${esc(r.key)}</code><span class="q-go">${links.join("")}</span></p>\n` +
+      `      </li>\n`;
+  };
+  const section = ([q, text], i) => {
+    const rs = answering(q);
+    const ds = demos.map((d, i) => [d, i]).filter(([d]) => law(d.key).question === q);
+    const bs = alone.filter((c) => law(keyOf(c.law, "boundaries")).question === q);
+    const tally = shapes.map(([id, s]) => [id, s, rs.filter((r) => law(r.key).shape === id).length]).filter(([, , n]) => n)
+      .map(([id, s, n]) => `<span>${mark(id)}${s.name} ${n}</span>`).join("");
+    return `<section class="wrap block q" id="q-${q}" aria-labelledby="h-q-${q}">\n` +
+      `  <div class="side">\n    <p class="q-k">Question ${i + 1} of ${questions.length}</p>\n    <h2 id="h-q-${q}">${text}</h2>\n` +
+      `    <p class="q-tally"><span>${rs.length} law${rs.length === 1 ? "" : "s"}:</span>${tally}</p>\n  </div>\n` +
+      `  <div class="stack">\n` + (data.questionNotes[q] ? `    <p class="note q-note">${data.questionNotes[q]}</p>\n` : "") + `    <ol class="q-laws">\n${rs.map(entry).join("")}    </ol>\n` +
+      (ds.length || bs.length ? `    <h3>Try to break it</h3>\n    <p class="note">Each card is the model's own output: a vector it wrote, or, for a premise, a case <code>lake exe boundaries</code> writes. With scripts on, a button varies what the law lets vary, and the trail keeps the answer the model gave for each variant shown. Where a law has a premise, a second button takes it away and adds what the model says then; some of those inputs are ones the protocol doesn't produce, and each says whether it is one. Without scripts, a card lists every variant and every answer. Nothing is computed in your browser.</p>\n` +
+        `    <div class="demos">\n${ds.map(([d, i]) => demoCard(d, i)).join("")}${bs.map(boundCard).join("")}    </div>\n` : "") +
+      `  </div>\n</section>\n`;
+  };
+
   const bullets = (heading) => (notes[heading] ?? fail(`laws.md has no notes under ${heading}`)).map((b) => {
     const m = b.match(/^\*\*(.+?)\*\*\s*(.*)$/);
     return m ? `      <div class="row"><div class="row-k wide"><b>${inline(m[1])}</b></div><div class="row-v"><p>${inline(m[2])}</p></div></div>\n`
-      : `      <div class="row"><div class="row-v"><p>${inline(b)}</p></div></div>\n`;
+      : `      <div class="row is-full"><div class="row-v"><p>${inline(b)}</p></div></div>\n`;
   }).join("");
 
-  const top = header("laws", [["shapes", "Shapes"], ["try", "Try"], ["coverage", "Coverage"], ["chain", "Chain"], ["map", "Map"], ["stop", "Limits"]]);
+  const top = header("laws", [["sentence", "Sentence"], ["overview", "Overview"], ["questions", "Questions"], ["stop", "Edges"]]);
   let body = read("page.html");
+  // Every boundary case is on the page, on its law's card or on one of its own: read off the
+  // page as built, so a card that goes missing can't pass for one that was drawn.
+  const asked = questions.map(section).join("\n");
+  for (const c of bounds) if (!asked.includes(`data-boundary="${esc(c.law)}"`)) fail(`boundaries.json: ${c.law} is on no card; every case must be shown`);
   for (const [name, value] of Object.entries({
-    header: top, lede, opening, shapes, bar, demos: demoCards, boundaries: boundCards, chain, laws: byLayer, "alone": aloneNote, map: mapSvg, coverage,
-    limits, "no-promise": bullets("What these laws don't promise"), simplifications: bullets("Simplifications in the model"),
+    header: top, lede, opening, filters, overview, "shape-key": shapeKey, "question-index": questionIndex, questions: asked,
+    "unless-said": `  <p class="note">Unless a law says otherwise, ${premises.pageWide.join(", and ")}.</p>\n`,
+    "no-promise": bullets("What these laws don't promise"), simplifications: bullets("Simplifications in the model"),
   })) body = fill(body, name, value);
 
-  const rotor = invariances.map((r) => ({ change: data.laws[r.key].change, stays: data.laws[r.key].stays, link: lawLink(r.key) }));
+  const rotor = invariances.map((r) => ({ change: law(r.key).change, stays: law(r.key).stays, verb: `${verbOf(law(r.key))}.`, holds: holdsOf(r.key), link: lawLink(r.key) }));
   return documentOf(root, {
     head: read("head.html"),
-    css: read("styles.css"),
+    css: read("sentence.css") + read("shapes.css") + read("styles.css"),
     body,
-    scripts: [`const ROTOR = ${JSON.stringify(rotor)};\nconst MAP_NOTES = ${JSON.stringify(mapNotes)};\n`, read("app.js")],
+    scripts: [`const ROTOR = ${JSON.stringify(rotor)};\n`, read("shapes.js"), read("app.js")],
   });
 }
-

@@ -86,7 +86,7 @@ export function renderGrammar(root) {
     `      <div class="plate${l.status === "settled" ? " is-settled" : ""}" data-layer="${k}" style="--z:${n - 1 - k}"><span>${l.name}</span></div>\n`).join("");
   const layerRows = words.layers.map((l, k) =>
     `        <tr data-layer="${k}"><th scope="row">${l.name}${l.status === "settled" ? ` ${chip("settled")}` : ""}<span class="gist">${l.gist}</span></th>` +
-    `<td>${l.made}</td><td>${l.lasts}</td><td>${l.named}</td></tr>\n`).join("");
+    `<td data-label="Made by">${l.made}</td><td data-label="Lasts">${l.lasts}</td><td data-label="Named by">${l.named}</td></tr>\n`).join("");
 
   const mv = words.matrix.verbs;
   const status = Object.fromEntries(words.verbs.map((v) => [v.word, v.status]));

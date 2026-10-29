@@ -16,6 +16,7 @@ export function fill(text, name, value) {
 export const PAGES = [
   { id: "grammar", name: "Grammar" },
   { id: "laws", name: "Laws" },
+  { id: "evidence", name: "Evidence" },
 ];
 
 export function header(current, sections) {
@@ -33,8 +34,11 @@ export function header(current, sections) {
 `;
 }
 
+// The document: the register's styles before the page's own, its script (register.js) before
+// the page's scripts.
 export function documentOf(root, { head, css, body, scripts }) {
   const register = readFileSync(join(root, "design", "register.css"), "utf8");
+  const shared = readFileSync(join(root, "design", "register.js"), "utf8");
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -47,7 +51,7 @@ ${css}</style>
 </head>
 <body>
 ${body}
-${scripts.map((s) => `<script>\n${s}</script>\n`).join("")}</body>
+${[shared, ...scripts].map((s) => `<script>\n${s}</script>\n`).join("")}</body>
 </html>
 `;
 }

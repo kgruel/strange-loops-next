@@ -1,0 +1,56 @@
+<!-- build:header -->
+
+<main>
+<section class="wrap intro">
+  <h1>Evidence</h1>
+<!-- build:lede -->
+</section>
+
+<section class="wrap block" id="coverage" aria-labelledby="h-coverage">
+  <div class="side">
+    <h2 id="h-coverage">Coverage</h2>
+    <p>What evidence each law has: theorems Lean checked, vectors <code>laws.md</code> cites, vectors that name the law themselves, whether those two agree, whether the JS implementation runs any of them, a demo, and how many laws it rests on and carries.</p>
+    <p>A filled cell says the evidence exists, not that it is complete: a law cited by one vector is pinned at one point.</p>
+  </div>
+  <div class="stack">
+<!-- build:coverage -->
+  </div>
+</section>
+
+<section class="wrap block" id="map" aria-labelledby="h-map">
+  <div class="side">
+    <h2 id="h-map">What rests on what</h2>
+    <p>A line from one law down to another says a proof of the first uses a theorem of the second, directly or through lemmas no law names. Lean recorded every one of them; <code>lake exe proofs</code> reads them out of the checked proofs.</p>
+    <p>The stack only rests downward: the build fails if a proof ever leans on a layer above its own. A law's layer is declared, not derived; that check is all the proofs say about it.</p>
+    <p>A proof by computation (<code>decide</code>) evaluates definitions and uses no theorem, so it draws no line.</p>
+    <p class="hint">Point at or tap a law to follow it, or a line to see the theorems that make it. Enter, or a second tap, opens the law's card.</p>
+    <p>The map is laid out when the page is built: the same laws and proofs always draw the same map.</p>
+  </div>
+  <div class="map-wrap">
+    <div class="pan map-pan"><div class="map" id="lawmap">
+<!-- build:map -->
+    </div></div>
+    <p class="map-note" id="map-note" aria-live="polite"></p>
+<!-- build:alone -->
+  </div>
+</section>
+
+<section class="wrap block" id="chain" aria-labelledby="h-chain">
+  <div class="side">
+    <h2 id="h-chain">From claim to code</h2>
+    <p>A law is a sentence on the laws page, a row in <code>protocol/laws.md</code>, a theorem Lean checks, and vectors every implementation must pass. The build joins all four and fails when one doesn't meet the next.</p>
+    <p>A sentence says no more than its theorems: where a premise or a proof's reach needs saying, it follows the sentence. Open a theorem to read exactly what Lean checked.</p>
+    <p>Laws are grouped by the layer they govern, from the ground up.</p>
+  </div>
+  <div class="stack">
+    <div class="tiles">
+<!-- build:chain -->
+    </div>
+<!-- build:laws -->
+  </div>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <p>Built from <code>design/evidence/</code>, <code>design/laws/</code> and <code>protocol/laws.md</code> by <code>node design/build.mjs</code>; the proof graph is <code>design/laws/proofs.json</code>, written by <code>lake exe proofs</code>.</p>
+</footer>
