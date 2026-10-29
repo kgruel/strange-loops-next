@@ -1,5 +1,6 @@
-// Greedy reductions preserve a decoded disagreement. This is not a minimality proof.
-import { equal } from './evaluate.mjs';
+// Greedy reductions preserve a disagreement's acceptance and equality pattern.
+// This is not a minimality proof.
+import { equal } from '../answers.mjs';
 
 function* reductions(value, path = []) {
   if (Array.isArray(value)) {
@@ -101,12 +102,23 @@ export function* candidates(vector) {
 }
 
 export function sameDisagreement(original, candidate) {
-  return candidate.status === 'mismatch' && equal(original.jsException, candidate.jsException);
+  if (original.status !== 'mismatch' || candidate.status !== 'mismatch'
+    || !equal(original.jsException, candidate.jsException)) return false;
+  if (original.comparison || candidate.comparison) {
+    return equal(original.comparison?.acceptance, candidate.comparison?.acceptance)
+      && equal(original.comparison?.partition, candidate.comparison?.partition);
+  }
+  // Older callers supply answer fields without comparison metadata.
+  const fields = ['lean', 'rust', 'js', 'leanError', 'rustError'];
+  if (fields.some(name => Object.hasOwn(original, name) !== Object.hasOwn(candidate, name))) return false;
+  const names = ['lean', 'rust', 'js'].filter(name => Object.hasOwn(original, name));
+  return names.every((name, i) => names.slice(i + 1).every(other =>
+    equal(original[name], original[other]) === equal(candidate[name], candidate[other])));
 }
 
 // testMany is a batched disagreement predicate. Its results use assess()'s shape.
 export async function shrink(vector, original, testMany, { maxTrials = 80, batchSize = 16 } = {}) {
-  if (original.status !== 'mismatch') throw new Error('shrink requires a decoded mismatch');
+  if (original.status !== 'mismatch') throw new Error('shrink requires a mismatch');
   if (!Number.isSafeInteger(maxTrials) || maxTrials < 0 || !Number.isSafeInteger(batchSize) || batchSize < 1 || batchSize > 256) {
     throw new Error('invalid shrink trial or batch bound');
   }

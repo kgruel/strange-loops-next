@@ -40,6 +40,28 @@ def main (args : List String) : IO Unit := do
     ensure (match j with | .int i => i == expected | _ => false) s!"safe-whole normalization {text}"
   for text in ["01", "+1", "1.", "1e", "1e+", ".5", "NaN", "Infinity"] do
     ensure (refused (Read.parseJson text)) s!"invalid RFC number survives: {text}"
+  -- Exact output integers use the same grammar, member order, and text decoder.
+  for text in ["9007199254740993", "-9007199254740993",
+      "123456789012345678901234567890123456789012345678901234567890", "-0"] do
+    let some expected := text.toInt? | throw (IO.userError "invalid exact test integer")
+    ensure (match Read.parseExactIntegers text with | .ok (.int i) => i == expected | _ => false)
+      s!"exact output integer {text}"
+  for text in ["9007199254740993.0", "9007199254740993e0", "1.0", "1e2",
+      "1.5", "-0.0", "1e-999", "1e999", "-1e999"] do
+    ensure (reprStr (Read.parseExactIntegers text) == reprStr (Read.parseJson text))
+      s!"exact mode changes non-integer spelling {text}"
+  for text in ["01", "+1", "1.", "1e", "1e+", ".5", "NaN", "Infinity",
+      "{\"a\":1,}", "[1,]", "\"\\ud800\"", "\"\\udc00\""] do
+    ensure (reprStr (Read.parseExactIntegers text) == reprStr (Read.parseJson text))
+      s!"exact mode changes syntax refusal {text}"
+  let text := "{\"雪\\ud83d\\ude00\":[9007199254740993],\"雪😀\":-9007199254740993}"
+  ensure (match Read.parseExactIntegers text with
+    | .ok (.obj [(k, .arr [.int i]), (k', .int j)]) =>
+      k == "雪😀" && k' == k && i == 9007199254740993 && j == -9007199254740993
+    | _ => false) "exact mode changes order, duplicates, or Unicode"
+  let .ok rounded := Read.parseJson "9007199254740993" | throw (IO.userError "input integer fails to parse")
+  ensure (match rounded with | .number n => n.bits == (Number.ofScientific false 9007199254740992 0).bits | _ => false)
+    "input API stops rounding unsafe integers once to binary64"
   let env : Env := { kind := "note", observer := "o:test", emitted := timeText 0 }
   let salt := List.replicate 16 (0 : UInt8)
   for text in ["9007199254740992", "-9007199254740992", "9007199254740991.5",

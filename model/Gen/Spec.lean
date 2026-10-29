@@ -35,6 +35,10 @@ def fromOf (source : Json) : Json :=
   o [("vertex", s "x"), ("from", a [source]), ("fold", o [("c", o [("count", .bool true)])])]
 
 def parseCases : List (String × Json) := [
+  ("phase2-null-fold", o [("vertex", s "x"), ("from", a [o [("store", s ".")]]),
+    ("fold", .null)]),
+  ("phase2-unsafe-limit", slotOf (o [("collect", .bool true),
+    ("limit", .number (Number.ofScientific false 9007199254740992 0))])),
   ("01-latest-by", o [("vertex", s "decisions"),
     ("note", s "Decisions from notes; the latest per topic."),
     ("from", a [o [("store", s "notes"), ("kind", a [s "decision"])],
@@ -315,6 +319,11 @@ structure RunCase where
   records : List Record
 
 def runCases : List RunCase := [
+  ⟨"phase2-exact-output", ["spec.set", "sum.perm", "numeric.safe-whole"],
+    o [("vertex", s "exact-output"), ("from", a [o [("store", s ".")]]),
+      ("fold", o [("n", o [("sum", s "n")]), ("field", o [("sum", s "est")])])],
+    [{ task (fixtureId 0xf1) "task:1" 100 [("est", .int 9007199254740991)] with n := 9007199254740991 },
+      { task (fixtureId 0xf2) "task:2" 110 [("est", .int 2)] with n := 2 }]⟩,
   ⟨"01-tasks", ["spec.set", "spec.select"], taskSpec, [t1, t2, t3, n1]⟩,
   ⟨"02-withheld-payload", ["spec.set", "view.refines", "result.unread"], taskSpec, [t1, t2, t3, t4, n1]⟩,
   ⟨"03-withheld-successor", ["spec.set", "view.no-resurrection", "result.unread"], taskSpec,

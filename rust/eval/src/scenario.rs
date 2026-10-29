@@ -21,14 +21,7 @@ fn ids(xs: &[Record]) -> Json {
 fn outcome(sp: &Spec, thing: &str, forms: &[Record]) -> Json {
     let settled = things::settle(forms);
     let admitted = things::admit(&settled, |_, _| true);
-    // Already admitted: do not cross the realm-normalizing state_in boundary twice.
-    let state = loops::fold::latest_fold(
-        &admitted
-            .iter()
-            .filter(|r| r.is_about(thing))
-            .cloned()
-            .collect::<Vec<_>>(),
-    );
+    let state = things::state_in(thing, &admitted);
     object(vec![
         (
             "settled",

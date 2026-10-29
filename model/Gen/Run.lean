@@ -294,7 +294,14 @@ def readVector (textIn : String) : Dec (J × Option J) := do
   let kvs ← object "the vector" j
   let layer ← text "layer" (← req "the vector" kvs "layer")
   let got ← answer layer (← req "the vector" kvs "input")
-  pure (got, (kvs.lookup "expect").map Records.ofJson)
+  -- Inputs always use binary64. Only output metadata is taken from the exact parse.
+  let want ← match kvs.lookup "expect" with
+    | none => pure none
+    | some _ => do
+      let exact ← parseExactIntegers textIn
+      let exactKvs ← object "the vector" exact
+      pure ((exactKvs.lookup "expect").map Records.ofJson)
+  pure (got, want)
 
 /-! ## The command -/
 

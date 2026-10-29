@@ -1,0 +1,21 @@
+{
+  "vector": "phase2-null-fold",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": null
+    }
+  },
+  "expect": {
+    "refused": "fold-invalid",
+    "path": "fold"
+  }
+}

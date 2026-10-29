@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { jsonSourceAt } from './json-source.mjs';
+import { jsonSourceAt } from '../json-source.mjs';
 import { evaluateJS } from './evaluate.mjs';
 import { generate } from './generate.mjs';
 import { campaign, parseArgs } from './run.mjs';

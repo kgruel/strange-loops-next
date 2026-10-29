@@ -128,7 +128,7 @@ const ids = (rs) => rs.map((r) => r.id);
 // Per thing: its heads (ids, newest first), its winner and its others (a fork when non-empty).
 export function latestBy(records) {
   const out = Object.create(null);
-  for (const [t, hs] of states(records)) out[t] = { heads: ids(hs), winner: hs[0].id, others: ids(hs.slice(1)) };
+  for (const [t, hs] of states(records)) out[t] = { heads: ids(hs), winner: hs.length ? hs[0].id : null, others: ids(hs.slice(1)) };
   return out;
 }
 

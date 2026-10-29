@@ -73,8 +73,11 @@ requires a canonical base32 encoding of exactly 32 seed bytes.
 Per-thing heads are composed by a distinct-id union for `fold/heads`,
 `fold/view`, and whole-view latest. The low-level `LatestBy::fold` retains its
 unchecked raw behavior. Spec/realm/scenario adapters keep their separate
-settlement and admission boundaries; a scenario state already admitted by
-the adapter does not cross realm admission a second time.
+settlement and admission boundaries. Scenarios use `things::state_in` on
+admitted records, folding only the target thing without repeating admission.
+Whole-view head unions retain records superseded on one thing but current on another.
+The generated `scenario/phase2-thing-state` pin distinguishes both heads and winner
+from whole-view state across every rotation.
 
 Lens edited sections reject repeated and empty ids and pair by id. Duplicate
 base ids retain the model's first-match behavior. Explicit line arrays are
@@ -90,14 +93,14 @@ There is no deferred-family or skipped-file allowlist:
 | --- | ---: |
 | record | 33 |
 | occurred | 8 |
-| fold | 44 |
-| spec | 107 |
-| realm | 14 |
-| scenario | 3 |
+| fold | 48 |
+| spec | 110 |
+| realm | 15 |
+| scenario | 5 |
 | lens | 16 |
 | batch | 13 |
 | standard | 12 |
-| **Total** | **250** |
+| **Total** | **260** |
 
 All seven evaluator families are checked against immutable fixture answers,
 including every listed arrival order or Cartesian variant. Occurred fixtures

@@ -74,6 +74,12 @@ def n2 := { rec (fixtureId 0x22) "metric:load" 110 with n := -3 }
 def n3 := { rec (fixtureId 0x23) "metric:load" 120 with n := 40 }
 def n4 := { rec (fixtureId 0x24) "metric:load" 130 with n := 40 }
 
+-- Both inputs are readable safe integers; only the exact sum exceeds binary64's
+-- safe-whole range, and must not be rounded at the output/checker boundary.
+def exactSumRecords : List Record := [
+  { rec (fixtureId 0x25) "metric:load" 100 with n := 9007199254740991 },
+  { rec (fixtureId 0x26) "metric:load" 110 with n := 2 }]
+
 -- the current load per host: `h3` supersedes `h2`
 def h1 := { rec (fixtureId 0x31) "host:a" 100 with n := 5 }
 def h2 := { rec (fixtureId 0x32) "host:b" 110 with n := 9 }
@@ -111,6 +117,7 @@ def latestCases : List FoldCase := [
 ]
 
 def sumCases : List FoldCase := [
+  ⟨"phase2-exact-output", ["sum.perm"], rotations exactSumRecords⟩,
   ⟨"01-empty", ["sum.perm"], [[]]⟩,
   ⟨"02-mixed-signs", ["sum.perm"], rotations [n1, n2, n3]⟩,
   ⟨"03-repeats-counted", ["sum.repeats"], [[n1, n2, n3, n1, n2, n3]]⟩,
@@ -131,6 +138,11 @@ def jOptInt : Option Int → J
   | none => .null
 
 def latestByCases : List FoldCase := [
+  -- Runner-domain fixtures, not a claim that self-prev is hash-addressable.
+  ⟨"phase2-self-prev", ["latest-by.set", "thing.local"],
+    [[rec (fixtureId 0x27) "topic:auth" 100 (prev := [fixtureId 0x27])]]⟩,
+  ⟨"phase2-self-prev-anchor", ["latest-by.set", "thing.local"],
+    [[{ rec (fixtureId 0x28) "unused:x" 100 (prev := [fixtureId 0x28]) with about := [] }]]⟩,
   ⟨"01-one", ["latest-by.set"], [[r1]]⟩,
   ⟨"02-fork", ["latest-by.set", "latest-by.order"], rotations [r1, r3]⟩,
   ⟨"03-chain", ["latest-by.set"], [[r1, r2]]⟩,
@@ -223,6 +235,8 @@ structure SelectCase where
   w : Where
 
 def selectCases : List SelectCase := [
+  ⟨"phase2-exact-output", ["sum.perm", "select.set", "result.full"], exactSumRecords,
+    .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩,
   ⟨"01-payload-test-on-withheld", ["result.unread", "select.set"],
     [n1, n2, n3.withhold],
     .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩,

@@ -54,6 +54,9 @@ structure Case where
   forms : List Record
 
 def cases : List Case := [
+  ⟨"phase2-exact-output", ["settle.set", "sum.perm", "numeric.safe-whole"],
+    [{ r (fixtureId 0xf1) "load" ["host:a"] 100 with n := 9007199254740991 },
+      { r (fixtureId 0xf2) "load" ["host:b"] 110 with n := 2 }]⟩,
   ⟨"01-erased-without-record-is-withheld", ["settle.set", "settle.keeps"], [full, full.erase]⟩,
   ⟨"02-here-beats-withheld", ["settle.set", "settle.keeps"], [full.withhold, full, full.withhold]⟩,
   ⟨"03-erase-record-sticks", ["settle.set", "settle.erased"], [full, full.erase, eraseRec, full]⟩,

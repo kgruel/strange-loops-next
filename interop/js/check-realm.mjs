@@ -3,13 +3,14 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import { realm } from "./realm.mjs";
 import { tally, jsonFiles, rotations, runAlone } from "./tally.mjs";
 
 export function check(dir) {
   const t = tally();
   for (const file of jsonFiles(join(dir, "realm"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     const n = `${v.layer}/${v.vector}`;
     t.files++;
     for (const [k, forms] of rotations(v.input.forms).entries()) {

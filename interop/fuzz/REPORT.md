@@ -2,14 +2,61 @@
 
 ## Scope
 
-The change adds a dependency-free Node harness, a Lean batch CLI, and CI checks.
-It leaves `model/Loops`, `protocol/`, `interop/js`, and existing vectors unchanged.
+This report covers the integrated JS, Lean, and Rust campaign and its fixes.
+It also preserves evidence from earlier two-way campaigns as historical findings.
 The harness covers record, fold, spec, realm, scenario, batch, and lens inputs.
+
+## Current integrated three-way campaign
+
+A fresh Node 22 run compared JS, Lean, and Rust on 5,600 cases: 800 per family.
+It used seed `integrate-1`, shrink limit 80, 88 chunks, and completed in 160.70 seconds.
+Exit 1 was expected because the duplicate-base lens disagreement remains.
+
+| Family | Before: match / protocol refusal / decoder refusal / mismatch | After: match / protocol refusal / decoder refusal / mismatch |
+|---|---:|---:|
+| record | 686 / 94 / 20 / 0 | 686 / 94 / 20 / 0 |
+| fold | 700 / 0 / 100 / 0 | 700 / 0 / 100 / 0 |
+| spec | 687 / 64 / 49 / 0 | 687 / 64 / 49 / 0 |
+| realm | 698 / 0 / 102 / 0 | 698 / 0 / 102 / 0 |
+| scenario | 648 / 0 / 98 / 54 | 702 / 0 / 98 / 0 |
+| batch | 605 / 195 / 0 / 0 | 605 / 195 / 0 / 0 |
+| lens | 577 / 179 / 0 / 44 | 577 / 179 / 0 / 44 |
+
+The fixed run totals 4,655 matches, 532 matching protocol refusals, 369 decoder refusals, and 44 mismatches.
+All 369 decoder refusals reject in both Lean and Rust; they are not agreement.
+Only 20 refusal diagnostic pairs are text-identical; wording differences do not change their classification.
+
+The earlier integrated run took 279.98 seconds and had 98 mismatches.
+All 54 prior scenario mismatches now match; all 44 lens mismatches remain.
+Replaying those 54 previous scenario cases restored a single JS/Lean/Rust equality partition in every case.
+All 44 old and new raw and shrunk lens answer payloads match, ignoring artifact-local file paths.
+The remaining lens inputs all repeat base ID `t:repeat`; JS differs from Lean/Rust.
+The public fixture is `found/03-duplicate-base-id.json`; raw replay remains one mismatch and exits 1.
+This probe does not decide whether duplicate base IDs are valid or prescribe protocol behavior.
+
+The Rust scenario adapter now calls `things::state_in(thing, &admitted)` after settlement and admission.
+That scopes state to the selected thing; it does not reduce the whole admitted view with latest-fold.
+This aligns scenario `heads` and `winner` with the thing-specific state used by Lean and JS.
+
+Reproduce into fresh output directories:
+
+```sh
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed integrate-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-integrate-1-5600
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --replay interop/fuzz/found/03-duplicate-base-id.json --out /tmp/fuzz-duplicate-base
+```
+
+The runner shrinks each generated disagreement within its configured bound.
+All 98 initial mismatches were reduced: 54 scenario reductions hit the 80-trial bound, and 44 lens reductions used 76 trials.
+After the fix, all 44 remaining mismatches used 76 trials, three accepted rounds, and did not hit the bound.
+Their input sizes reduced from 119 to 98 serialized bytes; no absolute-minimality claim follows.
+Per-case classifications and raw/shrunk artifacts are retained locally under `.pi/gates/02-threeway/campaign-fixed/`.
+The previous run's successful answer payloads were not persisted, so full answer-by-answer comparison is unavailable for its 5,502 prior non-mismatches.
+Non-scenario family acceptance counts were unchanged.
 
 ## Historical campaigns
 
-These campaigns ran before the gap15, gap16, and gap17 rulings.
-Their counts describe that earlier code, not the current integration.
+These two-way campaigns ran before the gap15, gap16, and gap17 rulings.
+Their 105,000-case total and findings below describe historical code, not the current integrated three-way run.
 The two large campaigns contain 105,000 cases: 15,000 per family.
 The first campaign checks the initial adapters.
 The final campaign checks corrected API boundaries and adds lens, integer, and held-reference cases.
@@ -85,8 +132,9 @@ Lean reports no edit. JS replaces both bodies with the first body's value.
 `model/Loops/Lens.lean:78-91` uses first-match `lookup` in `diffSection` and `diff`.
 `interop/js/lens.mjs:51` constructs a map, which keeps the last base entry.
 `model/Laws/Lens.lean:143,250` requires unique base IDs for `no_op` and `put_get`.
-The prose table at `protocol/laws.md:186-187` omits that premise.
-The design premise inventory does name `SectionIds`; the gap is not a claim about every document.
+At the time, the prose table at `protocol/laws.md:186-187` omitted that premise.
+Current `protocol/laws.md` states distinct valid lens premises.
+The historical design premise inventory did name `SectionIds`; the gap was not a claim about every document.
 `model/Gen/Read.lean:328-332` accepts the duplicate base.
 
 This is a domain-boundary probe, not a valid-base law violation.
@@ -151,12 +199,13 @@ The design build leaves tracked output unchanged.
 The mutant check refuses 51 cases and preserves its one expected survivor.
 All 19 harness tests pass on Node 22 in 3.980 seconds.
 Active LSP probes leave eight files unconfirmed.
-An auxiliary rule flags `JSON.parse` in `interop/fuzz/json-source.mjs:19` because that local call can throw.
+A historical auxiliary rule flagged `JSON.parse` in `interop/fuzz/json-source.mjs:19` because that local call can throw.
+The current shared JSON source file is `interop/json-source.mjs`.
 The source walker requires valid JSON; the evaluator catches thrown errors and reports them as mismatches.
 That rule does not follow the outer catch.
 Executable checks supply the verification evidence.
 
-The model CI job installs Node 22, runs the harness tests, and runs seed `ci-1` with N=28.
+The historical model CI job installed Node 22, ran the harness tests, and ran seed `ci-1` with N=28.
 Each new check step has a one-minute timeout.
 The fixed corpus has no mismatches on Node 22.
 Its local timed loop takes 0.430 seconds; the full command takes 1.44 seconds.

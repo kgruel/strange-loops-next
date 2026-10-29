@@ -38,6 +38,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # Same pinned Rust setup as the Rust gate, without unused components.
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
       - name: Install Lean
         run: |
           base=https://raw.githubusercontent.com/leanprover/elan/master
@@ -65,10 +67,13 @@ jobs:
       - name: Fuzz adapters and batch transport check
         timeout-minutes: 1
         run: node --test interop/fuzz/*.test.mjs
+      - name: Rust input-only evaluator for three-way fuzz
+        working-directory: rust
+        run: cargo build -p loops-eval --bin loops-eval
       - name: The verified fixed fuzz corpus agrees
-        timeout-minutes: 1
+        timeout-minutes: 2
         run: >-
-          node interop/fuzz/run.mjs --seed ci-1 --n 28 --no-shrink
+          node interop/fuzz/run.mjs --rust --seed ci-1 --n 28
           --out "$RUNNER_TEMP/loops-fuzz"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -99,7 +104,7 @@ jobs:
       - name: The JS implementation agrees on every vector
         run: node interop/js/check.mjs vectors
       - name: The JS reader guards hold
-        run: node --test interop/js/regression.test.mjs
+        run: node --test interop/js/*.test.mjs
 
   design:
     runs-on: ubuntu-latest

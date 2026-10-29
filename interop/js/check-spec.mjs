@@ -4,6 +4,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import * as S from "./spec.mjs";
 import { tally, jsonFiles, runAlone } from "./tally.mjs";
 
@@ -16,7 +17,7 @@ export function check(dir) {
   const t = tally();
 
   for (const file of jsonFiles(join(dir, "spec", "parse"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     const n = `${v.layer}/${v.vector}`;
     t.files++;
     // A spec that repeats a key comes as text too: read that one.
@@ -27,7 +28,7 @@ export function check(dir) {
   }
 
   for (const file of jsonFiles(join(dir, "spec", "run"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     const n = `${v.layer}/${v.vector}`;
     t.files++;
     const { parsed, refused } = S.parseNode(specNode(file));

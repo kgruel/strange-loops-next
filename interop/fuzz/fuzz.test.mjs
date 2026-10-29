@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { inspect } from 'node:util';
 import { readdir, readFile, mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { FAMILIES, FOLD_LAYERS, generate } from './generate.mjs';
-import { assess, equal } from './evaluate.mjs';
+import { assess } from './evaluate.mjs';
+import { equal, readVector } from '../answers.mjs';
 import { ROOT, batchVectors, executeBatch, parseResponses, warmLean } from './transport.mjs';
 import { candidates, sameDisagreement, shrink } from './shrink.mjs';
 import { campaign, parseArgs, persistMismatch } from './run.mjs';
@@ -147,9 +149,9 @@ test('all existing supported vectors agree with the public API adapters', async 
   let checked = 0, refused = 0;
   for (const family of FAMILIES) {
     for await (const file of jsonFiles(join(ROOT, 'vectors', family))) {
-      const rawText = await readFile(file, 'utf8'), vector = JSON.parse(rawText);
+      const rawText = await readFile(file, 'utf8'), vector = readVector(rawText);
       const result = assess(vector, { expect: vector.expect }, { rawText });
-      assert.notEqual(result.status, 'mismatch', `${file}\n${JSON.stringify(result)}`);
+      assert.notEqual(result.status, 'mismatch', `${file}\n${inspect(result, { depth: null })}`);
       checked++; refused += result.status === 'protocol-refusal';
     }
   }
@@ -193,7 +195,7 @@ test('adapters align per-thing heads and admission boundaries', async () => {
     orders: [[{ ...a, about: ['t:x'] }, { ...b, about: ['t:y'] }]] } });
   const responses = await batchVectors(vectors);
   for (let i = 0; i < vectors.length; i++) {
-    assert.equal(assess(vectors[i], responses[i]).status, 'match', JSON.stringify(responses[i]));
+    assert.equal(assess(vectors[i], responses[i]).status, 'match', inspect(responses[i], { depth: null }));
   }
   assert.equal(responses[0].expect.max.value, 9);
   assert.ok(responses[1].expect.heads.some(head => head.id === a.id));
@@ -309,7 +311,7 @@ test('small real campaign counts every family and persists injected failures', {
     const { summary } = await campaign(options, { warm: false });
     assert.equal(Object.keys(summary.counts).length, FAMILIES.length);
     assert.equal(Object.values(summary.counts).reduce((n, x) => n + x.cases, 0), 28);
-    assert.equal(summary.mismatches, 0, JSON.stringify(summary));
+    assert.equal(summary.mismatches, 0, inspect(summary, { depth: null }));
     const injected = await campaign(parseArgs(['--family', 'lens', '--n', '1', '--out', join(dir, 'injected'), '--shrink-trials', '16']), {
       warm: false, js: () => [{ injected: true }],
     });

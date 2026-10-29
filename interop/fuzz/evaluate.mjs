@@ -1,5 +1,6 @@
 // Adapters ask the public JS APIs the same questions as Gen.Run.
-import { jsonSourceAt } from './json-source.mjs';
+import { jsonSourceAt } from '../json-source.mjs';
+import { equal } from '../answers.mjs';
 import * as F from '../js/fold.mjs';
 import * as L from '../js/loops.mjs';
 import * as S from '../js/spec.mjs';
@@ -8,17 +9,6 @@ import { realm } from '../js/realm.mjs';
 import { resolveBatch } from '../js/batch.mjs';
 import { formOf, step, lensEdit } from '../js/scenario.mjs';
 
-export function equal(a, b) {
-  if (a === b) return true;
-  // Compare the integer a Number actually holds, not its rounded decimal text.
-  if (typeof a === 'bigint' && typeof b === 'number' && Number.isInteger(b)) return a === BigInt(b);
-  if (typeof b === 'bigint' && typeof a === 'number' && Number.isInteger(a)) return BigInt(a) === b;
-  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
-  if (Array.isArray(a)) return a.length === b.length && a.every((v, i) => equal(v, b[i]));
-  const keys = Object.keys(a);
-  return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && equal(a[k], b[k]));
-}
 const WRITE_CODES = new Set([
   'kind-empty', 'observer-not-typed', 'emitted-not-rfc3339', 'occurred-not-span',
   'about-not-typed', 'prev-not-record-id', 'under-not-record-id', 'erases-not-record-id',
@@ -117,18 +107,73 @@ export function evaluateJS(vector, rawText) {
   }
 }
 
-// Decoder errors are not protocol answers. Typed JS APIs have no fixture decoder.
-export function assess(vector, lean, { rawText, js = evaluateJS } = {}) {
-  if (Object.hasOwn(lean, 'error')) return { status: 'decoder-refusal', diagnostic: lean.error };
-  if (!Object.hasOwn(lean, 'expect')) throw new Error('Lean response has no answer');
-  let answers;
-  try { answers = js(vector, rawText); }
-  catch (error) {
-    return { status: 'mismatch', lean: lean.expect, jsException: { name: error.name, message: error.message } };
+// Equality groups describe observations. They do not assign a guilty implementation.
+function comparison(outcomes) {
+  const acceptance = Object.fromEntries(Object.entries(outcomes).map(([name, o]) => [name, o.status]));
+  const nodes = Object.entries(outcomes).flatMap(([name, o]) => {
+    if (o.status === 'not-called') return [];
+    if (name === 'js' && o.status === 'answered') {
+      return o.answers.map((answer, i) => [`js:${i}`, { status: 'decoded', answer }]);
+    }
+    return [[name, o]];
+  });
+  const equivalent = (a, b) => a.status === b.status && (
+    a.status === 'decoder-refusal' || equal(a.answer, b.answer));
+  const pairwise = {}, groups = [];
+  for (let i = 0; i < nodes.length; i++) {
+    const [name, outcome] = nodes[i];
+    for (const [other, value] of nodes.slice(i + 1)) pairwise[`${name}:${other}`] = equivalent(outcome, value);
+    const group = groups.find(g => equivalent(outcome, g.outcome));
+    if (group) group.names.push(name); else groups.push({ outcome, names: [name] });
   }
-  if (!Array.isArray(answers) || !answers.length) throw new Error('adapter produces no answers');
-  const order = answers.findIndex(answer => !equal(answer, lean.expect));
-  if (order !== -1) return { status: 'mismatch', lean: lean.expect, js: answers[order], order };
-  const refused = lean.expect?.refused;
-  return { status: typeof refused === 'string' || refused === true ? 'protocol-refusal' : 'match' };
+  return { acceptance, pairwise, partition: groups.map(g => g.names) };
+}
+
+// A Lean wrapper keeps the two-way API. Rust mode accepts { lean, rust } wrappers.
+// Decoder refusals are not protocol answers. Typed JS APIs have no fixture decoder.
+export function assess(vector, response, { rawText, js = evaluateJS } = {}) {
+  const bundled = response && Object.hasOwn(response, 'lean');
+  const responses = { lean: bundled ? response.lean : response };
+  if (bundled && Object.hasOwn(response, 'rust')) responses.rust = response.rust;
+  const outcomes = {}, result = { implementations: ['js', ...Object.keys(responses)], responses };
+  for (const [name, r] of Object.entries(responses)) {
+    const hasError = r && Object.hasOwn(r, 'error'), hasExpect = r && Object.hasOwn(r, 'expect');
+    if (!r || hasError === hasExpect || (hasError && typeof r.error !== 'string')) {
+      throw new Error(`${name === 'lean' ? 'Lean' : 'Rust'} response has no answer or is invalid`);
+    }
+    outcomes[name] = hasError ? { status: 'decoder-refusal' } : { status: 'decoded', answer: r.expect };
+    if (hasError) result[`${name}Error`] = r.error;
+    else result[name] = r.expect;
+  }
+  if (outcomes.lean.status === 'decoder-refusal') {
+    outcomes.js = { status: 'not-called' };
+  } else {
+    let answers;
+    try { answers = js(vector, rawText); }
+    catch (error) {
+      result.jsException = { name: error.name, message: error.message };
+      outcomes.js = { status: 'exception', answer: result.jsException };
+    }
+    if (!outcomes.js) {
+      if (!Array.isArray(answers) || !answers.length) throw new Error('adapter produces no answers');
+      result.jsAnswers = answers;
+      outcomes.js = { status: 'answered', answers };
+      const order = answers.findIndex(answer => !equal(answer, responses.lean.expect));
+      result.js = answers[order === -1 ? 0 : order];
+      if (order !== -1) result.order = order;
+    }
+  }
+  result.comparison = comparison(outcomes);
+  if (Object.values(responses).every(r => Object.hasOwn(r, 'error'))) {
+    result.status = 'decoder-refusal';
+    result.diagnostic = responses.lean.error;
+    result.diagnostics = Object.fromEntries(Object.entries(responses).map(([name, r]) => [name, r.error]));
+  } else if (Object.values(outcomes).some(o => o.status !== 'decoded' && o.status !== 'answered')
+    || result.comparison.partition.length !== 1) {
+    result.status = 'mismatch';
+  } else {
+    const refused = responses.lean.expect?.refused;
+    result.status = typeof refused === 'string' || refused === true ? 'protocol-refusal' : 'match';
+  }
+  return result;
 }

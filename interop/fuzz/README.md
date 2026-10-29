@@ -1,7 +1,9 @@
 # Differential fuzz checks
 
-Node 22 and the repo's Lean toolchain run these checks without package dependencies.
+Node 22 and the repo's Lean toolchain run the two-way checks without package dependencies.
 The harness compares the public JS APIs with `Gen.Run` answers.
+The explicit `--rust` switch also checks the public Rust evaluator.
+Rust mode needs Cargo and the workspace dependencies.
 A decoded vector is not proof of a valid wire record.
 
 ## Run
@@ -9,18 +11,21 @@ A decoded vector is not proof of a valid wire record.
 From the repo root:
 
 ```sh
-node --test interop/fuzz/*.test.mjs
+node --test interop/fuzz/phase2.test.mjs  # Mock-only checks; no engine builds or runs
+node --test interop/fuzz/*.test.mjs      # Includes real Lean checks
 node interop/fuzz/run.mjs --seed ci-1 --n 28 --out /tmp/fuzz-ci
-node interop/fuzz/run.mjs --seed campaign-1 --n 10000 --no-shrink --out /tmp/fuzz-large
+node interop/fuzz/run.mjs --rust --seed phase2-20261029 --n 5000 --out /tmp/fuzz-large
 node interop/fuzz/run.mjs --seed campaign-1 --n 1000 --family record --no-shrink
-node interop/fuzz/run.mjs --replay /tmp/fuzz-large/mismatches/000000.json --out /tmp/fuzz-replay
+node interop/fuzz/run.mjs --rust --replay /tmp/fuzz-large/mismatches/000000.json --out /tmp/fuzz-replay
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed integrate-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-integrate-1-5600
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --replay interop/fuzz/found/03-duplicate-base-id.json --out /tmp/fuzz-duplicate-base
 ```
 
 An explicit output directory must be empty.
 Without `--out`, the runner creates an artifact directory under the system temporary directory.
 It prints that path with the summary.
 Exit codes are 0 for agreement, 1 for disagreements, and 2 for infrastructure or CLI errors.
-A larger campaign can expose the open duplicate-base disagreement; see [REPORT.md](REPORT.md).
+The integrated three-way campaign and its remaining duplicate-base disagreement are reported in [REPORT.md](REPORT.md). The reproducible campaign currently exits 1 for those 44 known lens cases.
 
 `--n` is the total case count, not a count per family.
 Without `--family`, cases cycle through record, fold, spec, realm, scenario, batch, and lens.
@@ -36,15 +41,42 @@ The generator uses FNV-1a seed mixing and xorshift32, not `Math.random`.
 | `--family F` | all seven | One family |
 | `--out DIR` | new temporary directory | Run artifacts |
 | `--replay FILE` | none | One input vector or mismatch artifact |
-| `--chunk-size N` | `64` | Cases per Lean call; maximum 256 |
-| `--timeout-ms N` | `120000` | Timeout per Lean call |
+| `--rust` | off | Add Rust; require reduction for generated disagreements |
+| `--chunk-size N` | `64` | Cases per engine call; maximum 256 |
+| `--timeout-ms N` | `120000` | Timeout per engine call |
 | `--shrink-trials N` | `80` | Maximum trials per mismatch |
-| `--no-shrink` | off | Keep raw mismatches without reduction |
+| `--no-shrink` | off | Keep raw mismatches without reduction; two-way mode only |
 
 The runner builds `run` once before its timed loop.
-It starts one Lean process per chunk, not one per case.
-Use `--no-shrink` for large campaigns, then replay selected mismatch artifacts.
+Rust mode also runs `cargo build -p loops-eval --bin loops-eval` once from `rust/`.
+It starts one process per engine per chunk, not one per case.
+Both engines read the same chunk files.
+The large three-way command shrinks every generated disagreement through both engines.
+It does not select only some failures for later replay.
+The runner rejects `--rust --no-shrink`.
+A trial bound can stop each reduction before the search finds a smaller case.
 Record signing can cost more than the reader families.
+Do not run engine checks or campaigns during source mutation checks. The integrated three-way command above completed 5,600 cases on Node 22; see [REPORT.md](REPORT.md) for counts and limitations.
+
+### Batch interface
+
+Lean receives `lake --quiet exe run --batch DIR` from `model/`.
+Rust receives `rust/target/debug/loops-eval --batch DIR` from the repo root.
+Each engine discovers `.json` files recursively and processes their sorted paths.
+Each output line contains `{file, expect}` or `{file, error}`.
+Each engine computes its answer from input alone, without a fixture `expect` lookup.
+The shared transport matches responses by path, not by output order.
+It rejects missing, duplicate, unexpected, or malformed responses.
+Each process has a timeout and a 64 MiB output bound.
+Build, process, signal, timeout, and IO failures stop the run.
+Errors name the engine, or both engines for shared input IO.
+
+`batchVectors(vectors, options)` returns Lean response wrappers in two-way mode.
+With `options.rust`, each result contains `{lean, rust}` response wrappers.
+`assess(vector, response, options)` accepts either result shape.
+The transport writes each input once and uses one parser for both engines.
+The `spawn` option injects a process mock for transport tests.
+Campaign tests inject `batch`, `buildLean`, `buildRust`, and `js`; they start no real engine.
 
 ## Input generation
 
@@ -90,24 +122,30 @@ The following boundaries prevent comparisons between different questions:
 - `spec/run` receives settled generated forms and compares JS `runSpec` with Lean `Spec.run`.
   Each operation admits its input.
   Realm and scenario tests cover settlement itself.
+- Rust scenario answers use `things::state_in(thing, &admitted)` after settlement and admission.
+  This computes state for the selected thing, rather than taking latest state across the whole view.
 - Raw replay can violate these generation premises.
   A reported mismatch still needs domain review before it becomes a finding.
 
 The boundary tests guard these compositions.
 The comparator ignores object member order but preserves array order and string contents.
-Lean answer integers outside the safe Number range use BigInt during comparison.
+Engine answer integers outside the safe Number range use their exact source digits as BigInt.
+The comparator does not round exact output sums to binary64.
 Artifacts encode those integers as `{"$integer":"decimal digits"}`.
 
 | Status | Meaning |
 |---|---|
-| `match` | All JS answers equal the Lean answer |
-| `protocol-refusal` | Matching top-level refusal answers |
-| `decoder-refusal` | `Gen.Read` or `Gen.Run` rejects the vector shape or its listed orders |
-| `mismatch` | A JS answer differs, or JS throws after Lean gives an answer |
+| `match` | Every JS order and each enabled engine return equal answers |
+| `protocol-refusal` | All implementations return matching top-level refusal answers |
+| `decoder-refusal` | Every enabled engine rejects the fixture input; diagnostics can differ |
+| `mismatch` | Answers differ, only one engine rejects input, or JS throws after Lean decodes |
 
-A decoder refusal does not invoke JS.
+A Lean decoder refusal does not invoke JS, even if Rust accepts the fixture.
 Typed JS APIs do not provide the model's fixture decoder.
-The summary counts decoder refusals separately and saves their field diagnostics.
+If Lean accepts and Rust refuses, the harness also records the JS answers or exception.
+A shared Lean/Rust decoder refusal remains a decoder refusal, not protocol agreement.
+A one-sided decoder refusal is always a mismatch.
+The summary counts shared decoder refusals separately and saves both field diagnostics.
 A realm's `refused` record list remains part of a normal realm answer, not a top-level protocol refusal.
 Only explicit writer refusal codes normalize caught writer exceptions.
 Unexpected JS exceptions remain mismatches.
@@ -122,7 +160,11 @@ Generated mismatch artifacts remain shrinkable, including their embedded text fi
 ## Artifacts and reduction
 
 Each run keeps `options.json`, `summary.json`, `decoder-refusals.json`, and chunked input files under `inputs/`.
-Each mismatch keeps its original vector and both answers under `mismatches/`.
+Options, summaries, and mismatch artifacts name the enabled implementations.
+Each mismatch keeps its original vector and all engine responses under `mismatches/`.
+It also keeps every JS order answer, or the JS exception name and message.
+The comparison records acceptance states, pairwise equality, and the answer partition.
+A partition groups equal observations; it does not identify a guilty implementation by majority.
 The runner saves that raw mismatch before reduction starts.
 It does not write `found/` entries or assign a protocol verdict.
 Parent review decides which failures are distinct and need regression vectors.
@@ -130,7 +172,9 @@ Parent review decides which failures are distinct and need regression vectors.
 The shrinker cuts records, steps, members, and nested arrays or objects, then reduces scalar values.
 It repairs related arrival orders and scenario references.
 It rejects inconsistent forms of one logical record.
-A candidate must keep the layer and a decoded mismatch.
+A candidate must keep the layer, acceptance pattern, and equality partition.
+It cannot change which engine refuses or which implementations disagree.
+The partition also preserves which JS orders agree with each engine.
 These checks do not prove envelope validity or preserve the original root cause.
 Review each reduced input against the relevant law premises.
 The reviewed `found/` cases include cause-specific, domain-preserving reduction checks.
@@ -138,19 +182,19 @@ It cannot replace an answer mismatch with a JS exception.
 An original JS exception must keep its exact name and message.
 Transport errors stop reduction rather than count as successful trials.
 
-Reduction is deterministic and greedy, with bounded trials and batched Lean calls.
+Reduction is deterministic and greedy, with bounded trials and batched engine calls.
+Rust mode checks every reduction candidate through both Lean and Rust.
 The artifact reports trials, accepted rounds, and whether the trial limit stops the search.
 It makes no global minimality claim.
 
-## CI scope
+## Verification scope
 
-The model job installs Node 22 before the Lean build and runtime checks.
-It runs the tests and the verified `ci-1`, N=28 corpus.
-Each check step has a one-minute timeout.
-The job keeps campaign artifacts for inspection.
-This prefix covers every family, but not every generated fold sublayer.
+`phase2.test.mjs` checks the three-way contract with process and campaign mocks.
+The other test files include real Lean checks and raw-source replay checks.
 The adapter corpus test covers every supported existing vector.
 The fuzz runner has no mismatch allowlist or ignored disagreement.
 A test reproduces both recorded answers for the duplicate-base candidate.
 The official gap17 vectors test the resolved repeated and empty edited IDs.
-The human ruling resolves gap17. Duplicate-base behavior remains a protocol-domain question.
+The human ruling resolves gap17. Duplicate-base behavior remains a protocol-domain question. The integrated 5,600-case three-way campaign has 44 such lens mismatches; scenario answers now agree across JS, Lean, and Rust.
+
+[REPORT.md](REPORT.md) separates historical two-way results from the completed integrated three-way campaign. Campaign artifacts are local evidence; the commands above provide public reproduction.

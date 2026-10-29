@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { FAMILIES, generate } from './generate.mjs';
 import { assess } from './evaluate.mjs';
-import { batchVectors, warmLean } from './transport.mjs';
+import { batchVectors, warmLean, warmRust } from './transport.mjs';
 import { shrink } from './shrink.mjs';
 
 function number(text, flag, min = 1) {
@@ -15,10 +15,11 @@ function number(text, flag, min = 1) {
   return n;
 }
 export function parseArgs(args) {
-  const options = { seed: '1', n: 70, chunkSize: 64, timeoutMs: 120000, maxTrials: 80, noShrink: false };
+  const options = { seed: '1', n: 70, chunkSize: 64, timeoutMs: 120000, maxTrials: 80, noShrink: false, rust: false };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--no-shrink') { options.noShrink = true; continue; }
+    if (arg === '--rust') { options.rust = true; continue; }
     if (!['--seed', '--n', '--family', '--out', '--replay', '--chunk-size', '--timeout-ms', '--shrink-trials'].includes(arg)) {
       throw new Error(`unknown option: ${arg}`);
     }
@@ -35,6 +36,8 @@ export function parseArgs(args) {
   }
   if (options.family && !FAMILIES.includes(options.family)) throw new Error(`unknown family: ${options.family}`);
   if (options.chunkSize > 256) throw new Error('--chunk-size must be <= 256');
+  if (options.rust && options.noShrink) throw new Error('--rust requires shrinking; --no-shrink is two-way only');
+  options.implementations = options.rust ? ['js', 'lean', 'rust'] : ['js', 'lean'];
   return options;
 }
 
@@ -46,12 +49,19 @@ export async function persistMismatch(out, index, artifact) {
   return file;
 }
 
-export async function campaign(options, { js, warm = true } = {}) {
+export async function campaign(options, {
+  js, warm = true, batch = batchVectors, buildLean = warmLean, buildRust = warmRust,
+} = {}) {
+  if (options.rust && options.noShrink) throw new Error('--rust requires shrinking; --no-shrink is two-way only');
+  const implementations = options.rust ? ['js', 'lean', 'rust'] : ['js', 'lean'];
   const out = options.out ?? await mkdtemp(join(tmpdir(), 'loops-fuzz-run-'));
   await mkdir(out, { recursive: true });
   const entries = await readdir(out);
   if (entries.length) throw new Error(`artifact directory is not empty: ${out}`);
-  if (warm) warmLean();
+  if (warm) {
+    buildLean();
+    if (options.rust) buildRust();
+  }
   const start = performance.now();
   const families = options.family ? [options.family] : FAMILIES;
   let replay, rawText;
@@ -62,9 +72,9 @@ export async function campaign(options, { js, warm = true } = {}) {
     replay = content.vector ?? content;
     rawText = content.rawText ?? (!content.vector ? await readFile(options.replay, 'utf8') : undefined);
   }
-  const summary = { seed: String(options.seed), requested: replay ? 1 : options.n, counts: {},
+  const summary = { implementations, seed: String(options.seed), requested: replay ? 1 : options.n, counts: {},
     mismatches: 0, decoderRefusals: 0, protocolRefusals: 0, chunks: 0, shrinkTrials: 0, seconds: 0 };
-  await writeFile(join(out, 'options.json'), JSON.stringify(options, null, 2) + '\n');
+  await writeFile(join(out, 'options.json'), JSON.stringify({ ...options, implementations }, null, 2) + '\n');
   const diagnostics = [];
   let failureIndex = 0;
   for (let offset = 0; offset < summary.requested; offset += options.chunkSize) {
@@ -74,7 +84,8 @@ export async function campaign(options, { js, warm = true } = {}) {
     });
     // A replay preserves raw spec member order and repeated members.
     const directory = join(out, 'inputs', String(summary.chunks).padStart(5, '0'));
-    const answers = await batchVectors(vectors, { directory, timeoutMs: options.timeoutMs, rawText });
+    const answers = await batch(vectors, { directory, timeoutMs: options.timeoutMs, rawText, rust: options.rust });
+    if (answers.length !== vectors.length) throw new Error('campaign transport loses vectors');
     summary.chunks++;
     for (let j = 0; j < vectors.length; j++) {
       const vector = vectors[j], result = assess(vector, answers[j], { js, rawText });
@@ -83,18 +94,21 @@ export async function campaign(options, { js, warm = true } = {}) {
       counts.cases++; counts[result.status]++;
       if (result.status === 'decoder-refusal') {
         summary.decoderRefusals++;
-        diagnostics.push({ case: offset + j, vector: vector.fuzz, layer: vector.layer, diagnostic: result.diagnostic });
+        diagnostics.push({ case: offset + j, vector: vector.fuzz, layer: vector.layer,
+          diagnostic: result.diagnostic, diagnostics: result.diagnostics });
       }
       if (result.status === 'protocol-refusal') summary.protocolRefusals++;
       if (result.status !== 'mismatch') continue;
       summary.mismatches++;
-      const artifact = { vector, rawText, answer: result, note: 'Unclassified disagreement. Parent review decides its cause.' };
+      const artifact = { implementations, vector, rawText, answer: result,
+        note: 'Unclassified disagreement. Parent review decides its cause.' };
       // Persist the raw case before any reduction or transport failure.
       const index = failureIndex++;
       await persistMismatch(out, index, artifact);
       if (!options.noShrink && !rawText) {
         artifact.shrink = await shrink(vector, result, async candidates => {
-          const responses = await batchVectors(candidates, { timeoutMs: options.timeoutMs });
+          const responses = await batch(candidates, { timeoutMs: options.timeoutMs, rust: options.rust });
+          if (responses.length !== candidates.length) throw new Error('shrink transport loses candidates');
           return candidates.map((v, i) => assess(v, responses[i], { js }));
         }, { maxTrials: options.maxTrials });
         summary.shrinkTrials += artifact.shrink.trials;

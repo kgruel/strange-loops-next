@@ -1,0 +1,59 @@
+{
+  "vector": "phase2-exact-output",
+  "layer": "fold/sum",
+  "laws": ["sum.perm"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["metric:load"],
+          "value": "v37",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 9007199254740991
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaata",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["metric:load"],
+          "value": "v38",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
+          "n": 2
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaata",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["metric:load"],
+          "value": "v38",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
+          "n": 2
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["metric:load"],
+          "value": "v37",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 9007199254740991
+        }
+      ]
+    ]
+  },
+  "expect": 9007199254740993
+}

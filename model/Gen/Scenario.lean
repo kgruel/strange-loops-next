@@ -96,6 +96,98 @@ def outcome (sp : Spec) (forms : List Record) : J :=
       | none => .null),
     ("slots", .obj ((sp.run settled).map fun (n, v) => (n, jSlot v)))]
 
+def jl (ls : List Line) : J := .arr (ls.map fun l => .str (String.ofList l))
+def jsec (d : List Section) : J := .arr (d.map fun x =>
+  .obj [("id", .str (String.ofList x.id)), ("body", jl x.body)])
+def jout : Outcome → J
+  | .accepted i b => .obj [("accepted", .str (String.ofList i)), ("body", jl b)]
+  | .unknown i => .obj [("unknown", .str (String.ofList i))]
+  | .absent i => .obj [("absent", .str (String.ofList i))]
+
+-- Reuse the scenario outcome oracle and the same lens/step contract.
+def exactSumVector : Except String J := do
+  let name := "phase2-exact-output"
+  let spec : Json := o [("vertex", s "exact-output"),
+    ("from", a [o [("store", s "team")]]),
+    ("fold", o [("n", o [("sum", s "n")]), ("field", o [("sum", s "est")])])]
+  let sp ← match Spec.ofJson spec with
+    | .ok sp => pure sp
+    | .error r => throw s!"scenario/{name}: spec refused {r.code} at {r.path}"
+  let first : Record := { decision (fixtureId 0xf1) "sl:ada" 100 "First." with
+    n := 9007199254740991, fields := [("est", .int 9007199254740991)] }
+  let second : Record := { decision (fixtureId 0xf2) "sl:bo" 110 "Second." with
+    n := 2, fields := [("est", .int 2)] }
+  let records := [first, second]
+  let steps := [("safe-input", [first]), ("exact-output", records)]
+  let base : List Section := [⟨"decision:auth".toList, [first.value.toList]⟩]
+  let text := render [⟨"decision:auth".toList, [second.value.toList]⟩]
+  let some os := edit base text | throw s!"scenario/{name}: the edited text doesn't parse"
+  let mut outs : List J := []
+  for (label, forms) in steps do
+    let results := (rotations forms).map (outcome sp)
+    let expected := results.headD .null
+    if !(results.all (·.render 0 == expected.render 0)) then
+      throw s!"scenario/{name}/{label}: arrival orders disagree"
+    outs := outs ++ [expected]
+  return vector name "scenario" ["spec.set", "sum.perm", "numeric.safe-whole"]
+    (.obj [("spec", Records.ofJson spec), ("thing", .str "decision:auth"),
+      ("records", .arr (records.map jRecord)),
+      ("steps", .arr (steps.map fun (label, forms) => .obj [
+        ("name", .str label), ("forms", jShownIds forms),
+        ("orders", .arr ((rotations forms).map fun xs => .arr (xs.map (.str ∘ idText ∘ (·.id)))))])),
+      ("lens", .obj [("base", jsec base), ("text", jl text)])])
+    (.obj [("steps", .arr outs),
+      ("lens", .obj [("rendered", jl (render base)), ("outcomes", .arr (os.map jout)),
+        ("applied", jsec (apply base os))])])
+
+-- A superseded record remains a head only for its other thing.
+-- Its later timestamp also exposes an incorrect whole-view winner.
+def thingStateVector : Except String J := do
+  let name := "phase2-thing-state"
+  let sp ← match Spec.ofJson spec with
+    | .ok sp => pure sp
+    | .error r => throw s!"scenario/{name}: spec refused {r.code} at {r.path}"
+  let first : Record := { decision (fixtureId 0xf3) "sl:ada" 200 "Other thing still current." with
+    about := ["decision:auth", "decision:other"] }
+  let second := decision (fixtureId 0xf4) "sl:bo" 100 "Auth revised." [first.id]
+  let records := [first, second]
+  let steps := [("emit", [first]), ("partial-supersession", records)]
+  let mut outs : List J := []
+  for (label, forms) in steps do
+    let results := (rotations forms).map (outcome sp)
+    let expected := results.headD .null
+    if !(results.all (·.render 0 == expected.render 0)) then
+      throw s!"scenario/{name}/{label}: arrival orders disagree"
+    outs := outs ++ [expected]
+  for forms in rotations records do
+    let admitted := admit (fun _ _ => true) (settle forms)
+    let state := stateIn "decision:auth" admitted
+    if state.heads.map (·.id) != [second.id] || state.winner.map (·.id) != some second.id then
+      throw s!"scenario/{name}: auth must have only the successor as head and winner"
+    let other := stateIn "decision:other" admitted
+    if other.heads.map (·.id) != [first.id] || other.winner.map (·.id) != some first.id then
+      throw s!"scenario/{name}: the predecessor must remain the other thing's head and winner"
+    if (Latest.fold admitted).heads.map (·.id) != [first.id, second.id] then
+      throw s!"scenario/{name}: whole-view heads must retain the newer predecessor first"
+    match (sp.run (settle forms)).lookup "current" with
+    | some (.things ts unread) =>
+      if ts != [("decision:auth", [(second.id, .here)]), ("decision:other", [(first.id, .here)])] || unread != 0 then
+        throw s!"scenario/{name}: the spec must retain each thing's own head"
+    | _ => throw s!"scenario/{name}: expected a per-thing current slot"
+  let base : List Section := [⟨"decision:auth".toList, [first.value.toList]⟩]
+  let text := render [⟨"decision:auth".toList, [second.value.toList]⟩]
+  let some os := edit base text | throw s!"scenario/{name}: the edited text doesn't parse"
+  return vector name "scenario" ["thing.local", "latest-by.order", "spec.set", "lens.put-get"]
+    (.obj [("spec", Records.ofJson spec), ("thing", .str "decision:auth"),
+      ("records", .arr (records.map jRecord)),
+      ("steps", .arr (steps.map fun (label, forms) => .obj [
+        ("name", .str label), ("forms", jShownIds forms),
+        ("orders", .arr ((rotations forms).map fun xs => .arr (xs.map (.str ∘ idText ∘ (·.id)))))])),
+      ("lens", .obj [("base", jsec base), ("text", jl text)])])
+    (.obj [("steps", .arr outs),
+      ("lens", .obj [("rendered", jl (render base)), ("outcomes", .arr (os.map jout)),
+        ("applied", jsec (apply base os))])])
+
 def vectors : Except String (List (String × J)) := do
   let sp ← match Spec.ofJson spec with
     | .ok sp => pure sp
@@ -116,12 +208,6 @@ def vectors : Except String (List (String × J)) := do
     if i != "decision:auth".toList || b != [dF.value.toList] then
       throw "scenario/01-decision: the accepted edit isn't F's body"
   | _ => throw "scenario/01-decision: expected exactly one accepted edit"
-  let jl (ls : List Line) : J := .arr (ls.map fun l => .str (String.ofList l))
-  let jsec (d : List Section) : J := .arr (d.map fun x => .obj [("id", .str (String.ofList x.id)), ("body", jl x.body)])
-  let jout : Outcome → J
-    | .accepted i b => .obj [("accepted", .str (String.ofList i)), ("body", jl b)]
-    | .unknown i => .obj [("unknown", .str (String.ofList i))]
-    | .absent i => .obj [("absent", .str (String.ofList i))]
   let input := J.obj [
     ("spec", Records.ofJson spec),
     ("thing", .str "decision:auth"),
@@ -136,6 +222,8 @@ def vectors : Except String (List (String × J)) := do
     ("lens", .obj [("rendered", jl (render lensBase)), ("outcomes", .arr (os.map jout)),
       ("applied", jsec (apply lensBase os))])]
   return [("01-decision", vector "01-decision" "scenario"
-    ["spec.set", "latest-by.order", "settle.erased", "view.no-resurrection", "lens.put-get"] input expect)]
+    ["spec.set", "latest-by.order", "settle.erased", "view.no-resurrection", "lens.put-get"] input expect),
+    ("phase2-exact-output", ← exactSumVector),
+    ("phase2-thing-state", ← thingStateVector)]
 
 end Gen.ScenarioVectors

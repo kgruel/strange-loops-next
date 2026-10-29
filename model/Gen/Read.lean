@@ -15,6 +15,8 @@ Two rules shape it:
   order written and a repeated name is kept, since a spec's refusal depends
   on both (`member-duplicate`, errors in written order). Numbers round to binary64.
   Safe-whole values become integers; other numbers retain their binary64 bits.
+  The checker's exact-integer mode keeps lexical integers for output comparison;
+  it is never used to decode inputs.
 * **Decoding refuses, naming the field.** Inputs will come from people, so
   every refusal says where (`input.orders[0][1].prev[0]`) and what was
   wanted. A record is decoded as far as the model's `Record` needs: ids
@@ -98,8 +100,15 @@ partial def stringBody (acc : List Char) : Parser String := do
 
 def str : Parser String := do expectChar '"'; stringBody []
 
-/-- RFC 8259 numbers round once to binary64. -/
-def number : Parser Json := do
+/-- Inputs round once to binary64; expected outputs may carry unbounded integers. -/
+inductive NumericMode where
+  | binary64
+  | exactIntegers
+  deriving BEq
+
+/-- RFC 8259 numbers, with exact lexical integers only when explicitly requested.
+Fraction and exponent spellings retain the ordinary binary64 behavior in both modes. -/
+def number (mode : NumericMode := .binary64) : Parser Json := do
   let cs ← get
   let neg := cs.head? == some '-'
   let cs := if neg then cs.drop 1 else cs
@@ -108,12 +117,14 @@ def number : Parser Json := do
   if ds.length > 1 && ds.head? == some '0' then fail "a number with a leading zero"
   let mut rest := cs.drop ds.length
   let mut frac : List Char := []
-  if rest.head? == some '.' then
+  let hasFraction := rest.head? == some '.'
+  if hasFraction then
     frac := (rest.drop 1).takeWhile Char.isDigit
     if frac.isEmpty then set rest; fail "expected digits after the decimal point"
     rest := rest.drop (frac.length + 1)
   let mut exp : Int := 0
-  if rest.head? == some 'e' || rest.head? == some 'E' then
+  let hasExponent := rest.head? == some 'e' || rest.head? == some 'E'
+  if hasExponent then
     rest := rest.drop 1
     let minus := rest.head? == some '-'
     if minus || rest.head? == some '+' then rest := rest.drop 1
@@ -124,55 +135,63 @@ def number : Parser Json := do
     rest := rest.drop digits.length
   set rest
   let m := (ds ++ frac).foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
+  if mode == .exactIntegers && !hasFraction && !hasExponent then
+    return .int (if neg then -(m : Int) else m)
   let n := Number.ofScientific neg m (exp - frac.length)
   pure (match n.whole? with | some i => .int i | none => .number n)
 
 mutual
-partial def value : Parser Json := do
+partial def value (mode : NumericMode := .binary64) : Parser Json := do
   skipWs
   match ← peek with
-  | some '{' => expectChar '{'; skipWs; members []
-  | some '[' => expectChar '['; skipWs; elements []
+  | some '{' => expectChar '{'; skipWs; members [] mode
+  | some '[' => expectChar '['; skipWs; elements [] mode
   | some '"' => .str <$> str
   | some 't' => word "true" (.bool true)
   | some 'f' => word "false" (.bool false)
   | some 'n' => word "null" .null
-  | some _ => number
+  | some _ => number mode
   | none => fail "expected a value, found the end"
 
 /-- Members in the order written; a repeated name is kept. -/
-partial def members (acc : List (String × Json)) : Parser Json := do
+partial def members (acc : List (String × Json)) (mode : NumericMode := .binary64) : Parser Json := do
   if acc.isEmpty && (← peek) == some '}' then expectChar '}'; return .obj []
   skipWs
   let k ← str
   skipWs; expectChar ':'
-  let v ← value
+  let v ← value mode
   skipWs
   match ← peek with
-  | some ',' => expectChar ','; skipWs; members ((k, v) :: acc)
+  | some ',' => expectChar ','; skipWs; members ((k, v) :: acc) mode
   | some '}' => expectChar '}'; pure (.obj ((k, v) :: acc).reverse)
   | _ => fail "expected ',' or '}'"
 
-partial def elements (acc : List Json) : Parser Json := do
+partial def elements (acc : List Json) (mode : NumericMode := .binary64) : Parser Json := do
   if acc.isEmpty && (← peek) == some ']' then expectChar ']'; return .arr []
-  let v ← value
+  let v ← value mode
   skipWs
   match ← peek with
-  | some ',' => expectChar ','; elements (v :: acc)
+  | some ',' => expectChar ','; elements (v :: acc) mode
   | some ']' => expectChar ']'; pure (.arr (v :: acc).reverse)
   | _ => fail "expected ',' or ']'"
 end
 
-/-- Parse JSON text, or say where it stops being JSON. -/
-def parseJson (text : String) : Except String Json :=
+/-- The shared text parser; only numeric representation varies by mode. -/
+def parseJsonWith (text : String) (mode : NumericMode := .binary64) : Except String Json :=
   let cs := text.toList
-  match (do let v ← value; skipWs; if (← get).isEmpty then pure v else fail "text after the value").run cs with
+  match (do let v ← value mode; skipWs; if (← get).isEmpty then pure v else fail "text after the value").run cs with
   | .ok (v, _) => .ok v
   | .error (left, what) =>
     let before := cs.take (cs.length - left)
     let line := (before.filter (· == '\n')).length + 1
     let col := (before.reverse.takeWhile (· != '\n')).length + 1
     .error s!"line {line}, column {col}: {what}"
+
+/-- Parse inputs as binary64 JSON, or say where the text stops being JSON. -/
+def parseJson (text : String) : Except String Json := parseJsonWith text .binary64
+
+/-- Preserve unbounded lexical integers in expected outputs, not input values. -/
+def parseExactIntegers (text : String) : Except String Json := parseJsonWith text .exactIntegers
 
 /-! ## Decoding, with the path of each field -/
 
