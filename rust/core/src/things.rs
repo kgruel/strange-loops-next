@@ -6,7 +6,8 @@ use crate::{
 };
 
 impl Record {
-    /// Record.things (model/Loops/Things.lean): no about anchors the record's own id.
+    /// Lean: `Loops.Record.things`, model/Loops/Things.lean.
+    /// Returns `about`, or the record's own text id when `about` is empty.
     pub fn things(&self) -> Vec<String> {
         if self.about.is_empty() {
             vec![id_text(&self.id)]
@@ -15,24 +16,28 @@ impl Record {
         }
     }
 
-    /// Record.isAbout (model/Loops/Things.lean), including the self-anchoring case.
+    /// Lean: `Loops.Record.isAbout`, model/Loops/Things.lean.
+    /// Checks whether the reference names one of this record's things, including its own id.
     pub fn is_about(&self, thing: &str) -> bool {
         self.things().iter().any(|t| t == thing)
     }
 }
 
-/// shares (model/Loops/Things.lean): intersection of things, not raw about lists.
+/// Lean: `Loops.shares`, model/Loops/Things.lean.
+/// Checks whether two records share a thing, including their own id when `about` is empty.
 pub fn shares(a: &Record, b: &Record) -> bool {
     let bs = b.things();
     a.things().iter().any(|t| bs.contains(t))
 }
 
-/// thingsOf (model/Loops/Things.lean): distinct things in canonical UTF-16 order.
+/// Lean: `Loops.thingsOf`, model/Loops/Things.lean.
+/// Returns all distinct things in canonical UTF-16 order.
 pub fn things_of(xs: &[Record]) -> Vec<String> {
     canon_set(&xs.iter().flat_map(Record::things).collect::<Vec<_>>())
 }
 
-/// stateIn (model/Loops/Things.lean): supersession within one thing, before selection.
+/// Lean: `Loops.stateIn`, model/Loops/Things.lean.
+/// Folds supersession after filtering records to one thing, before any payload selection.
 pub fn state_in(thing: &str, xs: &[Record]) -> LatestBy {
     latest_fold(
         &xs.iter()
@@ -42,7 +47,8 @@ pub fn state_in(thing: &str, xs: &[Record]) -> LatestBy {
     )
 }
 
-/// perThing (model/Loops/Things.lean): each thing and all its current heads.
+/// Lean: `Loops.perThing`, model/Loops/Things.lean.
+/// Returns each thing with all its current heads.
 pub fn per_thing(xs: &[Record]) -> Vec<(String, LatestBy)> {
     things_of(xs)
         .into_iter()

@@ -2,36 +2,43 @@
 use crate::time::{self, Moment};
 use std::cmp::Ordering;
 
-/// Span (model/Loops/Occurred.lean): closed stop cannot precede start; open sorts last.
+/// Lean: `Loops.Span`, model/Loops/Occurred.lean.
+/// A span holds a start and an optional stop that cannot precede the start.
+/// Spans compare by start, then stop, with an open stop last.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Span {
     start: Moment,
     stop: Option<Moment>,
 }
 impl Span {
-    /// Span.point (model/Loops/Occurred.lean).
+    /// Lean: `Loops.Span.point`, model/Loops/Occurred.lean.
+    /// Creates a span with equal start and stop moments.
     pub fn point(moment: Moment) -> Self {
         Self {
             start: moment.clone(),
             stop: Some(moment),
         }
     }
-    /// Span.closed? (model/Loops/Occurred.lean); none if stop precedes start.
+    /// Lean: `Loops.Span.closed?`, model/Loops/Occurred.lean.
+    /// Creates a closed span, or returns `None` when the stop precedes the start.
     pub fn closed(start: Moment, stop: Moment) -> Option<Self> {
         (start <= stop).then_some(Self {
             start,
             stop: Some(stop),
         })
     }
-    /// openFrom's result construction (model/Loops/Occurred.lean), with a parsed start.
+    /// Lean: `Loops.openFrom`, model/Loops/Occurred.lean.
+    /// Creates a span with no stop from a parsed start moment.
     pub fn open(start: Moment) -> Self {
         Self { start, stop: None }
     }
-    /// Span.start (model/Loops/Occurred.lean).
+    /// Lean: `Loops.Span.start`, model/Loops/Occurred.lean.
+    /// Returns the first moment that the span covers.
     pub fn start(&self) -> &Moment {
         &self.start
     }
-    /// Span.stop (model/Loops/Occurred.lean).
+    /// Lean: `Loops.Span.stop`, model/Loops/Occurred.lean.
+    /// Returns the end moment, or no value for an open span.
     pub fn stop(&self) -> Option<&Moment> {
         self.stop.as_ref()
     }
@@ -105,7 +112,9 @@ fn point(s: &str) -> Option<(Moment, Moment)> {
         date_days(cs).map(|(a, b)| (Moment::day(a), Moment::day(b)))
     }
 }
-/// occurredSpan? (model/Loops/Occurred.lean), including single/openFrom/between semantics.
+/// Lean: `Loops.occurredSpan?`, model/Loops/Occurred.lean.
+/// Parses a single claim, an open interval, or a closed interval.
+/// A closed interval's left start cannot follow its right start.
 pub fn occurred_span(text: &str) -> Option<Span> {
     match text.split_once('/') {
         None => {
@@ -127,25 +136,29 @@ pub fn occurred_span(text: &str) -> Option<Span> {
         }
     }
 }
-/// Stamp (model/Loops/Occurred.lean): immutable text and its matching instant? result.
+/// Lean: `Loops.Stamp`, model/Loops/Occurred.lean.
+/// A stamp keeps the written emission time and its matching parsed instant.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Stamp {
     text: String,
     moment: Moment,
 }
 impl Stamp {
-    /// Stamp.of? (model/Loops/Occurred.lean); none when instant? refuses.
+    /// Lean: `Loops.Stamp.of?`, model/Loops/Occurred.lean.
+    /// Parses emission text, or returns `None` when the instant grammar refuses it.
     pub fn of(s: &str) -> Option<Self> {
         time::instant(s).map(|moment| Self {
             text: s.into(),
             moment,
         })
     }
-    /// Stamp.text (model/Loops/Occurred.lean), preserving the observer's spelling.
+    /// Lean: `Loops.Stamp.text`, model/Loops/Occurred.lean.
+    /// Returns the observer's original spelling of the emission time.
     pub fn text(&self) -> &str {
         &self.text
     }
-    /// Stamp.moment (model/Loops/Occurred.lean), invariant under equivalent time spellings.
+    /// Lean: `Loops.Stamp.moment`, model/Loops/Occurred.lean.
+    /// Returns the parsed instant, which is equal for equivalent time spellings.
     pub fn moment(&self) -> &Moment {
         &self.moment
     }
@@ -158,25 +171,29 @@ impl Default for Stamp {
         }
     }
 }
-/// Claim (model/Loops/Occurred.lean): immutable text and its matching occurredSpan? result.
+/// Lean: `Loops.Claim`, model/Loops/Occurred.lean.
+/// A claim keeps the written occurred time and its matching parsed span.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Claim {
     text: String,
     span: Span,
 }
 impl Claim {
-    /// Claim.of? (model/Loops/Occurred.lean); none when occurredSpan? refuses.
+    /// Lean: `Loops.Claim.of?`, model/Loops/Occurred.lean.
+    /// Parses claim text, or returns `None` when the occurred grammar refuses it.
     pub fn of(s: &str) -> Option<Self> {
         occurred_span(s).map(|span| Self {
             text: s.into(),
             span,
         })
     }
-    /// Claim.text (model/Loops/Occurred.lean), including qualifiers and uncertainty.
+    /// Lean: `Loops.Claim.text`, model/Loops/Occurred.lean.
+    /// Returns the original claim text, including qualifiers and uncertainty.
     pub fn text(&self) -> &str {
         &self.text
     }
-    /// Claim.span (model/Loops/Occurred.lean).
+    /// Lean: `Loops.Claim.span`, model/Loops/Occurred.lean.
+    /// Returns the parsed span without changing the claim's text.
     pub fn span(&self) -> &Span {
         &self.span
     }

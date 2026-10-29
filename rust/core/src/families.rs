@@ -5,7 +5,8 @@ use crate::{
     record::{Record, Shown},
 };
 
-/// dedup (model/Loops/Families.lean), retaining the last form of each id.
+/// Lean: `Loops.dedup`, model/Loops/Families.lean.
+/// Keeps the last reader form of each id in input order.
 pub fn dedup(xs: &[Record]) -> Vec<Record> {
     xs.iter()
         .enumerate()
@@ -13,19 +14,21 @@ pub fn dedup(xs: &[Record]) -> Vec<Record> {
         .map(|(_, r)| r.clone())
         .collect()
 }
-/// Tri (model/Loops/Families.lean).
+/// Lean: `Loops.Tri`, model/Loops/Families.lean.
+/// A test either holds, fails, or needs a payload that the reader lacks.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Tri {
-    /// Tri.yes (model/Loops/Families.lean), also its derived Inhabited value.
+    /// The test holds. This value also represents an empty conjunction.
     #[default]
     Yes,
-    /// Tri.no (model/Loops/Families.lean).
+    /// The test fails.
     No,
-    /// Tri.unknown (model/Loops/Families.lean).
+    /// The reader lacks the payload that the test needs.
     Unknown,
 }
 impl Tri {
-    /// Tri.and (model/Loops/Spec.lean): No dominates Unknown, which dominates Yes.
+    /// Lean: `Loops.Tri.and`, model/Loops/Spec.lean.
+    /// Combines test results. `No` overrides `Unknown`, and `Unknown` overrides `Yes`.
     #[must_use]
     pub fn and(self, other: Self) -> Self {
         match (self, other) {
@@ -34,7 +37,8 @@ impl Tri {
             (Self::Yes, Self::Yes) => Self::Yes,
         }
     }
-    /// Tri.ofBool (model/Loops/Families.lean).
+    /// Lean: `Loops.Tri.ofBool`, model/Loops/Families.lean.
+    /// Converts a known test result to `Yes` or `No`.
     #[expect(
         clippy::fn_params_excessive_bools,
         reason = "Lean Tri.ofBool takes Bool"
@@ -43,17 +47,20 @@ impl Tri {
         if b { Self::Yes } else { Self::No }
     }
 }
-/// Where (model/Loops/Families.lean). Envelope predicates must depend only on the envelope;
-/// unlike Lean, Rust cannot enforce the `SameEnvelope` proof obligation.
+/// Lean: `Loops.Where`, model/Loops/Families.lean.
+/// A predicate declares whether it needs the envelope or the payload.
+/// Envelope predicates must depend only on `SameEnvelope` data.
+/// Rust does not enforce this Lean proof requirement.
 #[derive(Debug)]
 pub enum Where<T> {
-    /// Where.envelope (model/Loops/Families.lean).
+    /// A predicate that reads only envelope data.
     Envelope(T),
-    /// Where.payload (model/Loops/Families.lean).
+    /// A predicate that needs the payload.
     Payload(T),
 }
 impl<T: Fn(&Record) -> bool> Where<T> {
-    /// Where.eval (model/Loops/Families.lean).
+    /// Lean: `Loops.Where.eval`, model/Loops/Families.lean.
+    /// Tests the record, or returns `Unknown` when a payload predicate lacks its payload.
     pub fn eval(&self, r: &Record) -> Tri {
         match self {
             Self::Envelope(t) => Tri::of_bool(t(r)),
@@ -62,31 +69,36 @@ impl<T: Fn(&Record) -> bool> Where<T> {
         }
     }
 }
-/// Result (model/Loops/Families.lean).
+/// Lean: `Loops.Result`, model/Loops/Families.lean.
+/// A selection result holds the fold value and its unread count.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Result<T> {
-    /// Result.value (model/Loops/Families.lean).
+    /// The state after the fold steps through selected readable records.
     pub value: T,
-    /// Result.unread (model/Loops/Families.lean).
+    /// The count of unknown tests and selected records that the fold cannot read.
     pub unread: Nat,
 }
-/// Acc (model/Loops/Families.lean). Caller must ensure the step commutes;
-/// Rust closures do not carry Lean's proof.
+/// Lean: `Loops.Acc`, model/Loops/Families.lean.
+/// A fold family defines its initial state, step, and readability test.
+/// The caller must supply pure steps that commute, as Lean requires.
+/// Rust does not enforce that proof requirement.
 #[derive(Debug)]
 pub struct Acc<T, S, R> {
-    /// Acc.init (model/Loops/Families.lean).
+    /// The state before the fold reads any record.
     pub init: T,
-    /// Acc.step (model/Loops/Families.lean).
+    /// The pure function that adds one record to the state.
     pub step: S,
-    /// Acc.readable (model/Loops/Families.lean).
+    /// The test for data that this fold can read from the record.
     pub readable: R,
 }
 impl<T: Clone, S: Fn(T, &Record) -> T, R: Fn(&Record) -> bool> Acc<T, S, R> {
-    /// Acc.fold (model/Loops/Families.lean).
+    /// Lean: `Loops.Acc.fold`, model/Loops/Families.lean.
+    /// Steps through every record without selection, readability checks, or duplicate removal.
     pub fn fold(&self, xs: &[Record]) -> T {
         xs.iter().fold(self.init.clone(), &self.step)
     }
-    /// Acc.select (model/Loops/Families.lean).
+    /// Lean: `Loops.Acc.select`, model/Loops/Families.lean.
+    /// Skips `No`, steps selected readable records, and counts each other record once as unread.
     pub fn select(&self, ev: impl Fn(&Record) -> Tri, xs: &[Record]) -> Result<T> {
         let mut value = self.init.clone();
         let mut unread = Nat::default();
@@ -100,10 +112,12 @@ impl<T: Clone, S: Fn(T, &Record) -> T, R: Fn(&Record) -> bool> Acc<T, S, R> {
         Result { value, unread }
     }
 }
-/// Count.acc, Sum.acc, Min.acc and Max.acc (model/Loops/Families.lean), concrete steps.
+/// Lean: `Loops.Count.acc`, `Loops.Sum.acc`, `Loops.Min.acc`, and `Loops.Max.acc`, model/Loops/Families.lean.
+/// This alias names fold families with concrete step and readability functions.
 pub type PrimitiveAcc<T> = Acc<T, fn(T, &Record) -> T, fn(&Record) -> bool>;
 
-/// Count.acc (model/Loops/Families.lean): every envelope is readable.
+/// Lean: `Loops.Count.acc`, model/Loops/Families.lean.
+/// Creates a count family that can read every envelope.
 pub fn count_acc() -> PrimitiveAcc<Nat> {
     Acc {
         init: Nat::default(),
@@ -111,7 +125,8 @@ pub fn count_acc() -> PrimitiveAcc<Nat> {
         readable: |_| true,
     }
 }
-/// Sum.acc (model/Loops/Families.lean): the builtin n, readable only here.
+/// Lean: `Loops.Sum.acc`, model/Loops/Families.lean.
+/// Creates a sum family for built-in `n`, which is readable only when the payload is `Here`.
 pub fn sum_acc() -> PrimitiveAcc<Int> {
     Acc {
         init: Int::default(),
@@ -119,7 +134,8 @@ pub fn sum_acc() -> PrimitiveAcc<Int> {
         readable: |r| r.shown == Shown::Here,
     }
 }
-/// Min.acc (model/Loops/Families.lean): the builtin n, readable only here.
+/// Lean: `Loops.Min.acc`, model/Loops/Families.lean.
+/// Creates a minimum family for built-in `n`, which is readable only when the payload is `Here`.
 pub fn min_acc() -> PrimitiveAcc<Option<Int>> {
     Acc {
         init: None,
@@ -127,7 +143,8 @@ pub fn min_acc() -> PrimitiveAcc<Option<Int>> {
         readable: |r| r.shown == Shown::Here,
     }
 }
-/// Max.acc (model/Loops/Families.lean): the builtin n, readable only here.
+/// Lean: `Loops.Max.acc`, model/Loops/Families.lean.
+/// Creates a maximum family for built-in `n`, which is readable only when the payload is `Here`.
 pub fn max_acc() -> PrimitiveAcc<Option<Int>> {
     Acc {
         init: None,
@@ -136,7 +153,9 @@ pub fn max_acc() -> PrimitiveAcc<Option<Int>> {
     }
 }
 
-/// Sum.on (model/Loops/Families.lean): missing, hidden and nonnumeric fields are unreadable.
+/// Lean: `Loops.Sum.on`, model/Loops/Families.lean.
+/// Creates a sum family for a named integer field.
+/// Missing, hidden, and nonnumeric fields count as unreadable.
 pub fn sum_on(
     field: &str,
 ) -> Acc<Int, impl Fn(Int, &Record) -> Int + '_, impl Fn(&Record) -> bool + '_> {
@@ -147,7 +166,9 @@ pub fn sum_on(
     }
 }
 
-/// Min.on (model/Loops/Families.lean): unreadable fields leave the raw fold unchanged.
+/// Lean: `Loops.Min.on`, model/Loops/Families.lean.
+/// Creates a minimum family for a named integer field.
+/// Its raw step leaves the state unchanged when the field is unreadable.
 #[expect(
     clippy::type_complexity,
     reason = "Explicit closure types avoid boxing field-specific accumulators"
@@ -170,7 +191,9 @@ pub fn min_on(
     }
 }
 
-/// Max.on (model/Loops/Families.lean): unreadable fields leave the raw fold unchanged.
+/// Lean: `Loops.Max.on`, model/Loops/Families.lean.
+/// Creates a maximum family for a named integer field.
+/// Its raw step leaves the state unchanged when the field is unreadable.
 #[expect(
     clippy::type_complexity,
     reason = "Explicit closure types avoid boxing field-specific accumulators"
@@ -193,13 +216,15 @@ pub fn max_on(
     }
 }
 
-/// OverHeads.fold (model/Loops/Families.lean): supersede first, then answer.
+/// Lean: `Loops.OverHeads.fold`, model/Loops/Families.lean.
+/// Resolves supersession before passing all current heads to the answer function.
 pub fn over_heads<T>(answer: impl FnOnce(&LatestBy) -> T, xs: &[Record]) -> T {
     answer(&fold::latest_fold(xs))
 }
 
 impl LatestBy {
-    /// LatestBy.maxHeads (model/Loops/Families.lean).
+    /// Lean: `Loops.LatestBy.maxHeads`, model/Loops/Families.lean.
+    /// Finds the greatest integer among readable heads and counts the unread heads.
     pub fn max_heads(&self) -> Result<Option<Int>> {
         let mut value = None;
         let mut unread = Nat::default();

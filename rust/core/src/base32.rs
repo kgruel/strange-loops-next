@@ -1,5 +1,7 @@
 //! RFC 4648 encoding from model/Loops/Base32.lean.
-/// base32 (model/Loops/Base32.lean): lowercase, unpadded, right-zero-padded final group.
+/// Lean: `Loops.base32`, model/Loops/Base32.lean.
+/// Encodes bytes with lowercase base32 and no padding characters.
+/// Adds zero bits on the right for the final group.
 pub fn base32(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 32] = b"abcdefghijklmnopqrstuvwxyz234567";
     let mut out = String::new();

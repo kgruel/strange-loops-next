@@ -4,16 +4,22 @@ use loops::{
     fold::{self, LatestBy},
     number::{Int, Nat},
     occurred::{Claim, Stamp},
-    record::{Record, Shown, Val, id_text},
+    record::{Digest, Record, Shown, Val, id_text},
     things,
 };
 
+fn id(n: u64) -> Digest {
+    let mut bytes = [0; 32];
+    bytes[24..].copy_from_slice(&n.to_be_bytes());
+    Digest(bytes)
+}
+
 #[test]
 fn insertion_preserves_unchecked_tail() {
-    let xs = vec![Nat::from(4), Nat::from(2), Nat::from(4)];
+    let xs = vec![id(4), id(2), id(4)];
     assert_eq!(
-        fold::insert_id(Nat::from(3), &xs),
-        vec![Nat::from(3), Nat::from(4), Nat::from(2), Nat::from(4)]
+        fold::insert_id(id(3), &xs),
+        vec![id(3), id(4), id(2), id(4)]
     );
 }
 
@@ -47,9 +53,9 @@ fn sum_is_unbounded() {
     );
 }
 
-fn rec(id: u64, n: i64) -> Record {
+fn rec(number: u64, n: i64) -> Record {
     Record {
-        id: Nat::from(id),
+        id: id(number),
         n: Int::from(n),
         ..Record::default()
     }
@@ -94,13 +100,13 @@ fn selection_counts_unknown_or_unreadable_once_and_excluded_never() {
     let acc = families::Acc {
         init: Nat::default(),
         step: fold::count_step,
-        readable: |r: &Record| r.id <= Nat::from(3),
+        readable: |r: &Record| r.id <= id(3),
     };
     let result = acc.select(
         |r| {
-            if r.id == Nat::from(1) || r.id == Nat::from(4) {
+            if r.id == id(1) || r.id == id(4) {
                 Tri::Unknown
-            } else if r.id == Nat::from(2) || r.id == Nat::from(5) {
+            } else if r.id == id(2) || r.id == id(5) {
                 Tri::No
             } else {
                 Tri::Yes
@@ -159,7 +165,7 @@ fn numeric_on_uses_first_field_and_builtin_precedence() {
 fn batches_match_one_fold_and_limits_do_not_truncate_big_nats() {
     let a = rec(1, 5);
     let b = Record {
-        prev: vec![a.id.clone()],
+        prev: vec![a.id],
         ..rec(2, -9)
     };
     let c = rec(3, 12);
@@ -209,7 +215,7 @@ fn batches_match_one_fold_and_limits_do_not_truncate_big_nats() {
 fn hidden_successor_does_not_revive_replaced_numeric_head() {
     let a = rec(1, 900);
     let b = Record {
-        prev: vec![a.id.clone()],
+        prev: vec![a.id],
         ..rec(2, 1)
     }
     .withhold();
@@ -251,18 +257,15 @@ fn record_equality_includes_spelling_and_unchecked_state_stays_unchecked() {
     );
     assert!(!plain.newer(&qualified) && !qualified.newer(&plain));
     let mut s = LatestBy {
-        named: vec![Nat::from(8), Nat::from(2), Nat::from(8)],
+        named: vec![id(8), id(2), id(8)],
         heads: vec![a.clone(), rec(9, 9), a.clone()],
     };
     let incoming = Record {
-        prev: vec![Nat::from(2)],
+        prev: vec![id(2)],
         ..b
     };
     s.step(&incoming);
-    assert_eq!(
-        s.named,
-        vec![Nat::from(2), Nat::from(8), Nat::from(2), Nat::from(8)]
-    );
+    assert_eq!(s.named, vec![id(2), id(8), id(2), id(8)]);
     assert_eq!(s.heads, vec![a.clone(), incoming, rec(9, 9), a]);
     let old = rec(1, 1);
     let newer = rec(3, 3);
@@ -276,7 +279,7 @@ fn per_thing_is_canonical_self_anchored_and_scopes_supersession() {
     let a = rec(1, 1);
     let b = Record {
         about: vec![id_text(&a.id)],
-        prev: vec![a.id.clone()],
+        prev: vec![a.id],
         ..rec(2, 2)
     };
     assert!(things::shares(&a, &b));
@@ -287,7 +290,7 @@ fn per_thing_is_canonical_self_anchored_and_scopes_supersession() {
     };
     let unrelated = Record {
         about: vec!["y".into()],
-        prev: vec![x.id.clone()],
+        prev: vec![x.id],
         ..rec(4, 4)
     };
     assert_eq!(x.things(), vec!["x".to_string(), "x".to_string()]);

@@ -2,14 +2,16 @@
 use num_bigint::{BigInt, BigUint};
 use std::{fmt, str::FromStr};
 
-/// Lean Nat, notably Record.id and reader links (model/Loops/Record.lean).
+/// Lean: `Nat` in `Loops.Count` and `Loops.LatestBy.limit`, model/Loops/{Fold,Families}.lean.
+/// Counts, unread totals, and limits have no size bound.
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Nat(pub(crate) BigUint);
-/// Lean Int, notably Json.int and Record.n (model/Loops/{Json,Record}.lean).
+/// Lean: `Int` in `Loops.Json.int` and `Loops.Record.n`, model/Loops/{Json,Record}.lean.
+/// Payload integers and numeric fold state have no size bound.
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Int(pub(crate) BigInt);
-/// Decimal ingestion of Json.int/Record.id/n (model/Loops/{Json,Record}.lean).
-/// Rust-boundary failure; Lean has no corresponding decimal parser here.
+/// Supports Lean `Gen.Read.number`, model/Gen/Read.lean.
+/// This Rust boundary error reports invalid decimal integer text.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ParseNumberError;
 impl fmt::Display for ParseNumberError {

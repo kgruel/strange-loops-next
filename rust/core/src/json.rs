@@ -2,35 +2,39 @@
 use crate::number::Int;
 use std::cmp::Ordering;
 
-/// Loops.Json (model/Loops/Json.lean): object lists retain order and duplicate members.
+/// Lean: `Loops.Json`, model/Loops/Json.lean.
+/// This raw JSON value keeps object member order and duplicate names.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum Json {
-    /// Json.null.
+    /// The JSON null value.
     #[default]
     Null,
-    /// Json.bool.
+    /// A true or false value.
     Bool(bool),
-    /// Json.int; unbounded until the independent inRange check.
+    /// An exact integer with no size bound.
     Int(Int),
-    /// Json.str, Unicode scalar text.
+    /// Text that contains Unicode scalar values.
     Str(String),
-    /// Json.arr, retaining list order.
+    /// An array that keeps value order.
     Arr(Vec<Json>),
-    /// Json.obj, retaining member order and multiplicity.
+    /// An object that keeps member order and duplicate names.
     Obj(Vec<(String, Json)>),
 }
-/// strLt/utf16 (model/Loops/Json.lean), exposed as an ordering for Rust sorting.
+/// Lean: `Loops.strLt` and `Loops.utf16`, model/Loops/Json.lean.
+/// Compares text by UTF-16 code units, not Unicode scalar values.
 pub fn str_cmp(a: &str, b: &str) -> Ordering {
     a.encode_utf16().cmp(b.encode_utf16())
 }
-/// canonSet (model/Loops/Json.lean): sorted, distinct strings in UTF-16 order.
+/// Lean: `Loops.canonSet`, model/Loops/Json.lean.
+/// Returns distinct strings in UTF-16 order.
 pub fn canon_set(xs: &[String]) -> Vec<String> {
     let mut ys = xs.to_vec();
     ys.sort_by(|a, b| str_cmp(a, b));
     ys.dedup();
     ys
 }
-/// quote/escapeChar (model/Loops/Json.lean), without ASCII-escaping Unicode.
+/// Lean: `Loops.quote` and `Loops.escapeChar`, model/Loops/Json.lean.
+/// Quotes JSON text and escapes control characters without changing other Unicode text.
 pub fn quote(s: &str) -> String {
     use std::fmt::Write;
     let mut out = String::from("\"");
@@ -53,7 +57,9 @@ pub fn quote(s: &str) -> String {
     out
 }
 impl Json {
-    /// Json.canon (model/Loops/Json.lean): sortBy keeps the FIRST equal-key member.
+    /// Lean: `Loops.Json.canon`, model/Loops/Json.lean.
+    /// Writes canonical integer JSON and keeps the first member for each duplicate name.
+    /// This function does not validate the value.
     pub fn canon(&self) -> String {
         match self {
             Self::Null => "null".into(),
@@ -80,7 +86,8 @@ impl Json {
             }
         }
     }
-    /// Json.keysDistinct (model/Loops/Json.lean), including nested raw members.
+    /// Lean: `Loops.Json.keysDistinct`, model/Loops/Json.lean.
+    /// Checks every raw object for duplicate member names, including nested objects.
     pub fn keys_distinct(&self) -> bool {
         match self {
             Self::Arr(xs) => xs.iter().all(Self::keys_distinct),
@@ -91,7 +98,8 @@ impl Json {
             _ => true,
         }
     }
-    /// Json.inRange/maxExact (model/Loops/Json.lean); independent of keysDistinct.
+    /// Lean: `Loops.Json.inRange` and `Loops.maxExact`, model/Loops/Json.lean.
+    /// Checks every raw integer against ±(2^53 - 1), including values under duplicate names.
     pub fn in_range(&self) -> bool {
         match self {
             Self::Int(i) => {

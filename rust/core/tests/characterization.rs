@@ -2,12 +2,18 @@
 use loops::{
     envelope::{self, Env},
     json::Json,
-    number::{Int, Nat},
+    number::Int,
     occurred::{self, Stamp},
-    record::{self, Record, Shown, Val},
+    record::{self, Digest, Record, Shown, Val},
     stored::{self, Error},
     time,
 };
+
+fn id(n: u64) -> Digest {
+    let mut bytes = [0; 32];
+    bytes[24..].copy_from_slice(&n.to_be_bytes());
+    Digest(bytes)
+}
 
 fn env() -> Env {
     Env {
@@ -19,7 +25,7 @@ fn env() -> Env {
 }
 fn record() -> Record {
     Record {
-        id: 1_u64.into(),
+        id: id(1),
         kind: "note".into(),
         observer: "sl:x".into(),
         emitted: Stamp::of("1970-01-01T00:00:00Z").expect("valid fixture"),
@@ -54,17 +60,8 @@ fn canonicalization_first_wins_before_validation() {
     );
 }
 #[test]
-fn integers_and_ids_are_unbounded_not_wire_limited() {
-    let huge: Nat =
-        "115792089237316195423570985008687907853269984665640564039457584007913129639936"
-            .parse()
-            .expect("2^256");
-    assert_eq!(record::id_text(&huge), record::id_text(&Nat::default()));
-    assert_eq!(record::id_digest(&huge)[0], 256_u64.into());
+fn unchecked_integers_remain_unbounded() {
     let mut r = record();
-    let small = r.clone();
-    r.id = huge;
-    assert!(r.newer(&small));
     let n: Int = "-9999999999999999999999999999999999999999999"
         .parse()
         .expect("unbounded Int");
@@ -76,7 +73,7 @@ fn integers_and_ids_are_unbounded_not_wire_limited() {
 #[test]
 fn reader_lists_lookup_and_views_keep_lean_behavior() {
     let mut r = record();
-    r.prev = vec![4_u64.into(), 4_u64.into()];
+    r.prev = vec![id(4), id(4)];
     r.value = "payload".into();
     r.n = 42_i64.into();
     r.fields = vec![
@@ -140,7 +137,7 @@ fn precise_times_span_order_and_text_proofs() {
     assert!(occurred::Span::closed(later, m).is_none());
 }
 #[test]
-fn newer_is_span_then_emitted_then_unbounded_id_not_record_equality() {
+fn newer_is_span_then_emitted_then_digest_not_record_equality() {
     let mut older = record();
     older.occurred = occurred::Claim::of("2009");
     let mut newer = older.clone();
@@ -150,7 +147,7 @@ fn newer_is_span_then_emitted_then_unbounded_id_not_record_equality() {
     newer.emitted = Stamp::of("1970-01-01T00:00:01Z").expect("stamp");
     assert!(newer.newer(&older), "emitted breaks span ties");
     older = newer.clone();
-    newer.id = 2_u64.into();
+    newer.id = id(2);
     assert!(newer.newer(&older), "id breaks emitted ties");
     older = newer.clone();
     newer.value = "different payload, same ordering keys".into();
@@ -175,7 +172,11 @@ fn refusal_precedence_is_exact() {
     let duplicate = Json::Obj(vec![
         (
             "x".into(),
-            Json::Int("9007199254740992".parse().expect("int")),
+            Json::Int(
+                "999999999999999999999999999999999999999999999999"
+                    .parse()
+                    .expect("int"),
+            ),
         ),
         ("x".into(), Json::Null),
     ]);
@@ -219,5 +220,17 @@ fn refusal_precedence_is_exact() {
         ),
         Some(Error::NumberOutOfRange)
     );
-    assert!(stored::write(e, vec![0; 16], Json::Int(9_007_199_254_740_991_i64.into())).is_ok());
+    for n in [-9_007_199_254_740_991_i64, 9_007_199_254_740_991] {
+        assert!(stored::write(e.clone(), vec![0; 16], Json::Int(n.into())).is_ok());
+    }
+    for n in [
+        "-9007199254740992",
+        "9007199254740992",
+        "-999999999999999999999999999999999999999999999999",
+    ] {
+        assert_eq!(
+            stored::write_problem(&e, &[0; 16], &Json::Int(n.parse().expect("integer"))),
+            Some(Error::NumberOutOfRange)
+        );
+    }
 }

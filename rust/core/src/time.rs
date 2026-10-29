@@ -1,18 +1,22 @@
 //! RFC3339 instants from model/Loops/Time.lean.
 
-/// Moment (model/Loops/Time.lean), restricted to parser-produced canonical moments.
-/// Four-digit years and bounded offsets prove seconds fit i64; fractions have no precision cap.
+/// Lean: `Loops.Moment`, model/Loops/Time.lean.
+/// A parsed moment holds UTC seconds and exact decimal fraction digits.
+/// Four-digit years and bounded offsets keep seconds within `i64`.
+/// Fractions have no precision limit. The fields exclude arbitrary raw Lean moments.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Moment {
     seconds: i64,
     fraction: Vec<u8>,
 }
 impl Moment {
-    /// Head of Moment (model/Loops/Time.lean): UTC seconds since the Unix epoch.
+    /// Lean: `Loops.Moment`, model/Loops/Time.lean.
+    /// Returns UTC seconds since the Unix epoch.
     pub fn seconds(&self) -> i64 {
         self.seconds
     }
-    /// Tail of Moment/stripZeros (model/Loops/Time.lean): digits, trailing zeros removed.
+    /// Lean: `Loops.Moment` and `Loops.stripZeros`, model/Loops/Time.lean.
+    /// Returns decimal fraction digits without trailing zeros.
     pub fn fraction(&self) -> &[u8] {
         &self.fraction
     }
@@ -75,7 +79,8 @@ fn offset(cs: &[u8]) -> Option<i64> {
         _ => None,
     }
 }
-/// instant? (model/Loops/Time.lean); uppercase T/Z, arbitrary decimal precision, leap second 60.
+/// Lean: `Loops.instant?`, model/Loops/Time.lean.
+/// Parses an instant with uppercase `T` and `Z`, exact fractions, and second 60.
 pub fn instant(text: &str) -> Option<Moment> {
     let cs = text.as_bytes();
     if cs.len() < 20
@@ -125,7 +130,8 @@ pub fn instant(text: &str) -> Option<Moment> {
         fraction,
     })
 }
-/// validEmitted (model/Loops/Time.lean).
+/// Lean: `Loops.validEmitted`, model/Loops/Time.lean.
+/// Checks whether the text names an RFC 3339 instant with an offset.
 pub fn valid_emitted(s: &str) -> bool {
     instant(s).is_some()
 }

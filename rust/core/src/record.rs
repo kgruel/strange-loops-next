@@ -1,98 +1,110 @@
 //! Reader records, visibility and order from model/Loops/Record.lean.
 use crate::{
     base32,
-    number::{Int, Nat},
+    number::Int,
     occurred::{Claim, Span, Stamp},
 };
 
-/// Shown (model/Loops/Record.lean), payload availability for this reader.
+/// Lean: `Loops.Shown`, model/Loops/Record.lean.
+/// This value states which payload the reader holds.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Shown {
-    /// Shown.here.
+    /// The reader holds the payload.
     #[default]
     Here,
-    /// Shown.withheld.
+    /// The reader's grant excludes the payload.
     Withheld,
-    /// Shown.erased.
+    /// The store erases the payload.
     Erased,
 }
-/// Val (model/Loops/Record.lean), exact payload primitives.
+/// Lean: `Loops.Val`, model/Loops/Record.lean.
+/// A payload field holds text, an exact integer, or a Boolean value.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Val {
-    /// Val.str.
+    /// A text value.
     Str(String),
-    /// Val.int.
+    /// An integer with no size bound.
     Int(Int),
-    /// Val.bool.
+    /// A true or false value.
     Bool(bool),
 }
-/// Record (model/Loops/Record.lean): unbounded ids/numbers and unnormalized lists.
+/// Lean: `Loops.Record`, model/Loops/Record.lean.
+/// A reader record holds an envelope and a payload view.
+/// Lists keep their order and repeats.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Record {
-    /// Record.id.
-    pub id: Nat,
-    /// Record.kind.
+    /// The record's 32-byte content digest.
+    pub id: Digest,
+    /// The record's kind name.
     pub kind: String,
-    /// Record.observer.
+    /// The reference for the observer who makes the claim.
     pub observer: String,
-    /// Record.about.
+    /// The references for the things this record concerns.
     pub about: Vec<String>,
-    /// Record.value.
+    /// The text payload field.
     pub value: String,
-    /// Record.prev.
-    pub prev: Vec<Nat>,
-    /// Record.under.
-    pub under: Option<Nat>,
-    /// Record.occurred.
+    /// The digests of the records this record supersedes.
+    pub prev: Vec<Digest>,
+    /// The digest of the grant this record uses, if any.
+    pub under: Option<Digest>,
+    /// The observer's claim about past time, if any.
     pub occurred: Option<Claim>,
-    /// Record.emitted.
+    /// The observer's current time when it emits the record.
     pub emitted: Stamp,
-    /// Record.erases.
-    pub erases: Vec<Nat>,
-    /// Record.n.
+    /// The digests of the records whose payloads this record erases.
+    pub erases: Vec<Digest>,
+    /// The exact integer payload field for numeric folds.
     pub n: Int,
-    /// Record.fields.
+    /// The other named payload fields, in lookup order.
     pub fields: Vec<(String, Val)>,
-    /// Record.shown.
+    /// The payload availability for this reader.
     pub shown: Shown,
 }
-// digestDigits (model/Loops/Record.lean), internal fixed-width idDigest helper.
-fn digest_digits(k: usize, n: &Nat) -> Vec<Nat> {
-    if k == 0 {
-        return Vec::new();
+/// Lean: `Loops.Record.id` and `Loops.idDigest`, model/Loops/Record.lean.
+/// A digest holds 32 bytes, with the most significant byte first.
+/// Derived byte order follows `id_order`, model/Laws/Order.lean:46.
+/// Branch `lean-unread` supplies expected bounded-id, `idText` injectivity, and digest roundtrip laws.
+/// This worktree does not verify those expected laws.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Digest(pub [u8; 32]);
+
+impl From<[u8; 32]> for Digest {
+    fn from(bytes: [u8; 32]) -> Self {
+        Self(bytes)
     }
-    let bytes = n.0.to_bytes_be();
-    let low_len = k - 1;
-    // Above the low k-1 bytes, Lean retains ALL remaining magnitude in the first digit.
-    let split = bytes.len().saturating_sub(low_len);
-    let mut out = Vec::with_capacity(k);
-    out.push(Nat(num_bigint::BigUint::from_bytes_be(&bytes[..split])));
-    out.extend(std::iter::repeat_with(Nat::default).take(low_len.saturating_sub(bytes.len())));
-    out.extend(bytes[split..].iter().map(|b| Nat::from(u64::from(*b))));
-    out
 }
-/// idDigest (model/Loops/Record.lean), retaining the unbounded first digit.
-pub fn id_digest(n: &Nat) -> Vec<Nat> {
-    digest_digits(32, n)
+impl TryFrom<&[u8]> for Digest {
+    type Error = std::array::TryFromSliceError;
+
+    /// Converts bytes for Lean `idDigest`, model/Loops/Record.lean.
+    /// # Errors
+    /// Returns an error if the slice does not contain exactly 32 bytes.
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        bytes.try_into().map(Self)
+    }
 }
-/// idText (model/Loops/Record.lean): Nat.toUInt8 reduces the first digit modulo 256.
-pub fn id_text(n: &Nat) -> String {
-    let bytes: Vec<_> = id_digest(n)
-        .into_iter()
-        .map(|digit| digit.0.to_bytes_le().first().copied().unwrap_or(0))
-        .collect();
-    format!("r:{}", base32::base32(&bytes))
+/// Lean: `Loops.idDigest`, model/Loops/Record.lean.
+/// Returns the exact digest bytes without a numeric conversion.
+pub const fn id_digest(id: &Digest) -> &[u8; 32] {
+    &id.0
+}
+/// Lean: `Loops.idText`, model/Loops/Record.lean.
+/// Encodes all digest bytes as lowercase base32 after `r:`.
+pub fn id_text(id: &Digest) -> String {
+    format!("r:{}", base32::base32(id_digest(id)))
 }
 impl Record {
-    /// Record.span (model/Loops/Record.lean): occurred, otherwise emitted as a point.
+    /// Lean: `Loops.Record.span`, model/Loops/Record.lean.
+    /// Returns the occurred span, or the emission instant as a point.
     pub fn span(&self) -> Span {
         self.occurred.as_ref().map_or_else(
             || Span::point(self.emitted.moment().clone()),
             |c| c.span().clone(),
         )
     }
-    /// Newer (model/Loops/Record.lean), descending span, emitted moment, then unbounded id.
-    /// This relation intentionally is not Ord: equal ordering keys need not mean equal records.
+    /// Lean: `Loops.Newer`, model/Loops/Record.lean.
+    /// Compares the span, emitted moment, and digest, in that order.
+    /// Equal order keys do not imply equal records, so this relation does not implement `Ord`.
     pub fn newer(&self, other: &Self) -> bool {
         self.span()
             .cmp(&other.span())
@@ -100,7 +112,8 @@ impl Record {
             .then_with(|| self.id.cmp(&other.id))
             .is_gt()
     }
-    /// Record.withhold (model/Loops/Record.lean), clearing payload only.
+    /// Lean: `Loops.Record.withhold`, model/Loops/Record.lean.
+    /// Removes the payload and marks it withheld without changing the envelope.
     #[must_use]
     pub fn withhold(&self) -> Self {
         Self {
@@ -111,7 +124,8 @@ impl Record {
             ..self.clone()
         }
     }
-    /// Record.erase (model/Loops/Record.lean), clearing payload only.
+    /// Lean: `Loops.Record.erase`, model/Loops/Record.lean.
+    /// Removes the payload and marks it erased without changing the envelope.
     #[must_use]
     pub fn erase(&self) -> Self {
         Self {
@@ -122,8 +136,9 @@ impl Record {
             ..self.clone()
         }
     }
-    /// Record.get (model/Loops/Record.lean): builtins override fields, then first field wins.
-    /// Like Lean, this does not consult shown.
+    /// Lean: `Loops.Record.get`, model/Loops/Record.lean.
+    /// Reads built-in `value` and `n` before the first matching named field.
+    /// This lookup does not inspect payload visibility.
     pub fn get(&self, name: &str) -> Option<Val> {
         match name {
             "value" => Some(Val::Str(self.value.clone())),
@@ -135,7 +150,8 @@ impl Record {
                 .map(|(_, v)| v.clone()),
         }
     }
-    /// Record.num (model/Loops/Record.lean): only exact integers held here.
+    /// Lean: `Loops.Record.num`, model/Loops/Record.lean.
+    /// Returns the named integer only when this reader holds the payload.
     pub fn num(&self, name: &str) -> Option<Int> {
         if self.shown != Shown::Here {
             return None;
@@ -146,7 +162,8 @@ impl Record {
         }
     }
 }
-/// withholding (model/Loops/Record.lean), the predicate-selected payload view.
+/// Lean: `Loops.withholding`, model/Loops/Record.lean.
+/// Withholds the payload when the predicate holds and keeps the record otherwise.
 pub fn withholding(p: impl FnOnce(&Record) -> bool, r: &Record) -> Record {
     if p(r) { r.withhold() } else { r.clone() }
 }

@@ -2,14 +2,20 @@
 use loops::{
     families::Tri,
     json::Json,
-    number::{Int, Nat},
+    number::Int,
     occurred::Claim,
-    record::{Record, Val, id_text},
+    record::{Digest, Record, Val, id_text},
     where_::{
         Arg, Cond, EnvField, Field, FieldType, Item, Op, RefusalCode, parse_arg, parse_bound,
         parse_op, parse_where,
     },
 };
+
+fn id(n: u64) -> Digest {
+    let mut bytes = [0; 32];
+    bytes[24..].copy_from_slice(&n.to_be_bytes());
+    Digest(bytes)
+}
 
 fn error_type<E: std::error::Error + Send + Sync + 'static>(_: &E) {}
 
@@ -32,9 +38,9 @@ fn field_reads_preserve_raw_lists_and_first_lookup() {
         kind: "k".into(),
         observer: "o:x".into(),
         about: vec!["z".into(), "a".into(), "z".into()],
-        prev: vec![Nat::from(2), Nat::from(1), Nat::from(2)],
-        under: Some(Nat::from(4)),
-        erases: vec![Nat::from(8), Nat::from(8)],
+        prev: vec![id(2), id(1), id(2)],
+        under: Some(id(4)),
+        erases: vec![id(8), id(8)],
         fields: vec![
             ("score".into(), Val::Int(Int::from(6_i64))),
             ("score".into(), Val::Bool(true)),
@@ -58,11 +64,7 @@ fn field_reads_preserve_raw_lists_and_first_lookup() {
     ] {
         assert_eq!(
             Field::Env(f).read(&r),
-            Some(
-                ns.into_iter()
-                    .map(|n| item(&id_text(&Nat::from(n))))
-                    .collect()
-            )
+            Some(ns.into_iter().map(|n| item(&id_text(&id(n)))).collect())
         );
     }
     assert_eq!(
@@ -259,7 +261,14 @@ fn parser_domains_bounds_and_true_only_operators_are_closed() {
     // Id arguments use envelope.recordId, not the stricter fixture base32 decoder.
     assert!(parse_arg(FieldType::Ids, "p", &text("r:bad")).is_err());
     assert!(parse_arg(FieldType::Refs, "p", &text("not a ref")).is_err());
-    assert!(parse_bound(FieldType::Payload, "p", &Json::Int(huge)).is_ok());
+    assert_eq!(
+        parse_arg(FieldType::Payload, "p", &Json::Int(huge.clone())),
+        Ok(Arg::Val(Val::Int(huge.clone())))
+    );
+    assert_eq!(
+        parse_bound(FieldType::Payload, "p", &Json::Int(huge.clone())),
+        Ok(Arg::Val(Val::Int(huge)))
+    );
     assert!(parse_bound(FieldType::Payload, "p", &text("12")).is_err());
     assert!(parse_bound(FieldType::Payload, "p", &Json::Bool(true)).is_err());
     assert!(parse_bound(FieldType::Time, "p", &text("2026-01-01/..")).is_ok());

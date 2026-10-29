@@ -2,9 +2,9 @@
 use loops::{
     base32, envelope,
     json::Json,
-    number::{Int, Nat},
+    number::Int,
     occurred::{Claim, Stamp},
-    record::{Record, Shown, Val, id_text},
+    record::{Digest, Record, Shown, Val, id_text},
 };
 
 /// Gen.Read.members? (model/Gen/Read.lean), duplicates before unknown members.
@@ -66,7 +66,7 @@ fn texts(path: &str, j: &Json) -> Result<Vec<String>, String> {
         .map(|(i, j)| text(&format!("{path}[{i}]"), j).map(str::to_owned))
         .collect()
 }
-fn reader_id(path: &str, j: &Json) -> Result<Nat, String> {
+fn reader_id(path: &str, j: &Json) -> Result<Digest, String> {
     let s = text(path, j)?;
     if !envelope::record_id(s) {
         return Err(format!("{path}: expected record id"));
@@ -90,16 +90,13 @@ fn reader_id(path: &str, j: &Json) -> Result<Nat, String> {
     if bytes.len() != 32 || base32::base32(&bytes) != s[2..] {
         return Err(format!("{path}: noncanonical base32 digest"));
     }
-    let n: Nat = num_bigint::BigUint::from_bytes_be(&bytes)
-        .to_string()
-        .parse()
-        .map_err(|e| format!("{path}: {e}"))?;
-    if id_text(&n) != s {
+    let digest = Digest::try_from(bytes.as_slice()).map_err(|e| format!("{path}: {e}"))?;
+    if id_text(&digest) != s {
         return Err(format!("{path}: id does not round trip"));
     }
-    Ok(n)
+    Ok(digest)
 }
-fn ids(path: &str, j: &Json) -> Result<Vec<Nat>, String> {
+fn ids(path: &str, j: &Json) -> Result<Vec<Digest>, String> {
     list(path, j)?
         .iter()
         .enumerate()
@@ -206,5 +203,58 @@ pub(super) fn record(path: &str, j: &Json) -> Result<Record, String> {
             }
         }
         Ok(base)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{reader_id, record};
+    use loops::{
+        base32,
+        json::Json,
+        record::{Digest, id_text},
+    };
+
+    #[test]
+    fn digest_text_round_trips_every_bit_and_all_reader_links() {
+        let mut digests = vec![Digest([0; 32]), Digest([255; 32])];
+        for index in 0..32 {
+            for bit in 0..8 {
+                let mut bytes = [0; 32];
+                bytes[index] = 1 << bit;
+                digests.push(Digest(bytes));
+            }
+        }
+        for digest in digests {
+            let text = Json::Str(id_text(&digest));
+            assert_eq!(reader_id("id", &text).expect("digest"), digest);
+            let raw = Json::Obj(vec![
+                ("id".into(), text.clone()),
+                ("kind".into(), Json::Str("k".into())),
+                ("observer".into(), Json::Str("o:x".into())),
+                ("about".into(), Json::Arr(vec![])),
+                ("prev".into(), Json::Arr(vec![text.clone(), text.clone()])),
+                ("under".into(), text.clone()),
+                ("erases".into(), Json::Arr(vec![text])),
+                ("emitted".into(), Json::Str("1970-01-01T00:00:00Z".into())),
+                ("value".into(), Json::Str(String::new())),
+                ("n".into(), Json::Int(0_i64.into())),
+            ]);
+            let r = record("record", &raw).expect("reader form");
+            assert_eq!(r.id, digest);
+            assert_eq!(r.prev, vec![digest, digest]);
+            assert_eq!(r.under, Some(digest));
+            assert_eq!(r.erases, vec![digest]);
+        }
+    }
+
+    #[test]
+    fn reader_refuses_wrong_digest_lengths_and_nonzero_padding() {
+        for len in [0, 1, 31, 33, 64] {
+            let raw = Json::Str(format!("r:{}", base32::base32(&vec![0; len])));
+            assert!(reader_id("id", &raw).is_err(), "length {len}");
+        }
+        let raw = Json::Str(format!("r:{}b", "a".repeat(51)));
+        assert!(reader_id("id", &raw).is_err());
     }
 }

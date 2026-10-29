@@ -4,32 +4,34 @@ use crate::{
     families::Tri,
     json::Json,
     occurred::{Claim, Span},
-    record::{Record, Shown, Val, id_text},
+    record::{Digest, Record, Shown, Val, id_text},
 };
 use std::fmt;
 
-/// `EnvField` (model/Loops/Spec.lean): fields available to every reader.
+/// Lean: `Loops.EnvField`, model/Loops/Spec.lean.
+/// These envelope fields remain available when the reader lacks the payload.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EnvField {
-    /// EnvField.kind (model/Loops/Spec.lean).
+    /// The record's kind name.
     Kind,
-    /// EnvField.observer (model/Loops/Spec.lean).
+    /// The typed reference for the observer who emits the record.
     Observer,
-    /// EnvField.about (model/Loops/Spec.lean).
+    /// The references for the things this record concerns.
     About,
-    /// EnvField.prev (model/Loops/Spec.lean).
+    /// The ids of the records this record supersedes.
     Prev,
-    /// EnvField.under (model/Loops/Spec.lean).
+    /// The id of the grant this record uses, if any.
     Under,
-    /// EnvField.erases (model/Loops/Spec.lean).
+    /// The ids of the records whose payloads this record erases.
     Erases,
-    /// EnvField.emitted (model/Loops/Spec.lean).
+    /// The observer's current time at emission.
     Emitted,
-    /// EnvField.occurred (model/Loops/Spec.lean).
+    /// The observer's claim about past time, if any.
     Occurred,
 }
 impl EnvField {
-    /// EnvField.all (model/Loops/Spec.lean), in declared order.
+    /// Lean: `Loops.EnvField.all`, model/Loops/Spec.lean.
+    /// Lists every envelope field in declaration order.
     pub const ALL: [Self; 8] = [
         Self::Kind,
         Self::Observer,
@@ -41,7 +43,8 @@ impl EnvField {
         Self::Occurred,
     ];
 
-    /// EnvField.name (model/Loops/Spec.lean).
+    /// Lean: `Loops.EnvField.name`, model/Loops/Spec.lean.
+    /// Returns the field name without the `env.` prefix.
     pub fn name(self) -> &'static str {
         match self {
             Self::Kind => "kind",
@@ -54,7 +57,8 @@ impl EnvField {
             Self::Occurred => "occurred",
         }
     }
-    /// EnvField.type (model/Loops/Spec.lean).
+    /// Lean: `Loops.EnvField.type`, model/Loops/Spec.lean.
+    /// Returns the argument domain for this envelope field.
     pub fn field_type(self) -> FieldType {
         match self {
             Self::Kind => FieldType::Text,
@@ -65,31 +69,34 @@ impl EnvField {
     }
 }
 
-/// `FieldType` (model/Loops/Spec.lean): the argument domain, not a coercion rule.
+/// Lean: `Loops.FieldType`, model/Loops/Spec.lean.
+/// A field type restricts test arguments without converting their values.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FieldType {
-    /// FieldType.text (model/Loops/Spec.lean).
+    /// Text with at least one character.
     Text,
-    /// FieldType.refs (model/Loops/Spec.lean).
+    /// Typed references that the envelope grammar accepts.
     Refs,
-    /// FieldType.ids (model/Loops/Spec.lean).
+    /// Record id text that the envelope grammar accepts.
     Ids,
-    /// FieldType.time (model/Loops/Spec.lean).
+    /// Time claims that the occurred grammar accepts.
     Time,
-    /// FieldType.payload (model/Loops/Spec.lean).
+    /// Text, exact integers, or Boolean payload values.
     Payload,
 }
 
-/// Field (model/Loops/Spec.lean).
+/// Lean: `Loops.Field`, model/Loops/Spec.lean.
+/// A test reads either a named payload field or a known envelope field.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Field {
-    /// Field.env (model/Loops/Spec.lean).
+    /// A known envelope field that all readers can read.
     Env(EnvField),
-    /// Field.payload (model/Loops/Spec.lean).
+    /// A payload field name that requires the payload to be present.
     Payload(String),
 }
 impl Field {
-    /// Field.ofName (model/Loops/Spec.lean): unknown env names never become payload fields.
+    /// Lean: `Loops.Field.ofName`, model/Loops/Spec.lean.
+    /// Reads a nonempty field name and refuses unknown names after `env.`.
     pub fn of_name(name: &str) -> Option<Self> {
         if name.is_empty() {
             None
@@ -102,28 +109,33 @@ impl Field {
             Some(Self::Payload(name.into()))
         }
     }
-    /// Field.name (model/Loops/Spec.lean).
+    /// Lean: `Loops.Field.name`, model/Loops/Spec.lean.
+    /// Returns the written field name, with `env.` for envelope fields.
     pub fn name(&self) -> String {
         match self {
             Self::Env(f) => format!("env.{}", f.name()),
             Self::Payload(n) => n.clone(),
         }
     }
-    /// Field.onEnvelope (model/Loops/Spec.lean).
+    /// Lean: `Loops.Field.onEnvelope`, model/Loops/Spec.lean.
+    /// States whether this field remains known without a payload.
     pub fn on_envelope(&self) -> bool {
         matches!(self, Self::Env(_))
     }
-    /// Field.type (model/Loops/Spec.lean).
+    /// Lean: `Loops.Field.type`, model/Loops/Spec.lean.
+    /// Returns the domain that this field permits for test arguments.
     pub fn field_type(&self) -> FieldType {
         match self {
             Self::Env(f) => f.field_type(),
             Self::Payload(_) => FieldType::Payload,
         }
     }
-    /// Field.read (model/Loops/Spec.lean): None is unknown, Some(empty) is known absent.
+    /// Lean: `Loops.Field.read`, model/Loops/Spec.lean.
+    /// Returns values in raw list order, including repeats.
+    /// Returns `None` for unknown payload data and an empty list for a known absent field.
     pub fn read(&self, r: &Record) -> Option<Vec<Item>> {
         let text = |s: &str| Item::Val(Val::Str(s.into()));
-        let ids = |ns: &[crate::number::Nat]| ns.iter().map(|n| text(&id_text(n))).collect();
+        let ids = |ns: &[Digest]| ns.iter().map(|n| text(&id_text(n))).collect();
         Some(match self {
             Self::Env(EnvField::Kind) => vec![text(&r.kind)],
             Self::Env(EnvField::Observer) => vec![text(&r.observer)],
@@ -149,16 +161,18 @@ impl Field {
     }
 }
 
-/// Item (model/Loops/Spec.lean): a value read, or a time span without its spelling.
+/// Lean: `Loops.Item`, model/Loops/Spec.lean.
+/// A field read yields a payload value or a time span without its text spelling.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Item {
-    /// Item.val (model/Loops/Spec.lean).
+    /// A text, integer, or Boolean value that the field holds.
     Val(Val),
-    /// Item.time (model/Loops/Spec.lean).
+    /// A parsed time span without its written claim.
     Time(Span),
 }
 impl Item {
-    /// Item.atLeast (model/Loops/Spec.lean): numeric value or time START.
+    /// Lean: `Loops.Item.atLeast`, model/Loops/Spec.lean.
+    /// Tests an inclusive lower bound on an integer or the span's start.
     pub fn at_least(&self, bound: &Arg) -> bool {
         match (bound, self) {
             (Arg::Val(Val::Int(i)), Self::Val(Val::Int(j))) => i <= j,
@@ -166,7 +180,8 @@ impl Item {
             _ => false,
         }
     }
-    /// Item.below (model/Loops/Spec.lean): numeric value or time START.
+    /// Lean: `Loops.Item.below`, model/Loops/Spec.lean.
+    /// Tests an exclusive upper bound on an integer or the span's start.
     pub fn below(&self, bound: &Arg) -> bool {
         match (bound, self) {
             (Arg::Val(Val::Int(i)), Self::Val(Val::Int(j))) => j < i,
@@ -176,16 +191,18 @@ impl Item {
     }
 }
 
-/// Arg (model/Loops/Spec.lean): retains a time's written claim as well as its span.
+/// Lean: `Loops.Arg`, model/Loops/Spec.lean.
+/// A test argument holds a value or a time claim with its text and span.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Arg {
-    /// Arg.val (model/Loops/Spec.lean).
+    /// A value that the field's argument domain permits.
     Val(Val),
-    /// Arg.time (model/Loops/Spec.lean).
+    /// A time claim that keeps its written text and parsed span.
     Time(Claim),
 }
 impl Arg {
-    /// Arg.matches (model/Loops/Spec.lean): time equality compares whole spans.
+    /// Lean: `Loops.Arg.matches`, model/Loops/Spec.lean.
+    /// Compares exact values, or whole time spans without their spelling.
     pub fn matches(&self, item: &Item) -> bool {
         match (self, item) {
             (Self::Val(v), Item::Val(w)) => v == w,
@@ -195,24 +212,26 @@ impl Arg {
     }
 }
 
-/// Op (model/Loops/Spec.lean): the closed test vocabulary.
+/// Lean: `Loops.Op`, model/Loops/Spec.lean.
+/// An operator tests the values that one field supplies.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Op {
-    /// Op.is (model/Loops/Spec.lean).
+    /// At least one field value matches the argument.
     Is(Arg),
-    /// Op.not (model/Loops/Spec.lean).
+    /// No field value matches the argument, including when the field is absent.
     Not(Arg),
-    /// Op.present (model/Loops/Spec.lean).
+    /// The field supplies at least one value.
     Present,
-    /// Op.absent (model/Loops/Spec.lean).
+    /// The field supplies no values.
     Absent,
-    /// Op.atLeast (model/Loops/Spec.lean).
+    /// At least one integer or span start meets an inclusive lower bound.
     AtLeast(Arg),
-    /// Op.below (model/Loops/Spec.lean).
+    /// At least one integer or span start meets an exclusive upper bound.
     Below(Arg),
 }
 impl Op {
-    /// Op.test (model/Loops/Spec.lean): not and absent are complements even on empty lists.
+    /// Lean: `Loops.Op.test`, model/Loops/Spec.lean.
+    /// Tests known field values. `Not` and `Absent` also hold on empty lists.
     pub fn test(&self, items: &[Item]) -> bool {
         match self {
             Self::Is(a) => items.iter().any(|i| a.matches(i)),
@@ -225,32 +244,37 @@ impl Op {
     }
 }
 
-/// Cond (model/Loops/Spec.lean).
+/// Lean: `Loops.Cond`, model/Loops/Spec.lean.
+/// A condition applies one operator to one record field.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cond {
-    /// Cond.field (model/Loops/Spec.lean).
+    /// The field that supplies values for this condition.
     pub field: Field,
-    /// Cond.op (model/Loops/Spec.lean).
+    /// The test that this condition applies to the field's values.
     pub op: Op,
 }
 impl Cond {
-    /// Cond.eval (model/Loops/Spec.lean).
+    /// Lean: `Loops.Cond.eval`, model/Loops/Spec.lean.
+    /// Tests the field, or returns `Unknown` when the reader lacks its payload.
     pub fn eval(&self, r: &Record) -> Tri {
         self.field
             .read(r)
             .map_or(Tri::Unknown, |items| Tri::of_bool(self.op.test(&items)))
     }
-    /// Cond.all (model/Loops/Spec.lean): conjunction, with Yes for no conditions.
+    /// Lean: `Loops.Cond.all`, model/Loops/Spec.lean.
+    /// Combines all conditions. `No` overrides `Unknown`, and an empty conjunction returns `Yes`.
     pub fn all(cs: &[Self], r: &Record) -> Tri {
         cs.iter().rfold(Tri::Yes, |t, c| c.eval(r).and(t))
     }
 }
 
-/// Tests and Tests.conds (model/Loops/Spec.lean): written field/operator order, including repeats.
+/// Lean: `Loops.Tests`, model/Loops/Spec.lean.
+/// A where map keeps fields and operators in written order, including repeats.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Tests(pub Vec<(Field, Vec<Op>)>);
 impl Tests {
-    /// Tests.conds (model/Loops/Spec.lean): flatten without reordering.
+    /// Lean: `Loops.Tests.conds`, model/Loops/Spec.lean.
+    /// Returns one condition per operator without changing written order.
     pub fn conds(&self) -> Vec<Cond> {
         self.0
             .iter()
@@ -264,15 +288,17 @@ impl Tests {
     }
 }
 
-/// Refusal.code (model/Loops/Spec.lean), the implemented where-parser subset.
+/// Lean: `Loops.Refusal.code`, model/Loops/Spec.lean.
+/// This type names only the refusal codes for the current where parser.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum RefusalCode {
-    /// parseWhere's where-invalid (model/Loops/Spec.lean).
+    /// A field, argument, operator, or map shape breaks the where grammar.
     WhereInvalid,
 }
 impl RefusalCode {
-    /// Refusal.code (model/Loops/Spec.lean): exact wire spelling.
+    /// Lean: `Loops.Refusal.code`, model/Loops/Spec.lean.
+    /// Returns the exact wire code for this refusal code.
     pub fn code(self) -> &'static str {
         match self {
             Self::WhereInvalid => "where-invalid",
@@ -285,16 +311,18 @@ impl fmt::Display for RefusalCode {
     }
 }
 
-/// Refusal (model/Loops/Spec.lean): typed code and original field path.
+/// Lean: `Loops.Refusal`, model/Loops/Spec.lean.
+/// A refusal names the failed check and the original field path.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Refusal {
-    /// Refusal.code (model/Loops/Spec.lean).
+    /// The check that refuses the where input.
     pub code: RefusalCode,
-    /// Refusal.path (model/Loops/Spec.lean).
+    /// The written field path where the check fails.
     pub path: String,
 }
 impl Refusal {
-    /// Refusal.code (model/Loops/Spec.lean): exact wire spelling.
+    /// Lean: `Loops.Refusal.code`, model/Loops/Spec.lean.
+    /// Returns the exact wire code for this refusal.
     pub fn code(&self) -> &'static str {
         self.code.code()
     }
@@ -313,7 +341,8 @@ fn invalid(path: &str) -> Refusal {
     }
 }
 
-/// parseArg (model/Loops/Spec.lean): validate against the field's exact domain.
+/// Lean: `Loops.parseArg`, model/Loops/Spec.lean.
+/// Parses an argument in the field's exact domain without bounding payload integers.
 ///
 /// # Errors
 /// Returns where-invalid at path for a value outside the argument domain.
@@ -333,7 +362,8 @@ pub fn parse_arg(ty: FieldType, path: &str, value: &Json) -> Result<Arg, Refusal
     }
 }
 
-/// parseBound (model/Loops/Spec.lean): only payload integers or times.
+/// Lean: `Loops.parseBound`, model/Loops/Spec.lean.
+/// Parses an unbounded payload integer or time claim as an order bound.
 ///
 /// # Errors
 /// Returns where-invalid at path for a bound outside this field's domain.
@@ -345,7 +375,8 @@ pub fn parse_bound(ty: FieldType, path: &str, value: &Json) -> Result<Arg, Refus
     }
 }
 
-/// parseOp (model/Loops/Spec.lean): validate one operator without changing error paths.
+/// Lean: `Loops.parseOp`, model/Loops/Spec.lean.
+/// Parses one known operator and keeps the field's original error path.
 ///
 /// # Errors
 /// Returns where-invalid at the field path, not the operator path.
@@ -361,7 +392,8 @@ pub fn parse_op(ty: FieldType, path: &str, name: &str, value: &Json) -> Result<O
     }
 }
 
-/// parseField (model/Loops/Spec.lean): at least one operator, in written order.
+/// Lean: `Loops.parseField`, model/Loops/Spec.lean.
+/// Parses a field with at least one operator, in written order.
 ///
 /// # Errors
 /// Returns where-invalid at path.name on an invalid name, shape or operator.
@@ -381,7 +413,9 @@ pub fn parse_field(path: &str, name: &str, ops: &Json) -> Result<(Field, Vec<Op>
     Ok((field, parsed))
 }
 
-/// parseWhere (model/Loops/Spec.lean): nonempty map; duplicate checks belong to the outer boundary.
+/// Lean: `Loops.parseWhere`, model/Loops/Spec.lean.
+/// Parses a nonempty where map in written order, without checking duplicate names.
+/// The outer spec or selection boundary checks those duplicates.
 ///
 /// # Errors
 /// Returns the first where-invalid in written order, with its field path.

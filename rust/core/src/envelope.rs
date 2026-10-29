@@ -6,27 +6,30 @@ use crate::{
     time,
 };
 
-/// Env (model/Loops/Envelope.lean): raw lists remain lists until toJson canonicalizes sets.
+/// Lean: `Loops.Env`, model/Loops/Envelope.lean.
+/// An unchecked writer envelope keeps text spellings and raw lists.
+/// Only `to_json` sorts its set fields and removes repeats.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Env {
-    /// Env.kind.
+    /// The name for the record's kind.
     pub kind: String,
-    /// Env.observer.
+    /// The typed reference for the observer who emits the record.
     pub observer: String,
-    /// Env.emitted.
+    /// The observer's current time, with its written offset.
     pub emitted: String,
-    /// Env.occurred.
+    /// The observer's claim about past time, if any.
     pub occurred: Option<String>,
-    /// Env.about.
+    /// The typed references for the things this record concerns.
     pub about: Vec<String>,
-    /// Env.prev.
+    /// The text ids of the records this record supersedes.
     pub prev: Vec<String>,
-    /// Env.under.
+    /// The text id of the grant this record uses, if any.
     pub under: Option<String>,
-    /// Env.erases.
+    /// The text ids of the records whose payloads this record erases.
     pub erases: Vec<String>,
 }
-/// typedRef (model/Loops/Envelope.lean); Lean Char.isLower/isDigit are ASCII predicates.
+/// Lean: `Loops.typedRef`, model/Loops/Envelope.lean.
+/// Checks a lowercase ASCII prefix and a nonempty value after the first colon.
 pub fn typed_ref(s: &str) -> bool {
     let Some((prefix, value)) = s.split_once(':') else {
         return false;
@@ -36,7 +39,8 @@ pub fn typed_ref(s: &str) -> bool {
         && chars.next().is_some_and(|c| c.is_ascii_lowercase())
         && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
 }
-/// recordId (model/Loops/Envelope.lean); validates alphabet/length, not final padding bits.
+/// Lean: `Loops.recordId`, model/Loops/Envelope.lean.
+/// Checks the `r:` prefix and 52 lowercase base32 characters, but not final padding bits.
 pub fn record_id(s: &str) -> bool {
     s.strip_prefix("r:").is_some_and(|rest| {
         rest.len() == 52
@@ -46,7 +50,9 @@ pub fn record_id(s: &str) -> bool {
     })
 }
 impl Env {
-    /// Env.toJson (model/Loops/Envelope.lean): nonempty sorted sets, optional fields omitted.
+    /// Lean: `Loops.Env.toJson`, model/Loops/Envelope.lean.
+    /// Writes the envelope, sorts its set fields, and removes repeats.
+    /// Omits empty sets and optional fields with no value.
     pub fn to_json(&self) -> Json {
         let mut xs = vec![
             ("kind".into(), Json::Str(self.kind.clone())),
@@ -80,7 +86,8 @@ impl Env {
         }
         Json::Obj(xs)
     }
-    /// Env.problem (model/Loops/Envelope.lean), in its exact first-refusal order.
+    /// Lean: `Loops.Env.problem`, model/Loops/Envelope.lean.
+    /// Returns the first envelope refusal in protocol check order.
     pub fn problem(&self) -> Option<Error> {
         if self.kind.is_empty() {
             Some(Error::KindEmpty)
