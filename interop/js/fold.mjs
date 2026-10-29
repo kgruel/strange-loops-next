@@ -132,9 +132,9 @@ export function latestBy(records) {
   return out;
 }
 
-// Latest is LatestBy over one thing: every record, whatever it is about.
+// Latest chooses the newest head across all things.
 export function latest(records) {
-  const hs = headsOf(distinct(records));
+  const hs = heads(records);
   return { winner: hs.length ? hs[0].id : null, others: ids(hs.slice(1)) };
 }
 

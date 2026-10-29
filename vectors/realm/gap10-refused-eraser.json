@@ -1,0 +1,62 @@
+{
+  "vector": "gap10-refused-eraser",
+  "layer": "realm",
+  "laws": ["settle.erased", "admit.no-cross"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
+        "kind": "load",
+        "observer": "sl:kyle",
+        "about": ["host:a"],
+        "value": "",
+        "prev": [],
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
+        "n": 40
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja",
+        "kind": "erase",
+        "observer": "sl:kyle",
+        "about": ["host:b"],
+        "value": "",
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
+        "emitted": "2026-10-01T00:01:50Z",
+        "occurred": "2026-10-01T00:01:50Z",
+        "erases": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
+        "shown": "erased"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja",
+        "shown": "here"
+      }
+    ],
+    "refused": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabja",
+        "code": "prev-unrelated"
+      }
+    ],
+    "things": {
+      "host:a": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 1
+    }
+  }
+}

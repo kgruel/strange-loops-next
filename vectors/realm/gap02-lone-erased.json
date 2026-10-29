@@ -1,0 +1,40 @@
+{
+  "vector": "gap02-lone-erased",
+  "layer": "realm",
+  "laws": ["settle.keeps"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
+        "kind": "load",
+        "observer": "sl:kyle",
+        "about": ["host:a"],
+        "prev": [],
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
+        "shown": "erased"
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
+        "shown": "withheld"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "host:a": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabiq",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 1
+    }
+  }
+}

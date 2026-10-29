@@ -1904,7 +1904,7 @@ loops emit dispute --about r:x2 --about r:x3                                    
   </div></details>
 
   <details class="unfold"><summary>Determinism, across implementations</summary><div class="body"><ul>
-    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. Numeric folds are exact: integers, or decimals at a scale the spec declares; never floats, whose sums change with order (found in step 1).</li>
+    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. The reader reads JSON numbers as binary64 values. Numeric folds accept only safe whole values and count other values as unread. Sum uses an exact integer accumulator.</li>
     <li><b>The spec hash pins the fold-vocabulary version.</b> Otherwise a change to LatestBy's semantics would change results under an unchanged hash.</li>
     <li><b>Conformance vectors bind implementations.</b> The vectors in <code>vectors/</code> are how any two implementations, such as the Rust core and a JavaScript record writer, stay bit-for-bit identical; they become a requirement.</li>
     <li><b>Window membership:</b> a record belongs if the start of its <code>occurred</code> span falls in the window; records without <code>occurred</code> use <code>emitted</code>. A spec may override.</li>
@@ -4070,7 +4070,7 @@ C · native bindings (the core runs inside the app)
       <thead><tr><th>Module</th><th>Holds</th><th>Tokens</th></tr></thead>
       <tbody>
         <tr><td><code>record</code></td><td>envelope, ids, salted commitments, Ed25519, the <code>Signer</code> trait</td><td>~6k</td></tr>
-        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers exact), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
+        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers read as binary64), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
         <tr><td><code>spec</code></td><td>JSON to typed specs and declarations; the closed folds and predicates as enums</td><td>~6k</td></tr>
         <tr><td><code>fold</code></td><td>six folds in two families, their modifiers, results that count what they couldn't read; no admission</td><td>~8k</td></tr>
         <tr><td><code>standing</code></td><td>declarations, stances, grants, presence, retire through, name tables, <code>resolve-by</code>, folded with <code>fold</code></td><td>~8k</td></tr>
@@ -4237,7 +4237,7 @@ loops sync [place]  ·  loops serve  ·  loops mcp  ·  loops whoami
 
 everywhere: --json   -C &lt;dir&gt;</pre>
   <ul>
-    <li><b>Payload syntax from HTTPie:</b> <code>field=text</code> is always a string, <code>field:=json</code> a JSON value. A bare quoted string at the end is the message. <code>:=</code> numbers are integers; decimals stay strings, so sums stay exact.</li>
+    <li><b>Payload syntax from HTTPie:</b> <code>field=text</code> is always a string, <code>field:=json</code> a JSON value. A bare quoted string at the end is the message. <code>:=</code> numbers use the layer 0 binary64 rule. Numeric folds accept only safe whole values; other values count as unread.</li>
     <li><b><code>emit</code> writes to a store,</b> never a vertex: the nearest <code>.loops/</code>, found the way git finds <code>.git</code>, or <code>--into</code>.</li>
     <li><b>Output:</b> human by default, through the vertex's lens. <code>--json</code> prints exactly what <code>serve</code> returns. No <code>-q</code>/<code>-v</code>: a different lens is how you see more or less.</li>
     <li><b>Exit codes:</b> 0 ok; 1 refused, printed with its code and field; 2 a usage error.</li>
@@ -4614,7 +4614,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
     </div></details>
     <details class="unfold"><summary>The crate's name</summary><div class="body"><p><code>loops</code> may already be taken on crates.io. Decide when the workspace is created; the name in code can differ from the published one.</p></div></details>
     <details class="unfold"><summary>Schema field names</summary><div class="body"><p>The JSON shapes on this page are drafts: <code>from</code>, <code>ticks</code>, <code>fold</code> with the fold type as its key, <code>where</code> with word operators, <code>boundary</code>, <code>param</code>, <code>note</code>. The schemas in <code>protocol/</code> fix them when step 2 is modelled.</p></div></details>
-    <details class="unfold"><summary>What "decimal" means <span class="pill p-lean">leaning</span></summary><div class="body"><p>Over floating point, addition isn't associative, so arrival order would change a sum and "the set decides" fails. The model folds integers. Lean: a decimal is a string in a fixed grammar, parsed to an integer at a scale the spec declares per field; mixed scales are refused, and a fractional <code>:=</code> on a declared numeric field is refused. Avg is gone from the core, so no fold divides or rounds.</p></div></details>
+    <details class="unfold"><summary>What a numeric fold reads <span class="pill p-done">settled</span></summary><div class="body"><p>The reader reads RFC 8259 numbers as binary64 values. Sum, min, and max accept only safe whole values. Thus <code>1.0</code> counts, but <code>1.5</code> counts as unread. Sum uses an exact integer accumulator. The protocol does not define fixed-scale decimal strings.</p></div></details>
     <details class="unfold"><summary>The review's other findings</summary><div class="body"><p>Two outside reviews of version 31 are compiled in <a href="https://claude.ai/artifact/TVxL5UBVhc2cTGWMi4B8KE">Strange Loops Rethink: Review</a>. Version 32 took its fold, withholding, tick and vertex findings. The <code>occurred</code> grammar is settled, and with it the window time zone: calendar dates are UTC days. Still to weigh there: id prefixes, standing's bootstrap order and two key tiers, <code>resolve-by</code> transitivity, closing segments per changeset, salt as an input to the core, and the sequence (ticks before standing).</p></div></details>
     <details class="unfold"><summary>Canonical encoding for results <span class="pill p-lean">leaning</span></summary><div class="body"><p>A result hash needs one encoding per state. Lean: RFC 8785 (JCS) for results, as for records; a Merkle encoding only if hashing large results gets slow.</p></div></details>
     <details class="unfold"><summary>Where does the LSP's history index live?</summary><div class="body"><p>Mapping a cursor to a birth key needs a cache of each symbol's history. Lean: the editor tooling's own disposable cache, not loops' index; the core never reads git.</p></div></details>

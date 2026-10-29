@@ -1,0 +1,16 @@
+{
+  "vector": "gap09-empty-array",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": []
+    }
+  },
+  "expect": {
+    "refused": "from-missing",
+    "path": "from"
+  }
+}

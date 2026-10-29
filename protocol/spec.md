@@ -30,6 +30,11 @@ A source takes a record when the record's kind is one of `kind` (or `kind`
 is left out) and the record is about `about` (or `about` is left out). The
 spec takes a record when any of its sources does.
 
+For direct spec evaluation, the caller resolves store names outside the runner.
+The runner receives records and does not look up stores.
+Each source tests only `kind` and `about` on those records.
+The direct spec and scenario vectors do not test store resolution, missing stores, or per-source routing.
+
 `about` here means about the thing: a record about nothing anchors the
 thing named by its own id, so `"about": "r:X"` takes X as well as every
 record about X. (`env.about` in `where` reads the field as written, which
@@ -57,6 +62,27 @@ and optionally:
 | `note` | any value: carried, not read | any |
 
 Any other key is refused.
+
+Settle forms before admission, then run heads and all slots over admitted records.
+For each slot, count each unread record id once, even if it heads several things.
+For `collect`, count unread candidates before the limit.
+Apply the limit only to the ordered list of matching records.
+
+A record belongs to each thing in its `about` set.
+When that set is empty, it belongs to the thing named by its own id.
+Compute heads separately for each thing, using only its records.
+A successor can replace a head in one thing but not another.
+For a whole-reader view, combine these heads and keep each id once.
+Count, sum, min, and max do not copy records for each membership.
+`latest` selects the newest head in this combined view as its winner.
+It returns the other heads in content order.
+It does not use global succession state.
+
+Sum, min, and max read only safe whole values from the named payload field.
+Read each number using the layer 0 binary64 rule first.
+For each selected record, count an unavailable payload, missing field, or other value as unread.
+Do not convert text or booleans to numbers.
+The safe input range does not limit the sum accumulator.
 
 ## `where`
 
@@ -87,6 +113,20 @@ What the tests mean is in [`laws.md`](laws.md): a map holds when every test
 does, a set field holds a value when one of its members is that value, and a
 time is tested by the span it reads as, never its spelling.
 
+For payload tests, read JSON numbers using the layer 0 binary64 rule.
+A whole value has no fractional part and lies within ±(2^53 − 1), inclusive.
+This rule applies to `is`, `not`, `at-least`, and `below`.
+Thus `1.0` and `1e2` are whole values, but `1.5` and ±2^53 are not.
+
+A `where` map answers no if any test answers no.
+Otherwise, it answers unknown if any test answers unknown.
+Otherwise, it answers yes.
+Test order does not change the answer.
+A missing field in a held payload is known absent.
+For that field, `is`, `present`, `at-least`, and `below` answer no.
+`not` and `absent` answer yes.
+A payload field test answers unknown when the reader does not hold the payload.
+
 ## Refusals
 
 A spec that breaks a rule is refused with a code and the path of what broke
@@ -101,11 +141,13 @@ Checks run in this order, and the first that fails is the refusal:
    found depth first in member order. A member's value is searched before
    the members after it, and an array's elements in order, so
    `{"a": 1, "b": {"c": 1, "c": 2}, "a": 2}` is refused at `b.c`.
+   Check each member's key before searching its value.
+   If the key repeats, refuse at its path without searching its value.
 2. **An object**: `spec-not-object`, at the empty path.
 3. **Known keys**: `unknown-key`, at the first unknown key as written.
 4. **`vertex`**: `vertex-missing` when it is left out, `vertex-invalid` when
    it isn't text or is empty; at `vertex`.
-5. **`from`**: `from-missing` when it is left out or empty; `from-invalid`
+5. **`from`**: `from-missing` when it is absent or an empty array; `from-invalid`
    at `from` when it isn't an array. Then each source in order: not an
    object (`from-invalid` at `from`), an unknown key (`unknown-key` at
    `from.<key>`), then `store`, `kind` and `about`, in that order however

@@ -62,7 +62,14 @@ def cases : List Case := [
   ⟨"06-about-nothing", ["thing.local"], [m1, m2, m3]⟩,
   ⟨"07-kind-change-supersedes", ["thing.local"], [t1, t2]⟩,
   ⟨"08-about-nothing-revised-unrelated", ["admit.no-cross", "thing.local"], [m1, m4]⟩,
-  ⟨"09-revision-erases", ["settle.set", "settle.erased"], [x1, x2]⟩
+  ⟨"09-revision-erases", ["settle.set", "settle.erased"], [x1, x2]⟩,
+  ⟨"gap01-id-order", ["settle.set", "admit.no-cross"],
+    [r 52 "note" ["thing:A"] 1, r 53 "note" ["thing:B"] 2 [52],
+      r 0 "note" ["thing:C"] 3, r 1 "note" ["thing:D"] 4 [0]]⟩,
+  ⟨"gap02-lone-erased", ["settle.keeps"], [full.erase]⟩,
+  ⟨"gap10-refused-eraser", ["settle.erased", "admit.no-cross"],
+    [full, { r 0x52 "erase" ["host:b"] 110 [0x51] with erases := [0x51] }]⟩,
+  ⟨"gap10-withheld-eraser", ["settle.erased"], [full, eraseRec.withhold]⟩
 ]
 
 def allow : Record → Record → Bool := fun _ _ => true

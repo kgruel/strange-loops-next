@@ -177,7 +177,7 @@ C · native bindings (the core runs inside the app)
       <thead><tr><th>Module</th><th>Holds</th><th>Tokens</th></tr></thead>
       <tbody>
         <tr><td><code>record</code></td><td>envelope, ids, salted commitments, Ed25519, the <code>Signer</code> trait</td><td>~6k</td></tr>
-        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers exact), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
+        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers read as binary64), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
         <tr><td><code>spec</code></td><td>JSON to typed specs and declarations; the closed folds and predicates as enums</td><td>~6k</td></tr>
         <tr><td><code>fold</code></td><td>six folds in two families, their modifiers, results that count what they couldn't read; no admission</td><td>~8k</td></tr>
         <tr><td><code>standing</code></td><td>declarations, stances, grants, presence, retire through, name tables, <code>resolve-by</code>, folded with <code>fold</code></td><td>~8k</td></tr>
@@ -344,7 +344,7 @@ loops sync [place]  ·  loops serve  ·  loops mcp  ·  loops whoami
 
 everywhere: --json   -C &lt;dir&gt;</pre>
   <ul>
-    <li><b>Payload syntax from HTTPie:</b> <code>field=text</code> is always a string, <code>field:=json</code> a JSON value. A bare quoted string at the end is the message. <code>:=</code> numbers are integers; decimals stay strings, so sums stay exact.</li>
+    <li><b>Payload syntax from HTTPie:</b> <code>field=text</code> is always a string, <code>field:=json</code> a JSON value. A bare quoted string at the end is the message. <code>:=</code> numbers use the layer 0 binary64 rule. Numeric folds accept only safe whole values; other values count as unread.</li>
     <li><b><code>emit</code> writes to a store,</b> never a vertex: the nearest <code>.loops/</code>, found the way git finds <code>.git</code>, or <code>--into</code>.</li>
     <li><b>Output:</b> human by default, through the vertex's lens. <code>--json</code> prints exactly what <code>serve</code> returns. No <code>-q</code>/<code>-v</code>: a different lens is how you see more or less.</li>
     <li><b>Exit codes:</b> 0 ok; 1 refused, printed with its code and field; 2 a usage error.</li>

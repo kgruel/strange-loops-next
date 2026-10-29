@@ -141,7 +141,7 @@
   </div></details>
 
   <details class="unfold"><summary>Determinism, across implementations</summary><div class="body"><ul>
-    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. Numeric folds are exact: integers, or decimals at a scale the spec declares; never floats, whose sums change with order (found in step 1).</li>
+    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. The reader reads JSON numbers as binary64 values. Numeric folds accept only safe whole values and count other values as unread. Sum uses an exact integer accumulator.</li>
     <li><b>The spec hash pins the fold-vocabulary version.</b> Otherwise a change to LatestBy's semantics would change results under an unchanged hash.</li>
     <li><b>Conformance vectors bind implementations.</b> The vectors in <code>vectors/</code> are how any two implementations, such as the Rust core and a JavaScript record writer, stay bit-for-bit identical; they become a requirement.</li>
     <li><b>Window membership:</b> a record belongs if the start of its <code>occurred</code> span falls in the window; records without <code>occurred</code> use <code>emitted</code>. A spec may override.</li>

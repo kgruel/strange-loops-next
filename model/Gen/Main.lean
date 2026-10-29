@@ -7,6 +7,7 @@ import Gen.Batch
 import Gen.Realm
 import Gen.Occurred
 import Gen.Scenario
+import Gen.Rulings
 
 /-!
 # Gen: write the vectors
@@ -91,20 +92,29 @@ def rotations (xs : List Record) : List (List Record) :=
 def countCases : List FoldCase := [
   ⟨"01-empty", ["count.perm"], [[]]⟩,
   ⟨"02-three", ["count.perm"], rotations [r1, r3, r5]⟩,
-  ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩
+  ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩,
+  ⟨"gap15-multi-thing-once", ["count.perm"], rotations [
+    { rec 0xc1 "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec 0xc2 "task:a" 200 (prev := [0xc1]) with n := 1 }]⟩
 ]
 
 def latestCases : List FoldCase := [
-  ⟨"01-chain", ["latest.set"], rotations [r1, r2]⟩,
+  ⟨"01-chain", ["latest.set", "latest.newest", "latest.one-thing"], rotations [r1, r2]⟩,
   ⟨"02-fork", ["latest.set"], rotations [r1, r3]⟩,
   ⟨"03-merge", ["latest.set"], rotations [r1, r2, r3, r4]⟩,
-  ⟨"04-repeats", ["latest.repeats"], [[r1, r3], [r3, r1, r3, r1]]⟩
+  ⟨"04-repeats", ["latest.repeats"], [[r1, r3], [r3, r1, r3, r1]]⟩,
+  ⟨"gap16-newest-union-head", ["latest.set", "heads.whole-view", "latest.newest"], rotations [
+    { rec 0xc1 "task:a" 300 with about := ["task:a", "task:b"] },
+    rec 0xc2 "task:a" 200 (prev := [0xc1]), rec 0xc3 "task:c" 100]⟩
 ]
 
 def sumCases : List FoldCase := [
   ⟨"01-empty", ["sum.perm"], [[]]⟩,
   ⟨"02-mixed-signs", ["sum.perm"], rotations [n1, n2, n3]⟩,
-  ⟨"03-repeats-counted", ["sum.repeats"], [[n1, n2, n3, n1, n2, n3]]⟩
+  ⟨"03-repeats-counted", ["sum.repeats"], [[n1, n2, n3, n1, n2, n3]]⟩,
+  ⟨"gap15-multi-thing-once", ["sum.perm"], rotations [
+    { rec 0xc1 "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec 0xc2 "task:a" 200 (prev := [0xc1]) with n := 1 }]⟩
 ]
 
 def extremaCases : List FoldCase := [
@@ -131,13 +141,24 @@ def latestByCases : List FoldCase := [
   ⟨"10-two-things", ["latest-by.set"], rotations [r1, r5, r3]⟩,
   ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩,
   ⟨"12-emitted-without-occurred", ["latest-by.order"], rotations [t1, t2, t3, t4]⟩,
-  ⟨"13-span-order", ["latest-by.order"], rotations [u1, u2, u3, u4]⟩
+  ⟨"13-span-order", ["latest-by.order"], rotations [u1, u2, u3, u4]⟩,
+  ⟨"gap15-memberships-and-anchor", ["latest-by.set"], rotations [
+    { rec 0xc1 "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec 0xc2 "task:a" 200 (prev := [0xc1]) with n := 1 },
+    { rec 0xc3 "unused:x" 250 with about := [], n := 2 },
+    { rec 0xc4 "task:c" 300 with n := 3 },
+    { rec 0xc5 (idText 0xc3) 350 (prev := [0xc3]) with n := 4 }]⟩
 ]
 
 def headsCases : List FoldCase := [
   ⟨"01-max-follows-prev", ["heads.set"], rotations [h1, h2, h3]⟩,
   ⟨"02-superseded-max-leaves", ["heads.set"], rotations [h2, h3]⟩,
-  ⟨"03-limit-newest-first", ["heads.set"], rotations [r1, r2, r3, r5, r8]⟩
+  ⟨"03-limit-newest-first", ["heads.set"], rotations [r1, r2, r3, r5, r8]⟩,
+  ⟨"gap15-partial-and-anchor", ["heads.set", "heads.whole-view"], rotations [
+    { rec 0xc1 "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec 0xc2 "task:a" 200 (prev := [0xc1]) with n := 1 },
+    { rec 0xc3 "unused:x" 250 with about := [], n := 2 },
+    { rec 0xc4 (idText 0xc3) 300 (prev := [0xc3]) with n := 3 }]⟩
 ]
 
 def jResult (r : Result (Option Int)) : J :=
@@ -163,7 +184,12 @@ def viewCases : List ViewCase := [
   ⟨"01-withheld-head-still-supersedes", ["view.no-resurrection"], [r1, r2], hideIds [0x12]⟩,
   ⟨"02-erased-head-still-supersedes", ["view.no-resurrection"], [r1, r2, r3, r4], eraseIds [0x14]⟩,
   ⟨"03-withheld-ancestor", ["view.no-resurrection"], [r1, r2, r3, r4], hideIds [0x11, 0x12]⟩,
-  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [0x33]⟩
+  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [0x33]⟩,
+  ⟨"gap15-partial-and-anchor", ["view.no-resurrection", "heads.whole-view"],
+    [{ rec 0xc1 "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+      { rec 0xc2 "task:a" 200 (prev := [0xc1]) with n := 1 },
+      { rec 0xc3 "unused:x" 250 with about := [], n := 2 },
+      { rec 0xc4 (idText 0xc3) 300 (prev := [0xc3]) with n := 3 }], hideIds [0xc1]⟩
 ]
 
 def jViewState (s : LatestBy) : J :=
@@ -172,13 +198,13 @@ def jViewState (s : LatestBy) : J :=
 
 def viewVector (c : ViewCase) : Except String J := do
   let orders := rotations (c.records.map c.view)
-  let results := orders.map fun o => jViewState (LatestBy.fold .empty o)
+  let results := orders.map fun o => jViewState (Latest.fold o)
   let first := results.headD .null
   if !(results.all (·.render 0 == first.render 0)) then
     throw s!"fold/view/{c.name}: arrival orders disagree"
   -- a view sees the same heads as a reader holding everything
-  let full := (LatestBy.fold .empty c.records).heads.map (·.id)
-  if (LatestBy.fold .empty (c.records.map c.view)).heads.map (·.id) != full then
+  let full := (Latest.fold c.records).heads.map (·.id)
+  if (Latest.fold (c.records.map c.view)).heads.map (·.id) != full then
     throw s!"fold/view/{c.name}: a view changed the heads"
   return vector c.name "fold/view" c.laws
     (.obj [("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
@@ -268,7 +294,18 @@ def lensCases : List LensCase := [
   ⟨"09-text-outside", ["lens.refuse"], base, [L "stray line"] ++ render base⟩,
   -- a backslash the text itself starts with, before nothing that needs escaping, is kept
   ⟨"10-backslash-kept", ["lens.escaping", "lens.put-get"], base,
-    render [base[0]!] ++ [L "::: decision:cache", L "\\No cache until reads are slow.", L ":::"]⟩
+    render [base[0]!] ++ [L "::: decision:cache", L "\\No cache until reads are slow.", L ":::"]⟩,
+  ⟨"gap11-embedded-newline", ["lens.round-trip"], [], render [S "notes" ["one\ntwo", "", "\r"]]⟩,
+  ⟨"gap17-escaping", ["lens.escaping"],
+    [S "notes" [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]],
+    render [S "notes" [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]]⟩,
+  ⟨"gap17-raw-backslash", ["lens.escaping"], [S "notes" ["old"]],
+    [L "::: notes", L "\\plain", L "\\\\", L "\\:::x", L ":::"]⟩,
+  ⟨"gap17-empty-id", ["lens.refuse"], [], [L "::: ", L "body", L ":::"]⟩,
+  ⟨"gap17-duplicate-id", ["lens.refuse"], [], render [S "a" ["one"], S "a" ["two"]]⟩,
+  ⟨"gap18-reorder-unknown-absent", ["lens.nothing-dropped"],
+    [S "a" ["A"], S "b" ["B"], S "c" ["C"]],
+    render [S "b" ["B2"], S "a" ["A2"], S "unknown" ["X"]]⟩
 ]
 
 def lensVector (c : LensCase) : Except String J := do
@@ -318,7 +355,7 @@ def main (args : List String) : IO UInt32 := do
   let latestBy ← latestByCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/latest-by" c fun o => jPerThing (perThing o)))
   let heads ← headsCases.mapM fun c => do
-    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (LatestBy.fold .empty o)))
+    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (Latest.fold o)))
   let views ← viewCases.mapM fun c => do pure (c.name, ← orFail (viewVector c))
   let selects ← selectCases.mapM fun c => do pure (c.name, ← orFail (selectVector c))
   let lens ← lensCases.mapM fun c => do pure (c.name, ← orFail (lensVector c))
@@ -354,6 +391,9 @@ def main (args : List String) : IO UInt32 := do
   let scenarios ← match Gen.ScenarioVectors.vectors with
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
-  writeAll dir "scenario" scenarios
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length} vectors to {dir}"
+  let rulingScenarios ← match Gen.RulingVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "scenario" (scenarios ++ rulingScenarios)
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length + rulingScenarios.length} vectors to {dir}"
   return 0

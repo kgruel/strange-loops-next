@@ -20,6 +20,7 @@ partial def ofJson : Json → J
   | .null => .null
   | .bool b => .bool b
   | .int i => .int i
+  | .number n => .number n
   | .str s => .str s
   | .arr xs => .arr (xs.map ofJson)
   | .obj kvs => .obj (kvs.map fun (k, v) => (k, ofJson v))

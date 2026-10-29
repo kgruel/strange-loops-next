@@ -1,0 +1,184 @@
+{
+  "vector": "gap05-unread-before-limit",
+  "layer": "spec/run",
+  "laws": ["result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "plain": {
+          "collect": true,
+          "limit": 1,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "follow": {
+          "collect": true,
+          "follow": "prev",
+          "limit": 1,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "all": {
+          "collect": true,
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 0,
+          "fields": {
+            "status": "open"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:b"],
+          "prev": [],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaczq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "shown": "withheld"
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:b"],
+          "prev": [],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaczq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 0,
+          "fields": {
+            "status": "open"
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaczq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 0,
+          "fields": {
+            "status": "open"
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:b"],
+          "prev": [],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "shown": "withheld"
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "plain": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+          "shown": "here"
+        }
+      ],
+      "unread": 2
+    },
+    "follow": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+          "shown": "here"
+        }
+      ],
+      "unread": 2
+    },
+    "all": {
+      "heads": [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+          "shown": "here"
+        }
+      ],
+      "unread": 2
+    }
+  }
+}

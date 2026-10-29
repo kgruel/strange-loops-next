@@ -13,15 +13,13 @@ Two rules shape it:
 
 * **The text parser keeps what JSON parsers may drop.** Members stay in the
   order written and a repeated name is kept, since a spec's refusal depends
-  on both (`member-duplicate`, errors in written order). Numbers are
-  integers, as the model's are; a fraction or an exponent is refused rather
-  than rounded.
+  on both (`member-duplicate`, errors in written order). Numbers round to binary64.
+  Safe-whole values become integers; other numbers retain their binary64 bits.
 * **Decoding refuses, naming the field.** Inputs will come from people, so
   every refusal says where (`input.orders[0][1].prev[0]`) and what was
   wanted. A record is decoded as far as the model's `Record` needs: ids
   that are record ids and times that read. Layer 0's other envelope rules
-  (a kind, typed references) are `write`'s, which a batch's drafts go
-  through; the folds read records as they are handed them.
+  remain `write`'s, which a batch's drafts go through. The decoder checks typed `about` members.
 -/
 
 namespace Gen.Read
@@ -100,22 +98,34 @@ partial def stringBody (acc : List Char) : Parser String := do
 
 def str : Parser String := do expectChar '"'; stringBody []
 
-/-- An integer, as JSON writes one: no leading zeros, no `+`. -/
+/-- RFC 8259 numbers round once to binary64. -/
 def number : Parser Json := do
   let cs ← get
   let neg := cs.head? == some '-'
   let cs := if neg then cs.drop 1 else cs
   let ds := cs.takeWhile Char.isDigit
   if ds.isEmpty then fail "expected a value"
-  else if ds.length > 1 && ds.head? == some '0' then fail "a number with a leading zero"
-  else
-    let rest := cs.drop ds.length
-    if rest.head?.any fun c => c == '.' || c == 'e' || c == 'E' then
-      set rest; fail "a fraction or exponent: the model's numbers are integers"
-    else
-      set rest
-      let n : Nat := ds.foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
-      pure (.int (if neg then -(n : Int) else n))
+  if ds.length > 1 && ds.head? == some '0' then fail "a number with a leading zero"
+  let mut rest := cs.drop ds.length
+  let mut frac : List Char := []
+  if rest.head? == some '.' then
+    frac := (rest.drop 1).takeWhile Char.isDigit
+    if frac.isEmpty then set rest; fail "expected digits after the decimal point"
+    rest := rest.drop (frac.length + 1)
+  let mut exp : Int := 0
+  if rest.head? == some 'e' || rest.head? == some 'E' then
+    rest := rest.drop 1
+    let minus := rest.head? == some '-'
+    if minus || rest.head? == some '+' then rest := rest.drop 1
+    let digits := rest.takeWhile Char.isDigit
+    if digits.isEmpty then set rest; fail "expected exponent digits"
+    let e := digits.foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
+    exp := if minus then -(e : Int) else e
+    rest := rest.drop digits.length
+  set rest
+  let m := (ds ++ frac).foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
+  let n := Number.ofScientific neg m (exp - frac.length)
+  pure (match n.whole? with | some i => .int i | none => .number n)
 
 mutual
 partial def value : Parser Json := do
@@ -276,8 +286,9 @@ def shownOf (path : String) (j : Json) : Dec Shown := do
 def valOf (path : String) : Json → Dec Val
   | .str s => pure (.str s)
   | .int i => pure (.int i)
+  | .number n => if n.finite then pure (.number n) else bad path "number-out-of-range"
   | .bool b => pure (.bool b)
-  | _ => bad path "a payload field is text, an integer or a boolean"
+  | _ => bad path "a payload field is text, a number or a boolean"
 
 def fieldsOf (path : String) (j : Json) : Dec (List (String × Val)) := do
   let kvs ← object path j
@@ -298,7 +309,9 @@ def record (path : String) (j : Json) : Dec Record := do
   let id ← recordId (dot path "id") idJ
   let kind ← text (dot path "kind") (← req path kvs "kind")
   let observer ← text (dot path "observer") (← req path kvs "observer")
-  let about ← texts (dot path "about") (← req path kvs "about")
+  let about ← each (dot path "about") (fun p j => do
+    let s ← text p j
+    if typedRef s then pure s else bad p "expected a typed reference") (← req path kvs "about")
   let prev ← each (dot path "prev") recordId (← req path kvs "prev")
   let under ← opt kvs "under" (recordId (dot path "under"))
   let emitted ← stampOf (dot path "emitted") (← req path kvs "emitted")
@@ -309,9 +322,13 @@ def record (path : String) (j : Json) : Dec Record := do
   match shown with
   | .here =>
     let value ← text (dot path "value") (← req path kvs "value")
-    let n ← int (dot path "n") (← req path kvs "n")
+    let nVal ← valOf (dot path "n") (← req path kvs "n")
+    let (n, nNumber) ← match nVal with
+      | .int i => pure (i, none)
+      | .number x => pure (0, some x)
+      | _ => bad (dot path "n") "expected a number"
     let fields ← (opt kvs "fields" (fieldsOf (dot path "fields"))).map (·.getD [])
-    pure { base with value, n, fields }
+    pure { base with value, n, nNumber, fields }
   | _ =>
     for k in ["value", "n", "fields"] do
       if (kvs.lookup k).isSome then bad path s!"its payload isn't here, so it carries no \"{k}\""

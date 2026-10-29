@@ -1,0 +1,100 @@
+{
+  "vector": "gap01-id-order",
+  "layer": "realm",
+  "laws": ["settle.set", "admit.no-cross"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["thing:A"],
+        "value": "",
+        "prev": [],
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
+        "n": 0
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["thing:B"],
+        "value": "",
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
+        "n": 0
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["thing:C"],
+        "value": "",
+        "prev": [],
+        "emitted": "2026-10-01T00:00:03Z",
+        "occurred": "2026-10-01T00:00:03Z",
+        "n": 0
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["thing:D"],
+        "value": "",
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        "emitted": "2026-10-01T00:00:04Z",
+        "occurred": "2026-10-01T00:00:04Z",
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "shown": "here"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq",
+        "shown": "here"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "shown": "here"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "shown": "here"
+      }
+    ],
+    "refused": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq",
+        "code": "prev-unrelated"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "code": "prev-unrelated"
+      }
+    ],
+    "things": {
+      "thing:A": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "others": []
+      },
+      "thing:C": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

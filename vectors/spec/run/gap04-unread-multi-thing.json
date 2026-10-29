@@ -1,0 +1,60 @@
+{
+  "vector": "gap04-unread-multi-thing",
+  "layer": "spec/run",
+  "laws": ["result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "by": {
+          "latest-by": "about",
+          "follow": "prev",
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "collect": {
+          "collect": true,
+          "follow": "prev",
+          "where": {
+            "status": {
+              "is": "open"
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacqq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "shown": "withheld"
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "by": {
+      "things": {},
+      "unread": 1
+    },
+    "collect": {
+      "heads": [],
+      "unread": 1
+    }
+  }
+}

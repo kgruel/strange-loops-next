@@ -1,0 +1,36 @@
+{
+  "vector": "gap17-raw-backslash",
+  "layer": "lens/section",
+  "laws": ["lens.escaping"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "notes",
+        "body": ["old"]
+      }
+    ],
+    "text": ["::: notes", "\\plain", "\\\\", "\\:::x", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "notes",
+        "body": ["\\plain", "\\", ":::x"]
+      }
+    ],
+    "normalized": ["::: notes", "\\\\plain", "\\\\", "\\:::x", ":::"],
+    "outcomes": [
+      {
+        "accepted": "notes",
+        "body": ["\\plain", "\\", ":::x"]
+      }
+    ],
+    "applied": [
+      {
+        "id": "notes",
+        "body": ["\\plain", "\\", ":::x"]
+      }
+    ]
+  }
+}

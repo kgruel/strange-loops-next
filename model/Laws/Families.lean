@@ -325,11 +325,11 @@ theorem Acc.select_set_decides {σ} (f : Acc σ) (ev : Record → Tri) {xs ys : 
   rw [f.perm (((p.filter _).filter _)), (p.filter _).length_eq,
     ((p.filter _).filter _).length_eq]
 
-/-- Max over heads counts the heads a view hides. -/
+/-- Max over heads counts every numeric value it cannot read. -/
 theorem LatestBy.maxHeads_view {f : Record → Record} (hf : View f) {xs : List Record}
     (hx : Addressed xs) :
     (OverHeads.fold LatestBy.maxHeads (xs.map f)).unread =
-      ((LatestBy.fold .empty xs).heads.filter fun h => (f h).shown != .here).length := by
+      ((LatestBy.fold .empty xs).heads.filter fun h => ((f h).num "n").isNone).length := by
   simp only [OverHeads.fold, LatestBy.maxHeads, LatestBy.view hf hx, filter_map, length_map]
   rfl
 

@@ -39,6 +39,16 @@ An envelope that breaks a rule is refused with one of: `kind-empty`,
 `about-not-typed`, `prev-not-record-id`, `under-not-record-id`,
 `erases-not-record-id`, checked in that order.
 
+The reader settles forms before admission checks `prev`.
+A held record applies `erases` even when admission refuses its `prev`.
+The reader applies `erases` without reading the eraser's payload.
+This rule does not establish signature validity or authority.
+A lone erased form settles as withheld unless a held record names its id in `erases`.
+The reader keeps its envelope and does not restore its payload.
+Write settled, refused, and admitted record arrays in ascending id order.
+Compare ids by unsigned digest bytes, first byte first, not by id text.
+This array order does not change head content order.
+
 Any record may erase, whatever its kind: no kind is reserved for it, so the
 field alone carries the meaning, and every reader applies it from the
 envelope, with or without the payload. A revision can erase what it
@@ -107,6 +117,11 @@ ECMAScript number formatting, no whitespace. Object member names must be
 distinct at every depth: JSON text with a repeated name is refused
 (`member-duplicate`), not resolved to the first or the last, which parsers
 disagree on.
+
+A payload can contain RFC 8259 number spellings, including fractions and exponents.
+JCS reads each number as an IEEE-754 binary64 value.
+The writer applies the range rule below to that value.
+Numeric folds have a separate safe-whole rule in [`spec.md`](spec.md).
 
 JCS reads every number as an IEEE-754 double, which holds an integer exactly
 only within ±(2^53 − 1). Past that, two different numbers share one canonical

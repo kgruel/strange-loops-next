@@ -1,0 +1,59 @@
+{
+  "vector": "gap15-multi-thing-once",
+  "layer": "fold/count",
+  "laws": ["count.perm"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        }
+      ]
+    ]
+  },
+  "expect": 2
+}

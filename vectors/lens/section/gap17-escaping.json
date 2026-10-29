@@ -1,0 +1,31 @@
+{
+  "vector": "gap17-escaping",
+  "layer": "lens/section",
+  "laws": ["lens.escaping"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "notes",
+        "body": [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]
+      }
+    ],
+    "text": ["::: notes", "\\:::", "\\::: task:a", "\\:::x", "\\\\", "\\\\:::", "\\\\plain", "  ::: x", "::", "", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "notes",
+        "body": [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]
+      }
+    ],
+    "normalized": ["::: notes", "\\:::", "\\::: task:a", "\\:::x", "\\\\", "\\\\:::", "\\\\plain", "  ::: x", "::", "", ":::"],
+    "outcomes": [],
+    "applied": [
+      {
+        "id": "notes",
+        "body": [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]
+      }
+    ]
+  }
+}

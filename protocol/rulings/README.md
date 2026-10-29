@@ -1,31 +1,41 @@
-# Proposed protocol rulings
+# Decided protocol rulings
 
-All proposals require human approval. This document changes no normative prose or behavior.
-Output ids abbreviate canonical `idText` values.
-The rank puts architectural boundaries and divergent behavior first, then silent selection and count differences, then wire order and refusals.
+The human decided all 18 gaps.
+The table gives the final resolutions.
+The sections below preserve earlier analysis, recommendations, proposed sentences, and test results as historical evidence.
+They do not state current requirements or current implementation status.
+In particular, the earlier gap 17 draft allowed empty ids, and the earlier gap 16 draft used global succession state.
+Both drafts are superseded by the table and the normative protocol pages.
+Output ids in the historical examples abbreviate canonical `idText` values.
 
-## Decision table
+## Final resolutions
 
-| Gap | Recommended decision | Agreement scope |
-|---|---|---|
-| 7 | Resolve externally for the direct runner | Direct inputs agree; routing is untested |
-| 17 | Lean syntax; empty ids allowed; refuse duplicates | Ordinary syntax agrees; id boundaries differ |
-| 15 | Per-thing membership and deduplicated whole-reader heads | Membership agrees; helper scopes differ |
-| 8 | Layer 0 safe integer values | Unsafe arguments differ; runner limits syntax |
-| 10 | Erase before admission | Tested forms agree |
-| 6 | Admit before slots | Composed scenarios agree |
-| 12 | No wins over unknown | Tested conjunctions agree |
-| 13 | Held missing field is known absent | Tested operators agree |
-| 14 | Exact integers without coercion | Shared valid domain agrees |
-| 4 | Count each unread id once per slot | Tested heads agree |
-| 5 | Count unread before limit | Tested collects agree |
-| 16 | Latest uses one combined state | Tested input agrees |
-| 18 | Match sections by id | Distinct ids agree |
-| 11 | Explicit line arrays; separate LF adapter | Core agrees; checker adds a relation |
-| 1 | Sort arrays by digest bytes | Tested arrays agree |
-| 3 | Check a key before its value | Tested refusal agrees |
-| 9 | Missing means absent or empty array | Tested refusals agree |
-| 2 | Lone erased form settles withheld | Tested form agrees |
+| Gap | Status | Resolution | Normative location |
+|---|---|---|---|
+| 1 | Decided | Sort settled, refused, and admitted arrays by digest bytes. | `protocol/record.md`, `vectors/README.md` |
+| 2 | Decided | Settle a lone erased form as withheld without a held eraser. | `protocol/record.md` |
+| 3 | Decided | Check a member key before its value for repeats. | `protocol/spec.md` |
+| 4 | Decided | Count each unread id once per slot. | `protocol/spec.md` |
+| 5 | Decided | Count unread candidates before the collect limit. | `protocol/spec.md` |
+| 6 | Decided | Settle, then admit, before heads and slots. | `protocol/spec.md`, `vectors/README.md` |
+| 7 | Decided | Resolve stores outside direct evaluation; routing remains untested. | `protocol/spec.md` |
+| 8 | Decided | Read payload test numbers as safe whole binary64 values. | `protocol/spec.md` |
+| 9 | Decided | Only an absent `from` or empty array is missing. | `protocol/spec.md` |
+| 10 | Decided | Apply held erasers before admission, without their payloads. | `protocol/record.md` |
+| 11 | Decided | Use line arrays and a separate LF-splitting scenario adapter. | `protocol/lens.md`, `vectors/README.md` |
+| 12 | Decided | A no answer wins over unknown in a conjunction. | `protocol/spec.md` |
+| 13 | Decided | A missing field in a held payload is known absent. | `protocol/spec.md` |
+| 14 | Decided | Read RFC 8259 numbers as binary64; numeric folds read safe whole values only. | `protocol/record.md`, `protocol/spec.md` |
+| 15 | Decided | Compute heads per thing and combine them once per id. | `protocol/spec.md` |
+| 16 | Decided | Latest selects the newest head in the per-thing union; other heads use content order. | `protocol/spec.md` |
+| 17 | Decided | Use Lean line and escape rules; refuse empty and repeated ids. | `protocol/lens.md` |
+| 18 | Decided | Match edited sections to base sections by id. | `protocol/lens.md` |
+
+## Historical evidence
+
+The following material records the investigation before these decisions.
+Its recommendations and proposed sentences are not normative.
+The implementation observations and verification results describe that earlier point in time.
 
 ## Lean context and reproduction
 
@@ -44,7 +54,7 @@ Use `scenarioCase` or `mkScenario` for scenario inputs.
 Write each encoded value under its matching family directory, then run `lake exe run <file>` from `model/`.
 Call the exported `check` functions in `interop/js/check-spec.mjs`, `check-realm.mjs`, `check-fold.mjs`, `check-lens.mjs`, and `check-scenario.mjs` with that vector root.
 The existing `lake exe run --check <root>` checks generated inputs as a group.
-Do not add these cases to Gen entry lists or generated vectors before approval.
+At the time of this investigation, the cases were not approved for Gen entry lists or generated vectors.
 
 ### Verification scope
 
