@@ -34,14 +34,16 @@
   // The sentence: one invariance after another, the slots changing and the frame staying. It
   // moves only when the reader asks, so nobody in a meeting loses their place.
   const change = $("#rotor-change"), stays = $("#rotor-stays"), law = $("#rotor-law"), at = $("#rotor-at");
+  const verb = $("#rotor-verb"), holds = $("#rotor-holds");
   let k = 0;
   const step = async (by) => {
     k = (k + by + ROTOR.length) % ROTOR.length;
     const r = ROTOR[k];
-    await Promise.all([change, stays, law].map((el) => animate(el, { opacity: [1, 0], transform: ["translateY(0px)", `translateY(${-6 * by}px)`] }, { duration: 0.16 })));
-    change.innerHTML = r.change; stays.innerHTML = r.stays; law.innerHTML = r.link;
+    await Promise.all([change, stays, verb, holds, law].map((el) => animate(el, { opacity: [1, 0], transform: ["translateY(0px)", `translateY(${-6 * by}px)`] }, { duration: 0.16 })));
+    change.innerHTML = r.change; stays.innerHTML = r.stays; verb.textContent = r.verb; law.innerHTML = r.link;
+    holds.innerHTML = r.holds; holds.hidden = !r.holds;
     at.textContent = `${k + 1} of ${ROTOR.length}`;
-    [change, stays, law].forEach((el, i) => animate(el, { opacity: [0, 1], transform: [`translateY(${6 * by}px)`, "translateY(0px)"] }, spring(320, 26, 0.05 * i)));
+    [change, stays, verb, holds, law].forEach((el, i) => animate(el, { opacity: [0, 1], transform: [`translateY(${6 * by}px)`, "translateY(0px)"] }, spring(320, 26, 0.05 * i)));
   };
   $("#rotor-next").addEventListener("click", () => step(1));
   $("#rotor-prev").addEventListener("click", () => step(-1));

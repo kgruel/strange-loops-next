@@ -170,6 +170,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .chip{color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair-2)}
 .law-scope{font-size:12.5px;color:var(--muted);border-left:2px solid var(--hair-2);padding-left:8px;line-height:1.5}
 .law-scope code{font-size:11px}
+.law-scope .holds{font-weight:600;color:var(--ink)}
 /* The evidence page, on design/register.css and design/laws/sentence.css: the law cards, the
    coverage table and the proof map. */
 
@@ -503,9 +504,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-batch-meaning" data-shape="exactness">
       <div class="law-h"><h4>batch.meaning</h4><span class="chip">Exactness</span></div>
-      <p class="law-s">An acyclic batch has one meaning: any two assignments of ids to its labels that both fit it agree.</p>
-      <p class="law-scope">That the batch resolver returns this meaning, whatever the drafts' order, is checked on every batch vector in every rotation of its drafts, not proved.</p>
-      <p class="law-md"><span>laws.md</span> an acyclic batch has one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters</p>
+      <p class="law-s">An acyclic batch has at most one meaning: any two assignments of ids to its labels that both fit it agree.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the batch is acyclic: its labels can be ranked so that a draft uses only labels ranked below its own. That the batch resolver returns this meaning, whatever the drafts' order, is checked on every batch vector in every rotation of its drafts, not proved.</p>
+      <p class="law-md"><span>laws.md</span> an acyclic batch has at most one meaning: each label's id is its record's id with real ids in place of labels, so draft order never matters</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Meaning.unique</code></summary><p class="thm-m">Laws.Batch</p><pre>∀ {H : Hash} {ds : List Draft} {rank : String → Nat}, Acyclic ds rank → ∀ {σ τ : String → Option String}, Meaning H ds σ → Meaning H ds τ → ∀ (l : String), σ l = τ l</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/batch/01-two-labels.json"><code>batch/01-two-labels</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/batch/02-chain-and-real-ids.json"><code>batch/02-chain-and-real-ids</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/batch/03-revise-and-erase.json"><code>batch/03-revise-and-erase</code></a></span></dd>
@@ -538,7 +539,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-record-erasure" data-shape="invariance">
       <div class="law-h"><h4>record.erasure</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">forgetting the payload's opening</span>, and <span class="inv">the id</span> stays.</p>
+      <p class="law-s">Change <span class="var">whether the payload's opening is kept</span>, and <span class="inv">the id</span> stays.</p>
       <p class="law-md"><span>laws.md</span> forgetting the opening never changes the id</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>erase_keeps_id</code></summary><p class="thm-m">Laws.Record</p><pre>∀ (H : Hash) (r : Stored), Stored.id H (erase H r) = Stored.id H r</pre></details><details class="thm"><summary><code>erase_idem</code></summary><p class="thm-m">Laws.Record</p><pre>∀ (H : Hash) (r : Stored), erase H (erase H r) = erase H r</pre></details></dd>
@@ -560,7 +561,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-record-sets" data-shape="invariance">
       <div class="law-h"><h4>record.sets</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">the order of <code>about</code>, <code>prev</code> or <code>erases</code>, and repeats in them</span>, and <span class="inv">the id</span> stays.</p>
+      <p class="law-s">Change <span class="var">the order of, and repeats in, <code>about</code>, <code>prev</code> or <code>erases</code></span>, and <span class="inv">the id</span> stays.</p>
       <p class="law-md"><span>laws.md</span> reordering or repeating <code>about</code>, <code>prev</code> or <code>erases</code> never changes the id</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>id_sets</code></summary><p class="thm-m">Laws.Record</p><pre>∀ (H : Hash) {e e' : Env} (commit : String), e.kind = e'.kind → e.observer = e'.observer → e.emitted = e'.emitted → e.occurred = e'.occurred → e.under = e'.under → (∀ (s : String), s ∈ e.about ↔ s ∈ e'.about) → (∀ (s : String), s ∈ e.prev ↔ s ∈ e'.prev) → (∀ (s : String), s ∈ e.erases ↔ s ∈ e'.erases) → idOf H e commit = idOf H e' commit</pre></details><details class="thm"><summary><code>canonSet_eq</code></summary><p class="thm-m">Laws.Record</p><pre>∀ {xs ys : List String}, (∀ (s : String), s ∈ xs ↔ s ∈ ys) → canonSet xs = canonSet ys</pre></details></dd>
@@ -573,7 +574,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-record-member-order" data-shape="invariance">
       <div class="law-h"><h4>record.member-order</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">the order of an object's members, their names distinct</span>, and <span class="inv">its canonical bytes</span> stays.</p>
+      <p class="law-s">Change <span class="var">the order of an object's members</span>, and <span class="inv">its canonical bytes</span> stay.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the object's member names are distinct.</p>
       <p class="law-md"><span>laws.md</span> reordering an object's members never changes its canonical bytes</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>canon_member_order</code></summary><p class="thm-m">Laws.Record</p><pre>∀ {kvs kvs' : List (String × Json)}, kvs.Perm kvs' → (List.map (fun x =&gt; x.fst) kvs).Nodup → (Json.obj kvs).canon = (Json.obj kvs').canon</pre></details></dd>
@@ -666,8 +668,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-occurred-order" data-shape="order">
       <div class="law-h"><h4>occurred.order</h4><span class="chip">Order</span></div>
-      <p class="law-s">Spans order by start, then end, an open end last: every store orders them the same.</p>
-      <p class="law-md"><span>laws.md</span> spans order by start then end, an open end last: a strict total order, so every store orders them the same</p>
+      <p class="law-s">Spans order by start, then end, an open end last, with no ties: any two stores that order by it agree.</p>
+      <p class="law-md"><span>laws.md</span> spans order by start then end, an open end last: a strict total order with no ties, so any two stores that order by it agree</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Span.before_irrefl</code></summary><p class="thm-m">Laws.Time</p><pre>∀ (a : Span), ¬a.Before a</pre></details><details class="thm"><summary><code>Span.before_trans</code></summary><p class="thm-m">Laws.Time</p><pre>∀ {a b c : Span}, a.Before b → b.Before c → a.Before c</pre></details><details class="thm"><summary><code>Span.before_total</code></summary><p class="thm-m">Laws.Time</p><pre>∀ (a b : Span), a.Before b ∨ a = b ∨ b.Before a</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/occurred/08-order.json"><code>occurred/08-order</code></a></span></dd>
@@ -694,9 +696,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="laws-grid">
     <article class="law" id="law-input-distinct" data-shape="exactness">
       <div class="law-h"><h4>input.distinct</h4><span class="chip">Exactness</span></div>
-      <p class="law-s">A fold is handed each id exactly once: the realm's union removes repeats.</p>
-      <p class="law-scope">This is the read path's contract; a fold called directly on a list with repeats counts them.</p>
-      <p class="law-md"><span>laws.md</span> a fold is handed each id once; <code>dedup</code> is the realm's union</p>
+      <p class="law-s">The read path's contract is that a fold is handed each id once, and the union gives that: <code>dedup</code> leaves each id once and, where an id names one record, keeps the same records.</p>
+      <p class="law-scope">Only <code>dedup</code> is proved; a fold called directly on a list with repeats counts them.</p>
+      <p class="law-md"><span>laws.md</span> the read path hands a fold each id once; <code>dedup</code>, the realm's union, leaves each id once and, where an id names one record, keeps the same records</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Distinct.addressed</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {xs : List Record}, Distinct xs → Addressed xs</pre></details><details class="thm"><summary><code>distinct_dedup</code></summary><p class="thm-m">Laws.Families</p><pre>∀ (xs : List Record), Distinct (dedup xs)</pre></details><details class="thm"><summary><code>mem_dedup</code></summary><p class="thm-m">Laws.Families</p><pre>∀ {xs : List Record}, Addressed xs → ∀ {r : Record}, r ∈ dedup xs ↔ r ∈ xs</pre></details></dd>
         <dt>pinned by</dt><dd><span>(the read path)</span></dd>
@@ -722,7 +724,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="laws-grid">
     <article class="law" id="law-view-no-resurrection" data-shape="invariance">
       <div class="law-h"><h4>view.no-resurrection</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">which payloads a reader holds</span>, and <span class="inv">the heads, by id</span> stays.</p>
+      <p class="law-s">Change <span class="var">which payloads a reader holds</span>, and <span class="inv">the set of heads, by id</span> stays.</p>
       <p class="law-scope">Each head comes back in the view's form, and a superseded record is never current.</p>
       <p class="law-md"><span>laws.md</span> a view (withheld or erased payloads) folds to the same heads; a superseded record is never current</p>
       <dl class="chain">
@@ -747,7 +749,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-settle-set" data-shape="invariance">
       <div class="law-h"><h4>settle.set</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">which place holds which form</span>, and <span class="inv">what the reader keeps, one record per id</span> stays.</p>
+      <p class="law-s">Change <span class="var">which place holds which form</span>, and <span class="inv">what the reader keeps (one record per id)</span> stays.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the forms of one id agree: the same envelope, and the same payload wherever it is held.</p>
       <p class="law-md"><span>laws.md</span> what a reader keeps depends only on which forms its places hold, one record per id</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>settle_eq</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {xs ys : List Record}, Forms xs → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → settle xs = settle ys</pre></details><details class="thm"><summary><code>settle_distinct</code></summary><p class="thm-m">Laws.Things</p><pre>∀ (xs : List Record), Distinct (settle xs)</pre></details></dd>
@@ -804,9 +807,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-view-no-resurrection-things" data-shape="invariance">
       <div class="law-h"><h4>view.no-resurrection</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">which payloads a reader holds</span>, and <span class="inv">which records are admitted, and each thing's heads, by id</span> stays.</p>
-      <p class="law-scope">Every record comes back in the view's form; a record superseded in a thing is never current there.</p>
-      <p class="law-md"><span>laws.md</span> a view admits the same records and folds each thing to the full reader's state, each record in the view's form; a record superseded in a thing is never current there</p>
+      <p class="law-s">Change <span class="var">which payloads a reader holds</span>, and <span class="inv">the admitted records and each thing's heads by id</span> stay.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the store's rule for who may replace whom reads only envelopes. Every record comes back in the view's form; a record superseded in a thing is never current there.</p>
+      <p class="law-md"><span>laws.md</span> for a rule that reads only envelopes, a view admits the same records and folds each thing to the full reader's state, each record in the view's form; a record superseded in a thing is never current there</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>admit_view</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {f : Record → Record}, View f → ∀ {may : Record → Record → Bool}, EnvOnly may → ∀ (xs : List Record), admit may (List.map f xs) = List.map f (admit may xs)</pre></details><details class="thm"><summary><code>stateIn_view</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {f : Record → Record}, View f → ∀ (t : String) {xs : List Record}, Addressed xs → stateIn t (List.map f xs) = { named := (stateIn t xs).named, heads := List.map f (stateIn t xs).heads }</pre></details><details class="thm"><summary><code>stateIn_no_false_resurrection</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {f : Record → Record}, View f → ∀ {t : String} {xs : List Record}, Addressed xs → ∀ {r q : Record}, q ∈ xs → q.isAbout t = true → r.id ∈ q.prev → ∀ (h : Record), h ∈ (stateIn t (List.map f xs)).heads → h.id ≠ r.id</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/01-withheld-head-still-supersedes.json"><code>fold/view/01-withheld-head-still-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/02-erased-head-still-supersedes.json"><code>fold/view/02-erased-head-still-supersedes</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/03-withheld-ancestor.json"><code>fold/view/03-withheld-ancestor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/view/04-max-counts-unread-heads.json"><code>fold/view/04-max-counts-unread-heads</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/03-withheld-successor.json"><code>spec/run/03-withheld-successor</code></a></span><span class="files also">also naming it: <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/scenario/01-decision.json"><code>scenario/01-decision</code></a></span></dd>
@@ -834,7 +837,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="laws-grid">
     <article class="law" id="law-incremental-batch" data-shape="invariance">
       <div class="law-h"><h4>incremental = batch</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">folding in parts or all at once</span>, and <span class="inv">the state</span> stays.</p>
+      <p class="law-s">Change <span class="var">whether records are folded in parts or all at once</span>, and <span class="inv">the state</span> stays.</p>
       <p class="law-scope">Proved for Count and LatestBy. Sum, Min and Max are step folds, for which it holds by construction; folds over heads inherit it from LatestBy's state (<a class="lawref" href="#law-heads-late"><code>heads.late</code></a>).</p>
       <p class="law-md"><span>laws.md</span> folding <code>xs</code> then <code>ys</code> is folding <code>xs ++ ys</code></p>
       <dl class="chain">
@@ -857,8 +860,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law is-limit" id="law-count-repeats" data-shape="limit">
       <div class="law-h"><h4>count.repeats</h4><span class="chip">Limit</span></div>
-      <p class="law-s">Deliver the whole set twice and each record is counted again: the count doubles. Any record delivered again is counted again. So the store must hand each id over once.</p>
-      <p class="law-md"><span>laws.md</span> a repeated delivery is counted again, so the store must hand each id over once</p>
+      <p class="law-s">Deliver the whole set twice and each record is counted again: the count doubles. Any record delivered again is counted again. That is why the read path hands each id over once (<a class="lawref" href="#law-input-distinct"><code>input.distinct</code></a>).</p>
+      <p class="law-md"><span>laws.md</span> a repeated delivery is counted again, which is why the read path hands each id over once</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Count.repeats</code></summary><p class="thm-m">Laws.Fold</p><pre>∀ (xs : List Record), Count.fold 0 (xs ++ xs) = 2 * Count.fold 0 xs</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/count/03-repeats-counted.json"><code>fold/count/03-repeats-counted</code></a></span></dd>
@@ -868,7 +871,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-latest-by-set" data-shape="invariance">
       <div class="law-h"><h4>latest-by.set</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">how the records arrive, the set kept</span>, and <span class="inv">every thing's state, its heads and winner</span> stays.</p>
+      <p class="law-s">Change <span class="var">how the records arrive, the set kept</span>, and <span class="inv">every thing's state (its heads and winner)</span> stays.</p>
       <p class="law-scope">Within one store an id names one record.</p>
       <p class="law-md"><span>laws.md</span> the state depends only on the set of records folded</p>
       <dl class="chain">
@@ -894,7 +897,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-latest-by-repeats" data-shape="invariance">
       <div class="law-h"><h4>latest-by.repeats</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">delivering records again</span>, and <span class="inv">the state</span> stays.</p>
+      <p class="law-s">Change <span class="var">how many times a record is delivered</span>, and <span class="inv">the state</span> stays.</p>
       <p class="law-scope">Within one store an id names one record.</p>
       <p class="law-md"><span>laws.md</span> re-delivering records changes nothing</p>
       <dl class="chain">
@@ -943,8 +946,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law is-limit" id="law-sum-repeats" data-shape="limit">
       <div class="law-h"><h4>sum.repeats</h4><span class="chip">Limit</span></div>
-      <p class="law-s">Deliver the whole set twice and each record is added again: the sum doubles. Any record delivered again is added again. So the store must hand each id over once.</p>
-      <p class="law-md"><span>laws.md</span> a repeated delivery is added again, so the store must hand each id over once</p>
+      <p class="law-s">Deliver the whole set twice and each record is added again: the sum doubles. Any record delivered again is added again. That is why the read path hands each id over once (<a class="lawref" href="#law-input-distinct"><code>input.distinct</code></a>).</p>
+      <p class="law-md"><span>laws.md</span> a repeated delivery is added again, which is why the read path hands each id over once</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Sum.repeats</code></summary><p class="thm-m">Laws.Numeric</p><pre>∀ (xs : List Record), Sum.fold 0 (xs ++ xs) = 2 * Sum.fold 0 xs</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/fold/sum/03-repeats-counted.json"><code>fold/sum/03-repeats-counted</code></a></span></dd>
@@ -954,7 +957,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-extrema-set" data-shape="invariance">
       <div class="law-h"><h4>extrema.set</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">arrival order and repeats</span>, and <span class="inv">the min and the max</span> stays.</p>
+      <p class="law-s">Change <span class="var">arrival order and repeats</span>, and <span class="inv">the min or the max</span> stays.</p>
       <p class="law-md"><span>laws.md</span> Min and Max depend only on the set of records</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Max.set_decides</code></summary><p class="thm-m">Laws.Numeric</p><pre>∀ {xs ys : List Record}, (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → Max.fold none xs = Max.fold none ys</pre></details><details class="thm"><summary><code>Min.set_decides</code></summary><p class="thm-m">Laws.Numeric</p><pre>∀ {xs ys : List Record}, (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → Min.fold none xs = Min.fold none ys</pre></details></dd>
@@ -1011,7 +1014,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law is-limit" id="law-heads-why" data-shape="limit">
       <div class="law-h"><h4>heads.why</h4><span class="chip">Limit</span></div>
-      <p class="law-s">Max can't follow <code>prev</code>: no step from its state and the next record keeps the current maximum. So folds over heads keep LatestBy's state instead.</p>
+      <p class="law-s">Max can't follow <code>prev</code>: no step from its state and the next record keeps the current maximum. That is why folds over heads keep LatestBy's state.</p>
       <p class="law-md"><span>laws.md</span> Max can't follow <code>prev</code>: no step from Max's state and the next record keeps the current maximum</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Max.cannot_follow_prev</code></summary><p class="thm-m">Laws.Families</p><pre>¬∃ g, ∀ (xs : List Record) (r : Record), Distinct (xs ++ [r]) → g (Max.fold none xs) r = (OverHeads.fold LatestBy.maxHeads (xs ++ [r])).value</pre></details></dd>
@@ -1035,7 +1038,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-result-full" data-shape="refinement">
       <div class="law-h"><h4>result.full</h4><span class="chip">Refinement</span></div>
-      <p class="law-s">When every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold.</p>
+      <p class="law-s">When every test answers and every record is readable to the fold, nothing is unread and the result is the fold of the records the test selects.</p>
       <p class="law-scope">A payload that is here but lacks the field, or holds it as text, isn't readable to a numeric fold.</p>
       <p class="law-md"><span>laws.md</span> when every test answers and every record is readable to the fold, nothing is unread and the result is the plain fold</p>
       <dl class="chain">
@@ -1047,7 +1050,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-select-set" data-shape="invariance">
       <div class="law-h"><h4>select.set</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">the order the records arrive in</span>, and <span class="inv">what is read and what is unread</span> stays.</p>
+      <p class="law-s">Change <span class="var">the order the records arrive in</span>, and <span class="inv">the split into read and unread</span> stays.</p>
       <p class="law-scope">Each id is handed over once (<a class="lawref" href="#law-input-distinct"><code>input.distinct</code></a>).</p>
       <p class="law-md"><span>laws.md</span> what is read and what is unread depend only on the set</p>
       <dl class="chain">
@@ -1060,8 +1063,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-thing-local" data-shape="invariance">
       <div class="law-h"><h4>thing.local</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">the records about other things, once records are settled and admitted</span>, and <span class="inv">this thing's state</span> stays.</p>
-      <p class="law-scope">Admission and erasure read records about other things, so this starts after them.</p>
+      <p class="law-s">Change <span class="var">the records not about this thing, once records are settled and admitted</span>, and <span class="inv">this thing's state</span> stays.</p>
+      <p class="law-scope">Admission and erasure can read records not about this thing, so this starts after them.</p>
       <p class="law-md"><span>laws.md</span> a thing's state depends only on the records about it; the set decides per thing</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>stateIn_local</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {t : String} {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ∧ r.isAbout t = true ↔ r ∈ ys ∧ r.isAbout t = true) → stateIn t xs = stateIn t ys</pre></details><details class="thm"><summary><code>perThing_set_decides</code></summary><p class="thm-m">Laws.Things</p><pre>∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → perThing xs = perThing ys</pre></details></dd>
@@ -1086,7 +1089,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-where-typed" data-shape="exactness">
       <div class="law-h"><h4>where.typed</h4><span class="chip">Exactness</span></div>
-      <p class="law-s">A test is accepted exactly when its argument fits its field, and renders back as it was written.</p>
+      <p class="law-s">A test is accepted exactly when its operator and argument fit its field, and renders back as it was written.</p>
       <p class="law-md"><span>laws.md</span> <code>at-least</code> and <code>below</code> compare numbers with numbers and times with times, and hold for nothing else; a test is accepted exactly when its argument fits its field (<code>Op.Fits</code>), and renders back to what was written</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Op.ordered_like_only</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (a : Arg) {xs : List Item}, (∀ (x : Item), x ∈ xs → Item.like a x = false) → (Op.atLeast a).test xs = false ∧ (Op.below a).test xs = false</pre></details><details class="thm"><summary><code>parseOp_ok_iff</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ (ty : FieldType) (path : String) (kv : String × Json) (op : Op), parseOp ty path kv = Except.ok op ↔ Op.Fits ty op ∧ op.toJson = kv</pre></details><details class="thm"><summary><code>parseArg_ok_iff</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ (ty : FieldType) (path : String) (j : Json) (a : Arg), parseArg ty path j = Except.ok a ↔ Arg.Fits ty a ∧ a.toJson = j</pre></details><details class="thm"><summary><code>parseBound_ok_iff</code></summary><p class="thm-m">Laws.Parse</p><pre>∀ (ty : FieldType) (path : String) (j : Json) (a : Arg), parseBound ty path j = Except.ok a ↔ Arg.Bounds ty a ∧ a.toJson = j</pre></details></dd>
@@ -1098,8 +1101,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-where-fields" data-shape="exactness">
       <div class="law-h"><h4>where.fields</h4><span class="chip">Exactness</span></div>
-      <p class="law-s">Each envelope field reads as exactly what it holds: a text as its text, a set as its members, <code>emitted</code> as its instant.</p>
-      <p class="law-md"><span>laws.md</span> each envelope field reads as what it holds: <code>kind</code> and <code>observer</code> as their text, a set as its members (<code>is</code>) and whether it holds any (<code>present</code>), <code>emitted</code> as its own instant</p>
+      <p class="law-s"><code>kind</code> and <code>observer</code> read as their text; <code>about</code>, <code>prev</code>, <code>under</code> and <code>erases</code> as their members; <code>emitted</code> as its instant.</p>
+      <p class="law-scope"><code>occurred</code> reads as its span (<a class="lawref" href="#law-where-time"><code>where.time</code></a>).</p>
+      <p class="law-md"><span>laws.md</span> <code>kind</code> and <code>observer</code> read as their text; <code>about</code>, <code>prev</code>, <code>under</code> and <code>erases</code> as their members (<code>is</code>) and whether they hold any (<code>present</code>); <code>emitted</code> as its own instant. <code>occurred</code> is <code>where.time</code>'s</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Cond.text_is</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (t : String) (r : Record), { field := Field.env EnvField.kind, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (t == r.kind) ∧ { field := Field.env EnvField.observer, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (t == r.observer)</pre></details><details class="thm"><summary><code>Cond.about_is</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (t : String) (r : Record), { field := Field.env EnvField.about, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (r.about.contains t)</pre></details><details class="thm"><summary><code>Cond.id_is</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (i : String) (r : Record), { field := Field.env EnvField.prev, op := Op.is (Arg.val (Val.str i)) }.eval r = Tri.ofBool ((List.map idText r.prev).contains i) ∧ { field := Field.env EnvField.under, op := Op.is (Arg.val (Val.str i)) }.eval r = Tri.ofBool ((List.map idText r.under.toList).contains i) ∧ { field := Field.env EnvField.erases, op := Op.is (Arg.val (Val.str i)) }.eval r = Tri.ofBool ((List.map idText r.erases).contains i)</pre></details><details class="thm"><summary><code>Cond.set_present</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (r : Record), { field := Field.env EnvField.about, op := Op.present }.eval r = Tri.ofBool !r.about.isEmpty ∧ { field := Field.env EnvField.prev, op := Op.present }.eval r = Tri.ofBool !r.prev.isEmpty ∧ { field := Field.env EnvField.under, op := Op.present }.eval r = Tri.ofBool r.under.isSome ∧ { field := Field.env EnvField.erases, op := Op.present }.eval r = Tri.ofBool !r.erases.isEmpty</pre></details><details class="thm"><summary><code>Cond.emitted_is</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (c : Claim) (r : Record), { field := Field.env EnvField.emitted, op := Op.is (Arg.time c) }.eval r = Tri.ofBool (c.span == Span.point r.emitted.moment)</pre></details><details class="thm"><summary><code>Cond.emitted_atLeast</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (c : Claim) (r : Record), { field := Field.env EnvField.emitted, op := Op.atLeast (Arg.time c) }.eval r = Tri.ofBool (decide (c.span.start ≤ r.emitted.moment))</pre></details><details class="thm"><summary><code>Cond.emitted_below</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (c : Claim) (r : Record), { field := Field.env EnvField.emitted, op := Op.below (Arg.time c) }.eval r = Tri.ofBool (decide (r.emitted.moment &lt; c.span.start))</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/08-envelope-fields.json"><code>spec/run/08-envelope-fields</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/09-from-about-anchor.json"><code>spec/run/09-from-about-anchor</code></a></span></dd>
@@ -1109,8 +1113,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-where-time" data-shape="invariance">
       <div class="law-h"><h4>where.time</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">how a time is spelled, the record's or the test's</span>, and <span class="inv">the answer</span> stays.</p>
-      <p class="law-md"><span>laws.md</span> a test on a time reads its span, never its spelling, the record's or the argument's: <code>is</code> asks for the same span, <code>at-least</code> and <code>below</code> compare starts, and a record without <code>occurred</code> passes neither</p>
+      <p class="law-s">Change <span class="var">how <code>emitted</code>, <code>occurred</code> or a test's time is spelled, to another spelling of the same span</span>, and <span class="inv">the answer</span> stays.</p>
+      <p class="law-scope">A time in a payload is text; these laws don't read it as a time.</p>
+      <p class="law-md"><span>laws.md</span> a test on an envelope time (<code>emitted</code>, <code>occurred</code>) reads what it means, never how it is spelled, in the record or in the argument: <code>is</code> asks for the same span, <code>at-least</code> and <code>below</code> compare starts, and a record without <code>occurred</code> passes neither</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Cond.occurred_is</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (c : Claim) (r : Record), { field := Field.env EnvField.occurred, op := Op.is (Arg.time c) }.eval r = Tri.yes ↔ ∃ k, r.occurred = some k ∧ k.span = c.span</pre></details><details class="thm"><summary><code>Cond.occurred_atLeast</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (c : Claim) (r : Record), { field := Field.env EnvField.occurred, op := Op.atLeast (Arg.time c) }.eval r = Tri.yes ↔ ∃ k, r.occurred = some k ∧ c.span.start ≤ k.span.start</pre></details><details class="thm"><summary><code>Cond.occurred_below</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (c : Claim) (r : Record), { field := Field.env EnvField.occurred, op := Op.below (Arg.time c) }.eval r = Tri.yes ↔ ∃ k, r.occurred = some k ∧ k.span.start &lt; c.span.start</pre></details><details class="thm"><summary><code>Cond.occurred_missing</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (a : Arg) {r : Record}, r.occurred = none → { field := Field.env EnvField.occurred, op := Op.atLeast a }.eval r = Tri.no ∧ { field := Field.env EnvField.occurred, op := Op.below a }.eval r = Tri.no</pre></details><details class="thm"><summary><code>Cond.time_meaning</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ {f : EnvField}, f.type = FieldType.time → ∀ (op : Op) {r r' : Record}, Option.map (fun x =&gt; x.span) r.occurred = Option.map (fun x =&gt; x.span) r'.occurred → r.emitted.moment = r'.emitted.moment → { field := Field.env f, op := op }.eval r = { field := Field.env f, op := op }.eval r'</pre></details><details class="thm"><summary><code>Op.time_arg_meaning</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ {c₁ c₂ : Claim}, c₁.span = c₂.span → ∀ (xs : List Item), (Op.is (Arg.time c₁)).test xs = (Op.is (Arg.time c₂)).test xs ∧ (Op.not (Arg.time c₁)).test xs = (Op.not (Arg.time c₂)).test xs ∧ (Op.atLeast (Arg.time c₁)).test xs = (Op.atLeast (Arg.time c₂)).test xs ∧ (Op.below (Arg.time c₁)).test xs = (Op.below (Arg.time c₂)).test xs</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/06-times.json"><code>spec/run/06-times</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/08-envelope-fields.json"><code>spec/run/08-envelope-fields</code></a></span></dd>
@@ -1141,7 +1146,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-spec-select" data-shape="invariance">
       <div class="law-h"><h4>spec.select</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">which payloads a reader holds</span>, and <span class="inv">which records a spec's <code>from</code> takes</span> stays.</p>
+      <p class="law-s">Change <span class="var">which payloads a reader holds</span>, and <span class="inv">the set of records a spec's <code>from</code> takes</span> stays.</p>
       <p class="law-scope">Each comes back in the view's form. A <code>where</code> test on a payload can still answer unknown under a view (<a class="lawref" href="#law-view-refines"><code>view.refines</code></a>).</p>
       <p class="law-md"><span>laws.md</span> selection reads only envelopes, so a view selects the same records</p>
       <dl class="chain">
@@ -1179,7 +1184,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       <div class="law-h"><h4>spec.after-supersession</h4><span class="chip">Exactness</span></div>
       <p class="law-s">A slot over heads returns only records that are a head of some thing, that <code>from</code> takes and every test holds for.</p>
       <p class="law-scope">A record about several things can be superseded in one and still head another.</p>
-      <p class="law-md"><span>laws.md</span> slots over heads return only heads, records no record about their thing has superseded, and only those <code>from</code> takes and every test holds for, so selection never brings back what was superseded; under a view each thing's state is the full reader's with payloads hidden</p>
+      <p class="law-md"><span>laws.md</span> slots over heads return only heads, records no record about their thing has superseded, and only those <code>from</code> takes and every test holds for, so selection never brings back what was superseded; under a view, and a rule that reads only envelopes, each thing's state is the full reader's with payloads hidden</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>latestOf_heads</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (sel : Record → Bool) (cs : List Cond) {xs : List Record}, Addressed xs → ∀ {ts : List (String × List (Nat × Shown))} {u : Nat}, latestOf sel cs xs = SlotValue.things ts u → ∀ {t : String} {ps : List (Nat × Shown)}, (t, ps) ∈ ts → ∀ {p : Nat × Shown}, p ∈ ps → ∃ r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = Tri.yes ∧ (r.id, r.shown) = p</pre></details><details class="thm"><summary><code>collectOf_heads</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (sel : Record → Bool) (cs : List Cond) (limit : Option Nat) {xs : List Record}, Addressed xs → ∀ {hs : List (Nat × Shown)} {u : Nat}, collectOf sel cs true limit xs = SlotValue.heads hs u → ∀ {p : Nat × Shown}, p ∈ hs → ∃ t r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = Tri.yes ∧ (r.id, r.shown) = p</pre></details><details class="thm"><summary><code>Spec.view_state</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ {f : Record → Record}, View f → ∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {xs : List Record}, Distinct xs → perThing (admit may (List.map f xs)) = List.map (fun p =&gt; (p.fst, { named := p.snd.named, heads := List.map f p.snd.heads })) (perThing (admit may xs))</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/03-withheld-successor.json"><code>spec/run/03-withheld-successor</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/04-kind-change.json"><code>spec/run/04-kind-change</code></a> <a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/spec/run/08-envelope-fields.json"><code>spec/run/08-envelope-fields</code></a></span></dd>
@@ -1236,7 +1241,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <article class="law" id="law-lens-no-op" data-shape="round-trip">
       <div class="law-h"><h4>lens.no-op</h4><span class="chip">Round trip</span></div>
       <p class="law-s">Parse an unedited render and there is nothing to apply.</p>
-      <p class="law-scope">The base's section ids are distinct.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the base's section ids are distinct.</p>
       <p class="law-md"><span>laws.md</span> the unedited render gives no outcomes</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.no_op</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ {base : List Lens.Section}, (Lens.ids base).Nodup → Lens.edit base (Lens.render base) = some []</pre></details></dd>
@@ -1249,7 +1254,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <article class="law" id="law-lens-put-get" data-shape="round-trip">
       <div class="law-h"><h4>lens.put-get</h4><span class="chip">Round trip</span></div>
       <p class="law-s">An edit that keeps exactly the base's sections, in the same order, applies exactly.</p>
-      <p class="law-scope">The base's section ids are distinct.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the base's section ids are distinct.</p>
       <p class="law-md"><span>laws.md</span> an edit that keeps the sections in order applies exactly, up to normal form</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.put_get</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ {base edited : List Lens.Section}, (Lens.ids base).Nodup → Lens.ids edited = Lens.ids base → Lens.apply base (Lens.diff base edited) = edited</pre></details><details class="thm"><summary><code>Lens.put_get_text</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ {base edited : List Lens.Section} {text : List Lens.Line}, (Lens.ids base).Nodup → Lens.parse text = some edited → Lens.ids edited = Lens.ids base → Option.map (fun os =&gt; Lens.render (Lens.apply base os)) (Lens.edit base text) = Lens.normalize text</pre></details></dd>
@@ -1271,9 +1276,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-lens-absence-not-edit" data-shape="invariance">
       <div class="law-h"><h4>lens.absence-not-edit</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">dropping a section from the text</span>, and <span class="inv">the state</span> stays.</p>
+      <p class="law-s">Change <span class="var">the text by dropping a section</span>, and <span class="inv">that section of the state</span> stays.</p>
       <p class="law-scope">Absence is never an edit; the other sections' accepted edits still apply.</p>
-      <p class="law-md"><span>laws.md</span> a dropped section changes nothing</p>
+      <p class="law-md"><span>laws.md</span> a dropped section leaves that section in the state as it was; the other sections' accepted edits still apply</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.absence_not_edit</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ (base : List Lens.Section) (id : Lens.Line), Lens.apply base [Lens.Outcome.absent id] = base</pre></details></dd>
         <dt>pinned by</dt><dd><span class="files"><a href="https://github.com/kgruel/strange-loops-next/blob/main/vectors/lens/section/06-dropped-section.json"><code>lens/section/06-dropped-section</code></a></span></dd>
@@ -1283,7 +1288,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     </article>
     <article class="law" id="law-normal-form" data-shape="invariance">
       <div class="law-h"><h4>normal form</h4><span class="chip">Invariance</span></div>
-      <p class="law-s">Change <span class="var">normalizing text that is already normal</span>, and <span class="inv">the text</span> stays.</p>
+      <p class="law-s">Change <span class="var">whether text that is already normal is normalized again</span>, and <span class="inv">the text</span> stays.</p>
       <p class="law-md"><span>laws.md</span> normalizing twice is normalizing once</p>
       <dl class="chain">
         <dt>proved by</dt><dd><details class="thm"><summary><code>Lens.normalize_idem</code></summary><p class="thm-m">Laws.Lens</p><pre>∀ {text out : List Lens.Line}, Lens.normalize text = some out → Lens.normalize out = some out</pre></details></dd>
@@ -1327,7 +1332,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 })();
 </script>
 <script>
-const MAP_NOTES = {"law-incremental-batch":{"label":"incremental = batch","sentence":"Change <span class=\"var\">folding in parts or all at once</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-set":{"label":"latest-by.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every thing's state, its heads and winner</span> stays."},"law-latest-by-order":{"label":"latest-by.order","sentence":"The winner is a head, a record nothing about its thing names in <code>prev</code>, and newer than every other head by content order: span, then <code>emitted</code>, then id."},"law-content-order":{"label":"content order","sentence":"Any two records with different ids order one way: by span, then <code>emitted</code>, then id. Never by how a time is spelled."},"law-latest-by-repeats":{"label":"latest-by.repeats","sentence":"Change <span class=\"var\">delivering records again</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-converge":{"label":"latest-by.converge","sentence":"Change <span class=\"var\">which way two places sync</span>, and <span class=\"inv\">the state both reach</span> stays."},"law-latest-set-latest-repeats":{"label":"latest.set …","sentence":"Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">Latest's winner</span> stays."},"law-input-distinct":{"label":"input.distinct","sentence":"A fold is handed each id exactly once: the realm's union removes repeats."},"law-input-union":{"label":"input.union","sentence":"Change <span class=\"var\">which place is read first</span>, and <span class=\"inv\">the union</span> stays."},"law-acc-set":{"label":"acc.set","sentence":"Change <span class=\"var\">the order, for any step that commutes</span>, and <span class=\"inv\">the state</span> stays."},"law-acc-late":{"label":"acc.late","sentence":"Change <span class=\"var\">whether a late record, not yet folded, is folded onto the cached state or the whole set refolded</span>, and <span class=\"inv\">the new state</span> stays."},"law-heads-set":{"label":"heads.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">any answer worked out from the heads</span> stays."},"law-heads-late":{"label":"heads.late","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached heads or the whole set refolded</span>, and <span class=\"inv\">any answer worked out from the new heads</span> stays."},"law-view-no-resurrection":{"label":"view.no-resurrection","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the heads, by id</span> stays."},"law-result-unread":{"label":"result.unread","sentence":"Max over heads counts the heads whose payload it doesn't hold, instead of guessing at them."},"law-select-set":{"label":"select.set","sentence":"Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">what is read and what is unread</span> stays."},"law-admit-set":{"label":"admit.set","sentence":"A record is refused exactly when it isn't entitled to its <code>prev</code>, and that depends only on the set."},"law-thing-local":{"label":"thing.local","sentence":"Change <span class=\"var\">the records about other things, once records are settled and admitted</span>, and <span class=\"inv\">this thing's state</span> stays."},"law-view-no-resurrection-things":{"label":"view.no-resurrection (things)","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">which records are admitted, and each thing's heads, by id</span> stays."},"law-where-typed":{"label":"where.typed","sentence":"A test is accepted exactly when its argument fits its field, and renders back as it was written."},"law-spec-set":{"label":"spec.set","sentence":"Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">every slot of every spec</span> stays."},"law-spec-after-supersession":{"label":"spec.after-supersession","sentence":"A slot over heads returns only records that are a head of some thing, that <code>from</code> takes and every test holds for."},"law-spec-parse":{"label":"spec.parse","sentence":"An accepted spec's parsed form parses back to itself, and the parser gives exactly the specs that fit."},"law-lens-escaping":{"label":"lens.escaping","sentence":"Any body survives rendering and parsing, backslashes and all."},"law-lens-round-trip":{"label":"lens.round-trip","sentence":"Render, then parse, and you get back what you rendered."},"law-lens-no-op":{"label":"lens.no-op","sentence":"Parse an unedited render and there is nothing to apply."},"law-normal-form":{"label":"normal form","sentence":"Change <span class=\"var\">normalizing text that is already normal</span>, and <span class=\"inv\">the text</span> stays."},"law-record-sets":{"label":"record.sets","sentence":"Change <span class=\"var\">the order of <code>about</code>, <code>prev</code> or <code>erases</code>, and repeats in them</span>, and <span class=\"inv\">the id</span> stays."},"law-record-member-order":{"label":"record.member-order","sentence":"Change <span class=\"var\">the order of an object's members, their names distinct</span>, and <span class=\"inv\">its canonical bytes</span> stays."},"law-utf-16-order":{"label":"UTF-16 order","sentence":"Any two distinct strings order one way, by UTF-16 code units."},"law-write-member-order":{"label":"write.member-order","sentence":"Change <span class=\"var\">the order of a written payload's members</span>, and <span class=\"inv\">its commitment</span> stays."},"law-occurred-order":{"label":"occurred.order","sentence":"Spans order by start, then end, an open end last: every store orders them the same."}};
+const MAP_NOTES = {"law-incremental-batch":{"label":"incremental = batch","sentence":"Change <span class=\"var\">whether records are folded in parts or all at once</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-set":{"label":"latest-by.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every thing's state (its heads and winner)</span> stays."},"law-latest-by-order":{"label":"latest-by.order","sentence":"The winner is a head, a record nothing about its thing names in <code>prev</code>, and newer than every other head by content order: span, then <code>emitted</code>, then id."},"law-content-order":{"label":"content order","sentence":"Any two records with different ids order one way: by span, then <code>emitted</code>, then id. Never by how a time is spelled."},"law-latest-by-repeats":{"label":"latest-by.repeats","sentence":"Change <span class=\"var\">how many times a record is delivered</span>, and <span class=\"inv\">the state</span> stays."},"law-latest-by-converge":{"label":"latest-by.converge","sentence":"Change <span class=\"var\">which way two places sync</span>, and <span class=\"inv\">the state both reach</span> stays."},"law-latest-set-latest-repeats":{"label":"latest.set …","sentence":"Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">Latest's winner</span> stays."},"law-input-distinct":{"label":"input.distinct","sentence":"The read path's contract is that a fold is handed each id once, and the union gives that: <code>dedup</code> leaves each id once and, where an id names one record, keeps the same records."},"law-input-union":{"label":"input.union","sentence":"Change <span class=\"var\">which place is read first</span>, and <span class=\"inv\">the union</span> stays."},"law-acc-set":{"label":"acc.set","sentence":"Change <span class=\"var\">the order, for any step that commutes</span>, and <span class=\"inv\">the state</span> stays."},"law-acc-late":{"label":"acc.late","sentence":"Change <span class=\"var\">whether a late record, not yet folded, is folded onto the cached state or the whole set refolded</span>, and <span class=\"inv\">the new state</span> stays."},"law-heads-set":{"label":"heads.set","sentence":"Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">any answer worked out from the heads</span> stays."},"law-heads-late":{"label":"heads.late","sentence":"Change <span class=\"var\">whether a late record is folded onto the cached heads or the whole set refolded</span>, and <span class=\"inv\">any answer worked out from the new heads</span> stays."},"law-view-no-resurrection":{"label":"view.no-resurrection","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the set of heads, by id</span> stays."},"law-result-unread":{"label":"result.unread","sentence":"Max over heads counts the heads whose payload it doesn't hold, instead of guessing at them."},"law-select-set":{"label":"select.set","sentence":"Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">the split into read and unread</span> stays."},"law-admit-set":{"label":"admit.set","sentence":"A record is refused exactly when it isn't entitled to its <code>prev</code>, and that depends only on the set."},"law-thing-local":{"label":"thing.local","sentence":"Change <span class=\"var\">the records not about this thing, once records are settled and admitted</span>, and <span class=\"inv\">this thing's state</span> stays."},"law-view-no-resurrection-things":{"label":"view.no-resurrection (things)","sentence":"Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the admitted records and each thing's heads by id</span> stay."},"law-where-typed":{"label":"where.typed","sentence":"A test is accepted exactly when its operator and argument fit its field, and renders back as it was written."},"law-spec-set":{"label":"spec.set","sentence":"Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">every slot of every spec</span> stays."},"law-spec-after-supersession":{"label":"spec.after-supersession","sentence":"A slot over heads returns only records that are a head of some thing, that <code>from</code> takes and every test holds for."},"law-spec-parse":{"label":"spec.parse","sentence":"An accepted spec's parsed form parses back to itself, and the parser gives exactly the specs that fit."},"law-lens-escaping":{"label":"lens.escaping","sentence":"Any body survives rendering and parsing, backslashes and all."},"law-lens-round-trip":{"label":"lens.round-trip","sentence":"Render, then parse, and you get back what you rendered."},"law-lens-no-op":{"label":"lens.no-op","sentence":"Parse an unedited render and there is nothing to apply."},"law-normal-form":{"label":"normal form","sentence":"Change <span class=\"var\">whether text that is already normal is normalized again</span>, and <span class=\"inv\">the text</span> stays."},"law-record-sets":{"label":"record.sets","sentence":"Change <span class=\"var\">the order of, and repeats in, <code>about</code>, <code>prev</code> or <code>erases</code></span>, and <span class=\"inv\">the id</span> stays."},"law-record-member-order":{"label":"record.member-order","sentence":"Change <span class=\"var\">the order of an object's members</span>, and <span class=\"inv\">its canonical bytes</span> stay."},"law-utf-16-order":{"label":"UTF-16 order","sentence":"Any two distinct strings order one way, by UTF-16 code units."},"law-write-member-order":{"label":"write.member-order","sentence":"Change <span class=\"var\">the order of a written payload's members</span>, and <span class=\"inv\">its commitment</span> stays."},"law-occurred-order":{"label":"occurred.order","sentence":"Spans order by start, then end, an open end last, with no ties: any two stores that order by it agree."}};
 </script>
 <script>
 // The evidence page's behaviour: the section links and the map. The map is drawn when the

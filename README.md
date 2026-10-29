@@ -79,7 +79,13 @@ read the protocol through `design/protocol.mjs`:
   trail of the answer the model gave to each variant shown. The build
   fails on a law without a sentence, a theorem name that resolves to nothing,
   a vector reference to no file, a law name a vector uses that isn't a law,
-  or a proof that rests on a layer above its own.
+  or a proof that rests on a layer above its own. It also reads the
+  hypotheses off each theorem's statement (`premises.mjs`) and fails when a
+  law's sentence leaves one out (`Addressed`, `EnvOnly`, ...): each is said
+  page-wide, on the law (`premises`, shown as "Holds when"), or listed as the
+  law's subject in `laws.json`'s `premises` vocabulary, and a premise a law
+  lists that no theorem of it takes fails too. That names the premise; what it
+  quantifies over is still wording.
 * `design/evidence/`: the same joins, for an implementer or maintainer: each
   law's card with its theorems, vectors and who runs them, what it rests on
   and carries; the coverage table; and the proof map, laid out when the page

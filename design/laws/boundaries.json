@@ -29,7 +29,7 @@
     {
       "law": "latest-by.set",
       "premise": "within one store an id names one record",
-      "input": "needs a hash collision: an id is the hash of what the record says",
+      "input": "two records under one id: a reader that doesn't check ids against content could hold them",
       "holds": {
         "given": "records first, second under two ids, in either order",
         "answer": "winner second either way"

@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { documentOf, fill, header } from "../page.mjs";
 import { inline, slug } from "../protocol.mjs";
-import { REPO, anchor, esc, joinLaws, sentence } from "./join.mjs";
+import { REPO, anchor, esc, joinLaws, sentence, verbOf } from "./join.mjs";
 import { shapeFigure } from "./shapes.mjs";
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -17,7 +17,7 @@ const plain = (html) => esc(html.replace(/<[^>]+>/g, "")).replace(/"/g, "&quot;"
 
 export function renderLaws(root) {
   const read = (...p) => readFileSync(join(root, "design", "laws", ...p), "utf8");
-  const { data, rows, notes, files, layers, fail, keyOf, bounds, tried, unpremised } = joinLaws(root);
+  const { data, rows, notes, files, layers, fail, keyOf, bounds, tried, unpremised, premises, scopeOf } = joinLaws(root);
   const law = (k) => data.laws[k];
   const lawLink = (k) => `<a class="lawref" href="#${anchor(k)}"><code>${esc(k)}</code></a>`;
   const mark = (shape) => `<span class="mk" aria-hidden="true">${data.shapes[shape].mark}</span>`;
@@ -148,7 +148,7 @@ export function renderLaws(root) {
       out.fig = { change: d.change, forms: v.input.base.length,
         lanes: [v.input.base, v.expect.parsed].map((ss) => [{ t: ss.map((s) => s.id).join(", "), code: true }]) };
       out.done = absent.length
-        ? `Parsing reports ${absent.map((a) => `<code>${a}</code>`).join(", ")} as absent, and applying changes nothing: the section is still there.`
+        ? `Parsing reports ${absent.map((a) => `<code>${a}</code>`).join(", ")} as absent; applying that leaves the section in the state as it was.`
         : "Parsing the render gives the sections back, exactly.";
     } else fail(`demo ${d.law}: unknown kind ${d.kind}`);
     return out;
@@ -203,7 +203,7 @@ export function renderLaws(root) {
     const p = attached.has(i) ? premise(attached.get(i), true) : null;
     return `    <article class="demo${d.shape === "limit" ? " is-limit" : ""}" id="try-${slug(d.law)}" data-demo="${i}">\n` +
       `      <p class="demo-s">${sentence(law(d.key))}</p>\n` +
-      (law(d.key).scope ? `      <p class="law-scope">${law(d.key).scope}</p>\n` : "") +
+      (scopeOf(d.key) ? `      <p class="law-scope">${scopeOf(d.key)}</p>\n` : "") +
       cardFigure(d) +
       `      <div class="demo-in">${d.variants.map((x, j) => `<div class="variant" data-v="${j}"><p class="variant-l">${x.label}</p>${x.html}</div>`).join("")}</div>\n` +
       `      <div class="demo-ctl"><button type="button" class="poke">${d.change} <span aria-hidden="true">↻</span></button>${p ? p.ctl : ""}</div>\n` +
@@ -222,7 +222,7 @@ export function renderLaws(root) {
     const sides = [["premise holds", c.holds], ["premise removed", c.removed]];
     return `    <article class="demo is-compact" id="without-${slug(c.law)}" data-demo="b-${slug(c.law)}">\n` +
       `      <p class="demo-s">${sentence(l)}</p>\n` +
-      (l.scope ? `      <p class="law-scope">${l.scope}</p>\n` : "") +
+      (scopeOf(key) ? `      <p class="law-scope">${scopeOf(key)}</p>\n` : "") +
       figure(key) +
       `      <div class="demo-in">${sides.map(([k, x], j) => `<div class="variant" data-v="${j}"><p class="variant-l">${k}</p><p class="given">${esc(x.given)}</p></div>`).join("")}</div>\n` +
       `      <div class="demo-ctl">${p.ctl}</div>\n` +
@@ -246,9 +246,12 @@ export function renderLaws(root) {
   // The sentence: the invariances, one at a time, stepped by the reader and never by a timer.
   const invariances = rows.filter((r) => law(r.key).shape === "invariance");
   const first = law(invariances[0].key);
+  // The premises a law alone needs, said with its sentence: the sentence stands by itself in the rotor.
+  const holdsOf = (k) => (premises.holds(k).length ? `<span class="holds">Holds when</span> ${premises.holds(k).join("; ")}.` : "");
   const opening = `    <p class="big-s" id="rotor" aria-live="polite"><span class="w">Change</span> <span class="slot var" id="rotor-change">${first.change}</span>, ` +
-    `<span class="w">and</span> <span class="slot inv" id="rotor-stays">${first.stays}</span> <span class="w">stays.</span></p>\n` +
+    `<span class="w">and</span> <span class="slot inv" id="rotor-stays">${first.stays}</span> <span class="w" id="rotor-verb">${verbOf(first)}.</span></p>\n` +
     `    <p class="rotor-law" id="rotor-law">${lawLink(invariances[0].key)}</p>\n` +
+    `    <p class="law-scope" id="rotor-holds"${holdsOf(invariances[0].key) ? "" : " hidden"}>${holdsOf(invariances[0].key)}</p>\n` +
     `    <p class="rotor-ctl"><button type="button" id="rotor-prev">Previous</button>` +
     `<span class="rotor-at" id="rotor-at">1 of ${invariances.length}</span><button type="button" id="rotor-next">Next</button></p>\n`;
 
@@ -281,7 +284,7 @@ export function renderLaws(root) {
       unpremised.has(r.key) ? `<a href="#without-${slug(unpremised.get(r.key))}">Without its premise</a>` : ""].filter(Boolean);
     return `      <li class="q-law${l.shape === "limit" ? " is-limit" : ""}" id="${anchor(r.key)}" data-shape="${l.shape}">\n` +
       `        <p class="q-s">${sentence(l)}</p>\n` +
-      (l.scope ? `        <p class="law-scope">${l.scope}</p>\n` : "") +
+      (scopeOf(r.key) ? `        <p class="law-scope">${scopeOf(r.key)}</p>\n` : "") +
       `        <p class="q-f"><span class="q-shape">${mark(l.shape)}${data.shapes[l.shape].name}</span><code>${esc(r.key)}</code><span class="q-go">${links.join("")}</span></p>\n` +
       `      </li>\n`;
   };
@@ -314,10 +317,11 @@ export function renderLaws(root) {
   for (const c of bounds) if (!asked.includes(`data-boundary="${esc(c.law)}"`)) fail(`boundaries.json: ${c.law} is on no card; every case must be shown`);
   for (const [name, value] of Object.entries({
     header: top, lede, opening, filters, overview, "shape-key": shapeKey, "question-index": questionIndex, questions: asked,
+    "unless-said": `  <p class="note">Unless a law says otherwise, ${premises.pageWide.join(", and ")}.</p>\n`,
     "no-promise": bullets("What these laws don't promise"), simplifications: bullets("Simplifications in the model"),
   })) body = fill(body, name, value);
 
-  const rotor = invariances.map((r) => ({ change: law(r.key).change, stays: law(r.key).stays, link: lawLink(r.key) }));
+  const rotor = invariances.map((r) => ({ change: law(r.key).change, stays: law(r.key).stays, verb: `${verbOf(law(r.key))}.`, holds: holdsOf(r.key), link: lawLink(r.key) }));
   return documentOf(root, {
     head: read("head.html"),
     css: read("sentence.css") + read("shapes.css") + read("styles.css"),

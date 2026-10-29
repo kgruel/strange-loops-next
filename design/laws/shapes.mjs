@@ -231,7 +231,7 @@ const TRIPS = {
   "lens.put-get": { start: ["an edit", "text"], out: "apply", mid: ["the state", "form"], back: "render", join: "the same, in normal form" },
   "spec.parse": { start: ["a parsed spec", "form"], out: "print", mid: ["spec JSON", "text"], back: "parse", join: "the same spec" },
 };
-const GENERIC_TRIP = { start: ["text", "text"], out: "parse", mid: ["parsed form", "form"], back: "render", join: "the same text" };
+const GENERIC_TRIP = { start: ["a form", "form"], out: "render", mid: ["its text", "text"], back: "parse", join: "the same form" };
 
 // A station: a sheet with its name and a glyph of what it holds, lines of text or the parts of
 // a form (three, unless a card's vector says how many).
@@ -273,7 +273,7 @@ function roundTrip(law, given) {
   out += ghost([[sx + sw + 4, s1 + 25], [fcx - 22, s1 + 25], [fcx, fy - 4], [fcx, fy + 56], [fcx - 22, s2 + 25], [sx + sw + 4, s2 + 25]], 0.3);
   const title = law
     ? `Round trip: ${t.start[0]}, ${t.out} to ${t.mid[0]}, ${t.back}, and ${t.join}.`
-    : "Round trip: there and back gives what you started with.";
+    : "Round trip: render, then parse, gives the form back; parse, then render, gives its normal form.";
   return { h: s2 + 50 + 10, body: out, title };
 }
 
@@ -388,7 +388,9 @@ function order(law) {
 }
 
 // Complements: of a test and its complement, exactly one holds where the test answers; on a
-// payload the reader doesn't hold both are unknown (where.complements' scope says so).
+// payload the reader doesn't hold both are unknown (where.complements' scope says so). For
+// at-least and below that is so only on a field holding a number or a time (a missing
+// occurred answers no to both), so the figure says that too.
 function complements(law) {
   const s = plain(law.says);
   const [, no, yes] = s.match(/(\w[\w-]*) is the complement of (\w[\w-]*)/) ?? [null, "not", "is"];
@@ -402,7 +404,8 @@ function complements(law) {
   const ey = y + h + 14;
   out += rec(12, ey, "E", { mod: "withheld", m: mv("in", 0.6) });
   out += words(44, ey + 15, "payload not held: both unknown", { width: W - 56, lines: 1 }).svg;
-  return { h: ey + R + 10, body: out, title: `Order: ${s}` };
+  out += words(12, ey + R + 16, "at-least and below: only on a number or a time", { width: W - 24, lines: 1 }).svg;
+  return { h: ey + R + 26, body: out, title: `Order: ${s}` };
 }
 
 // ---- exactness: a gate with two bins --------------------------------------------------------
@@ -452,17 +455,18 @@ function exactness(law) {
   out += "</g>";
   out += ghost([[118, gy], [gx + 3, gy], [ax + 30, gy]], 0.5);
   out += ghost([[118, gy], [gx - 8, gy + 6], [gx - 8, ry + 20]], 0.8);
-  const title = law ? `Exactness: ${plain(law.says)}` : "Exactness: accepted exactly when it fits; where the law refuses, it says what it refuses with.";
+  const title = law ? `Exactness: ${plain(law.says)}` : "Exactness: where the line is, an if and only if or a guarantee on one side of it; where the law refuses, it says what it refuses with.";
   return { h: ry + rh + 10, body: out, title };
 }
 
 // ---- limit: the boundary, in the limit colour, and who accounts for it ---------------------
 
 // From a limit's words: what moves (the first sentence, after its colon if it has one) and
-// who accounts for it (the sentence beginning "So").
+// who accounts for it (the sentence beginning "That is why": a consequence for the design, not
+// part of what the law proves).
 export function limitParts(says) {
   const s = plain(says);
-  const so = s.match(/\bSo (.*?)\.?$/);
+  const so = s.match(/\bThat is why (.*?)\.?$/);
   const first = (so ? s.slice(0, so.index).trim() : s).split(/(?<=\.)\s+/)[0].replace(/\.$/, "");
   const moves = first.includes(":") ? first.split(":").pop().trim() : first;
   return { moves, party: so ? so[1] : null, repeats: /twice|again|doubles/.test(s), noun: (s.match(/the (\w+) doubles/) ?? [])[1] ?? null };
@@ -470,7 +474,7 @@ export function limitParts(says) {
 
 function limit(law, given) {
   const p = law ? limitParts(law.says) : { moves: "the answer", party: "whoever the law names", repeats: false, noun: null };
-  if (!p.party) throw new Error(`shapes: limit ${law.key} names nobody who accounts for it (a sentence beginning "So")`);
+  if (!p.party) throw new Error(`shapes: limit ${law.key} names nobody who accounts for it (a sentence beginning "That is why")`);
   if (given && !(given.lane?.length && given.held != null && given.moved != null)) throw new Error(`shapes: ${law.key}: a card's figure needs its records and both answers`);
   const lane = given ? given.lane : p.repeats ? ["A", "B", "C", "A", "B", "C"] : ["A", "B", "C"];
   const again = lane.findIndex((l, i) => lane.indexOf(l) < i);    // where the first repeat arrives

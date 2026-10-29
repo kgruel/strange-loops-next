@@ -108,7 +108,7 @@ def cases : Except String (List Case) := do
       holds := ("is and not \"yes\" on a record whose value is yes", pair here),
       removed := ("the same tests, the payload withheld", pair here.withhold) },
     { law := "latest-by.set", premise := "within one store an id names one record",
-      input := "needs a hash collision: an id is the hash of what the record says",
+      input := "two records under one id: a reader that doesn't check ids against content could hold them",
       holds := (s!"records {ids [one, other]} under two ids, in either order", distinct),
       removed := (s!"records {ids [one, twin]} under one id: one order, then the other", s!"{a}, then {b}") },
     { law := "lens.no-op", premise := "the base's section ids are distinct",

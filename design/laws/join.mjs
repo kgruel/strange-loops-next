@@ -8,6 +8,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { lawEdges, lawTable, proofs, resolveTheorem, resolveVectors, slug, vectorFiles } from "../protocol.mjs";
+import { checkPremises } from "./premises.mjs";
 
 export const REPO = "https://github.com/kgruel/strange-loops-next/blob/main";
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -15,11 +16,14 @@ export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
 // A law's place on either page: the laws page holds its sentence there, the evidence page its card.
 export const anchor = (k) => `law-${slug(k)}`;
 
+// `verb` is "stay" for a `stays` that is plural ("the admitted records and each thing's heads"),
+// and absent otherwise.
+export const verbOf = (l) => l.verb ?? "stays";
 export const sentence = (l) => l.shape === "invariance"
-  ? `Change <span class="var">${l.change}</span>, and <span class="inv">${l.stays}</span> stays.`
+  ? `Change <span class="var">${l.change}</span>, and <span class="inv">${l.stays}</span> ${verbOf(l)}.`
   : l.says;
 
-const KEYS = ["shape", "layer", "question", "change", "stays", "says", "scope"];
+const KEYS = ["shape", "layer", "question", "change", "stays", "verb", "says", "scope", "premises"];
 
 export function joinLaws(root) {
   const read = (...p) => readFileSync(join(root, "design", "laws", ...p), "utf8");
@@ -39,6 +43,7 @@ export function joinLaws(root) {
     if (!data.shapes[l.shape]) fail(`${k}: unknown shape ${l.shape}`);
     if (!layers.includes(l.layer)) fail(`${k}: ${l.layer} isn't a layer on the grammar page`);
     const inv = l.shape === "invariance";
+    if (l.verb !== undefined && (l.verb !== "stay" || !inv)) fail(`${k}: verb is "stay", for an invariance whose \`stays\` is plural`);
     if (inv !== Boolean(l.change && l.stays) || inv === Boolean(l.says)) fail(`${k}: an invariance says what changes and what stays; any other shape says its sentence`);
   }
 
@@ -69,6 +74,14 @@ export function joinLaws(root) {
   }
   for (const t of Object.keys(data.notTheorems))
     if (!unresolved.has(t)) fail(`notTheorems: ${t} is no longer named, or now resolves; take it off the list`);
+
+  // The hypotheses each law's theorems take, each said once on the page or by the law.
+  const premises = checkPremises({ data, rows, resolved, graph, fail });
+  // What a law's scope line shows: the premises it alone needs, then what else bounds it.
+  const scopeOf = (k) => {
+    const holds = premises.holds(k);
+    return [holds.length ? `<span class="holds">Holds when</span> ${holds.join("; ")}.` : "", data.laws[k].scope ?? ""].filter(Boolean).join(" ");
+  };
 
   // The vectors each law cites, and the ones that name the law themselves.
   const cited = new Map(rows.map((r) => [r.key, resolveVectors(r.vectors, files)]));
@@ -110,5 +123,5 @@ export function joinLaws(root) {
   const tried = new Map(data.demos.map((d) => [keyOf(d.law, "demo"), d.law]));
   const unpremised = new Map(bounds.map((c) => [keyOf(c.law, "boundaries"), c.law]));
 
-  return { data, rows, notes, files, graph, layers, fail, resolved, cited, naming, runBy, edges, restsOn, carries, via, keyOf, bounds, tried, unpremised };
+  return { data, rows, notes, premises, scopeOf, files, graph, layers, fail, resolved, cited, naming, runBy, edges, restsOn, carries, via, keyOf, bounds, tried, unpremised };
 }

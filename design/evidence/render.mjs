@@ -13,7 +13,7 @@ import { layoutMap } from "./layout.mjs";
 
 export function renderEvidence(root) {
   const read = (...p) => readFileSync(join(root, "design", "evidence", ...p), "utf8");
-  const { data, rows, graph, layers, resolved, cited, naming, runBy, edges, restsOn, carries, via, tried, unpremised } = joinLaws(root);
+  const { data, rows, graph, layers, resolved, cited, naming, runBy, edges, restsOn, carries, via, tried, unpremised, scopeOf } = joinLaws(root);
   const law = (k) => data.laws[k];
   const label = (r) => r.names.join(", ");
   const lawLink = (k) => `<a class="lawref" href="#${anchor(k)}"><code>${esc(k)}</code></a>`;
@@ -53,7 +53,7 @@ export function renderEvidence(root) {
     return `    <article class="law${l.shape === "limit" ? " is-limit" : ""}" id="${anchor(r.key)}" data-shape="${l.shape}">\n` +
       `      <div class="law-h"><h4>${esc(label(r))}</h4><span class="chip">${data.shapes[l.shape].name}</span></div>\n` +
       `      <p class="law-s">${sentence(l)}</p>\n` +
-      (l.scope ? `      <p class="law-scope">${l.scope}</p>\n` : "") +
+      (scopeOf(r.key) ? `      <p class="law-scope">${scopeOf(r.key)}</p>\n` : "") +
       `      <p class="law-md"><span>laws.md</span> ${inline(r.says)}</p>\n` +
       `      <dl class="chain">\n` +
       `        <dt>proved by</dt><dd>${theorems}</dd>\n` +
