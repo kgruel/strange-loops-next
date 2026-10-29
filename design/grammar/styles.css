@@ -38,6 +38,7 @@
 .plate{transform-style:preserve-3d}
 .plate span{position:absolute;left:0;top:0;transform-origin:0 0;transform:rotateZ(40deg) rotateX(-58deg) translate(calc(-100% - 10px),-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
 .plate.hot span{color:var(--ink);font-weight:500}
+.stack3d .plate span{transition:color .18s,opacity .3s}.stack3d.is-settling .plate span{opacity:0}
 .plate.hot{box-shadow:0 0 0 1.5px var(--ink)}
 .plate::after{content:"";position:absolute;inset:14px 18px auto;height:6px;border-radius:3px;background:var(--hair);box-shadow:0 12px 0 var(--hair),0 24px 0 var(--hair)}
 .plate[data-layer="5"]::after{display:none}

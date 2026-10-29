@@ -60,12 +60,15 @@
   });
   $(".layers-fig").addEventListener("mouseleave", () => lift(null));
   if (M) {
-    // Each layer settles onto the one below it, the ground first.
+    // Each layer settles onto the one below it, the ground first. A plate fading in is flattened
+    // (opacity below 1 drops its 3D), which would squash its upright name, so the names wait
+    // until every plate has landed.
     plates.forEach((p) => { p.style.opacity = "0"; p.style.setProperty("--lift", "140px"); });
+    stack.classList.add("is-settling");
     M.inView(stack, () => {
-      plates.slice().reverse().forEach((p, j) => {
-        animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j));
-      });
+      const landing = plates.slice().reverse().map((p, j) =>
+        animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j)));
+      Promise.all(landing).then(() => stack.classList.remove("is-settling"));
     }, { amount: 0.4 });
   }
 

@@ -198,6 +198,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .plate{transform-style:preserve-3d}
 .plate span{position:absolute;left:0;top:0;transform-origin:0 0;transform:rotateZ(40deg) rotateX(-58deg) translate(calc(-100% - 10px),-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
 .plate.hot span{color:var(--ink);font-weight:500}
+.stack3d .plate span{transition:color .18s,opacity .3s}.stack3d.is-settling .plate span{opacity:0}
 .plate.hot{box-shadow:0 0 0 1.5px var(--ink)}
 .plate::after{content:"";position:absolute;inset:14px 18px auto;height:6px;border-radius:3px;background:var(--hair);box-shadow:0 12px 0 var(--hair),0 24px 0 var(--hair)}
 .plate[data-layer="5"]::after{display:none}
@@ -747,12 +748,15 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
   });
   $(".layers-fig").addEventListener("mouseleave", () => lift(null));
   if (M) {
-    // Each layer settles onto the one below it, the ground first.
+    // Each layer settles onto the one below it, the ground first. A plate fading in is flattened
+    // (opacity below 1 drops its 3D), which would squash its upright name, so the names wait
+    // until every plate has landed.
     plates.forEach((p) => { p.style.opacity = "0"; p.style.setProperty("--lift", "140px"); });
+    stack.classList.add("is-settling");
     M.inView(stack, () => {
-      plates.slice().reverse().forEach((p, j) => {
-        animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j));
-      });
+      const landing = plates.slice().reverse().map((p, j) =>
+        animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j)));
+      Promise.all(landing).then(() => stack.classList.remove("is-settling"));
     }, { amount: 0.4 });
   }
 
