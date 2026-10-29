@@ -69,7 +69,9 @@ def cases : List Case := [
   ⟨"gap02-lone-erased", ["settle.keeps"], [full.erase]⟩,
   ⟨"gap10-refused-eraser", ["settle.erased", "admit.no-cross"],
     [full, { r (fixtureId 0x52) "erase" ["host:b"] 110 [fixtureId 0x51] with erases := [fixtureId 0x51] }]⟩,
-  ⟨"gap10-withheld-eraser", ["settle.erased"], [full, eraseRec.withhold]⟩
+  ⟨"gap10-withheld-eraser", ["settle.erased"], [full, eraseRec.withhold]⟩,
+  ⟨"10-successor-expands-things", ["admit.no-cross", "thing.local"],
+    [r (fixtureId 0xb1) "note" ["thing:A"] 1, r (fixtureId 0xb2) "note" ["thing:A", "thing:B"] 2 [fixtureId 0xb1]]⟩
 ]
 
 def allow : Record → Record → Bool := fun _ _ => true

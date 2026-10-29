@@ -92,6 +92,10 @@ def cases : List Case := [
   ⟨"01-two-labels", ["batch.meaning"], [decide1, evidence, cites]⟩,
   ⟨"02-chain-and-real-ids", ["batch.meaning"], [decide1, revise, outside]⟩,
   ⟨"03-revise-and-erase", ["batch.meaning"], [eraseHeld]⟩,
+  ⟨"04-held-self-anchor", ["batch.meaning"],
+    [draft none "batch-anchor"
+      { kind := "note", observer := kyle, emitted := at0, about := [r1Id], prev := [r1Id] }
+      (.obj [])]⟩,
   ⟨"10-unknown-label", ["batch.refuse"], [cites]⟩,
   ⟨"11-duplicate-label", ["batch.refuse"], [decide1, { decide1 with salt := saltFor "batch-d-again" }]⟩,
   ⟨"12-cycle", ["batch.refuse"], [cycleA, cycleB]⟩,

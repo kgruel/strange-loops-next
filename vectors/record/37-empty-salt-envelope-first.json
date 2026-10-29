@@ -1,0 +1,20 @@
+{
+  "vector": "37-empty-salt-envelope-first",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "salt": "",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "kind-empty"
+  }
+}

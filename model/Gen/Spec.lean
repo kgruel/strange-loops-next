@@ -279,6 +279,13 @@ def taskSpec : Json := o [("vertex", s "tasks"),
     ("est", o [("sum", s "est")]),
     ("blocked", o [("count", .bool true), ("where", o [("blocked", o [("present", .bool true)])])])])]
 
+-- Hidden payloads must not supply numbers, even though their placeholder is zero.
+def hiddenNumbersSpec : Json := o [("vertex", s "hidden-numbers"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
+  ("fold", o [("count", o [("count", .bool true)]),
+    ("sum", o [("sum", s "n")]), ("min", o [("min", s "n")]),
+    ("max", o [("max", s "n")])])]
+
 -- a record about nothing anchors the thing named by its id: `from` takes it
 -- and its revision, while `env.about` reads only what each envelope says
 def x1 : Record := { said (fixtureId 0x71) "sl:alice" [] 100 with kind := "note" }
@@ -291,6 +298,15 @@ def anchorSpec : Json := o [("vertex", s "anchored"),
     ("all", o [("collect", .bool true)]),
     ("current", o [("latest-by", s "about"), ("follow", s "prev")]),
     ("says-about", o [("collect", .bool true), ("where", o [("env.about", o [("is", s (idText (fixtureId 0x71)))])])])])]
+
+def readableExtremaSpec : Json := o [("vertex", s "extrema"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
+  ("fold", o [("lo", o [("min", s "est")]), ("hi", o [("max", s "est")])])]
+
+def sourceUnionSpec : Json := o [("vertex", s "union"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])],
+    o [("store", s "."), ("kind", a [s "note"])]]),
+  ("fold", o [("c", o [("count", .bool true)])])]
 
 structure RunCase where
   name : String
@@ -359,7 +375,15 @@ def runCases : List RunCase := [
       task (fixtureId 0xe5) "task:5" 140 [("est", .str "1.5")],
       task (fixtureId 0xe6) "task:6" 150 [("est", .bool true)], task (fixtureId 0xe7) "task:7" 160 [],
       (task (fixtureId 0xe8) "task:8" 170 [("est", .int 7)]).withhold,
-      task (fixtureId 0xe9) "task:9" 180 [("est", .number (Number.ofScientific false 9007199254740992 0))]]⟩
+      task (fixtureId 0xe9) "task:9" 180 [("est", .number (Number.ofScientific false 9007199254740992 0))]]⟩,
+  ⟨"10-unread-shared-head", ["spec.set", "result.unread", "thing.local"], taskSpec,
+    [({ t3 with about := ["task:2", "task:9"] }).withhold]⟩,
+  ⟨"11-hidden-numbers", ["spec.set", "result.unread"], hiddenNumbersSpec,
+    [(task (fixtureId 0x76) "task:6" 100 []).withhold, (task (fixtureId 0x77) "task:7" 200 []).erase]⟩,
+  ⟨"12-readable-extrema", ["spec.set", "result.unread"], readableExtremaSpec,
+    [task (fixtureId 0x78) "task:8" 100 [("est", .int 3)], task (fixtureId 0x79) "task:9" 200 [("est", .int 5)]]⟩,
+  ⟨"13-source-union", ["spec.set", "spec.select"], sourceUnionSpec,
+    [task (fixtureId 0x78) "task:8" 100 []]⟩
 ]
 
 def jShownIds (hs : List (RecordId × Shown)) : J :=

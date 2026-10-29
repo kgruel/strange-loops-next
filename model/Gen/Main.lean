@@ -95,7 +95,9 @@ def countCases : List FoldCase := [
   ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩,
   ⟨"gap15-multi-thing-once", ["count.perm"], rotations [
     { rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
-    { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 }]⟩
+    { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 }]⟩,
+  ⟨"04-positive-offset-emitted", ["count.perm"],
+    [[{ rec (fixtureId 0x78) "topic:offset" 0 with emitted := stamp "2026-10-01T01:00:00+01:00" }]]⟩
 ]
 
 def latestCases : List FoldCase := [
