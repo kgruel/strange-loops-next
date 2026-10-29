@@ -15,7 +15,7 @@ fn integer(i: impl std::fmt::Display) -> Json {
 fn object(kvs: Vec<(&str, Json)>) -> Json {
     Json::Obj(kvs.into_iter().map(|(k, v)| (k.into(), v)).collect())
 }
-fn shown_ids(hs: Vec<(Digest, Shown)>) -> Json {
+pub(super) fn shown_ids(hs: Vec<(Digest, Shown)>) -> Json {
     Json::Arr(
         hs.into_iter()
             .map(|(id, shown)| {
@@ -37,7 +37,7 @@ fn shown_ids(hs: Vec<(Digest, Shown)>) -> Json {
             .collect(),
     )
 }
-fn slot(v: SlotValue) -> Json {
+pub(super) fn slot(v: SlotValue) -> Json {
     let (key, value, unread) = match v {
         SlotValue::Nat(r) => ("value", integer(r.value), r.unread),
         SlotValue::Int(r) => ("value", Json::Int(r.value), r.unread),
@@ -56,7 +56,7 @@ fn slot(v: SlotValue) -> Json {
     };
     object(vec![(key, value), ("unread", integer(unread))])
 }
-fn parsed(j: &Json) -> Result<Spec, String> {
+pub(super) fn parsed(j: &Json) -> Result<Spec, String> {
     let sp = Spec::of_json(j).map_err(|e| e.to_string())?;
     let back = Spec::of_json(&sp.to_json()).map_err(|e| format!("round trip refused: {e}"))?;
     if back != sp {

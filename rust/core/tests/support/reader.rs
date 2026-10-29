@@ -47,7 +47,7 @@ pub(super) fn list<'a>(path: &str, j: &'a Json) -> Result<&'a [Json], String> {
         _ => Err(format!("{path}: expected array")),
     }
 }
-fn text<'a>(path: &str, j: &'a Json) -> Result<&'a str, String> {
+pub(super) fn text<'a>(path: &str, j: &'a Json) -> Result<&'a str, String> {
     match j {
         Json::Str(s) => Ok(s),
         _ => Err(format!("{path}: expected text")),
@@ -59,14 +59,14 @@ fn int(path: &str, j: &Json) -> Result<Int, String> {
         _ => Err(format!("{path}: expected integer")),
     }
 }
-fn texts(path: &str, j: &Json) -> Result<Vec<String>, String> {
+pub(super) fn texts(path: &str, j: &Json) -> Result<Vec<String>, String> {
     list(path, j)?
         .iter()
         .enumerate()
         .map(|(i, j)| text(&format!("{path}[{i}]"), j).map(str::to_owned))
         .collect()
 }
-fn reader_id(path: &str, j: &Json) -> Result<Digest, String> {
+pub(super) fn reader_id(path: &str, j: &Json) -> Result<Digest, String> {
     let s = text(path, j)?;
     if !envelope::record_id(s) {
         return Err(format!("{path}: expected record id"));
@@ -103,7 +103,7 @@ fn ids(path: &str, j: &Json) -> Result<Vec<Digest>, String> {
         .map(|(i, j)| reader_id(&format!("{path}[{i}]"), j))
         .collect()
 }
-fn shown(path: &str, j: &Json) -> Result<Shown, String> {
+pub(super) fn shown(path: &str, j: &Json) -> Result<Shown, String> {
     match text(path, j)? {
         "here" => Ok(Shown::Here),
         "withheld" => Ok(Shown::Withheld),

@@ -1,4 +1,4 @@
-# Layers one through three and realm: limits and review points
+# Layers one through three, realm, and scenario: limits and review points
 
 This port changes no model, vector, protocol, design, or interop files.
 The implemented reader surface follows Lean except for the explicit representation boundaries below.
@@ -10,7 +10,7 @@ Layer two covers all 37 fold vectors.
 Fold selection uses only the closed where grammar and its evaluation.
 Layer three covers all 70 spec vectors, the full parser, renderer, slots, execution, and admission.
 The realm layer covers all nine realm vectors, settlement, and admission (`model/Loops/Things.lean:47–92`).
-Scenarios, batches, lenses, the CLI, and storage service remain future work.
+The scenario fixture is checked. Batches, lens vectors, the CLI, and storage service remain future work.
 
 Lean requires commuting steps through `Acc.comm` (`model/Loops/Families.lean:33–39`).
 Rust callers must supply pure steps that commute.
@@ -150,15 +150,14 @@ The port claims neither full RFC 8785 coverage nor independent SUPERCOP conforma
 
 | Deferred JSON family | Files |
 | --- | ---: |
-| scenario | 1 |
 | batch | 11 |
 | lens | 10 |
 | standard | 12 |
-| Total | 34 |
+| Total | 33 |
 
-The registry checks 26 record, eight occurred, 37 fold, 70 spec, and nine realm files: 150 of 184 recursive JSON files.
+The registry checks 26 record, eight occurred, 37 fold, 70 spec, nine realm, and one scenario file: 151 of 184 recursive JSON files.
 Spec includes 61 parse files and nine run files.
-The remaining allowlist stays `scenario`, `batch`, `lens`, and `standard`.
+The remaining allowlist stays `batch`, `lens`, and `standard`.
 
 ## Canonicalization before validation
 
@@ -193,3 +192,14 @@ Lean v4.35.0 defines `isLower` and `isDigit` with ASCII comparisons (`Init/Data/
 Rust uses ASCII predicates, not Unicode character classes.
 `Env.recordId` checks length and alphabet only. It does not check final base32 padding bits.
 The fixture reader applies stricter canonical decoding, as `Gen.Read.recordId` requires (`model/Gen/Read.lean:238–248`).
+
+## Scenario composition
+
+The scenario harness follows `model/Gen/Run.lean` and `model/Gen/Scenario.lean`.
+It settles forms, admits them, and runs the spec on settled forms.
+Each listed arrival order must produce the canonical forms outcome.
+The scenario layer adds the core lens dependency before the lens vector layer.
+Lens vector dispatch remains deferred.
+
+Scenario orders may be empty, as `model/Gen/Run.lean` permits.
+The harness compares outcomes, not order permutations.

@@ -1,9 +1,9 @@
-# Layers one through three and realm: Lean to Rust
+# Layers one through three, realm, and scenario: Lean to Rust
 
 Lean defines the behavior of this port.
 The port implements record primitives, fold families, per-thing state, specs, settlement, and admission.
-It checks nine realm vectors, 70 spec vectors, 37 fold vectors, and 34 record and occurred vectors.
-Scenarios, batches, lenses, the CLI, and storage service remain future work.
+It checks one scenario, nine realm, 70 spec, 37 fold, and 34 record and occurred vectors.
+The scenario fixture is checked. Batches, lens vectors, the CLI, and storage service remain future work.
 
 Layer two uses the closed where types, parser, and evaluation from layer three.
 Fold selection calls `parseWhere` and `Cond.all` directly (`model/Gen/Run.lean:112–122`).
@@ -41,6 +41,7 @@ Paths below start at the repository root. Public Rust docs also identify their L
 | Source, Spec, takes, select, run; model/Loops/Spec.lean:301–328 | spec::{Source, Spec}; Source::takes; Spec::{takes, select, run, run_with} |
 | idsOf, erasedIn, baseForm, pick, settle; model/Loops/Things.lean:47–65 | things::{ids_of, erased_in, base_form, pick, settle} |
 | entitled, refusalOf, admit, realm; model/Loops/Things.lean:78–92 | things::{entitled, refusal_of, Refusal, admit, realm}; typed refusal codes |
+| Lens.Section, Outcome, render, parse, diff, apply, edit, normalize; model/Loops/Lens.lean | lens::{Section, Outcome, render, parse, diff, apply, edit, normalize}; same-name helpers use snake case |
 | memberPath, parser keys and helpers; model/Loops/Spec.lean:376–378,398–500,524–538 | spec::{member_path, FOLD_TYPES, SLOT_KEYS, SOURCE_KEYS, SPEC_KEYS}; matching snake-case parser helpers |
 | Json.repeatAt/repeatIn/repeatMember, Spec.ofObject/ofJson; model/Loops/Spec.lean:507–555 | Json::repeat_at; Spec::{of_object, of_json} |
 | Val/Arg/Op/Tests/Slot/Source/Spec.toJson; model/Loops/Spec.lean:559–605 | Val/Arg/Op/Tests/Slot/Source/Spec::to_json |
@@ -228,6 +229,7 @@ Checks include public keys, signatures, both wire lines, and occurred ordering.
 | vectors/fold/count: three; sum: three; extrema: four; latest: four | Same registry and tests/support/fold.rs; raw primitive folds |
 | vectors/fold/latest-by: 13; heads: three; view: four; select: three | Same registry; per_thing, max_heads, limit, Cond.all, and Acc.select |
 | vectors/spec/parse: 61; run: nine | Same registry and tests/support/spec.rs; every refusal, parsed result, and arrival order |
+| vectors/scenario: one | Same registry and tests/support/scenario.rs; all steps and arrival orders |
 | vectors/realm: nine | Same registry and tests/support/realm.rs; every rotation and complete settled, refused, things, and sum fields |
 
 The test reader follows `Gen.Read.record`, `recordId`, and `fieldsOf` (`model/Gen/Read.lean:238–248,286–331`).
@@ -254,12 +256,12 @@ They also check empty-key paths, hidden duplicate metadata, original-input admis
 Eight realm tests cover first-form choices, raw conflicting forms, erasure before admission, sorted ids, absent targets, duplicate predecessors, and refusal precedence.
 Two realm harness tests check strict input shapes, empty forms, every rotation, and unbounded answers.
 The registry test also checks vector accounting.
-The suite runs 59 tests. Eight shared helper tests run in each of two integration test binaries.
+The suite runs 64 tests. Nine shared helper tests run in each of two integration test binaries.
 
-The registry accounts for 184 recursive JSON files: 150 checked and 34 explicitly deferred.
-The remaining allowlist stays `scenario`, `batch`, `lens`, and `standard`.
+The registry accounts for 184 recursive JSON files: 151 checked and 33 explicitly deferred.
+The remaining allowlist stays `batch`, `lens`, and `standard`.
 Layer two removes `fold` from the earlier allowlist. Layer three removes `spec`.
-The realm layer removes `realm`.
+The realm layer removes `realm`. The scenario layer removes `scenario`.
 Unknown families, root JSON, missing or stale registrations, count changes, and files outside accounted families fail.
 `GAPS.md` explains each deferred family and the external standard limits.
 
@@ -267,3 +269,16 @@ The local checks use `cargo fmt --check`, `cargo clippy --all-targets --all-feat
 `git diff --check` also checks whitespace.
 CI runs formatting, Clippy, and tests.
 Compiler checks and the vector registry provide evidence; an empty LSP cache does not prove correctness.
+
+## Scenario composition
+
+The scenario harness follows `model/Gen/Run.lean` and `model/Gen/Scenario.lean`.
+It settles forms, admits them, and runs the spec on settled forms.
+Each listed arrival order must produce the canonical forms outcome.
+The scenario layer adds the core lens dependency before the lens vector layer.
+Lens vector dispatch remains deferred.
+Each line is a string that represents a Lean character list. This module does not split files into lines.
+The lens keeps section order, duplicate ids, and first-match lookup.
+Arbitrary ids and embedded line breaks remain valid model values.
+`parse_render` applies to every document (`model/Laws/Lens.lean`).
+The no-op law requires unique base ids. The put-get law also requires equal id order.
