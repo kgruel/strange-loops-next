@@ -8,6 +8,8 @@ Readers cover folds, specs, realms, lenses and batches.
 JS and Rust check protocol fixtures and external standards.
 The theorem files prove the listed model laws; fixture checks do not prove implementation equivalence.
 
+[ROADMAP.md](ROADMAP.md) gives the current state, human decisions, and next work.
+
 ## Layout
 
 | Path | Holds |

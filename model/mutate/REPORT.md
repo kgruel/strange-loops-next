@@ -1,8 +1,46 @@
 # Lean model mutation report
 
-## Integration scope
+## CURRENT snapshot: `08fa7029485648fdc9de642d8c0f19c1dccc3651`
 
-The tables below record runs on the original `mutants` branch, not the merged model.
+The full catalogue run completes all 189 entries on Node `v22.23.4`, with a 240-second command timeout.
+
+| Outcome | Count |
+| --- | ---: |
+| Rejected by build | 140 |
+| Vector differences | 27 |
+| Generator assertion exceptions | 16 |
+| Survivors | 6 |
+
+The runner exits 1 because generator assertions fail, not because of timeout or infrastructure failure.
+No command times out, receives a signal, or reports a spawn or cleanup error.
+A build rejection is not a semantic proof kill.
+Survival does not establish equivalence or reachability.
+
+The six survivor IDs match `17bd7d4`.
+Four remain unapproved helper candidates: `wide-families-013`, `wide-spec-064`, `extra-families-max-acc`, and `extra-families-min-acc`.
+The scoped-equivalence interpretations concern `finish-json-hexdigit` and `last-spec-tests-conds`.
+Those interpretations do not follow from the run alone; their boundaries appear below.
+
+At `17bd7d4`, the counts are 140 build rejections, 29 vector differences, 14 assertions, and six survivors.
+`spec-source-all-any` and `things-negate-erases` now hit the new `phase2-thing-state` assertion before byte comparison.
+A rerun of those two cases and four suspicious build cases reproduces all six outcomes.
+The runner's clean baseline and final baseline pass, as does the rerun's final baseline.
+
+Restored tracked model and vector paths match the snapshot, and the mutation lock is absent.
+A fresh `lake build --wfail` and direct Lean checks of Things, Families, Lens, and Spec laws pass.
+Isolation is not independently established.
+A stale pi-lens notice has unknown capture time; the parent runs no explicit Lean or LSP commands during mutation.
+The root `README.md` changes only a link outside the checked source paths.
+Fresh checks do not establish that all diagnostics are clean.
+
+Build diagnostic markers overlap: 62 type mismatches, zero syntax markers, one unknown identifier, one heartbeat, two recursion-depth markers, and 81 unsolved goals.
+A type mismatch can occur in a law; it does not imply a malformed patch.
+These markers neither classify cases by majority nor constitute a complete syntax or semantic audit.
+Local details appear in `.pi/gates/04-final-mutants/RESULTS.md` and `.pi/gates/04-final-mutants/summary.json`.
+
+## HISTORICAL integration scope
+
+The historical tables below record runs on the original `mutants` branch, not the merged model.
 Integration starts from `c97d0ef` and merges `0000469`.
 The catalogue retains all 189 mutants.
 Nine entries move with their definitions to `model/Loops/Fold.lean` or `model/Loops/Id.lean`.
@@ -11,7 +49,6 @@ The head mutation still selects hidden records and reads their fixture numbers.
 The accumulator mutations still mark hidden records as readable.
 No mutation requires retirement.
 Listing and eight runner tests validate the catalogue without running it on the real source.
-A full catalogue run on the final tree remains pending.
 The run at `17bd7d4` predates Rust and the latest pins.
 The old counts, detection sites, and proposed laws are historical evidence only.
 The extrema candidates below describe the current safe-whole numeric reader.
@@ -19,7 +56,7 @@ They remain unapproved.
 No proposed law receives a proof or acceptance in this merge.
 The merged gates and vector parity are in `.pi/gates/04-mutants/`.
 
-## Integration run at `17bd7d4`
+## HISTORICAL integration run at `17bd7d4`
 
 The full run at `17bd7d4` covered 189 entries.
 It found 140 build rejections and 29 vector differences.
@@ -34,7 +71,7 @@ Four survivors were `wide-families-013`, `wide-spec-064`, `extra-families-max-ac
 The two distinct equivalent candidates were `finish-json-hexdigit` and `last-spec-tests-conds`.
 These are candidate interpretations, not approved laws.
 
-## Historical branch counts
+## HISTORICAL branch counts
 
 | Pass | Mutants | Build gate | Vector difference | Survived | Gen assertion error |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -66,7 +103,7 @@ The four unapproved candidate laws below concern those gaps.
 | `model/Loops/Things.lean` | 17 | 14 | 3 | 0 | 0 |
 | `model/Loops/Time.lean` | 8 | 3 | 0 | 0 | 5 |
 
-## Scope
+## HISTORICAL branch scope
 
 The catalogue contains 189 mutants across all 13 `model/Loops` files.
 The baseline commit is `f537fdf` on branch `mutants`.
@@ -83,7 +120,7 @@ They do not claim a second full-catalogue run.
 Each runner restores the source and passes its final baseline build.
 No run shares `.lake` with another mutation run.
 
-## Result limits
+## HISTORICAL branch result limits
 
 The old branch runner labeled every nonzero build `killed-by-proof`.
 That legacy table status means only a build rejection, not a semantic verdict.
@@ -110,12 +147,12 @@ No error in these runs indicates a missing tool or an unavailable file.
 The mutation command returns exit code 1 when these assertions fail.
 This exit does not mean that the clean baseline gates fail.
 
-## Initial survivors
+## HISTORICAL initial survivors
 
 All 16 initial survivors have a classification.
 Fourteen expose unpinned behaviour, including four low-level contracts with no current vector route.
-Two are equivalent at the protocol boundary.
-No survivor has an unclear classification.
+Two have scoped-equivalence interpretations at the protocol boundary.
+These interpretations do not follow from survival alone.
 
 | Mutant | Site | Classification | Distinguishing case or reason |
 | --- | --- | --- | --- |
@@ -155,7 +192,7 @@ Parsing, refusal order, and `Tests.toJson` do not use the changed order.
 The changed missing-number default therefore affects only unguarded low-level calls.
 The report keeps this public helper gap visible instead of hiding it in the equivalence count.
 
-## New Gen cases
+## HISTORICAL new Gen cases
 
 Gen writes every new vector.
 No vector receives a manual edit.
@@ -227,7 +264,7 @@ node model/mutate/run.mjs --timeout 240 --output /tmp/loops-mutants.json
 node --test model/mutate/run.test.mjs
 ```
 
-This historical reproduction command does not instruct a full run on the current tree.
+The mutation command runs all 189 entries on the current tree.
 The full mutation command returns 1 when generator assertions detect mutants.
 Inspect the result categories and logs rather than treating that exit as a baseline failure.
 
@@ -238,7 +275,7 @@ These temporary files do not form part of the commit.
 The following tables preserve each outcome and its first detection site.
 The catalogue preserves every exact replacement.
 
-## Per-mutant results
+## HISTORICAL per-mutant results
 
 The site column names the original mutation location.
 The evidence column gives the latest result's first proof diagnostic, vector difference, or generator assertion.
@@ -436,7 +473,7 @@ A proof diagnostic is a gate location, not a semantic counterexample.
 | `last-json-utf16` | `model/Loops/Json.lean:28` | killed-by-proof | `model/Laws/Record.lean:117`: Application type mismatch: The argument |
 | `last-json-quote` | `model/Loops/Json.lean:73` | killed-by-vector | `vectors/batch/01-two-labels.json` (30 files). |
 
-## Generator assertion errors
+## HISTORICAL generator assertion errors
 
 These assertions detect changed behaviour before the vector comparison completes.
 
@@ -459,7 +496,7 @@ These assertions detect changed behaviour before the vector comparison completes
 | `coverage-time-instant-` | `uncaught exception: record/09-leap-second: unexpectedly refused: emitted-not-rfc3339` |
 | `coverage-base32-bit-order` | `uncaught exception: self-check failed: base32: , my, m33a, m33pm, m33pmrq, m33pmrug, m33pmrugjy ≠ , my, mzxq, mzxw6, mzxw6yq, mzxw6ytb, mzxw6ytboi` |
 
-## Final gates
+## HISTORICAL branch final gates
 
 | Command | Result |
 | --- | --- |
