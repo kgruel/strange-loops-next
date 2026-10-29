@@ -98,5 +98,136 @@ def canon (n : Number) : String :=
         (if ds.length == 1 then "" else "." ++ String.ofList (ds.toList.drop 1))
       return sign ++ body ++ "e" ++ (if exp ≥ 0 then "+" else "-") ++ toString exp.natAbs
 
+private theorem scaled_den_pos (m : Nat) (e : Int) :
+    0 < (scaled m 1 e).2 := by
+  unfold scaled
+  split
+  · exact Nat.zero_lt_one
+  · exact Nat.mul_pos Nat.zero_lt_one (Nat.pow_pos (by decide))
+
+private theorem scaled_ten (m : Nat) (e : Int) :
+    let a := scaled (m * 10) 1 e
+    let b := scaled m 1 (e + 1)
+    a.1 * b.2 = b.1 * a.2 := by
+  dsimp
+  by_cases he : 0 ≤ e
+  · have he' : 0 ≤ e + 1 := by omega
+    have hn : (e + 1).toNat = e.toNat + 1 := by omega
+    simp [scaled, he, he', hn, Nat.pow_succ, Nat.mul_assoc, Nat.mul_comm,
+      Nat.mul_left_comm]
+  · by_cases he' : 0 ≤ e + 1
+    · have heq : e = -1 := by omega
+      subst e
+      simp [scaled, Nat.mul_comm]
+    · have hn : (-e).toNat = (-(e + 1)).toNat + 1 := by omega
+      simp [scaled, he, he', hn, Nat.pow_succ, Nat.mul_assoc, Nat.mul_comm]
+
+private theorem ratio_cross_trans {a b c d p q : Nat} (hd : 0 < d)
+    (hab : a * d = c * b) (hbc : c * q = p * d) : a * q = p * b := by
+  apply Nat.mul_right_cancel hd
+  calc
+    a * q * d = (a * d) * q := by ac_rfl
+    _ = (c * b) * q := by rw [hab]
+    _ = (c * q) * b := by ac_rfl
+    _ = (p * d) * b := by rw [hbc]
+    _ = p * b * d := by ac_rfl
+
+/-- Removing trailing zeros preserves the exact decimal ratio. -/
+theorem strip_preserves_value (fuel m : Nat) (e : Int) :
+    let r := strip fuel m e
+    let a := scaled m 1 e
+    let b := scaled r.1 1 r.2
+    a.1 * b.2 = b.1 * a.2 := by
+  induction fuel generalizing m e with
+  | zero => simp [strip]
+  | succ fuel ih =>
+    simp only [strip]
+    split
+    · rename_i h
+      have hs : m ≠ 0 ∧ m % 10 = 0 := by simpa using h
+      have hm : m = (m / 10) * 10 :=
+        (Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero hs.2)).symm
+      exact ratio_cross_trans (scaled_den_pos (m / 10) (e + 1))
+        (by simpa only [← hm] using scaled_ten (m / 10) e) (ih (m / 10) (e + 1))
+    · rfl
+
+/-- Removing trailing zeros keeps a positive mantissa positive. -/
+theorem strip_preserves_positive (fuel m : Nat) (e : Int) (hm : 0 < m) :
+    0 < (strip fuel m e).1 := by
+  induction fuel generalizing m e with
+  | zero => simpa [strip] using hm
+  | succ fuel ih =>
+    simp only [strip]
+    split
+    · rename_i h
+      have hs : m ≠ 0 ∧ m % 10 = 0 := by simpa using h
+      have heq : m = (m / 10) * 10 :=
+        (Nat.div_mul_cancel (Nat.dvd_of_mod_eq_zero hs.2)).symm
+      exact ih (m / 10) (e + 1) (by omega)
+    · exact hm
+
+private theorem choose_preserves (n : Number) (p q : Nat) (e : Int)
+    (c : Nat) (cs : List Nat)
+    (hc : (ofScientific false c e).bits = n.magnitude)
+    (hcs : ∀ x ∈ cs, (ofScientific false x e).bits = n.magnitude) :
+    (ofScientific false (cs.foldl (fun best x => if closer p q e x best then x else best) c) e).bits = n.magnitude := by
+  apply List.foldlRecOn (motive := fun m => (ofScientific false m e).bits = n.magnitude) cs _ hc
+  intro best hbest x hx
+  split
+  · exact hcs x hx
+  · exact hbest
+
+/-- The search returns matching bits or the fallback pair. -/
+theorem shortest_roundtrips_or_fallback (n : Number) (p q : Nat) (k : Int) :
+    let r := shortest n p q k
+    (ofScientific false r.1 r.2).bits = n.magnitude ∨ r = (p, 0) := by
+  unfold shortest
+  generalize List.range 17 = ds
+  induction ds with
+  | nil => exact Or.inr rfl
+  | cons d ds ih =>
+    simp only [List.forIn_cons]
+    split
+    · rename_i c cs hcs
+      apply Or.inl
+      have hall : ∀ x ∈ c :: cs, (ofScientific false x (k - (d : Int))).bits = n.magnitude := by
+        intro x hx
+        rw [← hcs] at hx
+        exact beq_iff_eq.mp (List.mem_filter.mp hx).2
+      exact choose_preserves n p q _ c cs (hall c (by simp)) (fun x hx => hall x (by simp [hx]))
+    · exact ih
+
+/-- A matching candidate makes the search return matching bits. -/
+theorem shortest_roundtrips_of_candidate (n : Number) (p q : Nat) (k : Int)
+    (hcandidate : ∃ d ∈ List.range 17,
+      let e := k - (d : Int)
+      let ab := scaled p q (-e)
+      let m := nearest ab.1 ab.2
+      ∃ c ∈ [m, m - 1, m + 1], (ofScientific false c e).bits = n.magnitude) :
+    let r := shortest n p q k
+    (ofScientific false r.1 r.2).bits = n.magnitude := by
+  unfold shortest
+  generalize List.range 17 = ds at *
+  induction ds with
+  | nil => simp at hcandidate
+  | cons d ds ih =>
+    simp only [List.forIn_cons]
+    split
+    · rename_i c cs hcs
+      have hall : ∀ x ∈ c :: cs, (ofScientific false x (k - (d : Int))).bits = n.magnitude := by
+        intro x hx
+        rw [← hcs] at hx
+        exact beq_iff_eq.mp (List.mem_filter.mp hx).2
+      exact choose_preserves n p q _ c cs (hall c (by simp)) (fun x hx => hall x (by simp [hx]))
+    · rename_i hnone
+      apply ih
+      rcases hcandidate with ⟨j, hj, c, hmem, hbits⟩
+      rcases List.mem_cons.mp hj with rfl | hj
+      · have hm := (List.mem_filter (p := fun x => (ofScientific false x (k - (j : Int))).bits == n.magnitude)).mpr
+          ⟨hmem, beq_iff_eq.mpr hbits⟩
+        obtain ⟨x, xs, hcons⟩ := List.exists_cons_of_ne_nil (List.ne_nil_of_mem hm)
+        exact False.elim (hnone x xs hcons)
+      · exact ⟨j, hj, c, hmem, hbits⟩
+
 end Number
 end Loops

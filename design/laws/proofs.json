@@ -1740,6 +1740,65 @@
    "module": "Laws.Spec"},
   "Loops.Op.absent.sizeOf_spec":
   {"uses": [], "states": "sizeOf Loops.Op.absent = 1", "module": "Loops.Spec"},
+  "Loops.Number.strip_preserves_value":
+  {"uses": [],
+   "states":
+   "∀ (fuel m : Nat) (e : Int), have r := Loops.Number.strip✝ fuel m e; have a := Loops.Number.scaled✝ m 1 e; have b := Loops.Number.scaled✝ r.fst 1 r.snd; a.fst * b.snd = b.fst * a.snd",
+   "module": "Loops.Number"},
+  "Loops.Number.strip_preserves_positive":
+  {"uses": [],
+   "states":
+   "∀ (fuel m : Nat) (e : Int), 0 < m → 0 < (Loops.Number.strip✝ fuel m e).fst",
+   "module": "Loops.Number"},
+  "Loops.Number.shortest_roundtrips_or_fallback":
+  {"uses": [],
+   "states":
+   "∀ (n : Loops.Number) (p q : Nat) (k : Int), have r := Loops.Number.shortest✝ n p q k; (Loops.Number.ofScientific false r.fst r.snd).bits = n.magnitude ∨ r = (p, 0)",
+   "module": "Loops.Number"},
+  "Loops.Number.shortest_roundtrips_of_candidate":
+  {"uses": [],
+   "states":
+   "∀ (n : Loops.Number) (p q : Nat) (k : Int), (∃ d, d ∈ List.range 17 ∧ have e := k - ↑d; have ab := Loops.Number.scaled✝ p q (-e); have m := Loops.Number.nearest✝ ab.fst ab.snd; ∃ c, c ∈ [m, m - 1, m + 1] ∧ (Loops.Number.ofScientific false c e).bits = n.magnitude) → have r := Loops.Number.shortest✝ n p q k; (Loops.Number.ofScientific false r.fst r.snd).bits = n.magnitude",
+   "module": "Loops.Number"},
+  "Loops.Number.scientific_mul_ten_nonnegative":
+  {"uses": [],
+   "states":
+   "∀ (spec : Float.Model.Format) (m : Nat) (e : Int), 0 ≤ e → e + 1 ≤ 2 ^ spec.exponentBits → Float.Model.UnpackedFloat.ofScientific spec (m * 10) e = Float.Model.UnpackedFloat.ofScientific spec m (e + 1)",
+   "module": "Laws.NumberScientific"},
+  "Loops.Number.scientific_division_shift_one":
+  {"uses": [],
+   "states":
+   "∀ (a b : Nat), 0 < b → (Float.Model.UnpackedFloat.ExtendedMantissa.ofMantissaAndAccuracy (a / b) (Float.Model.UnpackedFloat.accuracyOfFraction (a % b) b)).shiftRightOne = Float.Model.UnpackedFloat.ExtendedMantissa.ofMantissaAndAccuracy (a / (b * 2)) (Float.Model.UnpackedFloat.accuracyOfFraction (a % (b * 2)) (b * 2))",
+   "module": "Laws.NumberScientific"},
+  "Loops.Number.scientific_division_shift":
+  {"uses": ["Loops.Number.scientific_division_shift_one"],
+   "states":
+   "∀ (a b k : Nat), 0 < b → Float.Model.UnpackedFloat.ExtendedMantissa.ofMantissaAndAccuracy (a / b) (Float.Model.UnpackedFloat.accuracyOfFraction (a % b) b) >>> k = Float.Model.UnpackedFloat.ExtendedMantissa.ofMantissaAndAccuracy (a / (b * 2 ^ k)) (Float.Model.UnpackedFloat.accuracyOfFraction (a % (b * 2 ^ k)) (b * 2 ^ k))",
+   "module": "Laws.NumberScientific"},
+  "Loops.Number.scientific_division_cancel_ten":
+  {"uses": ["Loops.Number.scientific_accuracy_scale"],
+   "states":
+   "∀ (m n shift : Nat), ((m * 10) <<< shift / 10 ^ (n + 1), Float.Model.UnpackedFloat.accuracyOfFraction ((m * 10) <<< shift % 10 ^ (n + 1)) (10 ^ (n + 1))) = (m <<< shift / 10 ^ n, Float.Model.UnpackedFloat.accuracyOfFraction (m <<< shift % 10 ^ n) (10 ^ n))",
+   "module": "Laws.NumberScientific"},
+  "Loops.Number.scientific_accuracy_scale":
+  {"uses": [],
+   "states":
+   "∀ (num den scale : Nat), 0 < scale → Float.Model.UnpackedFloat.accuracyOfFraction (num * scale) (den * scale) = Float.Model.UnpackedFloat.accuracyOfFraction num den",
+   "module": "Laws.NumberScientific"},
+  "Loops.Number.ofScientific_mul_ten_nonnegative":
+  {"uses": ["Loops.Number.scientific_mul_ten_nonnegative"],
+   "states":
+   "∀ (negative : Bool) (m : Nat) (e : Int), 0 ≤ e → e < 2048 → Loops.Number.ofScientific negative (m * 10) e = Loops.Number.ofScientific negative m (e + 1)",
+   "module": "Laws.NumberScientific"},
+  "Loops.Number.normalizeZero_of_nonzero":
+  {"uses": [],
+   "states": "∀ (n : Loops.Number), n.magnitude ≠ 0 → n.normalizeZero = n",
+   "module": "Laws.NumberRoundTrip"},
+  "Loops.Number.normalizeZero_idempotent":
+  {"uses": [],
+   "states":
+   "∀ (n : Loops.Number), n.normalizeZero.normalizeZero = n.normalizeZero",
+   "module": "Laws.NumberRoundTrip"},
   "Loops.Number.no_exact_canon_reader":
   {"uses": ["Loops.Number.canon_zero"],
    "states":
@@ -1768,6 +1827,10 @@
    "states":
    "∀ (n : Loops.Number), n.canon ≠ \"NaN\" ∧ n.canon ≠ \"Infinity\" ∧ n.canon ≠ \"-Infinity\" ∧ n.canon ≠ \"+Infinity\"",
    "module": "Laws.Number"},
+  "Loops.Number.canon_normalizeZero":
+  {"uses": ["Loops.Number.canon_zero"],
+   "states": "∀ (n : Loops.Number), n.normalizeZero.canon = n.canon",
+   "module": "Laws.NumberRoundTrip"},
   "Loops.Number.canon_nonfinite":
   {"uses": [],
    "states": "∀ (n : Loops.Number), n.finite = false → n.canon = \"null\"",
@@ -3053,4 +3116,14 @@
   {"uses": [],
    "states":
    "StateT.run Gen.Read.number \"1e400\".toList = Except.ok (Loops.Json.number { bits := 9218868437227405312 }, []) ∧ StateT.run Gen.Read.number \"-1e400\".toList = Except.ok (Loops.Json.number { bits := 18442240474082181120 }, [])",
-   "module": "Laws.NumberRead"}}}
+   "module": "Laws.NumberRead"},
+  "Gen.Read.number_canon_zero":
+  {"uses": ["Loops.Number.canon_zero"],
+   "states":
+   "∀ (n : Loops.Number), n.magnitude = 0 → Gen.Read.readNumber n.canon = some n.normalizeZero",
+   "module": "Laws.NumberRoundTrip"},
+  "Float.Model.UnpackedFloat.finite.congr_simp":
+  {"uses": [],
+   "states":
+   "∀ (sign sign_1 : Float.Model.UnpackedFloat.Sign), sign = sign_1 → ∀ (mantissa mantissa_1 : Nat) (e_mantissa : mantissa = mantissa_1) (exponent exponent_1 : Int), exponent = exponent_1 → ∀ (mantissa_pos : 0 < mantissa), Float.Model.UnpackedFloat.finite sign mantissa exponent mantissa_pos = Float.Model.UnpackedFloat.finite sign_1 mantissa_1 exponent_1 ⋯",
+   "module": "Laws.NumberScientific"}}}

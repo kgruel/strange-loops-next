@@ -209,7 +209,7 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15`, `17` |
 | `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
 
-## Number text (`model/Laws/Number.lean`, `model/Laws/NumberRead.lean`)
+## Number text (`model/Loops/Number.lean`, `model/Laws/Number.lean`, `model/Laws/NumberRead.lean`, `model/Laws/NumberRoundTrip.lean`, `model/Laws/NumberScientific.lean`)
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
@@ -220,10 +220,22 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `number.no-special-text` | `Number.canon_not_special` | No number writes as `NaN`, `Infinity`, `-Infinity`, or `+Infinity`. | (the formatter's output characters) |
 | `number.refuse-tokens` | `Gen.Read.number_rejects_nonfinite_tokens` | The number reader refuses `NaN` and `Infinity`, with no sign, a minus sign, or a plus sign. | (the total number reader) |
 | `number.overflow` | `Gen.Read.number_overflow` | The number reader accepts `1e400` and `-1e400` as positive and negative infinity. | (the total number reader) |
+| `number.normalize-zero` | `Number.normalizeZero_of_nonzero`, `Number.normalizeZero_idempotent`, `Number.canon_normalizeZero` | Zero normalization leaves nonzero numbers unchanged. Repeating normalization gives the same result. Canonical text stays unchanged. | (zero normalization) |
+| `number.zero-read` | `Gen.Read.number_canon_zero` | Reading canonical text from a number with zero magnitude returns positive zero. | (the total number reader) |
+| `number.strip-value` | `Number.strip_preserves_value` | Removing trailing zeros preserves the exact decimal ratio. | (the formatter helper) |
+| `number.strip-positive` | `Number.strip_preserves_positive` | Removing trailing zeros keeps a positive mantissa positive. | (the formatter helper) |
+| `number.search-result` | `Number.shortest_roundtrips_or_fallback` | The decimal search returns a pair that converts to the input magnitude, or it returns the fallback pair. | (the formatter helper) |
+| `number.search-hit` | `Number.shortest_roundtrips_of_candidate` | If a tested candidate has the input magnitude, the search returns a pair that converts to that magnitude. | (the formatter helper) |
+| `number.scientific-nonnegative` | `Number.ofScientific_mul_ten_nonnegative` | Moving a trailing decimal zero into the exponent preserves binary64 conversion when the original exponent is from 0 through 2047. | (the conversion helper) |
 
 These laws keep the model's current behavior.
 Both zero signs write as `0`, so exact bit recovery fails for negative zero.
-A useful round-trip goal must normalize zero or exclude negative zero.
+The round-trip goal normalizes zero.
+`Number.normalizeZero` replaces either zero sign with positive zero and leaves all other numbers unchanged.
+`Gen.Read.readNumber` uses the total number reader and requires full input consumption.
+It keeps binary64 results and reconstructs integer results through `Number.ofScientific`.
+The zero-case theorem proves this round trip for both signs of zero.
+The finite nonzero case remains open.
 
 The token and overflow proofs cover `Gen.Read.number.run`, not the full JSON reader.
 The full reader calls the partial function `Gen.Read.value`, which has no kernel reduction equation.
@@ -232,7 +244,15 @@ Overflow is different from a nonfinite token: the number reader accepts `1e400` 
 The payload decoder refuses those results.
 
 The character law does not prove JSON number grammar or ECMAScript notation thresholds.
-Normalized round trip, complete spelling, and shortest text remain open proof goals.
+The search proofs preserve matching bits when a tested candidate exists.
+They do not prove that every finite nonzero input has such a candidate within 17 digits.
+The unconditional search law permits the fallback pair: the supplied numerator with exponent zero.
+The strip proof preserves the exact decimal ratio, not yet the result of binary64 conversion.
+One decimal rescaling step preserves binary64 conversion for an original exponent from 0 through 2047.
+Negative exponents and the exponent 2048 need separate proofs.
+The division path can choose different binary shifts for equal ratios.
+Equal quotients at a fixed shift do not yet prove equal rounded results.
+Normalized round trip for finite nonzero inputs, complete spelling, and shortest text remain open proof goals.
 The 4,000 binary64 cases still check formatting and zero-normalized round trip at runtime.
 
 ## Occurred (`model/Laws/Time.lean`)
