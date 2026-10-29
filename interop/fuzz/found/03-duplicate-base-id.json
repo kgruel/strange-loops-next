@@ -1,0 +1,98 @@
+{
+  "layer": "lens/section",
+  "input": {
+    "base": [
+      {
+        "id": "a",
+        "body": []
+      },
+      {
+        "id": "a",
+        "body": [
+          ""
+        ]
+      }
+    ],
+    "text": [
+      "::: a",
+      ":::"
+    ]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "a",
+        "body": []
+      }
+    ],
+    "normalized": [
+      "::: a",
+      ":::"
+    ],
+    "outcomes": [],
+    "applied": [
+      {
+        "id": "a",
+        "body": []
+      },
+      {
+        "id": "a",
+        "body": [
+          ""
+        ]
+      }
+    ]
+  },
+  "js": {
+    "parsed": [
+      {
+        "id": "a",
+        "body": []
+      }
+    ],
+    "normalized": [
+      "::: a",
+      ":::"
+    ],
+    "outcomes": [
+      {
+        "accepted": "a",
+        "body": []
+      }
+    ],
+    "applied": [
+      {
+        "id": "a",
+        "body": []
+      },
+      {
+        "id": "a",
+        "body": []
+      }
+    ]
+  },
+  "verdict": "spec gap",
+  "note": "Lean uses the first base section; JS uses the last. The protocol law table omits the unique-base premise.",
+  "scope": "This is a domain-boundary probe, not a valid-base law violation. Neither implementation defines a public refusal for duplicate base IDs.",
+  "citations": [
+    "model/Loops/Lens.lean:78-91 (lookup, diffSection, diff)",
+    "model/Laws/Lens.lean:143 (no_op)",
+    "model/Laws/Lens.lean:250 (put_get)",
+    "protocol/laws.md:186-187",
+    "interop/js/lens.mjs:51"
+  ],
+  "reduction": {
+    "trials": 35,
+    "rounds": 1,
+    "bounded": false,
+    "smallerDomainCandidates": 7,
+    "remainingMismatches": 0,
+    "claim": "No smaller case from the reducer keeps this cause and its domain. This is not a global minimality proof."
+  },
+  "provenance": {
+    "seed": "campaign-final-20261029",
+    "family": "lens",
+    "index": 23,
+    "nearMiss": "base-repeat"
+  }
+}

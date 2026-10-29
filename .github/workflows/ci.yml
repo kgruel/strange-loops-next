@@ -34,6 +34,20 @@ jobs:
       - name: Model mutants
         working-directory: model
         run: node mutants.mjs
+      - name: Fuzz adapters and batch transport check
+        timeout-minutes: 1
+        run: node --test interop/fuzz/*.test.mjs
+      - name: The verified fixed fuzz corpus agrees
+        timeout-minutes: 1
+        run: >-
+          node interop/fuzz/run.mjs --seed ci-1 --n 28 --no-shrink
+          --out "$RUNNER_TEMP/loops-fuzz"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fuzz-corpus
+          path: ${{ runner.temp }}/loops-fuzz
+          if-no-files-found: ignore
       - name: The proof graph is a pure render of the proofs
         working-directory: model
         run: |

@@ -337,13 +337,24 @@ def check (dir : System.FilePath) : IO UInt32 := do
     return 1
   return if misses.isEmpty then 0 else 1
 
+/-- A batch emits one answer or decoding error per file. IO errors stay fatal. -/
+def batch (dir : System.FilePath) : IO UInt32 := do
+  unless ← dir.isDir do throw (IO.userError s!"not a directory: {dir}")
+  for f in ← jsonFiles dir do
+    let result := match readVector (← IO.FS.readFile f) with
+      | .ok (got, _) => J.obj [("file", .str f.toString), ("expect", got)]
+      | .error e => J.obj [("file", .str f.toString), ("error", .str e)]
+    IO.println ((result.render 0).replace "\n" "")
+  return 0
+
 def main (args : List String) : IO UInt32 := do
   match args with
+  | ["--batch", dir] => batch dir
   | ["--check", dir] => check dir
   | [file] =>
     match readVector (← IO.FS.readFile file) with
     | .ok (got, _) => IO.println (got.render 0); return 0
     | .error e => IO.eprintln s!"{file}: {e}"; return 1
   | _ =>
-    IO.eprintln "usage: lake exe run <vector.json>\n       lake exe run --check <vectors dir>"
+    IO.eprintln "usage: lake exe run <vector.json>\n       lake exe run --check <vectors dir>\n       lake exe run --batch <dir>"
     return 2
