@@ -194,16 +194,18 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .plate{position:absolute;inset:0;border-radius:14px;background:var(--sheet);box-shadow:0 0 0 1px var(--hair-2);transform:translateZ(calc(var(--z) * var(--gap) + var(--lift)));cursor:pointer}
 .plate[data-layer="5"]{background:var(--sunk);box-shadow:0 0 0 1px var(--hair)}
 .plate.is-settled{background:color-mix(in srgb,var(--sheet) 55%,transparent);border:1px dashed var(--hair-2);box-shadow:none}
-.plate span{display:none}
-.plate-label{position:absolute;transform:translate(-100%,-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
-.plate-label.hot{color:var(--ink);font-weight:500}
+/* A layer's name is in the markup, stood upright at the plate's left corner: it turns the plate's tilt back, so it lifts with the plate and needs no script to place. */
+.plate{transform-style:preserve-3d}
+.plate span{position:absolute;left:0;top:0;transform-origin:0 0;transform:rotateZ(40deg) rotateX(-58deg) translate(calc(-100% - 10px),-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
+.plate.hot span{color:var(--ink);font-weight:500}
 .plate.hot{box-shadow:0 0 0 1.5px var(--ink)}
 .plate::after{content:"";position:absolute;inset:14px 18px auto;height:6px;border-radius:3px;background:var(--hair);box-shadow:0 12px 0 var(--hair),0 24px 0 var(--hair)}
 .plate[data-layer="5"]::after{display:none}
 .stack3d .loop{position:absolute;right:2%;top:8%;height:76%;width:44px;color:var(--faint);overflow:visible}
 .stack3d .loop path{fill:none;stroke:currentColor;stroke-width:1.2;vector-effect:non-scaling-stroke}
-.loop-t{position:absolute;right:calc(2% + 50px);top:50%;transform:translateY(-50%);font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
-@media (max-width:560px){.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
+/* Above the plates, at every width: beside them it sits on their right corners whenever the figure is narrow (1240-1400) or the stack is centred (560-1240). */
+.loop-t{position:absolute;right:calc(2% + 50px);top:-38px;font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
+@media (max-width:560px){.env{white-space:pre-wrap;overflow-wrap:anywhere}.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
 
 .layer-table{width:100%;border-collapse:collapse;font-size:13.5px}
 .layer-table th,.layer-table td{text-align:left;vertical-align:top;padding:9px 10px 9px 0;border-top:1px solid var(--hair)}
@@ -214,7 +216,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 .layer-table tr{transition:background .18s}
 .layer-table tbody tr{cursor:pointer}
 .layer-table tbody tr.hot th,.layer-table tbody tr.hot td{color:var(--ink)}
-@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}}
+@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}.layer-table td::before{content:attr(data-label);display:block;font-size:11px;color:var(--faint)}}
 
 /* the walk */
 .steps{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:1px;counter-reset:s}
@@ -557,12 +559,12 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <table class="layer-table">
       <thead><tr><th scope="col"></th><th scope="col">Made by</th><th scope="col">Lasts</th><th scope="col">Named by</th></tr></thead>
       <tbody>
-        <tr data-layer="0"><th scope="row">Text<span class="gist">For an audience: what a lens renders, and what people edit.</span></th><td>render</td><td>until the next render</td><td>its base: tick, lens, audience</td></tr>
-        <tr data-layer="1"><th scope="row">Tick <span class="chip settled">settled</span><span class="gist">A result at a moment, covering exactly the records folded.</span></th><td>tick</td><td>stored when cited</td><td>id over vertex, covers, result</td></tr>
-        <tr data-layer="2"><th scope="row">State<span class="gist">A vertex's slots, worked out from the set.</span></th><td>fold</td><td>a cache: recomputed at will</td><td>its vertex and the set</td></tr>
-        <tr data-layer="3"><th scope="row">View<span class="gist">What one reader holds, settled and admitted.</span></th><td>settle, admit</td><td>until more arrives</td><td>nothing: it is the reader's</td></tr>
-        <tr data-layer="4"><th scope="row">Store<span class="gist">A set of records in places. No order, no positions.</span></th><td>holding</td><td>as long as a place keeps it</td><td>its anchor</td></tr>
-        <tr data-layer="5"><th scope="row">Record<span class="gist">The ground. Appended, never edited; only a payload can go.</span></th><td>emit</td><td>for good</td><td><code>r:</code> content hash</td></tr>
+        <tr data-layer="0"><th scope="row">Text<span class="gist">For an audience: what a lens renders, and what people edit.</span></th><td data-label="Made by">render</td><td data-label="Lasts">until the next render</td><td data-label="Named by">its base: tick, lens, audience</td></tr>
+        <tr data-layer="1"><th scope="row">Tick <span class="chip settled">settled</span><span class="gist">A result at a moment, covering exactly the records folded.</span></th><td data-label="Made by">tick</td><td data-label="Lasts">stored when cited</td><td data-label="Named by">id over vertex, covers, result</td></tr>
+        <tr data-layer="2"><th scope="row">State<span class="gist">A vertex's slots, worked out from the set.</span></th><td data-label="Made by">fold</td><td data-label="Lasts">a cache: recomputed at will</td><td data-label="Named by">its vertex and the set</td></tr>
+        <tr data-layer="3"><th scope="row">View<span class="gist">What one reader holds, settled and admitted.</span></th><td data-label="Made by">settle, admit</td><td data-label="Lasts">until more arrives</td><td data-label="Named by">nothing: it is the reader's</td></tr>
+        <tr data-layer="4"><th scope="row">Store<span class="gist">A set of records in places. No order, no positions.</span></th><td data-label="Made by">holding</td><td data-label="Lasts">as long as a place keeps it</td><td data-label="Named by">its anchor</td></tr>
+        <tr data-layer="5"><th scope="row">Record<span class="gist">The ground. Appended, never edited; only a payload can go.</span></th><td data-label="Made by">emit</td><td data-label="Lasts">for good</td><td data-label="Named by"><code>r:</code> content hash</td></tr>
       </tbody>
     </table>
   </div>
@@ -727,27 +729,6 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
   const plates = $$(".plate", stack);
   const rows = $$(".layer-table tbody tr");
   const ground = plates.length - 1;
-  const labels = plates.map((p) => {
-    const l = document.createElement("span");
-    l.className = "plate-label";
-    l.textContent = p.textContent.trim();
-    stack.appendChild(l);
-    return l;
-  });
-  const placeLabels = () => {
-    const box = stack.getBoundingClientRect();
-    plates.forEach((p, k) => {
-      const r = p.getBoundingClientRect();
-      labels[k].style.left = `${r.left - box.left - 10}px`;
-      labels[k].style.top = `${r.top - box.top + r.height * 0.62}px`;
-    });
-  };
-  let follow = 0;
-  const track = (ms) => {
-    const until = performance.now() + ms;
-    const go = () => { placeLabels(); if (performance.now() < until) follow = requestAnimationFrame(go); };
-    cancelAnimationFrame(follow); go();
-  };
   let lifted = null;
   const lift = (k) => {
     if (k === lifted) return;
@@ -755,11 +736,9 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
     plates.forEach((p, i) => {
       const up = k !== null && i === k && i !== ground;
       p.classList.toggle("hot", i === k);
-      labels[i].classList.toggle("hot", i === k);
       animate(p, { "--lift": up ? "22px" : "0px" }, spring(260 + 40 * i, 18 + 2 * i));
     });
     rows.forEach((r, i) => r.classList.toggle("hot", i === k));
-    track(900);
   };
   [...plates, ...rows].forEach((el) => {
     const k = Number(el.dataset.layer);
@@ -767,8 +746,6 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
     el.addEventListener("click", () => lift(k));
   });
   $(".layers-fig").addEventListener("mouseleave", () => lift(null));
-  addEventListener("resize", placeLabels);
-  placeLabels();
   if (M) {
     // Each layer settles onto the one below it, the ground first.
     plates.forEach((p) => { p.style.opacity = "0"; p.style.setProperty("--lift", "140px"); });
@@ -776,7 +753,6 @@ const LAW_AT = {"write.checked":"law-write-checked","admit.no-cross":"law-admit-
       plates.slice().reverse().forEach((p, j) => {
         animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j));
       });
-      track(2200);
     }, { amount: 0.4 });
   }
 

@@ -34,16 +34,18 @@
 .plate{position:absolute;inset:0;border-radius:14px;background:var(--sheet);box-shadow:0 0 0 1px var(--hair-2);transform:translateZ(calc(var(--z) * var(--gap) + var(--lift)));cursor:pointer}
 .plate[data-layer="5"]{background:var(--sunk);box-shadow:0 0 0 1px var(--hair)}
 .plate.is-settled{background:color-mix(in srgb,var(--sheet) 55%,transparent);border:1px dashed var(--hair-2);box-shadow:none}
-.plate span{display:none}
-.plate-label{position:absolute;transform:translate(-100%,-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
-.plate-label.hot{color:var(--ink);font-weight:500}
+/* A layer's name is in the markup, stood upright at the plate's left corner: it turns the plate's tilt back, so it lifts with the plate and needs no script to place. */
+.plate{transform-style:preserve-3d}
+.plate span{position:absolute;left:0;top:0;transform-origin:0 0;transform:rotateZ(40deg) rotateX(-58deg) translate(calc(-100% - 10px),-50%);font-size:12px;color:var(--muted);white-space:nowrap;pointer-events:none;transition:color .18s}
+.plate.hot span{color:var(--ink);font-weight:500}
 .plate.hot{box-shadow:0 0 0 1.5px var(--ink)}
 .plate::after{content:"";position:absolute;inset:14px 18px auto;height:6px;border-radius:3px;background:var(--hair);box-shadow:0 12px 0 var(--hair),0 24px 0 var(--hair)}
 .plate[data-layer="5"]::after{display:none}
 .stack3d .loop{position:absolute;right:2%;top:8%;height:76%;width:44px;color:var(--faint);overflow:visible}
 .stack3d .loop path{fill:none;stroke:currentColor;stroke-width:1.2;vector-effect:non-scaling-stroke}
-.loop-t{position:absolute;right:calc(2% + 50px);top:50%;transform:translateY(-50%);font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
-@media (max-width:560px){.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
+/* Above the plates, at every width: beside them it sits on their right corners whenever the figure is narrow (1240-1400) or the stack is centred (560-1240). */
+.loop-t{position:absolute;right:calc(2% + 50px);top:-38px;font-size:11.5px;line-height:1.35;color:var(--faint);text-align:right}
+@media (max-width:560px){.env{white-space:pre-wrap;overflow-wrap:anywhere}.stack3d{height:300px}.stack3d .iso{--gap:26px;width:170px;height:118px;margin:-59px 0 0 -70px}.loop-t{display:none}}
 
 .layer-table{width:100%;border-collapse:collapse;font-size:13.5px}
 .layer-table th,.layer-table td{text-align:left;vertical-align:top;padding:9px 10px 9px 0;border-top:1px solid var(--hair)}
@@ -54,7 +56,7 @@
 .layer-table tr{transition:background .18s}
 .layer-table tbody tr{cursor:pointer}
 .layer-table tbody tr.hot th,.layer-table tbody tr.hot td{color:var(--ink)}
-@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}}
+@media (max-width:560px){.layer-table thead{display:none}.layer-table tr{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--hair);padding:8px 0}.layer-table th,.layer-table td{border:0;padding:2px 8px 2px 0}.layer-table tbody th{grid-column:1/-1;padding-bottom:4px}.layer-table td{font-size:12.5px}.layer-table td::before{content:attr(data-label);display:block;font-size:11px;color:var(--faint)}}
 
 /* the walk */
 .steps{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:1px;counter-reset:s}

@@ -42,27 +42,6 @@
   const plates = $$(".plate", stack);
   const rows = $$(".layer-table tbody tr");
   const ground = plates.length - 1;
-  const labels = plates.map((p) => {
-    const l = document.createElement("span");
-    l.className = "plate-label";
-    l.textContent = p.textContent.trim();
-    stack.appendChild(l);
-    return l;
-  });
-  const placeLabels = () => {
-    const box = stack.getBoundingClientRect();
-    plates.forEach((p, k) => {
-      const r = p.getBoundingClientRect();
-      labels[k].style.left = `${r.left - box.left - 10}px`;
-      labels[k].style.top = `${r.top - box.top + r.height * 0.62}px`;
-    });
-  };
-  let follow = 0;
-  const track = (ms) => {
-    const until = performance.now() + ms;
-    const go = () => { placeLabels(); if (performance.now() < until) follow = requestAnimationFrame(go); };
-    cancelAnimationFrame(follow); go();
-  };
   let lifted = null;
   const lift = (k) => {
     if (k === lifted) return;
@@ -70,11 +49,9 @@
     plates.forEach((p, i) => {
       const up = k !== null && i === k && i !== ground;
       p.classList.toggle("hot", i === k);
-      labels[i].classList.toggle("hot", i === k);
       animate(p, { "--lift": up ? "22px" : "0px" }, spring(260 + 40 * i, 18 + 2 * i));
     });
     rows.forEach((r, i) => r.classList.toggle("hot", i === k));
-    track(900);
   };
   [...plates, ...rows].forEach((el) => {
     const k = Number(el.dataset.layer);
@@ -82,8 +59,6 @@
     el.addEventListener("click", () => lift(k));
   });
   $(".layers-fig").addEventListener("mouseleave", () => lift(null));
-  addEventListener("resize", placeLabels);
-  placeLabels();
   if (M) {
     // Each layer settles onto the one below it, the ground first.
     plates.forEach((p) => { p.style.opacity = "0"; p.style.setProperty("--lift", "140px"); });
@@ -91,7 +66,6 @@
       plates.slice().reverse().forEach((p, j) => {
         animate(p, { opacity: [0, 1], "--lift": ["140px", "0px"] }, spring(170 + 30 * j, 17, 0.09 * j));
       });
-      track(2200);
     }, { amount: 0.4 });
   }
 
