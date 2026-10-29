@@ -1,0 +1,56 @@
+{
+  "layer": "lens/section",
+  "input": {
+    "base": [],
+    "text": [
+      "::: ",
+      ":::"
+    ]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "",
+        "body": []
+      }
+    ],
+    "normalized": [
+      "::: ",
+      ":::"
+    ],
+    "outcomes": [
+      {
+        "unknown": ""
+      }
+    ],
+    "applied": []
+  },
+  "js": {
+    "parsed": null,
+    "refused": true
+  },
+  "verdict": "JS wrong",
+  "note": "JS rejects an empty section ID, but the model and round-trip law permit it.",
+  "scope": "The base is empty and has unique IDs. One empty-ID section is the render of a model document.",
+  "citations": [
+    "model/Loops/Lens.lean:37-43 (headerId?, Section)",
+    "model/Loops/Lens.lean:54-66 (parseGo, parse)",
+    "model/Laws/Lens.lean:90 (parse_render)",
+    "protocol/laws.md:185",
+    "interop/js/lens.mjs:29"
+  ],
+  "reduction": {
+    "trials": 20,
+    "rounds": 1,
+    "bounded": false,
+    "smallerDomainCandidates": 3,
+    "remainingMismatches": 0,
+    "claim": "No smaller case from the reducer keeps this cause and its domain. This is not a global minimality proof."
+  },
+  "provenance": {
+    "seed": "campaign-final-20261029",
+    "family": "lens",
+    "index": 6,
+    "nearMiss": "section-empty"
+  }
+}

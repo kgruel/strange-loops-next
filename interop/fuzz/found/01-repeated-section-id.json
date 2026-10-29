@@ -1,0 +1,66 @@
+{
+  "layer": "lens/section",
+  "input": {
+    "base": [],
+    "text": [
+      "::: a",
+      ":::",
+      "::: a",
+      ":::"
+    ]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "a",
+        "body": []
+      },
+      {
+        "id": "a",
+        "body": []
+      }
+    ],
+    "normalized": [
+      "::: a",
+      ":::",
+      "::: a",
+      ":::"
+    ],
+    "outcomes": [
+      {
+        "unknown": "a"
+      },
+      {
+        "unknown": "a"
+      }
+    ],
+    "applied": []
+  },
+  "js": {
+    "parsed": null,
+    "refused": true
+  },
+  "verdict": "JS wrong",
+  "note": "JS rejects repeated section IDs, but the round-trip law permits every section list.",
+  "scope": "The base is empty and has unique IDs. The edited IDs repeat. A nonempty ID keeps this case separate from empty-ID refusal.",
+  "citations": [
+    "model/Loops/Lens.lean:54-66 (parseGo, parse)",
+    "model/Laws/Lens.lean:90 (parse_render)",
+    "protocol/laws.md:185",
+    "interop/js/lens.mjs:41"
+  ],
+  "reduction": {
+    "trials": 56,
+    "rounds": 2,
+    "bounded": false,
+    "smallerDomainCandidates": 6,
+    "remainingMismatches": 0,
+    "claim": "No smaller case from the reducer keeps this cause and its domain. This is not a global minimality proof."
+  },
+  "provenance": {
+    "seed": "campaign-final-20261029",
+    "family": "lens",
+    "index": 5,
+    "nearMiss": "section-repeat"
+  }
+}

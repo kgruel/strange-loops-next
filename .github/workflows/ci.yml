@@ -10,7 +10,8 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install Lean
         run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+          elan=https://raw.githubusercontent.com/leanprover/elan/master
+          curl -sSfL "$elan/elan-init.sh" \
             | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Proofs check
@@ -25,6 +26,23 @@ jobs:
       - name: Every vector's expect follows from its input alone
         working-directory: model
         run: lake exe run --check ../vectors
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fuzz adapters and batch transport check
+        timeout-minutes: 1
+        run: node --test interop/fuzz/*.test.mjs
+      - name: The verified fixed fuzz corpus agrees
+        timeout-minutes: 1
+        run: >-
+          node interop/fuzz/run.mjs --seed ci-1 --n 28 --no-shrink
+          --out "$RUNNER_TEMP/loops-fuzz"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fuzz-corpus
+          path: ${{ runner.temp }}/loops-fuzz
+          if-no-files-found: ignore
       - name: The proof graph is a pure render of the proofs
         working-directory: model
         run: |
@@ -55,7 +73,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: The design pages are a pure render of design/, protocol/ and vectors/
+      - name: >-
+          The design pages are a pure render of design/, protocol/ and vectors/
         run: |
           node design/build.mjs
           git diff --exit-code -- out
