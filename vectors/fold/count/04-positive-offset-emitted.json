@@ -1,0 +1,24 @@
+{
+  "vector": "04-positive-offset-emitted",
+  "layer": "fold/count",
+  "laws": ["count.perm"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab4a",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["topic:offset"],
+          "value": "v120",
+          "prev": [],
+          "emitted": "2026-10-01T01:00:00+01:00",
+          "occurred": "2026-10-01T00:00:00Z",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": 1
+}

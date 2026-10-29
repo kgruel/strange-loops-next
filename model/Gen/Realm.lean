@@ -62,7 +62,9 @@ def cases : List Case := [
   ⟨"06-about-nothing", ["thing.local"], [m1, m2, m3]⟩,
   ⟨"07-kind-change-supersedes", ["thing.local"], [t1, t2]⟩,
   ⟨"08-about-nothing-revised-unrelated", ["admit.no-cross", "thing.local"], [m1, m4]⟩,
-  ⟨"09-revision-erases", ["settle.set", "settle.erased"], [x1, x2]⟩
+  ⟨"09-revision-erases", ["settle.set", "settle.erased"], [x1, x2]⟩,
+  ⟨"10-successor-expands-things", ["admit.no-cross", "thing.local"],
+    [r 0xb1 "note" ["thing:A"] 1, r 0xb2 "note" ["thing:A", "thing:B"] 2 [0xb1]]⟩
 ]
 
 def allow : Record → Record → Bool := fun _ _ => true

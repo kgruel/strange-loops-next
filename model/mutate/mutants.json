@@ -1,33 +1,1483 @@
 [
-  {"id":"things-prev-or","file":"Things.lean","before":"shares r q && may r q","after":"shares r q || may r q","reason":"Allow either entitlement condition."},
-  {"id":"things-drop-may","file":"Things.lean","before":"shares r q && may r q","after":"(fun _ => shares r q) may","reason":"Ignore the store rule."},
-  {"id":"things-drop-erasure","file":"Things.lean","before":"if erasedIn xs i then r.erase else r","after":"r","reason":"Ignore settled erasure."},
-  {"id":"fold-drop-prev-filter","file":"Fold.lean","before":"s.heads.filter (fun h => !r.prev.contains h.id)","after":"s.heads","reason":"Keep replaced heads."},
-  {"id":"fold-drop-named-guard","file":"Fold.lean","before":"if named.contains r.id then heads else insertRec r heads","after":"insertRec r heads","reason":"Insert previously named records."},
-  {"id":"spec-unread-duplicates","file":"Spec.lean","before":"(idsOf unknown).length","after":"unknown.length","reason":"Count duplicate unread records."},
-  {"id":"spec-below-time-inclusive","file":"Spec.lean","before":"decide (s.start < c.span.start)","after":"decide (s.start ≤ c.span.start)","reason":"Include the boundary."},
-  {"id":"spec-atleast-time-strict","file":"Spec.lean","before":"decide (c.span.start ≤ s.start)","after":"decide (c.span.start < s.start)","reason":"Exclude the boundary."},
-  {"id":"spec-source-all-any","file":"Spec.lean","before":"s.about.all r.isAbout","after":"s.about.any r.isAbout","reason":"Reject an empty source selection."},
-  {"id":"families-unknown-no","file":"Families.lean","before":"| .payload t, r => if r.shown = .here then .ofBool (t r) else .unknown","after":"| .payload t, r => if r.shown = .here then .ofBool (t r) else .no","reason":"Treat hidden payloads as no."},
-  {"id":"families-drop-readable","file":"Families.lean","before":"f.fold (ys.filter f.readable)","after":"f.fold ys","reason":"Fold unreadable records."},
-  {"id":"families-unread-zero","file":"Families.lean","before":"(xs.filter (ev · == .unknown)).length + (ys.filter (!f.readable ·)).length","after":"0","reason":"Discard unread counts."},
-  {"id":"things-here-last","file":"Things.lean","before":"forms.find? (·.shown == .here)","after":"forms.reverse.find? (·.shown == .here)","reason":"Prefer the last here form."},
-  {"id":"things-no-self-anchor","file":"Things.lean","before":"if r.about.isEmpty then [idText r.id] else r.about","after":"if r.about.isEmpty then [] else r.about","reason":"Drop the self anchor."},
-  {"id":"things-negate-erases","file":"Things.lean","before":"e.erases.contains i","after":"!e.erases.contains i","reason":"Invert erasure membership."},
-  {"id":"fold-winner-last","file":"Fold.lean","before":"def LatestBy.winner (s : LatestBy) : Option Record := s.heads.head?","after":"def LatestBy.winner (s : LatestBy) : Option Record := s.heads.getLast?","reason":"Choose the oldest head."},
-  {"id":"fold-insert-nonstrict","file":"Fold.lean","before":"if n < m then n :: m :: ms","after":"if n ≤ m then n :: m :: ms","reason":"Insert equal ids twice."},
-  {"id":"fold-count-zero","file":"Fold.lean","before":"def Count.step (n : Nat) (_ : Record) : Nat := n + 1","after":"def Count.step (n : Nat) (_ : Record) : Nat := n + 0","reason":"Do not increment counts."},
-  {"id":"spec-drop-head-choice","file":"Spec.lean","before":"s.heads.filter (chosen sel cs)","after":"(let _ := sel; s.heads)","reason":"Keep unchosen heads."},
-  {"id":"spec-drop-collect-choice","file":"Spec.lean","before":"newestFirst (pool.filter (chosen sel cs))","after":"newestFirst (let _ := sel; pool)","reason":"Keep unchosen records."},
-  {"id":"spec-collect-unknown-yes","file":"Spec.lean","before":"limitTo limit (hs.filter (payTest cs · == .yes))","after":"limitTo limit (hs.filter (payTest cs · != .no))","reason":"Include unknown payload tests."},
-  {"id":"spec-below-number-inclusive","file":"Spec.lean","before":"decide (j < i)","after":"decide (j ≤ i)","reason":"Include the number boundary."},
-  {"id":"stored-salt-check","file":"Stored.lean","before":"if salt.length ≠ 16 then some \"salt-not-16-bytes\"","after":"if salt.length = 16 then some \"salt-not-16-bytes\"","reason":"Invert the salt check."},
-  {"id":"stored-commit-order","file":"Stored.lean","before":"salt ++ utf8 payload.canon","after":"utf8 payload.canon ++ salt","reason":"Reverse commitment inputs."},
-  {"id":"stored-refusal-last","file":"Stored.lean","before":"writeCodes.find? codes.contains","after":"writeCodes.reverse.find? codes.contains","reason":"Choose the last refusal."},
-  {"id":"record-newer-id-flip","file":"Record.lean","before":"a.id > b.id","after":"a.id < b.id","reason":"Reverse the id tie break."},
-  {"id":"record-num-hidden","file":"Record.lean","before":"if r.shown = .here then","after":"if True then","reason":"Read hidden numbers."},
-  {"id":"occurred-month-end","file":"Occurred.lean","before":"1 ≤ d && d ≤ daysIn y m","after":"1 ≤ d && d < daysIn y m","reason":"Reject the last day."},
-  {"id":"occurred-open-stop","file":"Occurred.lean","before":"| some _, none => True","after":"| some _, none => False","reason":"Reject an open stop."},
-  {"id":"occurred-qualifier-and","file":"Occurred.lean","before":"c == '?' || c == '~' || c == '%'","after":"c == '?' && c == '~' || c == '%'","reason":"Require two qualifiers."},
-  {"id":"record-num-drop-int","file":"Record.lean","before":"| some (.int i) => some i","after":"| some (.int _) => none","reason":"Use the default result for the integer match arm."}
+  {
+    "id": "things-prev-or",
+    "file": "Things.lean",
+    "before": "shares r q && may r q",
+    "after": "shares r q || may r q",
+    "reason": "Allow either entitlement condition."
+  },
+  {
+    "id": "things-drop-may",
+    "file": "Things.lean",
+    "before": "shares r q && may r q",
+    "after": "(fun _ => shares r q) may",
+    "reason": "Ignore the store rule."
+  },
+  {
+    "id": "things-drop-erasure",
+    "file": "Things.lean",
+    "before": "if erasedIn xs i then r.erase else r",
+    "after": "r",
+    "reason": "Ignore settled erasure."
+  },
+  {
+    "id": "fold-drop-prev-filter",
+    "file": "Fold.lean",
+    "before": "s.heads.filter (fun h => !r.prev.contains h.id)",
+    "after": "s.heads",
+    "reason": "Keep replaced heads."
+  },
+  {
+    "id": "fold-drop-named-guard",
+    "file": "Fold.lean",
+    "before": "if named.contains r.id then heads else insertRec r heads",
+    "after": "insertRec r heads",
+    "reason": "Insert previously named records."
+  },
+  {
+    "id": "spec-unread-duplicates",
+    "file": "Spec.lean",
+    "before": "(idsOf unknown).length",
+    "after": "unknown.length",
+    "reason": "Count duplicate unread records."
+  },
+  {
+    "id": "spec-below-time-inclusive",
+    "file": "Spec.lean",
+    "before": "decide (s.start < c.span.start)",
+    "after": "decide (s.start ≤ c.span.start)",
+    "reason": "Include the boundary."
+  },
+  {
+    "id": "spec-atleast-time-strict",
+    "file": "Spec.lean",
+    "before": "decide (c.span.start ≤ s.start)",
+    "after": "decide (c.span.start < s.start)",
+    "reason": "Exclude the boundary."
+  },
+  {
+    "id": "spec-source-all-any",
+    "file": "Spec.lean",
+    "before": "s.about.all r.isAbout",
+    "after": "s.about.any r.isAbout",
+    "reason": "Reject an empty source selection."
+  },
+  {
+    "id": "families-unknown-no",
+    "file": "Families.lean",
+    "before": "| .payload t, r => if r.shown = .here then .ofBool (t r) else .unknown",
+    "after": "| .payload t, r => if r.shown = .here then .ofBool (t r) else .no",
+    "reason": "Treat hidden payloads as no."
+  },
+  {
+    "id": "families-drop-readable",
+    "file": "Families.lean",
+    "before": "f.fold (ys.filter f.readable)",
+    "after": "f.fold ys",
+    "reason": "Fold unreadable records."
+  },
+  {
+    "id": "families-unread-zero",
+    "file": "Families.lean",
+    "before": "(xs.filter (ev · == .unknown)).length + (ys.filter (!f.readable ·)).length",
+    "after": "0",
+    "reason": "Discard unread counts."
+  },
+  {
+    "id": "things-here-last",
+    "file": "Things.lean",
+    "before": "forms.find? (·.shown == .here)",
+    "after": "forms.reverse.find? (·.shown == .here)",
+    "reason": "Prefer the last here form."
+  },
+  {
+    "id": "things-no-self-anchor",
+    "file": "Things.lean",
+    "before": "if r.about.isEmpty then [idText r.id] else r.about",
+    "after": "if r.about.isEmpty then [] else r.about",
+    "reason": "Drop the self anchor."
+  },
+  {
+    "id": "things-negate-erases",
+    "file": "Things.lean",
+    "before": "e.erases.contains i",
+    "after": "!e.erases.contains i",
+    "reason": "Invert erasure membership."
+  },
+  {
+    "id": "fold-winner-last",
+    "file": "Fold.lean",
+    "before": "def LatestBy.winner (s : LatestBy) : Option Record := s.heads.head?",
+    "after": "def LatestBy.winner (s : LatestBy) : Option Record := s.heads.getLast?",
+    "reason": "Choose the oldest head."
+  },
+  {
+    "id": "fold-insert-nonstrict",
+    "file": "Fold.lean",
+    "before": "if n < m then n :: m :: ms",
+    "after": "if n ≤ m then n :: m :: ms",
+    "reason": "Insert equal ids twice."
+  },
+  {
+    "id": "fold-count-zero",
+    "file": "Fold.lean",
+    "before": "def Count.step (n : Nat) (_ : Record) : Nat := n + 1",
+    "after": "def Count.step (n : Nat) (_ : Record) : Nat := n + 0",
+    "reason": "Do not increment counts."
+  },
+  {
+    "id": "spec-drop-head-choice",
+    "file": "Spec.lean",
+    "before": "s.heads.filter (chosen sel cs)",
+    "after": "(let _ := sel; s.heads)",
+    "reason": "Keep unchosen heads."
+  },
+  {
+    "id": "spec-drop-collect-choice",
+    "file": "Spec.lean",
+    "before": "newestFirst (pool.filter (chosen sel cs))",
+    "after": "newestFirst (let _ := sel; pool)",
+    "reason": "Keep unchosen records."
+  },
+  {
+    "id": "spec-collect-unknown-yes",
+    "file": "Spec.lean",
+    "before": "limitTo limit (hs.filter (payTest cs · == .yes))",
+    "after": "limitTo limit (hs.filter (payTest cs · != .no))",
+    "reason": "Include unknown payload tests."
+  },
+  {
+    "id": "spec-below-number-inclusive",
+    "file": "Spec.lean",
+    "before": "decide (j < i)",
+    "after": "decide (j ≤ i)",
+    "reason": "Include the number boundary."
+  },
+  {
+    "id": "stored-salt-check",
+    "file": "Stored.lean",
+    "before": "if salt.length ≠ 16 then some \"salt-not-16-bytes\"",
+    "after": "if salt.length = 16 then some \"salt-not-16-bytes\"",
+    "reason": "Invert the salt check."
+  },
+  {
+    "id": "stored-commit-order",
+    "file": "Stored.lean",
+    "before": "salt ++ utf8 payload.canon",
+    "after": "utf8 payload.canon ++ salt",
+    "reason": "Reverse commitment inputs."
+  },
+  {
+    "id": "stored-refusal-last",
+    "file": "Stored.lean",
+    "before": "writeCodes.find? codes.contains",
+    "after": "writeCodes.reverse.find? codes.contains",
+    "reason": "Choose the last refusal."
+  },
+  {
+    "id": "record-newer-id-flip",
+    "file": "Record.lean",
+    "before": "a.id > b.id",
+    "after": "a.id < b.id",
+    "reason": "Reverse the id tie break."
+  },
+  {
+    "id": "record-num-hidden",
+    "file": "Record.lean",
+    "before": "if r.shown = .here then",
+    "after": "if True then",
+    "reason": "Read hidden numbers."
+  },
+  {
+    "id": "occurred-month-end",
+    "file": "Occurred.lean",
+    "before": "1 ≤ d && d ≤ daysIn y m",
+    "after": "1 ≤ d && d < daysIn y m",
+    "reason": "Reject the last day."
+  },
+  {
+    "id": "occurred-open-stop",
+    "file": "Occurred.lean",
+    "before": "| some _, none => True",
+    "after": "| some _, none => False",
+    "reason": "Reject an open stop."
+  },
+  {
+    "id": "occurred-qualifier-and",
+    "file": "Occurred.lean",
+    "before": "c == '?' || c == '~' || c == '%'",
+    "after": "c == '?' && c == '~' || c == '%'",
+    "reason": "Require two qualifiers."
+  },
+  {
+    "id": "record-num-drop-int",
+    "file": "Record.lean",
+    "before": "| some (.int i) => some i",
+    "after": "| some (.int _) => none",
+    "reason": "Use the default result for the integer match arm."
+  },
+  {
+    "id": "wide-batch-003",
+    "file": "Batch.lean",
+    "before": "s.startsWith \"@\"",
+    "after": "s.startsWith \"@@\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.isLabel"
+  },
+  {
+    "id": "wide-batch-004",
+    "file": "Batch.lean",
+    "before": "(d.env.about ++ d.env.prev).filter isLabel",
+    "after": "(d.env.about ++ d.env.prev).filter (!isLabel ·)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Draft.refs"
+  },
+  {
+    "id": "wide-batch-005",
+    "file": "Batch.lean",
+    "before": "d.refs.all",
+    "after": "d.refs.any",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Draft.ready"
+  },
+  {
+    "id": "wide-batch-006",
+    "file": "Batch.lean",
+    "before": "if ready.isEmpty then throw \"label-cycle\"",
+    "after": "if !ready.isEmpty then throw \"label-cycle\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.resolveRounds"
+  },
+  {
+    "id": "wide-batch-007",
+    "file": "Batch.lean",
+    "before": "unless labels.Nodup do throw \"label-duplicate\"",
+    "after": "if labels.Nodup then throw \"label-duplicate\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.resolveBatch"
+  },
+  {
+    "id": "wide-envelope-008",
+    "file": "Envelope.lean",
+    "before": "c.isLower || c.isDigit",
+    "after": "c.isLower && c.isDigit",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.isLowerAlnum"
+  },
+  {
+    "id": "wide-envelope-009",
+    "file": "Envelope.lean",
+    "before": "p.isLower && ps.all",
+    "after": "p.isLower || ps.all",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.typedRef"
+  },
+  {
+    "id": "wide-envelope-010",
+    "file": "Envelope.lean",
+    "before": "rest.length == 52",
+    "after": "rest.length != 52",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.recordId"
+  },
+  {
+    "id": "wide-envelope-011",
+    "file": "Envelope.lean",
+    "before": "if e.kind.isEmpty then",
+    "after": "if !e.kind.isEmpty then",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Env.problem"
+  },
+  {
+    "id": "wide-families-012",
+    "file": "Families.lean",
+    "before": "if rs.any (·.id == r.id) then dedup rs else r :: dedup rs",
+    "after": "if rs.any (·.id != r.id) then dedup rs else r :: dedup rs",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.dedup"
+  },
+  {
+    "id": "wide-families-013",
+    "file": "Families.lean",
+    "before": "(r.num field).getD 0",
+    "after": "(r.num field).getD 1",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Sum.on"
+  },
+  {
+    "id": "wide-families-014",
+    "file": "Families.lean",
+    "before": "| some v, some m => some (max m v)",
+    "after": "| some v, some m => some (min m v)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Max.on"
+  },
+  {
+    "id": "wide-families-015",
+    "file": "Families.lean",
+    "before": "| some v, some m => some (min m v)",
+    "after": "| some v, some m => some (max m v)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Min.on"
+  },
+  {
+    "id": "wide-families-016",
+    "file": "Families.lean",
+    "before": "s.heads.take k",
+    "after": "s.heads.drop k",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.LatestBy.limit"
+  },
+  {
+    "id": "wide-families-017",
+    "file": "Families.lean",
+    "before": "s.heads.filter (·.shown == .here)",
+    "after": "s.heads.filter (·.shown != .here)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.LatestBy.maxHeads"
+  },
+  {
+    "id": "wide-fold-019",
+    "file": "Fold.lean",
+    "before": "some (max m r.n)",
+    "after": "some (min m r.n)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Max.step"
+  },
+  {
+    "id": "wide-fold-020",
+    "file": "Fold.lean",
+    "before": "some (min m r.n)",
+    "after": "some (max m r.n)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Min.step"
+  },
+  {
+    "id": "wide-json-021",
+    "file": "Json.lean",
+    "before": "if c.toNat < 0x10000",
+    "after": "if c.toNat ≤ 0x10000",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.utf16Char"
+  },
+  {
+    "id": "wide-json-022",
+    "file": "Json.lean",
+    "before": "if a < b then true else if a = b then lexLt as bs else false",
+    "after": "if a ≤ b then true else if a = b then lexLt as bs else false",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.lexLt"
+  },
+  {
+    "id": "wide-json-023",
+    "file": "Json.lean",
+    "before": "if lt (key x) (key y)",
+    "after": "if lt (key y) (key x)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.insertBy"
+  },
+  {
+    "id": "wide-json-025",
+    "file": "Json.lean",
+    "before": "| '\"' => \"\\\\\\\"\"",
+    "after": "| '\"' => \"\\\"\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.escapeChar"
+  },
+  {
+    "id": "wide-json-026",
+    "file": "Json.lean",
+    "before": "if b then \"true\" else \"false\"",
+    "after": "if b then \"false\" else \"true\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Json.canon"
+  },
+  {
+    "id": "wide-json-027",
+    "file": "Json.lean",
+    "before": "decide (kvs.map (·.1)).Nodup && Json.membersDistinct kvs",
+    "after": "decide (kvs.map (·.1)).Nodup || Json.membersDistinct kvs",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Json.keysDistinct"
+  },
+  {
+    "id": "wide-json-028",
+    "file": "Json.lean",
+    "before": "decide (-maxExact ≤ i) && decide (i ≤ maxExact)",
+    "after": "decide (-maxExact < i) && decide (i ≤ maxExact)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Json.inRange"
+  },
+  {
+    "id": "wide-json-029",
+    "file": "Json.lean",
+    "before": "x.inRange && Json.allInRange xs",
+    "after": "x.inRange || Json.allInRange xs",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Json.allInRange"
+  },
+  {
+    "id": "wide-json-030",
+    "file": "Json.lean",
+    "before": "v.inRange && Json.membersInRange kvs",
+    "after": "v.inRange || Json.membersInRange kvs",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Json.membersInRange"
+  },
+  {
+    "id": "wide-lens-031",
+    "file": "Lens.lean",
+    "before": "l.take 3 == fence || l.head? == some '\\\\'",
+    "after": "l.take 3 == fence && l.head? == some '\\\\'",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.reserved"
+  },
+  {
+    "id": "wide-lens-032",
+    "file": "Lens.lean",
+    "before": "if reserved l then '\\\\' :: l else l",
+    "after": "if reserved l then l else '\\\\' :: l",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.escape"
+  },
+  {
+    "id": "wide-lens-033",
+    "file": "Lens.lean",
+    "before": "if reserved l then l else '\\\\' :: l",
+    "after": "if reserved l then '\\\\' :: l else l",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.unescape"
+  },
+  {
+    "id": "wide-lens-034",
+    "file": "Lens.lean",
+    "before": "':' :: ':' :: ':' :: ' ' :: id",
+    "after": "':' :: ':' :: ':' :: id",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.headerId?"
+  },
+  {
+    "id": "wide-lens-036",
+    "file": "Lens.lean",
+    "before": "| [], .inside _ _, _ => none",
+    "after": "| [], .inside _ _, acc => some acc.reverse",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.parseGo"
+  },
+  {
+    "id": "wide-lens-037",
+    "file": "Lens.lean",
+    "before": "if s.id = id then some s.body else lookup id ss",
+    "after": "if s.id != id then some s.body else lookup id ss",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.lookup"
+  },
+  {
+    "id": "wide-lens-038",
+    "file": "Lens.lean",
+    "before": "if b = s.body then none",
+    "after": "if b ≠ s.body then none",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.diffSection"
+  },
+  {
+    "id": "wide-lens-039",
+    "file": "Lens.lean",
+    "before": "if (edited.map (·.id)).contains s.id then none else some (.absent s.id)",
+    "after": "if !(edited.map (·.id)).contains s.id then none else some (.absent s.id)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.absentSection"
+  },
+  {
+    "id": "wide-lens-041",
+    "file": "Lens.lean",
+    "before": "if i = id then some b else acceptedBody id os",
+    "after": "if i ≠ id then some b else acceptedBody id os",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Lens.acceptedBody"
+  },
+  {
+    "id": "wide-occurred-042",
+    "file": "Occurred.lean",
+    "before": "if isQualifier c then date? cs.dropLast",
+    "after": "if isQualifier c then date? cs",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.point?"
+  },
+  {
+    "id": "wide-occurred-043",
+    "file": "Occurred.lean",
+    "before": "if q = ['.', '.'] then openFrom p else if q.contains '/' then none else between p q",
+    "after": "if q.contains '/' then openFrom p else if q = ['.', '.'] then none else between p q",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.spanOf"
+  },
+  {
+    "id": "wide-record-044",
+    "file": "Record.lean",
+    "before": "base32 ((idDigest n).map Nat.toUInt8)",
+    "after": "base32 ((idDigest n).reverse.map Nat.toUInt8)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.idText"
+  },
+  {
+    "id": "wide-record-049",
+    "file": "Record.lean",
+    "before": "if name = \"value\"",
+    "after": "if name != \"value\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Record.get"
+  },
+  {
+    "id": "wide-record-050",
+    "file": "Record.lean",
+    "before": "if p r then r.withhold else r",
+    "after": "if p r then r else r.withhold",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.withholding"
+  },
+  {
+    "id": "wide-spec-051",
+    "file": "Spec.lean",
+    "before": "| .kind => \"kind\"",
+    "after": "| .kind => \"observer\"",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.EnvField.name"
+  },
+  {
+    "id": "wide-spec-052",
+    "file": "Spec.lean",
+    "before": "| .kind => .text",
+    "after": "| .kind => .payload",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.EnvField.type"
+  },
+  {
+    "id": "wide-spec-053",
+    "file": "Spec.lean",
+    "before": "if s.isEmpty then none",
+    "after": "if !s.isEmpty then none",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Field.ofName"
+  },
+  {
+    "id": "wide-spec-054",
+    "file": "Spec.lean",
+    "before": "| .payload _ => .payload",
+    "after": "| .payload _ => .text",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Field.type"
+  },
+  {
+    "id": "wide-spec-055",
+    "file": "Spec.lean",
+    "before": "| .payload f, r => if r.shown = .here",
+    "after": "| .payload f, r => if True",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Field.read"
+  },
+  {
+    "id": "wide-spec-056",
+    "file": "Spec.lean",
+    "before": "| .is a, xs => xs.any a.matches",
+    "after": "| .is a, xs => xs.all a.matches",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Op.test"
+  },
+  {
+    "id": "wide-spec-057",
+    "file": "Spec.lean",
+    "before": "| .no, _ => .no",
+    "after": "| .no, _ => .yes",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Tri.and"
+  },
+  {
+    "id": "wide-spec-059",
+    "file": "Spec.lean",
+    "before": "| some k, xs => xs.take k",
+    "after": "| some k, xs => xs.drop k",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.limitTo"
+  },
+  {
+    "id": "wide-spec-061",
+    "file": "Spec.lean",
+    "before": "Cond.all (cs.filter (!·.field.onEnvelope)) h",
+    "after": "Cond.all (cs.filter (·.field.onEnvelope)) h",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.payTest"
+  },
+  {
+    "id": "wide-spec-062",
+    "file": "Spec.lean",
+    "before": "if sel r then Cond.all cs r else Tri.no",
+    "after": "if sel r then Cond.all cs r else Tri.yes",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Slot.run"
+  },
+  {
+    "id": "wide-spec-063",
+    "file": "Spec.lean",
+    "before": "sp.sources.any (·.takes r)",
+    "after": "sp.sources.all (·.takes r)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Spec.takes"
+  },
+  {
+    "id": "wide-spec-064",
+    "file": "Spec.lean",
+    "before": "xs.filter sp.takes",
+    "after": "xs.filter (!sp.takes ·)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Spec.select"
+  },
+  {
+    "id": "wide-spec-066",
+    "file": "Spec.lean",
+    "before": "kvs.find? (!allowed.contains ·.1)",
+    "after": "kvs.find? (allowed.contains ·.1)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.checkKeys"
+  },
+  {
+    "id": "wide-spec-067",
+    "file": "Spec.lean",
+    "before": "if f.isEmpty then refuse",
+    "after": "if !f.isEmpty then refuse",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.fieldArg"
+  },
+  {
+    "id": "wide-spec-068",
+    "file": "Spec.lean",
+    "before": "if t = \"collect\" && i > 0",
+    "after": "if t = \"collect\" && i ≥ 0",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.slotLimit"
+  },
+  {
+    "id": "wide-spec-069",
+    "file": "Spec.lean",
+    "before": "| \"count\", .bool true => pure .count",
+    "after": "| \"count\", .bool _ => pure .count",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.foldType"
+  },
+  {
+    "id": "wide-spec-070",
+    "file": "Spec.lean",
+    "before": "if typedRef a then pure (some a) else refuse",
+    "after": "if !typedRef a then pure (some a) else refuse",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.sourceAbout"
+  },
+  {
+    "id": "wide-spec-073",
+    "file": "Spec.lean",
+    "before": "if !j.keysDistinct then refuse",
+    "after": "if j.keysDistinct then refuse",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Spec.ofJson"
+  },
+  {
+    "id": "wide-spec-074",
+    "file": "Spec.lean",
+    "before": "| .int i => .int i",
+    "after": "| .int i => .str (toString i)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Val.toJson"
+  },
+  {
+    "id": "wide-spec-076",
+    "file": "Spec.lean",
+    "before": "| .present => (\"present\", .bool true)",
+    "after": "| .present => (\"absent\", .bool true)",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Op.toJson"
+  },
+  {
+    "id": "wide-stored-081",
+    "file": "Stored.lean",
+    "before": "commitOf H salt payload == commit",
+    "after": "commitOf H salt payload != commit",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.opens"
+  },
+  {
+    "id": "wide-things-083",
+    "file": "Things.lean",
+    "before": "r.things.contains t",
+    "after": "r.things.contains t == false",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.Record.isAbout"
+  },
+  {
+    "id": "wide-things-084",
+    "file": "Things.lean",
+    "before": "a.things.any b.things.contains",
+    "after": "a.things.all b.things.contains",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.shares"
+  },
+  {
+    "id": "wide-time-091",
+    "file": "Time.lean",
+    "before": "if cs.isEmpty || !cs.all Char.isDigit then none",
+    "after": "if cs.isEmpty && !cs.all Char.isDigit then none",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.digitsVal"
+  },
+  {
+    "id": "wide-time-092",
+    "file": "Time.lean",
+    "before": "(y % 4 == 0 && y % 100 != 0) || y % 400 == 0",
+    "after": "(y % 4 == 0 || y % 100 != 0) || y % 400 == 0",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.leap"
+  },
+  {
+    "id": "wide-time-093",
+    "file": "Time.lean",
+    "before": "| 2 => if leap y then 29 else 28",
+    "after": "| 2 => if leap y then 28 else 29",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.daysIn"
+  },
+  {
+    "id": "wide-time-094",
+    "file": "Time.lean",
+    "before": "(ds.reverse.dropWhile (· == 0)).reverse",
+    "after": "(ds.reverse.dropWhile (· != 0)).reverse",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.stripZeros"
+  },
+  {
+    "id": "wide-time-095",
+    "file": "Time.lean",
+    "before": "h ≤ 23 && m ≤ 59",
+    "after": "h < 23 && m ≤ 59",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.offsetSecs"
+  },
+  {
+    "id": "wide-time-096",
+    "file": "Time.lean",
+    "before": "if frac.isEmpty then none",
+    "after": "if !frac.isEmpty then none",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.tail"
+  },
+  {
+    "id": "wide-time-097",
+    "file": "Time.lean",
+    "before": "(instant? s.toList).isSome",
+    "after": "(instant? s.toList).isNone",
+    "reason": "Change this selection or check.",
+    "definition": "Loops.validEmitted"
+  },
+  {
+    "id": "coverage-json-json-alldistinct",
+    "file": "Json.lean",
+    "before": "x.keysDistinct && Json.allDistinct xs",
+    "after": "x.keysDistinct || Json.allDistinct xs",
+    "reason": "Change the nested array check.",
+    "definition": "Loops.Json.allDistinct"
+  },
+  {
+    "id": "coverage-json-json-membersdistinct",
+    "file": "Json.lean",
+    "before": "v.keysDistinct && Json.membersDistinct kvs",
+    "after": "v.keysDistinct || Json.membersDistinct kvs",
+    "reason": "Change the nested member check.",
+    "definition": "Loops.Json.membersDistinct"
+  },
+  {
+    "id": "coverage-spec-parsearg",
+    "file": "Spec.lean",
+    "before": "if s.isEmpty then refuse \"where-invalid\" path else pure (.val (.str s))",
+    "after": "if !s.isEmpty then refuse \"where-invalid\" path else pure (.val (.str s))",
+    "reason": "Invert the text check.",
+    "definition": "Loops.parseArg"
+  },
+  {
+    "id": "coverage-spec-parsebound",
+    "file": "Spec.lean",
+    "before": "if ty = .time then parseArg ty path (.str s) else refuse \"where-invalid\" path",
+    "after": "if ty ≠ .time then parseArg ty path (.str s) else refuse \"where-invalid\" path",
+    "reason": "Invert the time type check.",
+    "definition": "Loops.parseBound"
+  },
+  {
+    "id": "coverage-spec-parseop",
+    "file": "Spec.lean",
+    "before": "| (\"present\", .bool true) => pure .present",
+    "after": "| (\"present\", .bool false) => pure .present",
+    "reason": "Accept false for present.",
+    "definition": "Loops.parseOp"
+  },
+  {
+    "id": "coverage-spec-parsewhere",
+    "file": "Spec.lean",
+    "before": "| .obj [] => refuse \"where-invalid\" path\n  | .obj fs => fs.mapM (parseField path)",
+    "after": "| .obj [] => pure []\n  | .obj fs => fs.mapM (parseField path)",
+    "reason": "Accept an empty where map.",
+    "definition": "Loops.parseWhere"
+  },
+  {
+    "id": "coverage-spec-slotfollow",
+    "file": "Spec.lean",
+    "before": "if t = \"collect\" || t = \"latest-by\" then pure true",
+    "after": "if t = \"collect\" && t = \"latest-by\" then pure true",
+    "reason": "Require both fold types.",
+    "definition": "Loops.slotFollow"
+  },
+  {
+    "id": "coverage-spec-parseslot",
+    "file": "Spec.lean",
+    "before": "if name.isEmpty then refuse \"fold-invalid\" path else",
+    "after": "if !name.isEmpty then refuse \"fold-invalid\" path else",
+    "reason": "Invert the slot name check.",
+    "definition": "Loops.parseSlot"
+  },
+  {
+    "id": "coverage-spec-parsekinds",
+    "file": "Spec.lean",
+    "before": "| .arr [] => refuse \"from-invalid\" path",
+    "after": "| .arr [] => pure []",
+    "reason": "Accept an empty kind list.",
+    "definition": "Loops.parseKinds"
+  },
+  {
+    "id": "coverage-spec-sourcestore",
+    "file": "Spec.lean",
+    "before": "if s.isEmpty then refuse \"from-invalid\" \"from.store\" else pure s",
+    "after": "if !s.isEmpty then refuse \"from-invalid\" \"from.store\" else pure s",
+    "reason": "Invert the store name check.",
+    "definition": "Loops.sourceStore"
+  },
+  {
+    "id": "coverage-spec-json-repeatin",
+    "file": "Spec.lean",
+    "before": "(x.repeatAt path).orElse fun _ => Json.repeatIn path xs",
+    "after": "(Json.repeatIn path xs).orElse fun _ => x.repeatAt path",
+    "reason": "Check later array items first.",
+    "definition": "Loops.Json.repeatIn"
+  },
+  {
+    "id": "coverage-spec-json-repeatmember",
+    "file": "Spec.lean",
+    "before": "if seen.contains k then some (memberPath path k)",
+    "after": "if !seen.contains k then some (memberPath path k)",
+    "reason": "Invert the repeated key check.",
+    "definition": "Loops.Json.repeatMember"
+  },
+  {
+    "id": "coverage-occurred-span-closed-",
+    "file": "Occurred.lean",
+    "before": "if h : a ≤ b then some ⟨a, some b, fun e he => by cases he; exact h⟩ else none",
+    "after": "if a < b then (if h : a ≤ b then some ⟨a, some b, fun e he => by cases he; exact h⟩ else none) else none",
+    "reason": "Reject spans with equal ends.",
+    "definition": "Loops.Span.closed?"
+  },
+  {
+    "id": "coverage-occurred-between",
+    "file": "Occurred.lean",
+    "before": "if a ≤ b then Span.closed? a e else none",
+    "after": "if a < b then Span.closed? a e else none",
+    "reason": "Reject equal start times.",
+    "definition": "Loops.between"
+  },
+  {
+    "id": "coverage-time-instant-",
+    "file": "Time.lean",
+    "before": "&& s ≤ 60",
+    "after": "&& s < 60",
+    "reason": "Reject leap seconds.",
+    "definition": "Loops.instant?"
+  },
+  {
+    "id": "coverage-spec-slottests",
+    "file": "Spec.lean",
+    "before": "| none => pure []\n  | some w => parseWhere",
+    "after": "| none => refuse \"where-invalid\" s!\"{path}.where\"\n  | some w => parseWhere",
+    "reason": "Require a where map.",
+    "definition": "Loops.slotTests"
+  },
+  {
+    "id": "coverage-spec-sourcekinds",
+    "file": "Spec.lean",
+    "before": "| none => pure []\n  | some j => parseKinds \"from.kind\" j",
+    "after": "| none => refuse \"from-invalid\" \"from.kind\"\n  | some j => parseKinds \"from.kind\" j",
+    "reason": "Require a kind list.",
+    "definition": "Loops.sourceKinds"
+  },
+  {
+    "id": "coverage-spec-specslots",
+    "file": "Spec.lean",
+    "before": "| none => pure []\n  | some (.obj fs) => fs.mapM",
+    "after": "| none => refuse \"fold-invalid\" \"fold\"\n  | some (.obj fs) => fs.mapM",
+    "reason": "Require fold slots.",
+    "definition": "Loops.specSlots"
+  },
+  {
+    "id": "coverage-base32-bit-order",
+    "file": "Base32.lean",
+    "before": "(List.range 8).reverse.map fun i => (b.toNat >>> i) % 2 == 1",
+    "after": "(List.range 8).map fun i => (b.toNat >>> i) % 2 == 1",
+    "reason": "Read the bits in reverse order.",
+    "definition": "Loops.base32"
+  },
+  {
+    "id": "finish-batch-subst",
+    "file": "Batch.lean",
+    "before": "if isLabel s then σ s else some s",
+    "after": "if isLabel s then some s else σ s",
+    "reason": "Invert label substitution.",
+    "definition": "Loops.subst"
+  },
+  {
+    "id": "finish-batch-envthings",
+    "file": "Batch.lean",
+    "before": "if about.isEmpty then [id] else about",
+    "after": "if about.isEmpty then [] else (let _ := id; about)",
+    "reason": "Drop the self anchor.",
+    "definition": "Loops.envThings"
+  },
+  {
+    "id": "finish-batch-checkprev",
+    "file": "Batch.lean",
+    "before": "if rs.any fun r => r.env.prev.any fun p => (target p).isNone then throw \"prev-unknown\"",
+    "after": "if rs.all fun r => r.env.prev.any fun p => (target p).isNone then throw \"prev-unknown\"",
+    "reason": "Require all records to have unknown targets.",
+    "definition": "Loops.checkPrev"
+  },
+  {
+    "id": "finish-envelope-env-tojson",
+    "file": "Envelope.lean",
+    "before": "| ys => [(k, .arr (ys.map .str))]",
+    "after": "| ys => [(k, .arr (ys.reverse.map .str))]",
+    "reason": "Reverse the canonical set.",
+    "definition": "Loops.Env.toJson"
+  },
+  {
+    "id": "finish-families-acc-fold",
+    "file": "Families.lean",
+    "before": "xs.foldl f.step f.init",
+    "after": "(xs.drop 1).foldl f.step f.init",
+    "reason": "Skip the first record.",
+    "definition": "Loops.Acc.fold"
+  },
+  {
+    "id": "finish-families-tri-ofbool",
+    "file": "Families.lean",
+    "before": "if b then .yes else .no",
+    "after": "if b then .no else .yes",
+    "reason": "Invert the Boolean answer.",
+    "definition": "Loops.Tri.ofBool"
+  },
+  {
+    "id": "finish-fold-count-fold",
+    "file": "Fold.lean",
+    "before": "xs.foldl Count.step n",
+    "after": "(xs.drop 1).foldl Count.step n",
+    "reason": "Skip the first record.",
+    "definition": "Loops.Count.fold"
+  },
+  {
+    "id": "finish-fold-insertrec",
+    "file": "Fold.lean",
+    "before": "if Newer r h then r :: h :: t",
+    "after": "if Newer h r then r :: h :: t",
+    "reason": "Reverse record order.",
+    "definition": "Loops.insertRec"
+  },
+  {
+    "id": "finish-fold-latestby-fold",
+    "file": "Fold.lean",
+    "before": "xs.foldl LatestBy.step s",
+    "after": "(xs.drop 1).foldl LatestBy.step s",
+    "reason": "Skip the first record.",
+    "definition": "Loops.LatestBy.fold"
+  },
+  {
+    "id": "finish-fold-latestby-others",
+    "file": "Fold.lean",
+    "before": "def LatestBy.others (s : LatestBy) : List Record := s.heads.drop 1",
+    "after": "def LatestBy.others (s : LatestBy) : List Record := s.heads.take 1",
+    "reason": "Return the winner as the other head.",
+    "definition": "Loops.LatestBy.others"
+  },
+  {
+    "id": "finish-fold-latest-others",
+    "file": "Fold.lean",
+    "before": "def Latest.others (s : LatestBy) : List Record := s.heads.drop 1",
+    "after": "def Latest.others (s : LatestBy) : List Record := s.heads.take 1",
+    "reason": "Return the winner as the other head.",
+    "definition": "Loops.Latest.others"
+  },
+  {
+    "id": "finish-fold-sum-fold",
+    "file": "Fold.lean",
+    "before": "xs.foldl Sum.step s",
+    "after": "(xs.drop 1).foldl Sum.step s",
+    "reason": "Skip the first record.",
+    "definition": "Loops.Sum.fold"
+  },
+  {
+    "id": "finish-fold-max-fold",
+    "file": "Fold.lean",
+    "before": "xs.foldl Max.step s",
+    "after": "(xs.drop 1).foldl Max.step s",
+    "reason": "Skip the first record.",
+    "definition": "Loops.Max.fold"
+  },
+  {
+    "id": "finish-fold-min-fold",
+    "file": "Fold.lean",
+    "before": "xs.foldl Min.step s",
+    "after": "(xs.drop 1).foldl Min.step s",
+    "reason": "Skip the first record.",
+    "definition": "Loops.Min.fold"
+  },
+  {
+    "id": "finish-json-sortby",
+    "file": "Json.lean",
+    "before": "xs.foldl (fun acc x => insertBy lexLt key x acc) []",
+    "after": "xs.reverse.foldl (fun acc x => insertBy lexLt key x acc) []",
+    "reason": "Keep the last item for equal keys.",
+    "definition": "Loops.sortBy"
+  },
+  {
+    "id": "finish-json-hexdigit",
+    "file": "Json.lean",
+    "before": "\"0123456789abcdef\".toList.getD n '0'",
+    "after": "\"0123456789abcdef\".toList.getD n 'f'",
+    "reason": "Change the digit fallback.",
+    "definition": "Loops.hexDigit"
+  },
+  {
+    "id": "finish-json-json-canonall",
+    "file": "Json.lean",
+    "before": "| x :: xs => x.canon :: Json.canonAll xs",
+    "after": "| x :: xs => Json.canonAll xs ++ [x.canon]",
+    "reason": "Reverse canonical array items.",
+    "definition": "Loops.Json.canonAll"
+  },
+  {
+    "id": "finish-json-json-canonmembers",
+    "file": "Json.lean",
+    "before": "| (k, v) :: kvs => (k, v.canon) :: Json.canonMembers kvs",
+    "after": "| (k, v) :: kvs => Json.canonMembers kvs ++ [(k, v.canon)]",
+    "reason": "Reverse canonical members.",
+    "definition": "Loops.Json.canonMembers"
+  },
+  {
+    "id": "finish-occurred-halves",
+    "file": "Occurred.lean",
+    "before": "| _ :: b => (cs.takeWhile (· != '/'), some b)",
+    "after": "| _ :: b => (cs.takeWhile (· != '/'), some b.reverse)",
+    "reason": "Reverse the second half.",
+    "definition": "Loops.halves"
+  },
+  {
+    "id": "finish-occurred-stamp-of",
+    "file": "Occurred.lean",
+    "before": "match h : instant? s.toList with\n  | some m => some ⟨s, m, h⟩\n  | none => none",
+    "after": "if s.toList.contains '+' then none else\n  match h : instant? s.toList with\n  | some m => some ⟨s, m, h⟩\n  | none => none",
+    "reason": "Reject positive offsets.",
+    "definition": "Loops.Stamp.of?"
+  },
+  {
+    "id": "finish-occurred-claim-of",
+    "file": "Occurred.lean",
+    "before": "match h : occurredSpan? s with\n  | some sp => some ⟨s, sp, h⟩\n  | none => none",
+    "after": "if s.toList.contains '/' then none else\n  match h : occurredSpan? s with\n  | some sp => some ⟨s, sp, h⟩\n  | none => none",
+    "reason": "Reject interval claims.",
+    "definition": "Loops.Claim.of?"
+  },
+  {
+    "id": "finish-record-digestdigits",
+    "file": "Record.lean",
+    "before": "n / 256 ^ k :: digestDigits k (n % 256 ^ k)",
+    "after": "n % 256 ^ k :: digestDigits k (n % 256 ^ k)",
+    "reason": "Use the remainder for the digit.",
+    "definition": "Loops.digestDigits"
+  },
+  {
+    "id": "finish-record-record-span",
+    "file": "Record.lean",
+    "before": "| some c => c.span\n  | none => Span.point r.emitted.moment",
+    "after": "| some c => (let _ := c; Span.point r.emitted.moment)\n  | none => Span.point r.emitted.moment",
+    "reason": "Ignore the claimed span.",
+    "definition": "Loops.Record.span"
+  },
+  {
+    "id": "finish-spec-field-name",
+    "file": "Spec.lean",
+    "before": "| .env f => envPrefix ++ f.name",
+    "after": "| .env f => f.name ++ envPrefix",
+    "reason": "Put the envelope prefix last.",
+    "definition": "Loops.Field.name"
+  },
+  {
+    "id": "finish-spec-field-onenvelope",
+    "file": "Spec.lean",
+    "before": "| .env _ => true\n  | .payload _ => false",
+    "after": "| .env _ => false\n  | .payload _ => true",
+    "reason": "Invert the field location.",
+    "definition": "Loops.Field.onEnvelope"
+  },
+  {
+    "id": "finish-spec-arg-matches",
+    "file": "Spec.lean",
+    "before": "| .val v, .val w => v == w",
+    "after": "| .val v, .val w => v != w",
+    "reason": "Invert value equality.",
+    "definition": "Loops.Arg.matches"
+  },
+  {
+    "id": "finish-spec-cond-eval",
+    "file": "Spec.lean",
+    "before": "| some x => .ofBool (c.op.test x)",
+    "after": "| some x => .ofBool (!(c.op.test x))",
+    "reason": "Invert a known test answer.",
+    "definition": "Loops.Cond.eval"
+  },
+  {
+    "id": "finish-spec-cond-all",
+    "file": "Spec.lean",
+    "before": "cs.foldr (fun c t => (c.eval r).and t) .yes",
+    "after": "(cs.drop 1).foldr (fun c t => (c.eval r).and t) .yes",
+    "reason": "Skip the first condition.",
+    "definition": "Loops.Cond.all"
+  },
+  {
+    "id": "finish-spec-chosen",
+    "file": "Spec.lean",
+    "before": "sel h && Cond.all (cs.filter (·.field.onEnvelope)) h == .yes",
+    "after": "sel h || Cond.all (cs.filter (·.field.onEnvelope)) h == .yes",
+    "reason": "Accept either selection condition.",
+    "definition": "Loops.chosen"
+  },
+  {
+    "id": "finish-spec-memberpath",
+    "file": "Spec.lean",
+    "before": "| some p, k => s!\"{p}.{k}\"",
+    "after": "| some p, k => s!\"{k}.{p}\"",
+    "reason": "Reverse the path parts.",
+    "definition": "Loops.memberPath"
+  },
+  {
+    "id": "finish-spec-slottype",
+    "file": "Spec.lean",
+    "before": "match kvs.filter (foldTypes.contains ·.1) with",
+    "after": "match kvs.filter (!foldTypes.contains ·.1) with",
+    "reason": "Select non-fold keys.",
+    "definition": "Loops.slotType"
+  },
+  {
+    "id": "finish-spec-parsesource",
+    "file": "Spec.lean",
+    "before": "checkKeys sourceKeys (some \"from\") kvs",
+    "after": "checkKeys slotKeys (some \"from\") kvs",
+    "reason": "Check source keys against slot keys.",
+    "definition": "Loops.parseSource"
+  },
+  {
+    "id": "finish-spec-json-repeatat",
+    "file": "Spec.lean",
+    "before": "| .arr xs => Json.repeatIn path xs",
+    "after": "| .arr xs => (let _ := xs; none)",
+    "reason": "Skip duplicate checks in arrays.",
+    "definition": "Loops.Json.repeatAt"
+  },
+  {
+    "id": "finish-spec-specvertex",
+    "file": "Spec.lean",
+    "before": "if v.isEmpty then refuse \"vertex-invalid\" \"vertex\" else pure v",
+    "after": "if !v.isEmpty then refuse \"vertex-invalid\" \"vertex\" else pure v",
+    "reason": "Invert the vertex name check.",
+    "definition": "Loops.specVertex"
+  },
+  {
+    "id": "finish-spec-specsources",
+    "file": "Spec.lean",
+    "before": "| some (.arr xs) => xs.mapM parseSource",
+    "after": "| some (.arr xs) => xs.reverse.mapM parseSource",
+    "reason": "Reverse source parsing order.",
+    "definition": "Loops.specSources"
+  },
+  {
+    "id": "finish-spec-spec-ofobject",
+    "file": "Spec.lean",
+    "before": "checkKeys specKeys none kvs",
+    "after": "checkKeys sourceKeys none kvs",
+    "reason": "Check spec keys against source keys.",
+    "definition": "Loops.Spec.ofObject"
+  },
+  {
+    "id": "finish-spec-arg-tojson",
+    "file": "Spec.lean",
+    "before": "| .time c => .str c.text",
+    "after": "| .time c => .str (String.ofList c.text.toList.reverse)",
+    "reason": "Reverse time text.",
+    "definition": "Loops.Arg.toJson"
+  },
+  {
+    "id": "finish-spec-slot-tojson",
+    "file": "Spec.lean",
+    "before": "if s.tests.isEmpty then [] else [(\"where\", s.tests.toJson)]",
+    "after": "if !s.tests.isEmpty then [] else [(\"where\", s.tests.toJson)]",
+    "reason": "Invert the where output check.",
+    "definition": "Loops.Slot.toJson"
+  },
+  {
+    "id": "finish-spec-source-tojson",
+    "file": "Spec.lean",
+    "before": "if s.kinds.isEmpty then [] else [(\"kind\", .arr (s.kinds.map .str))]",
+    "after": "if !s.kinds.isEmpty then [] else [(\"kind\", .arr (s.kinds.map .str))]",
+    "reason": "Invert the kind output check.",
+    "definition": "Loops.Source.toJson"
+  },
+  {
+    "id": "finish-stored-stored-commit",
+    "file": "Stored.lean",
+    "before": "| .erased c => c",
+    "after": "| .erased c => String.ofList c.toList.reverse",
+    "reason": "Reverse an erased commitment.",
+    "definition": "Loops.Stored.commit"
+  },
+  {
+    "id": "finish-stored-write",
+    "file": "Stored.lean",
+    "before": "match h : writeProblem env salt payload with\n  | some why => .error why\n  | none => .ok ⟨env, salt, payload, writeProblem_none.1 h⟩",
+    "after": "if salt.isEmpty then .error \"salt-not-16-bytes\" else\n  match h : writeProblem env salt payload with\n  | some why => .error why\n  | none => .ok ⟨env, salt, payload, writeProblem_none.1 h⟩",
+    "reason": "Report an empty salt first.",
+    "definition": "Loops.write"
+  },
+  {
+    "id": "finish-things-idsof",
+    "file": "Things.lean",
+    "before": "xs.foldl (fun ns r => insertId r.id ns) []",
+    "after": "(xs.drop 1).foldl (fun ns r => insertId r.id ns) []",
+    "reason": "Skip the first record id.",
+    "definition": "Loops.idsOf"
+  },
+  {
+    "id": "finish-things-refusalof",
+    "file": "Things.lean",
+    "before": "if !(r.prev.all fun p => xs.all fun q => q.id != p || shares r q) then some \"prev-unrelated\"",
+    "after": "if !(r.prev.any fun p => xs.all fun q => q.id != p || shares r q) then some \"prev-unrelated\"",
+    "reason": "Accept one related predecessor.",
+    "definition": "Loops.refusalOf"
+  },
+  {
+    "id": "finish-things-admit",
+    "file": "Things.lean",
+    "before": "xs.filter (entitled may xs)",
+    "after": "xs.filter (fun r => !(entitled may xs r))",
+    "reason": "Keep refused records.",
+    "definition": "Loops.admit"
+  },
+  {
+    "id": "finish-things-statein",
+    "file": "Things.lean",
+    "before": "xs.filter (·.isAbout t)",
+    "after": "xs.filter (!·.isAbout t)",
+    "reason": "Fold records about other things.",
+    "definition": "Loops.stateIn"
+  },
+  {
+    "id": "extra-lens-apply",
+    "file": "Lens.lean",
+    "before": "| some b => ⟨s.id, b⟩\n    | none => s",
+    "after": "| some b => (let _ := b; s)\n    | none => s",
+    "reason": "Ignore an accepted body.",
+    "definition": "Loops.Lens.apply"
+  },
+  {
+    "id": "extra-spec-parsefield",
+    "file": "Spec.lean",
+    "before": "match ops with\n    | .obj [] => refuse \"where-invalid\" p",
+    "after": "match ops with\n    | .obj [] => pure (field, [])",
+    "reason": "Accept a field without tests.",
+    "definition": "Loops.parseField"
+  },
+  {
+    "id": "extra-lens-render",
+    "file": "Lens.lean",
+    "before": "d.flatMap fun s => header s.id :: s.body.map escape ++ [fence]",
+    "after": "d.reverse.flatMap fun s => header s.id :: s.body.map escape ++ [fence]",
+    "reason": "Reverse the section order.",
+    "definition": "Loops.Lens.render"
+  },
+  {
+    "id": "extra-lens-diff",
+    "file": "Lens.lean",
+    "before": "edited.filterMap (diffSection base) ++ base.filterMap (absentSection edited)",
+    "after": "base.filterMap (absentSection edited) ++ edited.filterMap (diffSection base)",
+    "reason": "Report absences first.",
+    "definition": "Loops.Lens.diff"
+  },
+  {
+    "id": "extra-fold-latest-winner",
+    "file": "Fold.lean",
+    "before": "def Latest.winner (s : LatestBy) : Option Record := s.heads.head?",
+    "after": "def Latest.winner (s : LatestBy) : Option Record := s.heads.getLast?",
+    "reason": "Choose the last head.",
+    "definition": "Loops.Latest.winner"
+  },
+  {
+    "id": "extra-occurred-span-before",
+    "file": "Occurred.lean",
+    "before": "a.start < b.start ∨ (a.start = b.start ∧ StopBefore a.stop b.stop)",
+    "after": "a.start > b.start ∨ (a.start = b.start ∧ StopBefore a.stop b.stop)",
+    "reason": "Reverse start time order.",
+    "definition": "Loops.Span.Before"
+  },
+  {
+    "id": "extra-record-addressed",
+    "file": "Record.lean",
+    "before": "a.id = b.id → a = b",
+    "after": "a.id ≠ b.id → a = b",
+    "reason": "Compare different ids.",
+    "definition": "Loops.Addressed"
+  },
+  {
+    "id": "extra-things-thingsof",
+    "file": "Things.lean",
+    "before": "canonSet (xs.flatMap Record.things)",
+    "after": "(canonSet (xs.flatMap Record.things)).reverse",
+    "reason": "Reverse the thing order.",
+    "definition": "Loops.thingsOf"
+  },
+  {
+    "id": "extra-things-settle",
+    "file": "Things.lean",
+    "before": "(idsOf xs).filterMap (pick xs)",
+    "after": "(idsOf xs).reverse.filterMap (pick xs)",
+    "reason": "Reverse the settled record order.",
+    "definition": "Loops.settle"
+  },
+  {
+    "id": "extra-things-perthing",
+    "file": "Things.lean",
+    "before": "(thingsOf xs).map fun t => (t, stateIn t xs)",
+    "after": "(thingsOf xs).reverse.map fun t => (t, stateIn t xs)",
+    "reason": "Reverse the thing order.",
+    "definition": "Loops.perThing"
+  },
+  {
+    "id": "extra-spec-shownids",
+    "file": "Spec.lean",
+    "before": "hs.map fun h => (h.id, h.shown)",
+    "after": "hs.reverse.map fun h => (h.id, h.shown)",
+    "reason": "Reverse the head order.",
+    "definition": "Loops.shownIds"
+  },
+  {
+    "id": "extra-spec-spec-run",
+    "file": "Spec.lean",
+    "before": "sp.slots.map fun s => (s.name, s.run sp.takes ys)",
+    "after": "sp.slots.reverse.map fun s => (s.name, s.run sp.takes ys)",
+    "reason": "Reverse the slot order.",
+    "definition": "Loops.Spec.run"
+  },
+  {
+    "id": "extra-spec-tests-tojson",
+    "file": "Spec.lean",
+    "before": "ts.map fun (f, os) => (f.name, .obj (os.map Op.toJson))",
+    "after": "ts.reverse.map fun (f, os) => (f.name, .obj (os.map Op.toJson))",
+    "reason": "Reverse the test field order.",
+    "definition": "Loops.Tests.toJson"
+  },
+  {
+    "id": "extra-spec-spec-tojson",
+    "file": "Spec.lean",
+    "before": "sp.sources.map Source.toJson",
+    "after": "sp.sources.reverse.map Source.toJson",
+    "reason": "Reverse the source order.",
+    "definition": "Loops.Spec.toJson"
+  },
+  {
+    "id": "extra-families-sum-acc",
+    "file": "Families.lean",
+    "before": "fun s a b => by simp only [Sum.step]; omega, (·.shown == .here)",
+    "after": "fun s a b => by simp only [Sum.step]; omega, (·.shown != .here)",
+    "reason": "Read hidden records.",
+    "definition": "Loops.Sum.acc"
+  },
+  {
+    "id": "extra-families-max-acc",
+    "file": "Families.lean",
+    "before": "simp only [Max.step, Option.some.injEq] <;> omega, (·.shown == .here)",
+    "after": "simp only [Max.step, Option.some.injEq] <;> omega, (·.shown != .here)",
+    "reason": "Read hidden records.",
+    "definition": "Loops.Max.acc"
+  },
+  {
+    "id": "extra-families-min-acc",
+    "file": "Families.lean",
+    "before": "simp only [Min.step, Option.some.injEq] <;> omega, (·.shown == .here)",
+    "after": "simp only [Min.step, Option.some.injEq] <;> omega, (·.shown != .here)",
+    "reason": "Read hidden records.",
+    "definition": "Loops.Min.acc"
+  },
+  {
+    "id": "last-families-count-acc",
+    "file": "Families.lean",
+    "before": "⟨0, Count.step, fun _ _ _ => rfl, fun _ => true⟩",
+    "after": "⟨0, Count.step, fun _ _ _ => rfl, fun _ => false⟩",
+    "reason": "Mark records unreadable to count.",
+    "definition": "Loops.Count.acc"
+  },
+  {
+    "id": "last-families-tri-refines",
+    "file": "Families.lean",
+    "before": "a = .unknown ∨ a = b",
+    "after": "a = .unknown ∧ a = b",
+    "reason": "Require unknown and equal answers.",
+    "definition": "Loops.Tri.Refines"
+  },
+  {
+    "id": "last-things-forms",
+    "file": "Things.lean",
+    "before": "a.id = b.id → SameEnvelope a b ∧ (a.shown = .here → b.shown = .here → a = b)",
+    "after": "a.id ≠ b.id → SameEnvelope a b ∧ (a.shown = .here → b.shown = .here → a = b)",
+    "reason": "Compare forms with different ids.",
+    "definition": "Loops.Forms"
+  },
+  {
+    "id": "last-things-envonly",
+    "file": "Things.lean",
+    "before": "SameEnvelope a a' → SameEnvelope b b' → may a b = may a' b'",
+    "after": "SameEnvelope a a' → SameEnvelope b b' → may a b ≠ may a' b'",
+    "reason": "Invert the rule agreement.",
+    "definition": "Loops.EnvOnly"
+  },
+  {
+    "id": "last-spec-tests-conds",
+    "file": "Spec.lean",
+    "before": "ts.flatMap fun (f, os) => os.map (Cond.mk f)",
+    "after": "ts.reverse.flatMap fun (f, os) => os.map (Cond.mk f)",
+    "reason": "Reverse the test field order.",
+    "definition": "Loops.Tests.conds"
+  },
+  {
+    "id": "last-json-utf16",
+    "file": "Json.lean",
+    "before": "s.toList.flatMap utf16Char",
+    "after": "s.toList.reverse.flatMap utf16Char",
+    "reason": "Reverse the character order.",
+    "definition": "Loops.utf16"
+  },
+  {
+    "id": "last-json-quote",
+    "file": "Json.lean",
+    "before": "String.join (s.toList.map escapeChar)",
+    "after": "String.join (s.toList.reverse.map escapeChar)",
+    "reason": "Reverse the quoted characters.",
+    "definition": "Loops.quote"
+  }
 ]

@@ -285,6 +285,15 @@ def anchorSpec : Json := o [("vertex", s "anchored"),
     ("current", o [("latest-by", s "about"), ("follow", s "prev")]),
     ("says-about", o [("collect", .bool true), ("where", o [("env.about", o [("is", s (idText 0x71))])])])])]
 
+def readableExtremaSpec : Json := o [("vertex", s "extrema"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])]]),
+  ("fold", o [("lo", o [("min", s "est")]), ("hi", o [("max", s "est")])])]
+
+def sourceUnionSpec : Json := o [("vertex", s "union"),
+  ("from", a [o [("store", s "."), ("kind", a [s "task"])],
+    o [("store", s "."), ("kind", a [s "note"])]]),
+  ("fold", o [("c", o [("count", .bool true)])])]
+
 structure RunCase where
   name : String
   laws : List String
@@ -311,7 +320,11 @@ def runCases : List RunCase := [
   ⟨"10-unread-shared-head", ["spec.set", "result.unread", "thing.local"], taskSpec,
     [({ t3 with about := ["task:2", "task:9"] }).withhold]⟩,
   ⟨"11-hidden-numbers", ["spec.set", "result.unread"], hiddenNumbersSpec,
-    [(task 0x76 "task:6" 100 []).withhold, (task 0x77 "task:7" 200 []).erase]⟩
+    [(task 0x76 "task:6" 100 []).withhold, (task 0x77 "task:7" 200 []).erase]⟩,
+  ⟨"12-readable-extrema", ["spec.set", "result.unread"], readableExtremaSpec,
+    [task 0x78 "task:8" 100 [("est", .int 3)], task 0x79 "task:9" 200 [("est", .int 5)]]⟩,
+  ⟨"13-source-union", ["spec.set", "spec.select"], sourceUnionSpec,
+    [task 0x78 "task:8" 100 []]⟩
 ]
 
 def jShownIds (hs : List (Nat × Shown)) : J :=

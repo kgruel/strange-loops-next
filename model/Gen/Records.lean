@@ -181,7 +181,11 @@ def storedCases : List Case := [
     envs := [
       { note with prev := [r1Id], erases := [r1Id, grantId] },
       { note with prev := [r1Id], erases := [grantId, r1Id, grantId] }],
-    payloads := [.obj [("body", .str "hello, without the number")]] }
+    payloads := [.obj [("body", .str "hello, without the number")]] },
+  { name := "12-negative-exact-boundary", laws := ["record.canonical"],
+    envs := [note], payloads := [.int (-9007199254740991)] },
+  { name := "13-offset-hour-23", laws := ["record.emitted"],
+    envs := [note "2026-10-21T00:00:00+23:00"], payloads := [.obj []] }
 ]
 
 def refusedCases : List (String × Env) := [
@@ -195,7 +199,9 @@ def refusedCases : List (String × Env) := [
   ("27-prev-not-record", { note with prev := ["topic:auth"] }),
   ("28-under-not-record", { note with under := some "r:short" }),
   ("33-erases-not-record", { note with erases := ["topic:auth"] }),
-  ("34-occurred-duration", { note with occurred := some "2026-10-17T09:14/PT4M" })
+  ("34-occurred-duration", { note with occurred := some "2026-10-17T09:14/PT4M" }),
+  ("35-observer-prefix-start", { note with observer := "1:x" }),
+  ("36-observer-prefix-tail", { note with observer := "a!:x" })
 ]
 
 /-- Payloads refused under a good envelope. The largest exact integer is
@@ -249,6 +255,7 @@ def vectors : Except String (List (String × J)) := do
   let refused ← refusedCases.mapM fun (n, e) => do pure (n, ← refusedVector n e)
   let payloads ← refusedPayloads.mapM fun (n, p) => do pure (n, ← refusedVector n note p)
   let salt ← refusedVector "30-salt-short" note (salt := shortSalt)
-  return stored ++ refused ++ payloads ++ [("30-salt-short", salt)]
+  let envelopeFirst ← refusedVector "37-empty-salt-envelope-first" { note with kind := "" } (.obj []) []
+  return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst)]
 
 end Gen.Records

@@ -91,7 +91,9 @@ def rotations (xs : List Record) : List (List Record) :=
 def countCases : List FoldCase := [
   ⟨"01-empty", ["count.perm"], [[]]⟩,
   ⟨"02-three", ["count.perm"], rotations [r1, r3, r5]⟩,
-  ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩
+  ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩,
+  ⟨"04-positive-offset-emitted", ["count.perm"],
+    [[{ rec 0x78 "topic:offset" 0 with emitted := stamp "2026-10-01T01:00:00+01:00" }]]⟩
 ]
 
 def latestCases : List FoldCase := [
