@@ -354,13 +354,13 @@ def parseArg (ty : FieldType) (path : String) : Json → Parse Arg
     | .time => match Claim.of? s with
       | some c => pure (.time c)
       | none => refuse "where-invalid" path
-  | .int i => if ty = .payload then pure (.val (.int i)) else refuse "where-invalid" path
+  | .int i => if ty = .payload ∧ -maxExact ≤ i ∧ i ≤ maxExact then pure (.val (.int i)) else refuse "where-invalid" path
   | .bool b => if ty = .payload then pure (.val (.bool b)) else refuse "where-invalid" path
   | _ => refuse "where-invalid" path
 
 /-- A bound for `at-least` or `below`: a number on a payload field, a time on a time. -/
 def parseBound (ty : FieldType) (path : String) : Json → Parse Arg
-  | .int i => if ty = .payload then pure (.val (.int i)) else refuse "where-invalid" path
+  | .int i => if ty = .payload ∧ -maxExact ≤ i ∧ i ≤ maxExact then pure (.val (.int i)) else refuse "where-invalid" path
   | .str s => if ty = .time then parseArg ty path (.str s) else refuse "where-invalid" path
   | _ => refuse "where-invalid" path
 
@@ -561,6 +561,7 @@ def Spec.ofJson (j : Json) : Parse Spec :=
 def Val.toJson : Val → Json
   | .str s => .str s
   | .int i => .int i
+  | .number n => .number n
   | .bool b => .bool b
 
 /-- An argument as written: a time keeps its spelling. -/

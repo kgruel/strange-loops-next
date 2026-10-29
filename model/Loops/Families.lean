@@ -22,11 +22,6 @@ namespace Loops
 
 /-! ## What the realm hands a fold -/
 
-/-- The union of what several places hold, each id once. -/
-def dedup : List Record → List Record
-  | [] => []
-  | r :: rs => if rs.any (·.id == r.id) then dedup rs else r :: dedup rs
-
 /-! ## Accumulating folds -/
 
 /-- An accumulating fold: a step whose order never matters. -/
@@ -44,15 +39,15 @@ def Count.acc : Acc Nat :=
   ⟨0, Count.step, fun _ _ _ => rfl, fun _ => true⟩
 
 def Sum.acc : Acc Int :=
-  ⟨0, Sum.step, fun s a b => by simp only [Sum.step]; omega, (·.shown == .here)⟩
+  ⟨0, Sum.step, fun s a b => by simp only [Sum.step]; omega, (·.num "n" |>.isSome)⟩
 
 def Max.acc : Acc (Option Int) :=
   ⟨none, Max.step, fun s a b => by
-    cases s <;> simp only [Max.step, Option.some.injEq] <;> omega, (·.shown == .here)⟩
+    cases s <;> simp only [Max.step, Option.some.injEq] <;> omega, (·.num "n" |>.isSome)⟩
 
 def Min.acc : Acc (Option Int) :=
   ⟨none, Min.step, fun s a b => by
-    cases s <;> simp only [Min.step, Option.some.injEq] <;> omega, (·.shown == .here)⟩
+    cases s <;> simp only [Min.step, Option.some.injEq] <;> omega, (·.num "n" |>.isSome)⟩
 
 /-! The numeric folds a spec names, over a payload field. A record without
 that field as a number is not readable, so it is counted as unread. -/
@@ -130,7 +125,7 @@ def Acc.select {σ} (f : Acc σ) (ev : Record → Tri) (xs : List Record) : Resu
 /-- Max over the current values: the largest readable head, and how many heads
 were unreadable. -/
 def LatestBy.maxHeads (s : LatestBy) : Result (Option Int) :=
-  ⟨((s.heads.filter (·.shown == .here)).map (·.n)).max?,
-    (s.heads.filter (·.shown != .here)).length⟩
+  ⟨(s.heads.filterMap (·.num "n")).max?,
+    (s.heads.filter fun r => (r.num "n").isNone).length⟩
 
 end Loops

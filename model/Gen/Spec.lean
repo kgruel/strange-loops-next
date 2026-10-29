@@ -141,8 +141,22 @@ def parseCases : List (String × Json) := [
   -- a repeat under an empty key: its path starts with the empty key
   ("63-repeat-under-empty-key", o [("", o [("x", .int 1), ("x", .int 2)]), ("vertex", s "x"),
     ("from", a [o [("store", s ".")]])]),
-  ("64-slot-argument-before-where", slotOf (o [("count", .bool false), ("where", o [])]))
-]
+  ("64-slot-argument-before-where", slotOf (o [("count", .bool false), ("where", o [])])),
+  ("gap03-repeat-key-before-value", o [("vertex", s "x"), ("vertex", o [("x", s "a"), ("x", s "b")]),
+    ("from", a [o [("store", s ".")]])]),
+  ("gap05-limit-zero", slotOf (o [("collect", .bool true), ("limit", .int 0)])),
+  ("gap09-absent", o [("vertex", s "x")]),
+  ("gap09-empty-array", o [("vertex", s "x"), ("from", a [])]),
+  ("gap09-empty-object", o [("vertex", s "x"), ("from", o [])]),
+  ("gap09-empty-text", o [("vertex", s "x"), ("from", s "")]),
+  ("gap09-null", o [("vertex", s "x"), ("from", .null)]),
+  ("gap08-fractional-bound", slotOf (o [("count", .bool true),
+    ("where", o [("est", o [("at-least", .number (Number.ofScientific false 15 (-1)))])])])),
+  ("gap08-whole-bound", slotOf (o [("count", .bool true),
+    ("where", o [("est", o [("below", .int 2)])])]))
+] ++ [(-9007199254740992 : Int), -9007199254740991, 9007199254740991, 9007199254740992].flatMap fun i =>
+  ["is", "not", "at-least", "below"].map fun op =>
+    (s!"gap08-{op}-{i}", slotOf (o [("count", .bool true), ("where", o [("est", o [(op, .int i)])])]))
 
 def jRefusal (r : Refusal) : J := .obj [("refused", .str r.code), ("path", .str r.path)]
 
@@ -300,7 +314,52 @@ def runCases : List RunCase := [
       task (fixtureId 0x4a) "task:6" 195 [("est", .str "5")]]⟩,
   ⟨"08-envelope-fields", ["spec.set", "where.fields", "where.time", "where.total",
       "spec.after-supersession"], envSpec, [a1, a2, a3, a4, a5, a6]⟩,
-  ⟨"09-from-about-anchor", ["spec.set", "spec.from-thing", "where.fields"], anchorSpec, [x1, x2, x3]⟩
+  ⟨"09-from-about-anchor", ["spec.set", "spec.from-thing", "where.fields"], anchorSpec, [x1, x2, x3]⟩,
+  ⟨"gap04-unread-multi-thing", ["result.unread"],
+    o [("vertex", s "x"), ("from", a [o [("store", s ".")]]), ("fold", o [
+      ("by", o [("latest-by", s "about"), ("follow", s "prev"),
+        ("where", o [("status", o [("is", s "open")])])]),
+      ("collect", o [("collect", .bool true), ("follow", s "prev"),
+        ("where", o [("status", o [("is", s "open")])])])])],
+    [{ (task (fixtureId 0xa1) "task:a" 100 []).withhold with about := ["task:a", "task:b"] }]⟩,
+  ⟨"gap05-unread-before-limit", ["result.unread"],
+    o [("vertex", s "x"), ("from", a [o [("store", s ".")]]), ("fold", o [
+      ("plain", o [("collect", .bool true), ("limit", .int 1), ("where", o [("status", o [("is", s "open")])])]),
+      ("follow", o [("collect", .bool true), ("follow", s "prev"), ("limit", .int 1),
+        ("where", o [("status", o [("is", s "open")])])]),
+      ("all", o [("collect", .bool true), ("where", o [("status", o [("is", s "open")])])])])],
+    [task (fixtureId 0xb1) "task:a" 300 [("status", .str "open")],
+      (task (fixtureId 0xb2) "task:b" 200 []).withhold, (task (fixtureId 0xb3) "task:c" 100 []).withhold]⟩,
+  ⟨"gap06-direct-admission", ["spec.set"], fromOf (o [("store", s ".")]),
+    [task (fixtureId 0xc1) "task:a" 100 [], task (fixtureId 0xc2) "task:b" 200 [] [fixtureId 0xc1]]⟩,
+  ⟨"gap07-store-team", ["spec.set"], fromOf (o [("store", s "team")]), [t1]⟩,
+  ⟨"gap07-store-other", ["spec.set"], fromOf (o [("store", s "other")]), [t1]⟩,
+  ⟨"gap12-no-unknown", ["where.set", "result.unread"],
+    o [("vertex", s "x"), ("from", a [o [("store", s ".")]]), ("fold", o [
+      ("payload-first", o [("count", .bool true), ("where", o [("status", o [("is", s "open")]),
+        ("env.kind", o [("is", s "note")])])]),
+      ("envelope-first", o [("count", .bool true), ("where", o [("env.kind", o [("is", s "note")]),
+        ("status", o [("is", s "open")])])]),
+      ("unknown", o [("count", .bool true), ("where", o [("status", o [("is", s "open")]),
+        ("env.kind", o [("is", s "task")])])])])], [t4]⟩,
+  ⟨"gap13-missing-and-withheld", ["where.total", "result.unread"],
+    o [("vertex", s "x"), ("from", a [o [("store", s ".")]]), ("fold", o (
+      [("is", s "open"), ("not", s "open"), ("present", .bool true), ("absent", .bool true),
+       ("at-least", .int 1), ("below", .int 1)].map fun test =>
+        (test.1, o [("count", .bool true), ("where", o [("missing", o [test])])])))],
+    [task (fixtureId 0xd1) "task:a" 100 [], (task (fixtureId 0xd2) "task:b" 110 []).withhold]⟩,
+  ⟨"gap14-field-types", ["result.unread", "numeric.safe-whole"],
+    o [("vertex", s "x"), ("from", a [o [("store", s ".")]]), ("fold", o [
+      ("sum", o [("sum", s "est")]), ("min", o [("min", s "est")]),
+      ("max", o [("max", s "est")])])],
+    [task (fixtureId 0xe1) "task:1" 100 [("est", .int 2)],
+      task (fixtureId 0xe2) "task:2" 110 [("est", .int (-3))],
+      task (fixtureId 0xe3) "task:3" 120 [("est", .number (Number.ofScientific false 15 (-1)))],
+      task (fixtureId 0xe4) "task:4" 130 [("est", .int 2)],
+      task (fixtureId 0xe5) "task:5" 140 [("est", .str "1.5")],
+      task (fixtureId 0xe6) "task:6" 150 [("est", .bool true)], task (fixtureId 0xe7) "task:7" 160 [],
+      (task (fixtureId 0xe8) "task:8" 170 [("est", .int 7)]).withhold,
+      task (fixtureId 0xe9) "task:9" 180 [("est", .number (Number.ofScientific false 9007199254740992 0))]]⟩
 ]
 
 def jShownIds (hs : List (RecordId × Shown)) : J :=

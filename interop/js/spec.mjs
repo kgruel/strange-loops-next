@@ -6,6 +6,7 @@
 import { occurredSpan, problem } from "./loops.mjs";
 import { answer, held, YES, UNKNOWN } from "./where.mjs";
 import * as F from "./fold.mjs";
+import { admit } from "./realm.mjs";
 
 // JSON as written: an object keeps its members in order, repeats included,
 // as { members: [[key, node], ...] }; an array is { items: [node, ...] };
@@ -272,6 +273,7 @@ function runSlot(slot, spec, { records, taken, states }) {
 
 // Every slot's value, by name.
 export function runSpec(spec, records) {
+  records = admit(records).admitted;
   const ctx = { records, taken: records.filter((r) => takes(spec, r)), states: F.states(records) };
   const out = Object.create(null);
   for (const [name, slot] of Object.entries(spec.fold)) out[name] = runSlot(slot, spec, ctx);

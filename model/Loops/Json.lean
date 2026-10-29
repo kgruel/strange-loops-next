@@ -1,10 +1,11 @@
+import Loops.Number
+
 /-!
 # Json and canonical bytes
 
 The JSON the model needs, and its canonical text per RFC 8785 (JCS):
 members sorted by UTF-16 code units, minimal string escapes, no
-whitespace. The model's numbers are integers; IEEE-754 formatting of other
-numbers is tested against the RFC's own vectors in `vectors/standard/`.
+whitespace. Numbers use binary64 and shortest roundtripping decimal text.
 -/
 
 namespace Loops
@@ -13,6 +14,7 @@ inductive Json where
   | null
   | bool (b : Bool)
   | int (i : Int)
+  | number (n : Number)
   | str (s : String)
   | arr (xs : List Json)
   | obj (kvs : List (String × Json))
@@ -77,6 +79,7 @@ def Json.canon : Json → String
   | .null => "null"
   | .bool b => if b then "true" else "false"
   | .int i => toString i
+  | .number n => n.canon
   | .str s => quote s
   | .arr xs => "[" ++ ",".intercalate (Json.canonAll xs) ++ "]"
   | .obj kvs =>
@@ -121,6 +124,7 @@ mutual
 /-- Every number in the value lies within ±(2^53 − 1). -/
 def Json.inRange : Json → Bool
   | .int i => decide (-maxExact ≤ i) && decide (i ≤ maxExact)
+  | .number n => n.inRange
   | .arr xs => Json.allInRange xs
   | .obj kvs => Json.membersInRange kvs
   | _ => true

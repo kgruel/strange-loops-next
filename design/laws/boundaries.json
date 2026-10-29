@@ -49,7 +49,7 @@
       },
       "removed": {
         "given": "the same, both sections keyed decision:auth",
-        "answer": "accepted decision:auth: Device flow."
+        "answer": "refused"
       }
     },
     {

@@ -14,7 +14,7 @@ prose and checked against every vector.
 |---|---|
 | `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), `gen`, which writes the vectors, and `proofs`, which writes the proof graph the laws page draws |
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
-| `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
+| `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/lens.md`](protocol/lens.md) the lens contract, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS implementation, written from the prose: the layer 0 writer (`loops.mjs`) and the readers (`fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`) |
 | `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `build.mjs` renders all four |
 | `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/` | the pages, written by `node design/build.mjs`, never by hand |
@@ -31,6 +31,8 @@ lake build --wfail          # every proof checks; a `sorry` fails the build
 lake exe gen ../vectors     # rewrite the vectors from the model
 git diff --exit-code ../vectors
 lake exe run --check ../vectors   # recompute every expect from its input alone
+lake exe checks ..          # check runtime behavior against the repository
+node mutants.mjs            # check that runtime tests reject source mutants
 lake exe proofs ../design/laws/proofs.json   # which theorems each proof uses
 lake exe boundaries ../design/laws/boundaries.json   # laws without their premises
 git diff --exit-code ../design/laws

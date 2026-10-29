@@ -2,9 +2,9 @@ import Loops.Fold
 import Laws.Fold
 
 /-!
-# Laws of Latest, Sum, Min and Max
+# Laws of Sum, Min and Max
 
-* **Latest** inherits LatestBy's laws: it is LatestBy with a single key.
+Latest laws live in `Laws.Things`.
 * **Sum** is order-free and counts repeats, so the store hands each id over
   once. It is exact: over floating point, addition isn't associative and
   the order of arrival would change the total.
@@ -15,13 +15,27 @@ namespace Loops
 
 open List
 
-/-! ## Latest -/
+/-- A readable numeric value lies inside the safe-whole range. -/
+theorem Record.num_safe {r : Record} {field : String} {i : Int}
+    (h : r.num field = some i) : -(2^53 - 1) ≤ i ∧ i ≤ 2^53 - 1 := by
+  unfold Record.num at h
+  split at h
+  · cases hg : r.get field <;> simp only [hg] at h
+    · cases h
+    · rename_i v
+      cases v <;> simp only at h
+      all_goals try { cases h }
+      split at h
+      · rename_i hs
+        cases h
+        exact hs
+      · cases h
+  · cases h
 
-theorem Latest.perm {xs ys : List Record} (hx : Addressed xs) (h : xs ~ ys) :
-    Latest.fold xs = Latest.fold ys := LatestBy.perm hx h
-
-theorem Latest.repeats {xs : List Record} (hx : Addressed xs) :
-    Latest.fold (xs ++ xs) = Latest.fold xs := LatestBy.repeats hx
+/-- A nonwhole numeric payload is unread by a numeric slot. -/
+theorem Record.num_number {r : Record} {field : String} {n : Number}
+    (h : r.get field = some (.number n)) : r.num field = none := by
+  simp [Record.num, h]
 
 /-! ## Sum -/
 

@@ -29,7 +29,11 @@ With the model's SHA-256, an id written from bytes equals the id written from th
 | `latest-by.repeats` | `LatestBy.repeats` | re-delivering records changes nothing | `fold/latest-by/08` |
 | `latest-by.converge` | `LatestBy.converge` | two places syncing in either direction reach the same state | `fold/latest-by/09` |
 
-| `latest.set`, `latest.repeats` | `Latest.perm`, `Latest.repeats` | Latest is LatestBy over one thing, so it inherits LatestBy's laws | `fold/latest/*` |
+| `latest.set`, `latest.repeats` | `Latest.set_decides`, `Latest.perm`, `Latest.repeats` | the input set decides Latest's whole-reader heads and winner | `fold/latest/*` |
+| `heads.whole-view` | `mem_wholeHeads`, `wholeHeads_sorted`, `wholeHeads_distinct` | every head belongs to some thing; heads occur once per id in content order | `fold/heads/gap15-partial-and-anchor`, `fold/view/gap15-partial-and-anchor`, `fold/latest/gap16-newest-union-head` |
+| `latest.newest` | `Latest.winner_newest`, `Latest.others_ordered` | Latest chooses the newest whole-reader head; its other heads stay in content order | `fold/latest/01-chain`, `fold/latest/gap16-newest-union-head` |
+| `latest.one-thing` | `Latest.oneThing` | Latest equals global LatestBy when every record names exactly the same single thing | `fold/latest/01-chain` |
+| `numeric.safe-whole` | `Record.num_safe`, `Record.num_number` | numeric slots read only safe-whole values; nonwhole values count as unread | `spec/run/gap14-field-types` |
 | `sum.perm` | `Sum.perm` | arrival order doesn't change a sum | `fold/sum/01`, `02` |
 | `sum.repeats` | `Sum.repeats` | a repeated delivery is added again, which is why the read path hands each id over once | `fold/sum/03` |
 | `extrema.set` | `Max.set_decides`, `Min.set_decides` | Min and Max depend only on the set of records | `fold/extrema/*` |
@@ -39,10 +43,10 @@ teeth is `latest-by.set`: it is what lets late arrivals, re-sent segments and
 two-way syncs agree. It needs content addressing (`Addressed`): within a
 store, an id names one record.
 
-The numeric folds read an **exact** field: an integer. Over floating point,
-addition isn't associative, so the order records arrive in would change a
-sum, and `sum.perm` would be false. Decimals, if they come, must be exact
-too.
+Numeric slots read safe-whole binary64 values within ±(2^53 − 1).
+Integral decimals and exponents, including `1.0` and `1e2`, normalize to integers.
+Payloads retain nonwhole binary64 numbers, but numeric slots count them as unread.
+Addition uses exact integers because binary64 addition is not associative.
 
 The model's integers are unbounded; an implementation's are not. A writer
 refuses a payload number outside ±(2^53 − 1) (`number-out-of-range`, see
@@ -79,6 +83,7 @@ Latest-by counts each head once when its payload tests are unknown, after the so
 Collect counts each unknown record once, before its limit.
 It counts heads when it follows replacements, and all records otherwise.
 Max over heads counts heads whose payload the reader does not hold.
+Numeric folds count hidden, missing, nonnumeric and nonwhole values as unread.
 
 `view.no-resurrection` holds because `prev`, ids and times are on the
 envelope, which every reader holds. A `where` test on the envelope always
@@ -145,9 +150,11 @@ passes neither.
 record about nothing is about its own id, so `"about": "r:X"` takes X and
 its revisions.
 
-Accumulating slots select, then fold; a numeric fold (sum, min, max) counts
-a selected record as unread when its payload isn't held or lacks the field
-as a number (text that reads as one is not a number). Slots over heads
+Accumulating slots select, then fold.
+A numeric fold (sum, min, max) counts a selected record as unread when its payload is not held.
+It also counts the record as unread when its field is not a safe whole number.
+Text is not a number.
+Slots over heads
 (latest-by, and collect with `"follow": "prev"`) read each thing's state,
 already settled over everything the reader holds; `from` and the envelope
 tests then choose heads, and payload tests filter them. Selecting first
@@ -199,14 +206,14 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 
 | Law | Theorem | Says | Vectors |
 |---|---|---|---|
-| `lens.escaping` | `escaping`, `unescape_keeps` | any body survives rendering and parsing; reading drops a backslash only where rendering would have written one | `lens/section/02`, `10` |
-| `lens.round-trip` | `parse_render` | `parse (render d) = some d` | `lens/section/01` |
-| `lens.no-op` | `no_op` | the unedited render gives no outcomes | `lens/section/03` |
+| `lens.escaping` | `escaping`, `unescape_keeps` | any body survives when its section id is nonempty; reading removes only an escape backslash | `lens/section/02`, `10` |
+| `lens.round-trip` | `parse_render`, `parse_render_iff` | rendering roundtrips exactly when section ids are nonempty and distinct | `lens/section/01` |
+| `lens.no-op` | `no_op` | the unedited render gives no outcomes when section ids are nonempty and distinct | `lens/section/03` |
 | `lens.put-get` | `put_get`, `put_get_text` | an edit that keeps the sections in order applies exactly, up to normal form | `lens/section/04`, `10` |
 | `lens.nothing-dropped` | `nothing_dropped`, `absence_reported` | every section is unchanged, accepted or reported; every dropped one is reported | `lens/section/05`, `06` |
 | `lens.absence-not-edit` | `absence_not_edit` | a dropped section leaves that section in the state as it was; the other sections' accepted edits still apply | `lens/section/06` |
 | normal form | `normalize_idem` | normalizing twice is normalizing once | every lens vector |
-| `lens.refuse` | (by construction) | malformed text is refused, not guessed at | `lens/section/07`–`09` |
+| `lens.refuse` | `parse_valid` | malformed text, empty section ids and repeated section ids are refused | `lens/section/07`–`09` |
 
 ## Record (`model/Laws/Record.lean`)
 

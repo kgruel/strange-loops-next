@@ -1,0 +1,25 @@
+{
+  "vector": "gap11-embedded-newline",
+  "layer": "lens/section",
+  "laws": ["lens.round-trip"],
+  "source": "model",
+  "input": {
+    "base": [],
+    "text": ["::: notes", "one\ntwo", "", "\u000d", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "notes",
+        "body": ["one\ntwo", "", "\u000d"]
+      }
+    ],
+    "normalized": ["::: notes", "one\ntwo", "", "\u000d", ":::"],
+    "outcomes": [
+      {
+        "unknown": "notes"
+      }
+    ],
+    "applied": []
+  }
+}

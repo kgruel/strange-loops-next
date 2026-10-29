@@ -8,10 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install Lean
         run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
-            | sh -s -- -y --default-toolchain none
+          url=https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh
+          curl -sSfL "$url" | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Proofs check
         working-directory: model
@@ -25,6 +28,12 @@ jobs:
       - name: Every vector's expect follows from its input alone
         working-directory: model
         run: lake exe run --check ../vectors
+      - name: Runtime checks
+        working-directory: model
+        run: lake exe checks ..
+      - name: Model mutants
+        working-directory: model
+        run: node mutants.mjs
       - name: The proof graph is a pure render of the proofs
         working-directory: model
         run: |
@@ -47,6 +56,8 @@ jobs:
           node-version: 22
       - name: The JS implementation agrees on every vector
         run: node interop/js/check.mjs vectors
+      - name: The JS reader guards hold
+        run: node --test interop/js/regression.test.mjs
 
   design:
     runs-on: ubuntu-latest
@@ -55,7 +66,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: The design pages are a pure render of design/, protocol/ and vectors/
+      - name: The design pages match their sources
         run: |
           node design/build.mjs
           git diff --exit-code -- out

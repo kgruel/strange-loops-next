@@ -1,4 +1,5 @@
 import Loops.Id
+import Loops.Number
 import Loops.Occurred
 
 /-!
@@ -25,6 +26,7 @@ inductive Shown where
 inductive Val where
   | str (s : String)
   | int (i : Int)
+  | number (n : Number)
   | bool (b : Bool)
   deriving Repr, DecidableEq, Inhabited
 
@@ -47,9 +49,11 @@ structure Record where
   erases   : List RecordId := []
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
   n        : Int := 0
+  /-- A nonwhole numeric payload overrides the fixture integer. -/
+  nNumber  : Option Number := none
   /-- Further payload fields, by name. -/
   fields   : List (String × Val) := []
-  /-- Whether the payload (`value`, `n`, `fields`) is here for this reader. -/
+  /-- Whether the payload (`value`, `n`, `nNumber`, `fields`) is here for this reader. -/
   shown    : Shown := .here
   deriving Repr, DecidableEq, Inhabited
 
@@ -96,22 +100,22 @@ structure View (f : Record → Record) : Prop where
   hides : ∀ r, f r = r ∨ (f r).shown ≠ .here
 
 def Record.withhold (r : Record) : Record :=
-  { r with value := "", n := 0, fields := [], shown := .withheld }
+  { r with value := "", n := 0, nNumber := none, fields := [], shown := .withheld }
 
 def Record.erase (r : Record) : Record :=
-  { r with value := "", n := 0, fields := [], shown := .erased }
+  { r with value := "", n := 0, nNumber := none, fields := [], shown := .erased }
 
 /-- A payload field by name: `value` and `n` always exist; others may not. -/
 def Record.get (r : Record) (name : String) : Option Val :=
   if name = "value" then some (.str r.value)
-  else if name = "n" then some (.int r.n)
+  else if name = "n" then some (match r.nNumber with | some n => .number n | none => .int r.n)
   else r.fields.lookup name
 
 /-- A payload field as an exact number, if the reader holds it and it is one. -/
 def Record.num (r : Record) (name : String) : Option Int :=
   if r.shown = .here then
     match r.get name with
-    | some (.int i) => some i
+    | some (.int i) => if -(2^53 - 1) ≤ i ∧ i ≤ 2^53 - 1 then some i else none
     | _ => none
   else none
 

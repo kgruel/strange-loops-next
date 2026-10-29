@@ -79,8 +79,8 @@ def foldAnswer : String → Option (List Record → J)
   | "fold/sum" => some fun o => .int (Sum.fold 0 o)
   | "fold/extrema" => some fun o => .obj [("min", jOptInt (Min.fold none o)), ("max", jOptInt (Max.fold none o))]
   | "fold/latest-by" => some fun o => jPerThing (perThing o)
-  | "fold/heads" => some fun o => jHeads (LatestBy.fold .empty o)
-  | "fold/view" => some fun o => jViewState (LatestBy.fold .empty o)
+  | "fold/heads" => some fun o => jHeads (Latest.fold o)
+  | "fold/view" => some fun o => jViewState (Latest.fold o)
   | _ => none
 
 /-- One answer from several arrival orders: the first order's, which every

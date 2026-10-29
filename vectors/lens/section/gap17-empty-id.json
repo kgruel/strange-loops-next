@@ -1,0 +1,14 @@
+{
+  "vector": "gap17-empty-id",
+  "layer": "lens/section",
+  "laws": ["lens.refuse"],
+  "source": "model",
+  "input": {
+    "base": [],
+    "text": ["::: ", "body", ":::"]
+  },
+  "expect": {
+    "parsed": null,
+    "refused": true
+  }
+}

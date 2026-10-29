@@ -109,6 +109,9 @@ gives what the reader keeps, one record per id with what it holds of each
 (`refused`); each thing's state over the rest (`things`, as in
 `fold/latest-by`); and Sum over them (`sum`). Every rotation of the forms
 must give the same.
+Write `settled` and `refused` in ascending record-id order.
+Compare ids by unsigned digest bytes, first byte first, not by id text.
+This order does not change head content order.
 
 ## `scenario`
 
@@ -118,10 +121,14 @@ each of `input.steps` names the forms a reader's places hold at that step
 (`orders`, every rotation). `expect.steps` gives, per step, what the reader
 keeps (`settled`, as in `realm`), what is admitted (`admitted`),
 `input.thing`'s heads newest first and its winner, and each slot of the spec
-over the settled records (`slots`, as in `spec/run`). Every rotation of a
-step's forms must give the same. `input.lens` and `expect.lens` add a lens
-edit: the head rendered as a keyed section (`rendered`), the text after an
-edit, and the outcomes and what applying them gives, as in `lens/section`.
+over the admitted records (`slots`, as in `spec/run`). Every rotation of a
+step's forms must give the same.
+Write `settled` and `admitted` in ascending record-id order, by unsigned digest bytes.
+`input.lens.base` holds base sections, and `input.lens.text` holds edited lines.
+`expect.lens` holds the rendered base, outcomes, and applied sections.
+The scenario adapter splits a head's value at each LF and keeps all parts, including empty parts.
+It leaves CR unchanged; the lens itself does not split line elements.
+See [`protocol/lens.md`](../protocol/lens.md).
 
 `01-decision` is the walk the grammar page draws: two people write, fork,
 merge and erase one decision, a reader holds less, and a lens edit comes

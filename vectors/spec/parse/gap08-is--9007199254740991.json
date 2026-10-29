@@ -1,0 +1,46 @@
+{
+  "vector": "gap08-is--9007199254740991",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "est": {
+              "is": -9007199254740991
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "parsed": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "est": {
+              "is": -9007199254740991
+            }
+          }
+        }
+      }
+    }
+  }
+}

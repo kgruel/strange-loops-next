@@ -1,0 +1,317 @@
+{
+  "vector": "gap15-memberships-and-anchor",
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": [],
+          "value": "v195",
+          "prev": [],
+          "emitted": "2026-10-01T00:04:10Z",
+          "occurred": "2026-10-01T00:04:10Z",
+          "n": 2
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "value": "v196",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 3
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "value": "v197",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "emitted": "2026-10-01T00:05:50Z",
+          "occurred": "2026-10-01T00:05:50Z",
+          "n": 4
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": [],
+          "value": "v195",
+          "prev": [],
+          "emitted": "2026-10-01T00:04:10Z",
+          "occurred": "2026-10-01T00:04:10Z",
+          "n": 2
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "value": "v196",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 3
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "value": "v197",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "emitted": "2026-10-01T00:05:50Z",
+          "occurred": "2026-10-01T00:05:50Z",
+          "n": 4
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": [],
+          "value": "v195",
+          "prev": [],
+          "emitted": "2026-10-01T00:04:10Z",
+          "occurred": "2026-10-01T00:04:10Z",
+          "n": 2
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "value": "v196",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 3
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "value": "v197",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "emitted": "2026-10-01T00:05:50Z",
+          "occurred": "2026-10-01T00:05:50Z",
+          "n": 4
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "value": "v196",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 3
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "value": "v197",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "emitted": "2026-10-01T00:05:50Z",
+          "occurred": "2026-10-01T00:05:50Z",
+          "n": 4
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": [],
+          "value": "v195",
+          "prev": [],
+          "emitted": "2026-10-01T00:04:10Z",
+          "occurred": "2026-10-01T00:04:10Z",
+          "n": 2
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "value": "v197",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"],
+          "emitted": "2026-10-01T00:05:50Z",
+          "occurred": "2026-10-01T00:05:50Z",
+          "n": 4
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a", "task:b"],
+          "value": "v193",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 99
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "v194",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "emitted": "2026-10-01T00:03:20Z",
+          "occurred": "2026-10-01T00:03:20Z",
+          "n": 1
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": [],
+          "value": "v195",
+          "prev": [],
+          "emitted": "2026-10-01T00:04:10Z",
+          "occurred": "2026-10-01T00:04:10Z",
+          "n": 2
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["task:c"],
+          "value": "v196",
+          "prev": [],
+          "emitted": "2026-10-01T00:05:00Z",
+          "occurred": "2026-10-01T00:05:00Z",
+          "n": 3
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq": {
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadcq",
+      "others": []
+    },
+    "task:a": {
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+      "others": []
+    },
+    "task:b": {
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+      "others": []
+    },
+    "task:c": {
+      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca"],
+      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadca",
+      "others": []
+    }
+  }
+}
