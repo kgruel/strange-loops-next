@@ -68,10 +68,10 @@ def u2 := { rec 0x42 "topic:auth" 0 (emitted := 30) with occurred := some (claim
 def u3 := { rec 0x43 "topic:auth" 0 (emitted := 10) with occurred := some (claim "2026-10-01/..") }
 def u4 := { rec 0x44 "topic:auth" 0 (emitted := 20) with occurred := some (claim "2026") }
 
-def n1 := { rec 0x21 "load" 100 with n := 5 }
-def n2 := { rec 0x22 "load" 110 with n := -3 }
-def n3 := { rec 0x23 "load" 120 with n := 40 }
-def n4 := { rec 0x24 "load" 130 with n := 40 }
+def n1 := { rec 0x21 "metric:load" 100 with n := 5 }
+def n2 := { rec 0x22 "metric:load" 110 with n := -3 }
+def n3 := { rec 0x23 "metric:load" 120 with n := 40 }
+def n4 := { rec 0x24 "metric:load" 130 with n := 40 }
 
 -- the current load per host: `h3` supersedes `h2`
 def h1 := { rec 0x31 "host:a" 100 with n := 5 }
