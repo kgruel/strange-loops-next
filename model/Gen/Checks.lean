@@ -42,17 +42,44 @@ def main (args : List String) : IO Unit := do
     ensure (refused (Read.parseJson text)) s!"invalid RFC number survives: {text}"
   let env : Env := { kind := "note", observer := "o:test", emitted := timeText 0 }
   let salt := List.replicate 16 (0 : UInt8)
-  for text in ["1e400", "-1e400", "9007199254740992", "-9007199254740992",
-      "9007199254740991.5"] do
+  for text in ["9007199254740992", "-9007199254740992", "9007199254740991.5",
+      "-9007199254740991.5", "1e30", "-1e30", "1.7976931348623157e308", "-1.7976931348623157e308"] do
     let j ← parsed text
-    ensure (!j.inRange) s!"layer0 range admits {text}"
-    ensure (writeProblem env salt j == some "number-out-of-range") s!"write range admits {text}"
-    if text == "1e400" || text == "-1e400" then
-      ensure (refused (Read.valOf "payload" j)) s!"payload decoder admits {text}"
-    else
-      ensure (!(refused (Read.valOf "payload" j))) s!"payload decoder refuses {text}"
+    ensure (!j.inRange) s!"layer0 admits unsafe magnitude {text}"
+    ensure (writeProblem env salt j == some "number-out-of-range") s!"writer admits unsafe magnitude {text}"
+    ensure (!(refused (Read.valOf "payload" j))) s!"payload decoder refuses {text}"
     ensure (refused ((parseBound .payload "bound" j).mapError (·.code))) s!"bound admits {text}"
     ensure (refused ((parseArg .payload "arg" j).mapError (·.code))) s!"argument admits {text}"
+  for text in ["9007199254740991", "-9007199254740991", "9007199254740991.1",
+      "-9007199254740991.1", "1.5", "-1.5", "1424953923781206.25", "5e-324", "-0"] do
+    let j ← parsed text
+    ensure j.inRange s!"layer0 refuses within-range value {text}"
+    ensure (writeProblem env salt j == none) s!"writer refuses within-range value {text}"
+  for j in [Json.int 9007199254740992, .int (-9007199254740992),
+      .obj [("largest", .int 9007199254740991),
+        ("deep", .arr [.obj [("n", .int (-9007199254740992))]])],
+      .obj [("__proto__", .int 9007199254740992)]] do
+    ensure (!j.inRange) "layer0 admits raw unsafe integer"
+    ensure (writeProblem env salt j == some "number-out-of-range") "writer admits raw unsafe integer"
+  for text in ["1e400", "-1e400"] do
+    let j ← parsed text
+    ensure (!j.inRange) s!"layer0 admits overflow {text}"
+    ensure (writeProblem env salt j == some "number-out-of-range") s!"writer admits overflow {text}"
+    ensure (refused (Read.valOf "payload" j)) s!"payload decoder admits {text}"
+    ensure (refused ((parseBound .payload "bound" j).mapError (·.code))) s!"bound admits {text}"
+    ensure (refused ((parseArg .payload "arg" j).mapError (·.code))) s!"argument admits {text}"
+  for bits in [0x7ff0000000000000, 0xfff0000000000000, 0x7ff8000000000000] do
+    let j := Json.number ⟨bits⟩
+    ensure (writeProblem env salt j == some "number-out-of-range") "writer admits nonfinite bits"
+    ensure (refused (Read.valOf "payload" j)) "payload decoder admits nonfinite bits"
+  ensure (firstRefusal ["number-out-of-range", "kind-empty"] == some "kind-empty")
+    "global write priority changes"
+  for (text, bits, expected) in [
+      ("1424953923781206.25", 0x43143ff3c1cb0959, "1424953923781206.2"),
+      ("-1424953923781206.25", 0xc3143ff3c1cb0959, "-1424953923781206.2")] do
+    let j ← parsed text
+    ensure (match j with | .number n => n.bits == bits && n.canon == expected | _ => false)
+      s!"shortest midpoint tie {text}"
   for op in ["is", "not", "at-least", "below"] do
     for (text, accepted) in [("1.0", true), ("1e2", true), ("1.5", false),
         ("9007199254740992", false), ("-9007199254740992", false)] do

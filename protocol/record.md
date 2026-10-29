@@ -55,11 +55,9 @@ envelope, with or without the payload. A revision can erase what it
 replaces (`prev: [r:X], erases: [r:X]`). Targets don't go in `about`:
 `about: [r:X]` names the thing X anchors, which holds X's revisions too.
 
-Writing a record then checks the rest, in this order, after the envelope:
-a salt that isn't 16 bytes (`salt-not-16-bytes`), a repeated member name
-anywhere in the payload (`member-duplicate`), and a payload number outside
-±(2^53 − 1) (`number-out-of-range`). A batch writes each of its records the
-same way.
+Writing checks the envelope, then salt length (`salt-not-16-bytes`), repeated payload members (`member-duplicate`), and nonfinite or out-of-range payload numbers (`number-out-of-range`).
+Every number must have magnitude at most 2^53 − 1, whole or not.
+A batch writes each record through the same checks.
 
 ## Occurred
 
@@ -120,17 +118,20 @@ disagree on.
 
 A payload can contain RFC 8259 number spellings, including fractions and exponents.
 JCS reads each number as an IEEE-754 binary64 value.
-The writer applies the range rule below to that value.
+The writer accepts finite values only within ±(2^53 − 1), including fractions.
 Numeric folds have a separate safe-whole rule in [`spec.md`](spec.md).
 
-JCS reads every number as an IEEE-754 double, which holds an integer exactly
-only within ±(2^53 − 1). Past that, two different numbers share one canonical
-form (9007199254740993 becomes 9007199254740992), and an implementation that
-kept the number exactly would compute a different id. So a writer refuses a
-payload holding a number outside ±(2^53 − 1) with `number-out-of-range`.
-The range applies to the number as JCS reads it, a double: text such as
-`9007199254740991.1` reads as 9007199254740991 and is accepted as that. A
-number that must stay exact past the range belongs in a string.
+Number spellings round once to binary64 before canonicalization.
+For example, `9007199254740993` becomes `9007199254740992`; `9007199254740991.1` becomes `9007199254740991`.
+The first is refused as out of range; the second is accepted after rounding.
+Numbers needing exact decimal or large-integer precision belong in strings.
+Numeric readers additionally require whole values; within-range fractions remain writable but unread by numeric folds.
+
+The model also permits raw integers, before binary64 ingestion.
+Its writer refuses raw integers outside ±(2^53 − 1), preventing unchecked exact values from bypassing binary64 semantics.
+These raw integers are not distinct wire values.
+Nonfinite ingestion remains a roadmap boundary: overflow may fail during ingestion or writer validation.
+Shared wire fixtures do not pin this refusal stage.
 
 ## Commitment, id, signature
 

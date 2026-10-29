@@ -87,15 +87,15 @@
     "kind": "decision",
     "group": "Layer 0 · the record",
     "status": "settled",
-    "claim": "Numbers are what RFC 8785 reads: doubles, exact only within ±(2<sup>53</sup>−1).",
-    "why": "Past that range two numbers share one canonical form, so writers would disagree on an id. A payload number outside it is refused (<code>number-out-of-range</code>), not kept exactly. The range applies to the number as JCS reads it, so <code>9007199254740991.1</code> is accepted as <code>…991</code>. Non-integers are allowed. A number that must stay exact past the range belongs in a string. Version 35."
+    "claim": "Writers bound every number’s magnitude; numeric readers additionally require whole values.",
+    "why": "RFC 8785 reads numbers as binary64 before canonicalization. The final 13:25 human ruling keeps Option A: writers refuse any magnitude above 2<sup>53</sup>−1, whole or not (<code>number-out-of-range</code>); 1e30 is refused. Within-range fractions are accepted. Numeric readers additionally require whole values. Exact decimal or large-integer values belong in strings."
   },
   {
     "kind": "decision",
     "group": "Layer 0 · the record",
     "status": "settled",
     "claim": "One checked write path, and what it returns carries the proof.",
-    "why": "<code>write</code> refuses, in order: a bad envelope, a salt that isn't 16 bytes, a repeated member name at any depth, and an out-of-range number. A batch writes every record through it, and its refusal never depends on the order of drafts or of a <code>prev</code> set. It returns a <code>Written</code> record that carries the proof, so a law that needs distinct member names takes them from the record. Version 35 (PR 7)."
+    "why": "<code>write</code> checks the envelope, salt length, repeated members at any depth, then nonfinite numbers or any number outside ±(2<sup>53</sup>−1), whole or not. Within-range fractions pass. A batch uses the same path, with refusal priority independent of draft order and <code>prev</code> order. It returns a <code>Written</code> record carrying the proof, including distinct member names. Version 35 (PR 7), with the final 13:25 writer-range ruling."
   },
   {
     "kind": "decision",

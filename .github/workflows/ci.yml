@@ -4,6 +4,33 @@ on:
   pull_request:
 
 jobs:
+  rust:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+        with:
+          persist-credentials: false
+      # dtolnay/rust-toolchain stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          components: rustfmt, clippy
+      - name: Rust formatting
+        run: cargo fmt --all --check
+      - name: Rust lints
+        run: >-
+          cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Rust vectors and characterization
+        run: cargo test --workspace
+      - name: Rust documentation
+        run: cargo doc --workspace --no-deps
+      - name: Rust input-only evaluator
+        run: cargo build -p loops-eval --bin loops-eval
+
   model:
     runs-on: ubuntu-latest
     steps:
@@ -13,8 +40,9 @@ jobs:
           node-version: 22
       - name: Install Lean
         run: |
-          url=https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh
-          curl -sSfL "$url" | sh -s -- -y --default-toolchain none
+          base=https://raw.githubusercontent.com/leanprover/elan/master
+          curl -sSfL "$base/elan-init.sh" \
+            | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Proofs check
         working-directory: model
@@ -80,7 +108,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: The design pages match their sources
+      - name: >-
+          The design pages are a pure render of design/, protocol/ and vectors/
         run: |
           node design/build.mjs
           git diff --exit-code -- out

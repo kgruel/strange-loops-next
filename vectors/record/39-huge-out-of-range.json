@@ -1,0 +1,20 @@
+{
+  "vector": "39-huge-out-of-range",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "salt": "u2uawykml5oov3lmp6agp7ee2m",
+    "payload_text": "{\"positive\":1e+30,\"negative\":-1e+30,\"max\":1.7976931348623157e+308,\"min\":-1.7976931348623157e+308}"
+  },
+  "expect": {
+    "refused": "number-out-of-range"
+  }
+}

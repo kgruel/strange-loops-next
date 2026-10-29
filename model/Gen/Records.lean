@@ -186,7 +186,11 @@ def storedCases : List Case := [
   { name := "12-negative-exact-boundary", laws := ["record.canonical"],
     envs := [note], payloads := [.int (-9007199254740991)] },
   { name := "13-offset-hour-23", laws := ["record.emitted"],
-    envs := [note "2026-10-21T00:00:00+23:00"], payloads := [.obj []] }
+    envs := [note "2026-10-21T00:00:00+23:00"], payloads := [.obj []] },
+  { name := "38-native-shortest-tie", laws := ["record.canonical"],
+    envs := [note], payloads := [.obj [
+      ("positive", .number ⟨0x43143ff3c1cb0959⟩),
+      ("negative", .number ⟨0xc3143ff3c1cb0959⟩)]] }
 ]
 
 def refusedCases : List (String × Env) := [
@@ -205,15 +209,18 @@ def refusedCases : List (String × Env) := [
   ("36-observer-prefix-tail", { note with observer := "a!:x" })
 ]
 
-/-- Payloads refused under a good envelope. The largest exact integer is
-kept; one past the smallest, nested, is refused. A repeated member name is
-refused at any depth. -/
+/-- Unsafe magnitudes and repeated member names are refused at any depth under a good envelope. -/
 def refusedPayloads : List (String × Json) := [
   ("29-number-out-of-range", .obj [("largest", .int 9007199254740991),
-    ("deep", .arr [.obj [("n", .int (-9007199254740992))]])]),
+    ("deep", .arr [.obj [("n", .number (Number.ofScientific true 9007199254740992 0))]])]),
+  ("32-proto-out-of-range", .obj [("__proto__", .number (Number.ofScientific false 9007199254740992 0))]),
+  ("39-huge-out-of-range", .obj [
+    ("positive", .number (Number.ofScientific false 1 30)),
+    ("negative", .number (Number.ofScientific true 1 30)),
+    ("max", .number ⟨0x7fefffffffffffff⟩),
+    ("min", .number ⟨0xffefffffffffffff⟩)]),
   ("31-member-duplicate", .obj [("body", .str "hello"),
-    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])]),
-  ("32-proto-out-of-range", .obj [("__proto__", .int 9007199254740992)])
+    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])])
 ]
 
 /-- A salt that isn't 16 bytes. An empty salt would let anyone confirm a guess

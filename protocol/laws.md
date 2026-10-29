@@ -48,12 +48,10 @@ Integral decimals and exponents, including `1.0` and `1e2`, normalize to integer
 Payloads retain nonwhole binary64 numbers, but numeric slots count them as unread.
 Addition uses exact integers because binary64 addition is not associative.
 
-The model's integers are unbounded; an implementation's are not. A writer
-refuses a payload number outside ±(2^53 − 1) (`number-out-of-range`, see
-`protocol/record.md`), so implementations accumulate sums in 128 bits:
-overflowing that takes more than 2^74 records. An
-implementation that cannot hold a sum refuses with `sum-overflow`, never
-wraps.
+The model's integers are unbounded; an implementation's are not.
+Writers accept finite binary64 values within ±(2^53 − 1), whole or not; numeric readers additionally require whole values.
+Implementations accumulate sums in 128 bits: overflowing that takes more than 2^74 records.
+An implementation that cannot hold a sum refuses with `sum-overflow`, never wraps.
 
 ## Two families, views and honest results (`model/Laws/Families.lean`)
 
@@ -224,7 +222,7 @@ same code. What isn't proved yet is that `resolveBatch` returns the meaning
 | `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about`, `prev` or `erases` never changes the id | `record/02`, `03`, `11` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
-| `record.refuse` | (by construction) | a bad envelope, a salt that isn't 16 bytes, a repeated member name or a payload number outside ±(2^53 − 1) is refused with a stated reason | `record/20`–`34` |
+| `record.refuse` | (by construction) | A bad envelope, wrong salt length, repeated member, nonfinite number or any number outside ±(2^53 − 1) is refused with a stated reason. | `record/20`–`34` |
 | `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15`, `17` |
 | `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
 

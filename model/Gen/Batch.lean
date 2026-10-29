@@ -56,12 +56,12 @@ def unrelated := draft none "batch-n"
   { kind := "note", observer := kyle, emitted := at0, about := ["topic:cache"], prev := ["@d"] }
   (.obj [])
 
--- write refuses these, in a batch as on their own; the envelope is checked first
+-- The bad envelope refuses before the out-of-range payload, in every draft order.
 def badKind := draft none "batch-k"
   { kind := "", observer := kyle, emitted := at0, about := ["topic:auth"] } (.obj [])
 def bigNumber := draft none "batch-big"
   { kind := "estimate", observer := kyle, emitted := at0, about := ["topic:auth"] }
-  (.obj [("n", .int 9007199254740992)])
+  (.obj [("n", .number (Number.ofScientific false 9007199254740992 0))])
 -- one `prev` the writer holds but about another thing, one it doesn't hold
 def bothPrev := draft none "batch-p"
   { kind := "note", observer := kyle, emitted := at0, about := ["topic:cache"],
@@ -96,6 +96,7 @@ def cases : List Case := [
     [draft none "batch-anchor"
       { kind := "note", observer := kyle, emitted := at0, about := [r1Id], prev := [r1Id] }
       (.obj [])]⟩,
+  ⟨"05-large-number-out-of-range", ["batch.refuse", "write.checked"], [bigNumber]⟩,
   ⟨"10-unknown-label", ["batch.refuse"], [cites]⟩,
   ⟨"11-duplicate-label", ["batch.refuse"], [decide1, { decide1 with salt := saltFor "batch-d-again" }]⟩,
   ⟨"12-cycle", ["batch.refuse"], [cycleA, cycleB]⟩,

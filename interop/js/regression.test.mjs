@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { base32 } from "./loops.mjs";
+import { base32, canonical, seal, writeText } from "./loops.mjs";
 import { heads, latest, sum, min, max } from "./fold.mjs";
 import { parse } from "./lens.mjs";
 import { check as checkLens } from "./check-lens.mjs";
@@ -34,6 +34,57 @@ test("spec and scenario admit once against all settled records", () => {
   assert.deepEqual(result.admitted, [a.id]);
   assert.deepEqual(result.heads, [a.id]);
   assert.deepEqual(result.slots.count, { value: 1, unread: 0 });
+});
+
+const writerEnv = { kind: "note", observer: "o:test", emitted: "2026-10-21T00:00:00Z" };
+const writerSalt = new Uint8Array(16);
+const writerSeed = new Uint8Array(32);
+
+test("writers accept limits and within-range fractions after binary64 rounding", () => {
+  for (const n of [Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER, 9007199254740991.1,
+    -9007199254740991.1, 1.5, -1.5, 1424953923781206.25, Number.MIN_VALUE, -0]) {
+    const payload = JSON.parse(`{"deep":[{"n":${n}}],"__proto__":${n}}`);
+    assert.deepEqual(JSON.parse(seal(writerEnv, writerSalt, payload, writerSeed).line).payload, payload);
+    assert.deepEqual(writeText(writerEnv, writerSalt, JSON.stringify(payload), writerSeed),
+      seal(writerEnv, writerSalt, payload, writerSeed));
+  }
+});
+
+test("writers refuse unsafe magnitudes and nonfinite payloads with unchanged priority", () => {
+  for (const n of [2 ** 53, -(2 ** 53), 9007199254740991.5, -9007199254740991.5,
+    1e30, -1e30, Number.MAX_VALUE, -Number.MAX_VALUE, NaN, Infinity, -Infinity]) {
+    assert.throws(() => seal(writerEnv, writerSalt, { deep: [{ n }] }, writerSeed),
+      { message: "number-out-of-range" });
+    assert.throws(() => seal({ ...writerEnv, kind: "" }, writerSalt, n, writerSeed),
+      { message: "kind-empty" });
+    assert.throws(() => seal(writerEnv, new Uint8Array(0), n, writerSeed),
+      { message: "salt-not-16-bytes" });
+  }
+  for (const text of ["9007199254740991.5", "-9007199254740991.5", "1e30", "-1e30", "1e400", "-1e400"]) {
+    assert.throws(() => writeText(writerEnv, writerSalt, text, writerSeed),
+      { message: "number-out-of-range" });
+  }
+  for (const duplicate of ['{"n":1e30,"n":0}', '{"n":1e400,"n":0}']) {
+    assert.throws(() => writeText(writerEnv, writerSalt, duplicate, writerSeed),
+      { message: "member-duplicate" });
+    assert.throws(() => writeText(writerEnv, new Uint8Array(0), duplicate, writerSeed),
+      { message: "salt-not-16-bytes" });
+    assert.throws(() => writeText({ ...writerEnv, kind: "" }, new Uint8Array(0), duplicate, writerSeed),
+      { message: "kind-empty" });
+  }
+});
+
+test("native canonicalization still handles all 4000 standards independently of writer range", () => {
+  const rows = readFileSync(new URL("../../vectors/standard/es6-numbers.txt", import.meta.url), "utf8").trim().split("\n");
+  assert.equal(rows.length, 4000);
+  let outside = 0;
+  for (const row of rows) {
+    const [hex, expected] = row.split(",");
+    const n = Buffer.from(hex.padStart(16, "0"), "hex").readDoubleBE();
+    assert.equal(canonical(n), expected, hex);
+    if (Math.abs(n) > Number.MAX_SAFE_INTEGER) outside++;
+  }
+  assert.ok(outside > 0, "the standard corpus includes out-of-range magnitudes");
 });
 
 test("numeric folds read safe whole values only", () => {
