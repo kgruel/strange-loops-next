@@ -1,13 +1,14 @@
-# Layers one and two: Lean to Rust
+# Layers one through three: Lean to Rust
 
 Lean defines the behavior of this port.
-The port implements record primitives, fold families, per-thing state, and the fold selection grammar.
-It checks 37 fold vectors and 34 record and occurred vectors.
-Full specs, queries, realm settlement, admission, batches, lenses, the CLI, and storage service remain future work.
+The port implements record primitives, fold families, per-thing state, specs, and admission.
+It checks 70 spec vectors, 37 fold vectors, and 34 record and occurred vectors.
+Realm settlement, batches, lenses, the CLI, and storage service remain future work.
 
-Layer two uses only the closed where types, parser, and evaluation from layer three.
+Layer two uses the closed where types, parser, and evaluation from layer three.
 Fold selection calls `parseWhere` and `Cond.all` directly (`model/Gen/Run.lean:112–122`).
 It does not call the full spec parser or runner.
+Layer three adds the full spec parser, renderer, and runner.
 
 ## API mapping
 
@@ -32,7 +33,15 @@ Paths below start at the repository root. Public Rust docs also identify their L
 | OverHeads.fold, LatestBy.limit/maxHeads; model/Loops/Families.lean:86–90,132–134 | families::over_heads; LatestBy::{limit, max_heads} |
 | Record.things/isAbout, shares, thingsOf, stateIn, perThing; model/Loops/Things.lean:35–42,97–101 | Record::{things, is_about}; things::{shares, things_of, state_in, per_thing} |
 | EnvField/FieldType/Field/Item/Arg/Op/Cond, Field.read, Tri.and, Cond.all; model/Loops/Spec.lean:51–208 | where_::{EnvField, FieldType, Field, Item, Arg, Op, Cond}; their methods; families::Tri::and |
-| Tests.conds, Refusal, parseArg/Bound/Op/Field/Where; model/Loops/Spec.lean:226–228,333–338,346–396 | where_::{Tests, Refusal, RefusalCode, parse_arg, parse_bound, parse_op, parse_field, parse_where}; only where-invalid refusals |
+| Tests.conds, Refusal, parseArg/Bound/Op/Field/Where; model/Loops/Spec.lean:226–228,333–338,346–396 | where_::{Tests, Refusal, RefusalCode, parse_arg, parse_bound, parse_op, parse_field, parse_where}; all 14 refusal codes |
+| FoldType, Slot, SlotValue; model/Loops/Spec.lean:213–244 | spec::{FoldType, Slot, SlotValue}; ordered lists and full equality |
+| Record.unlinked, newestFirst, limitTo, shownIds; model/Loops/Spec.lean:247–257 | Record::unlinked; spec::{newest_first, limit_to, shown_ids} |
+| chosen, payTest, latestOf, collectOf, Slot.run; model/Loops/Spec.lean:260–296 | spec::{chosen, pay_test, latest_of, collect_of}; Slot::run |
+| Source, Spec, takes, select, run; model/Loops/Spec.lean:301–328 | spec::{Source, Spec}; Source::takes; Spec::{takes, select, run, run_with} |
+| idsOf, entitled, admit; model/Loops/Things.lean:47,78–88 | things::{ids_of, entitled, admit}; no settlement |
+| memberPath, parser keys and helpers; model/Loops/Spec.lean:376–378,398–500,524–538 | spec::{member_path, FOLD_TYPES, SLOT_KEYS, SOURCE_KEYS, SPEC_KEYS}; matching snake-case parser helpers |
+| Json.repeatAt/repeatIn/repeatMember, Spec.ofObject/ofJson; model/Loops/Spec.lean:507–555 | Json::repeat_at; Spec::{of_object, of_json} |
+| Val/Arg/Op/Tests/Slot/Source/Spec.toJson; model/Loops/Spec.lean:559–605 | Val/Arg/Op/Tests/Slot/Source/Spec::to_json |
 
 ## Digest representation
 
@@ -137,6 +146,43 @@ Time equality compares whole spans; time bounds compare their start moments.
 The outer `Spec.ofJson` or selection runner checks recursive duplicate names, not `parseWhere`.
 See `model/Loops/Spec.lean:393–396,554–555` and `model/Gen/Run.lean:114–118`.
 
+## Specs and admission
+
+`Spec.of_json` checks recursive duplicate names before every shape or grammar check.
+It follows written member order, including ignored metadata and root arrays.
+Paths use dots. Arrays keep their parent's path.
+An empty parent differs from no parent (`model/Loops/Spec.lean:376–378,507–555`).
+`Spec.of_object` and the lower parser helpers do not add recursive duplicate checks.
+Source checks follow keys, store, kinds, then about.
+Slot checks follow name, shape, keys, fold count, follow, limit, argument, then where.
+
+`Spec.to_json` emits vertex, sources, then slots.
+Source and slot lists keep written order.
+Fold members use canonical fold, follow, limit, then where order.
+Empty where maps disappear. Time arguments keep their original spelling.
+Accepted unused keys disappear from the result and gain no runtime meaning.
+The header at `model/Loops/Spec.lean:42` says these keys are carried.
+The structure and renderer discard them (`model/Loops/Spec.lean:307–311,601–605`).
+The port follows that executable behavior, not the header claim.
+
+`Spec.run` admits first, then runs each slot. It permits every replacement by default.
+`Spec.run_with` accepts the store's replacement rule.
+The caller supplies a pure `EnvOnly` rule that depends only on both envelopes (`model/Loops/Things.lean:73–88`).
+Admission checks each record against the original input once.
+A missing predecessor passes. Every held form of a matching predecessor must share a thing and pass the rule.
+Rust does not enforce the purity or envelope-only proof requirements.
+The caller supplies one record per id. The runner does not settle records or remove duplicate ids.
+Raw input outside that premise keeps the model's repeat behavior.
+
+Latest-by and following collect resolve per-thing heads before source, envelope, or payload tests.
+A successor outside the selected kind can still remove an older head.
+`newest_first` clears links on clones before applying the latest fold.
+Its duplicate check uses full records after link removal, not ids alone.
+Latest-by counts distinct unknown ids across things.
+Collect counts unknown raw heads before the limit.
+Its limit applies only to known matches, including hidden heads when no payload tests exist.
+Numeric slots use `Cond.all` and `Acc.select`; they do not add settlement or duplicate removal.
+
 ## Hashes and signatures
 
 Hash functions remain supplied byte-to-byte functions, as `Stored.Hash` specifies.
@@ -156,13 +202,17 @@ Checks include public keys, signatures, both wire lines, and occurred ordering.
 | vectors/record: 26; vectors/occurred: eight | tests/vectors.rs: every_registered_vector_and_every_expect |
 | vectors/fold/count: three; sum: three; extrema: four; latest: four | Same registry and tests/support/fold.rs; raw primitive folds |
 | vectors/fold/latest-by: 13; heads: three; view: four; select: three | Same registry; per_thing, max_heads, limit, Cond.all, and Acc.select |
+| vectors/spec/parse: 61; run: nine | Same registry and tests/support/spec.rs; every refusal, parsed result, and arrival order |
 
 The test reader follows `Gen.Read.record`, `recordId`, and `fieldsOf` (`model/Gen/Read.lean:238–248,286–331`).
 It requires payload fields for `Here` and refuses payload fields on hidden forms.
 It preserves exact defaults and ordered fields, decodes canonical 32-byte ids, and applies no writer-only kind or reference checks.
 The serde reader captures integer text before parsing `Int` and refuses fractions and exponent notation.
 Objects keep member order and repeats, including `payload_text`.
-Fold answers and expectations remain integer JSON without a floating-point conversion.
+Fold and spec answers and expectations remain integer JSON without a floating-point conversion.
+Spec inputs reach core JSON before any serde value conversion.
+The harness uses raw `spec_text` when supplied, so repeated names reach the spec parser.
+Each successful parse also passes a parse-render-parse equality check.
 
 Seven record, ten fold, and five where tests cover behavior outside the vectors.
 They check raw insertion, full equality, spelling, last-wins duplicate removal, raw repeats, readability, unknown counts, and numeric fields.
@@ -171,12 +221,16 @@ Where tests cover each envelope field, absence, hidden payloads, time equality, 
 They retain written refusal order and unchecked duplicate members.
 Three digest tests check zero, maximum, every bit position, byte order, exact bytes, lengths, and all link consumers.
 Two reader tests check digest text roundtrips, link ingestion, byte lengths, and canonical padding.
-Three harness tests check strict fixture shapes, unbounded input and answers, unknown fold layers, and missing arrival orders.
+Three fold harness tests check strict fixture shapes, unbounded input and answers, unknown fold layers, and missing arrival orders.
+One spec harness test checks unknown layers, strict input shapes, missing fields, and missing arrival orders.
+Nine spec tests check refusal precedence, lower parser domains, roundtrips, admission, supersession, hidden heads, raw repeats, and unbounded numbers.
+They also check empty-key paths, hidden duplicate metadata, original-input admission, and distinct unknown ids across things.
 The registry test also checks vector accounting.
+The suite runs 47 tests. Six shared helper tests run in each of two integration test binaries.
 
-The registry accounts for 184 recursive JSON files: 71 checked and 113 explicitly deferred.
-The remaining allowlist stays `spec`, `realm`, `scenario`, `batch`, `lens`, and `standard`.
-Layer two removes only `fold` from the earlier allowlist.
+The registry accounts for 184 recursive JSON files: 141 checked and 43 explicitly deferred.
+The remaining allowlist stays `realm`, `scenario`, `batch`, `lens`, and `standard`.
+Layer two removes `fold` from the earlier allowlist. Layer three removes `spec`.
 Unknown families, root JSON, missing or stale registrations, count changes, and files outside accounted families fail.
 `GAPS.md` explains each deferred family and the external standard limits.
 

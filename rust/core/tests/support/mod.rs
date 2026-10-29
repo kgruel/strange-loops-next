@@ -1,6 +1,7 @@
 //! Test-only Gen.Read fixture ingestion and Gen.OccurredVectors.utc rendering.
 pub(super) mod fold;
 mod reader;
+pub(super) mod spec;
 use loops::{json::Json, time::Moment};
 use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use std::fmt;

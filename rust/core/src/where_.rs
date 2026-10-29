@@ -288,13 +288,91 @@ impl Tests {
     }
 }
 
+impl Val {
+    /// Lean: `Loops.Val.toJson`, model/Loops/Spec.lean.
+    /// Encodes a payload value without a writer range check.
+    pub fn to_json(&self) -> Json {
+        match self {
+            Self::Str(s) => Json::Str(s.clone()),
+            Self::Int(i) => Json::Int(i.clone()),
+            Self::Bool(b) => Json::Bool(*b),
+        }
+    }
+}
+
+impl Arg {
+    /// Lean: `Loops.Arg.toJson`, model/Loops/Spec.lean.
+    /// Encodes the argument and keeps a time claim's original spelling.
+    pub fn to_json(&self) -> Json {
+        match self {
+            Self::Val(v) => v.to_json(),
+            Self::Time(c) => Json::Str(c.text().into()),
+        }
+    }
+}
+
+impl Op {
+    /// Lean: `Loops.Op.toJson`, model/Loops/Spec.lean.
+    /// Encodes one named operator with its argument.
+    pub fn to_json(&self) -> (String, Json) {
+        let (name, value) = match self {
+            Self::Is(a) => ("is", a.to_json()),
+            Self::Not(a) => ("not", a.to_json()),
+            Self::Present => ("present", Json::Bool(true)),
+            Self::Absent => ("absent", Json::Bool(true)),
+            Self::AtLeast(a) => ("at-least", a.to_json()),
+            Self::Below(a) => ("below", a.to_json()),
+        };
+        (name.into(), value)
+    }
+}
+
+impl Tests {
+    /// Lean: `Loops.Tests.toJson`, model/Loops/Spec.lean.
+    /// Encodes fields and operators in written order, including repeats.
+    pub fn to_json(&self) -> Json {
+        Json::Obj(
+            self.0
+                .iter()
+                .map(|(f, os)| (f.name(), Json::Obj(os.iter().map(Op::to_json).collect())))
+                .collect(),
+        )
+    }
+}
+
 /// Lean: `Loops.Refusal.code`, model/Loops/Spec.lean.
-/// This type names only the refusal codes for the current where parser.
+/// This type names the closed refusal vocabulary for spec parsing.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum RefusalCode {
     /// A field, argument, operator, or map shape breaks the where grammar.
     WhereInvalid,
+    /// A raw object repeats a member name.
+    MemberDuplicate,
+    /// The spec root is not an object.
+    SpecNotObject,
+    /// An object contains an unknown member name.
+    UnknownKey,
+    /// The spec has no vertex member.
+    VertexMissing,
+    /// The vertex is not nonempty text.
+    VertexInvalid,
+    /// The spec has no sources.
+    FromMissing,
+    /// A source or its fields break the source grammar.
+    FromInvalid,
+    /// A slot name or fold map breaks the slot grammar.
+    FoldInvalid,
+    /// A slot names zero or multiple fold types.
+    FoldType,
+    /// Latest-by does not name its succession link.
+    FollowMissing,
+    /// A succession link or its fold type is invalid.
+    FollowInvalid,
+    /// A limit is not a positive collect limit.
+    LimitInvalid,
+    /// A fold argument breaks its type's grammar.
+    FoldArgument,
 }
 impl RefusalCode {
     /// Lean: `Loops.Refusal.code`, model/Loops/Spec.lean.
@@ -302,6 +380,19 @@ impl RefusalCode {
     pub fn code(self) -> &'static str {
         match self {
             Self::WhereInvalid => "where-invalid",
+            Self::MemberDuplicate => "member-duplicate",
+            Self::SpecNotObject => "spec-not-object",
+            Self::UnknownKey => "unknown-key",
+            Self::VertexMissing => "vertex-missing",
+            Self::VertexInvalid => "vertex-invalid",
+            Self::FromMissing => "from-missing",
+            Self::FromInvalid => "from-invalid",
+            Self::FoldInvalid => "fold-invalid",
+            Self::FoldType => "fold-type",
+            Self::FollowMissing => "follow-missing",
+            Self::FollowInvalid => "follow-invalid",
+            Self::LimitInvalid => "limit-invalid",
+            Self::FoldArgument => "fold-argument",
         }
     }
 }
@@ -315,7 +406,7 @@ impl fmt::Display for RefusalCode {
 /// A refusal names the failed check and the original field path.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Refusal {
-    /// The check that refuses the where input.
+    /// The check that refuses the spec or where input.
     pub code: RefusalCode,
     /// The written field path where the check fails.
     pub path: String,

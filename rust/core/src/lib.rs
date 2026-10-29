@@ -1,4 +1,4 @@
-//! Executable record and fold port of model/Loops, with the fold selection grammar.
+//! Record, fold, and spec execution from model/Loops, with admission but no realm settlement.
 //! Lean definitions are authoritative; see ../PORTING.md for representation choices.
 
 pub mod base32;
@@ -9,6 +9,7 @@ pub mod json;
 pub mod number;
 pub mod occurred;
 pub mod record;
+pub mod spec;
 pub mod stored;
 pub mod things;
 pub mod time;

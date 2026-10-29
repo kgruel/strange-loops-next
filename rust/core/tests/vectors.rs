@@ -1,4 +1,4 @@
-//! Record, occurred and fold vectors (model/Gen/{Records,Occurred,Run,Read,Encode}.lean).
+//! Record, occurred, fold, and spec vectors from model/Gen.
 
 mod support;
 
@@ -11,10 +11,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-const IMPLEMENTED: &[(&str, usize)] = &[("record", 26), ("occurred", 8), ("fold", 37)];
+const IMPLEMENTED: &[(&str, usize)] =
+    &[("record", 26), ("occurred", 8), ("fold", 37), ("spec", 70)];
 // Shrink only. Standard includes external non-integer JCS and crypto fixtures;
 // it is not claimed as Lean integer-JSON conformance by this layer.
-const REMAINING: &[&str] = &["spec", "realm", "scenario", "batch", "lens", "standard"];
+const REMAINING: &[&str] = &["realm", "scenario", "batch", "lens", "standard"];
 
 fn json_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -204,22 +205,29 @@ fn every_registered_vector_and_every_expect() {
             );
             for file in files {
                 let source = fs::read_to_string(&file).expect("vector file");
-                let vector: Value = serde_json::from_str(&source).expect("vector JSON");
-                let layer = text(&vector["layer"]);
-                if family == "fold" {
-                    let raw = support::parse(&source);
-                    let answers = support::fold::answers(layer, member(&raw, "input"))
+                let raw = support::parse(&source);
+                let Json::Str(layer) = member(&raw, "layer") else {
+                    panic!("vector layer text");
+                };
+                if family == "fold" || family == "spec" {
+                    let dispatch = if family == "fold" {
+                        support::fold::answers
+                    } else {
+                        support::spec::answers
+                    };
+                    let answers = dispatch(layer, member(&raw, "input"))
                         .unwrap_or_else(|e| panic!("{file:?}: {e}"));
+                    assert!(!answers.is_empty(), "{file:?}: checker returns no answers");
                     for (i, got) in answers.iter().enumerate() {
                         assert_eq!(got, member(&raw, "expect"), "{file:?} order {i}");
                     }
                     checked += 1;
                     continue;
                 }
-                assert_eq!(layer, family, "{file:?}");
+                assert_eq!(layer, &family, "{file:?}");
+                let vector: Value = serde_json::from_str(&source).expect("vector JSON");
                 let got = match family.as_str() {
                     "record" => {
-                        let raw = support::parse(&source);
                         record_answer(&vector["input"], &record_payloads(member(&raw, "input")))
                     }
                     "occurred" => occurred_answer(&vector["input"], text(&vector["vector"])),
@@ -243,7 +251,8 @@ fn every_registered_vector_and_every_expect() {
     for family in REMAINING {
         assert!(seen.iter().any(|s| s == family), "stale allowlist {family}");
     }
-    assert_eq!(checked, 71);
+    assert_eq!(checked, 141);
+    assert_eq!(checked + deferred, 184);
     assert_eq!(
         checked + deferred,
         json_files(&root).len(),

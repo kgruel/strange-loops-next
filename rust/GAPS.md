@@ -1,4 +1,4 @@
-# Layers one and two: limits and review points
+# Layers one through three: limits and review points
 
 This port changes no model, vector, protocol, design, or interop files.
 The implemented reader surface follows Lean except for the explicit representation boundaries below.
@@ -6,10 +6,12 @@ These notes identify review points. They do not propose new laws.
 
 ## Scope and proof requirements
 
-Layer two covers all 37 fold vectors. It does not implement layer three.
+Layer two covers all 37 fold vectors.
 Fold selection uses only the closed where grammar and its evaluation.
-Full `Spec.ofJson`, `Spec.toJson`, spec execution, slots, and the remaining refusal codes remain outside this layer.
-Realm settlement and admission also remain outside this layer (`model/Loops/Things.lean:46–92`).
+Layer three covers all 70 spec vectors, the full parser, renderer, slots, execution, and admission.
+Realm settlement remains outside this layer.
+The deferred functions are `baseForm`, `pick`, `settle`, and `realm` (`model/Loops/Things.lean:53–65,91–92`).
+Batches, lenses, the CLI, and storage service also remain future work.
 
 Lean requires commuting steps through `Acc.comm` (`model/Loops/Families.lean:33–39`).
 Rust callers must supply pure steps that commute.
@@ -31,13 +33,37 @@ Requiring checked state or `Record::Ord` incorrectly restricts this executable d
 It keeps written order and reports the first invalid field path.
 Recursive duplicate checks belong to `Spec.ofJson` or the outer selection input boundary.
 See `model/Loops/Spec.lean:554–555` and `model/Gen/Run.lean:114–118`.
-`RefusalCode` currently names only `WhereInvalid`.
+`RefusalCode` names all 14 spec refusal codes.
 `Refusal` keeps the exact wire code and field path. It implements `Display` and `Error`.
-The full layer-three refusal vocabulary remains future work.
+`Spec.of_object` and the lower parser helpers retain their raw domains without recursive duplicate checks.
 
 The test reader follows `Gen.Read` shapes and rejection rules.
 Its diagnostic text uses Rust wording. It does not claim identical Lean diagnostic text.
-Core where refusals retain exact protocol codes and paths.
+Core spec and where refusals retain exact protocol codes and paths.
+
+## Spec metadata and admission
+
+The header at `model/Loops/Spec.lean:42` says accepted unused keys are carried.
+The actual structure and renderer discard those keys (`model/Loops/Spec.lean:307–311,601–605`).
+Rust follows that executable behavior. These keys gain no runtime meaning.
+Recursive duplicate checks still inspect every ignored value before any shape or grammar check.
+No model file changes to resolve this header mismatch.
+
+Admission requires a pure `EnvOnly` rule (`model/Loops/Things.lean:73–88`).
+The rule must depend only on both envelopes, not their payloads or reader forms.
+Rust cannot enforce that proof requirement for arbitrary closures.
+The port makes no unconditional admission-law claim.
+Admission filters once against the original held records, not a changing accepted set.
+All held forms with the linked id must share a thing and pass the rule. Missing predecessors pass.
+
+`Spec.run` expects one record per id, as the Lean comment states (`model/Loops/Spec.lean:322–328`).
+It admits records but does not call `settle` or remove duplicate ids.
+Tests retain the executable behavior on raw unequal forms with the same id.
+Latest-by and following collect resolve per-thing heads over all admitted records before source or where tests.
+Latest-by counts distinct unknown ids across things. Collect counts unknown raw heads before the limit.
+A hidden head with no payload tests can be a known match.
+The collect limit applies to known matches, not unknown counts or readable records alone.
+Large limits take every match without truncating to machine width.
 
 ## Digest ids
 
@@ -102,16 +128,16 @@ The port claims neither full RFC 8785 coverage nor independent SUPERCOP conforma
 
 | Deferred JSON family | Files |
 | --- | ---: |
-| spec | 70 |
 | realm | 9 |
 | scenario | 1 |
 | batch | 11 |
 | lens | 10 |
 | standard | 12 |
-| Total | 113 |
+| Total | 43 |
 
-The registry checks 26 record, eight occurred, and 37 fold files: 71 of 184 recursive JSON files.
-The remaining allowlist stays `spec`, `realm`, `scenario`, `batch`, `lens`, and `standard`.
+The registry checks 26 record, eight occurred, 37 fold, and 70 spec files: 141 of 184 recursive JSON files.
+Spec includes 61 parse files and nine run files.
+The remaining allowlist stays `realm`, `scenario`, `batch`, `lens`, and `standard`.
 
 ## Canonicalization before validation
 

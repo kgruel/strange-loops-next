@@ -1,8 +1,8 @@
-//! Per-thing reader state from model/Loops/Things.lean (not settle or admit).
+//! Per-thing state and admission from model/Loops/Things.lean, without settlement.
 use crate::{
-    fold::{LatestBy, latest_fold},
+    fold::{LatestBy, insert_id, latest_fold},
     json::canon_set,
-    record::{Record, id_text},
+    record::{Digest, Record, id_text},
 };
 
 impl Record {
@@ -28,6 +28,32 @@ impl Record {
 pub fn shares(a: &Record, b: &Record) -> bool {
     let bs = b.things();
     a.things().iter().any(|t| bs.contains(t))
+}
+
+/// Lean: `Loops.idsOf`, model/Loops/Things.lean.
+/// Returns each held digest once in ascending byte order.
+pub fn ids_of(xs: &[Record]) -> Vec<Digest> {
+    xs.iter().fold(Vec::new(), |ids, r| insert_id(r.id, &ids))
+}
+
+/// Lean: `Loops.entitled`, model/Loops/Things.lean.
+/// Checks all held targets of every succession link.
+/// Missing targets pass. Every matching target must share a thing and pass `may`.
+/// The caller must supply a pure `EnvOnly` rule that depends only on both envelopes.
+pub fn entitled(xs: &[Record], r: &Record, may: impl Fn(&Record, &Record) -> bool) -> bool {
+    r.prev
+        .iter()
+        .all(|p| xs.iter().all(|q| q.id != *p || (shares(r, q) && may(r, q))))
+}
+
+/// Lean: `Loops.admit`, model/Loops/Things.lean.
+/// Filters once against the original held records, not against a changing accepted set.
+/// The caller must supply a pure `EnvOnly` rule that depends only on both envelopes.
+pub fn admit(xs: &[Record], may: impl Fn(&Record, &Record) -> bool) -> Vec<Record> {
+    xs.iter()
+        .filter(|r| entitled(xs, r, &may))
+        .cloned()
+        .collect()
 }
 
 /// Lean: `Loops.thingsOf`, model/Loops/Things.lean.
