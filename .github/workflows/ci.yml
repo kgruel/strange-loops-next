@@ -57,7 +57,7 @@ jobs:
       - name: The JS implementation agrees on every vector
         run: node interop/js/check.mjs vectors
       - name: The JS reader guards hold
-        run: node --test interop/js/regression.test.mjs
+        run: node --test interop/js/*.test.mjs
 
   design:
     runs-on: ubuntu-latest

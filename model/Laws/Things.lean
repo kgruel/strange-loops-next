@@ -199,6 +199,31 @@ theorem admit_no_cross {may : Record → Record → Bool} {xs : List Record} {r 
   have := this q.id hp q hq
   simpa using this
 
+/-- Held erasers act before admission, even when admission later refuses them. -/
+theorem realm_erased {may : Record → Record → Bool} {xs : List Record} {i : Nat}
+    (held : ∃ e ∈ xs, i ∈ e.erases) {r : Record}
+    (hr : r ∈ realm may xs) (hi : r.id = i) : r.shown = .erased := by
+  obtain ⟨e, he, hei⟩ := held
+  have herased : erasedIn xs i = true := by
+    unfold erasedIn
+    apply List.any_eq_true.mpr
+    exact ⟨e, he, by simpa using hei⟩
+  unfold realm at hr
+  exact settle_erased herased (mem_admit.1 hr).1 hi
+
+/-- Heads keep erasure from held erasers, even when admission refuses the eraser. -/
+theorem realm_heads_erased {may : Record → Record → Bool} {xs : List Record} {i : Nat}
+    (held : ∃ e ∈ xs, i ∈ e.erases) {t : String} {r : Record}
+    (hr : r ∈ (stateIn t (realm may xs)).heads) (hi : r.id = i) :
+    r.shown = .erased := by
+  have hx : Addressed (realm may xs) :=
+    (admit_distinct may (settle_distinct xs)).addressed
+  have hm := ((LatestBy.inv_of (fun a ha b hb =>
+    hx a (mem_filter.1 ha).1 b (mem_filter.1 hb).1)).heads_mem r).1 (by
+    simpa [stateIn] using hr)
+  have hr' : r ∈ realm may xs := (mem_filter.1 hm.1).1
+  exact realm_erased held hr' hi
+
 /-- A record is refused exactly when it is not entitled to its `prev`. -/
 theorem refusalOf_none (may : Record → Record → Bool) (xs : List Record) (r : Record) :
     refusalOf may xs r = none ↔ entitled may xs r = true := by

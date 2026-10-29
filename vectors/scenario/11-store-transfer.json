@@ -1,0 +1,166 @@
+{
+  "vector": "11-store-transfer",
+  "layer": "scenario",
+  "description": "Stores that travel: a stable thing key retains owner-claim history across a revision; the case checks no authority or key transfer.",
+  "laws": ["settle.set", "spec.set", "latest-by.set"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "horizon",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "history": {
+          "collect": true
+        },
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        }
+      }
+    },
+    "thing": "object:traveling-tool",
+    "records": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["object:traveling-tool"],
+        "value": "Owner claim: Ada.",
+        "prev": [],
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
+        "n": 0,
+        "fields": {
+          "owner": "person:ada"
+        }
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["object:traveling-tool"],
+        "value": "Owner claim: Bo.",
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq"],
+        "emitted": "2026-10-01T00:03:20Z",
+        "occurred": "2026-10-01T00:03:20Z",
+        "n": 0,
+        "fields": {
+          "owner": "person:bo"
+        }
+      }
+    ],
+    "steps": [
+      {
+        "name": "first-owner-claim",
+        "forms": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+            "shown": "here"
+          }
+        ],
+        "orders": [
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq"]
+        ]
+      },
+      {
+        "name": "revised-owner-claim",
+        "forms": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba",
+            "shown": "here"
+          }
+        ],
+        "orders": [
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba"],
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq"]
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "steps": [
+      {
+        "settled": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+            "shown": "here"
+          }
+        ],
+        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq"],
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+        "slots": {
+          "history": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "object:traveling-tool": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          }
+        }
+      },
+      {
+        "settled": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba",
+            "shown": "here"
+          }
+        ],
+        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba"],
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba",
+        "slots": {
+          "history": {
+            "heads": [
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba",
+                "shown": "here"
+              },
+              {
+                "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmaq",
+                "shown": "here"
+              }
+            ],
+            "unread": 0
+          },
+          "current": {
+            "things": {
+              "object:traveling-tool": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabmba",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          }
+        }
+      }
+    ]
+  }
+}

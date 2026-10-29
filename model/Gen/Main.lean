@@ -8,6 +8,7 @@ import Gen.Realm
 import Gen.Occurred
 import Gen.Scenario
 import Gen.Rulings
+import Gen.Horizons
 
 /-!
 # Gen: write the vectors
@@ -394,6 +395,9 @@ def main (args : List String) : IO UInt32 := do
   let rulingScenarios ← match Gen.RulingVectors.vectors with
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
-  writeAll dir "scenario" (scenarios ++ rulingScenarios)
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length + rulingScenarios.length} vectors to {dir}"
+  let horizons ← match Gen.HorizonVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "scenario" (scenarios ++ rulingScenarios ++ horizons)
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length + rulingScenarios.length + horizons.length} vectors to {dir}"
   return 0

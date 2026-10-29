@@ -357,6 +357,12 @@ theorem Spec.set_decides (sp : Spec) (may : Record → Record → Bool) {xs ys :
   exact map_congr_left fun s _ => by
     rw [s.set_decides sp.takes (admit_distinct may hx) (admit_distinct may hy) (admit_same may h)]
 
+/-- Equal held-form sets give equal spec results after settlement and admission. -/
+theorem Spec.realm_set_decides (sp : Spec) (may : Record → Record → Bool)
+    {xs ys : List Record} (hF : Forms xs) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
+    sp.run (settle xs) may = sp.run (settle ys) may := by
+  rw [settle_eq hF h]
+
 /-! ## Selection after supersession -/
 
 /-- What a spec's heads read under a view: every thing's state is the full

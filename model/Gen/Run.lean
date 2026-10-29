@@ -214,18 +214,23 @@ def recordRun (input : Json) : Dec J := do
 /-- What a reader holding `forms` makes of them, for one thing: settled,
 admitted, the thing's state, the slots. `ScenarioVectors.outcome` with the
 thing taken from the input. -/
-def scenarioOutcome (sp : Spec) (thing : String) (forms : List Record) : J :=
+def scenarioOutcome (sp : Spec) (thing : String) (forms : List Record)
+    (pairs : Option (List (Nat × Nat)) := none) : J :=
+  let may (r q : Record) := pairs.all (·.contains (r.id, q.id))
   let settled := settle forms
-  let admitted := admit (fun _ _ => true) settled
+  let admitted := admit may settled
   let st := stateIn thing admitted
-  .obj [
+  .obj ([
     ("settled", ScenarioVectors.jShownIds settled),
     ("admitted", .arr (admitted.map (.str ∘ idText ∘ (·.id)))),
     ("heads", .arr (st.heads.map (.str ∘ idText ∘ (·.id)))),
     ("winner", match st.winner with
       | some r => .str (idText r.id)
       | none => .null),
-    ("slots", .obj ((sp.run settled).map fun (n, v) => (n, ScenarioVectors.jSlot v)))]
+    ("slots", .obj ((sp.run settled may).map fun (n, v) => (n, ScenarioVectors.jSlot v)))] ++
+    if pairs.isSome then [("refused", .arr (settled.filterMap fun r =>
+      (refusalOf may settled r).map fun code =>
+        .obj [("id", .str (idText r.id)), ("code", .str code)]))] else [])
 
 /-- A form: one of the scenario's records, as a place holds it. -/
 def form (pool : List Record) (path : String) (j : Json) : Dec Record := do
@@ -238,7 +243,8 @@ def form (pool : List Record) (path : String) (j : Json) : Dec Record := do
   | .erased => pure r.erase
 
 /-- A step's answer, from its forms; each listed order of them must agree. -/
-def step (sp : Spec) (thing : String) (pool : List Record) (path : String) (j : Json) : Dec J := do
+def step (sp : Spec) (thing : String) (pool : List Record)
+    (pairs : Option (List (Nat × Nat))) (path : String) (j : Json) : Dec J := do
   let kvs ← members? path ["name", "forms", "orders"] j
   let _ ← text (dot path "name") (← req path kvs "name")
   let forms ← each (dot path "forms") (form pool) (← req path kvs "forms")
@@ -248,20 +254,36 @@ def step (sp : Spec) (thing : String) (pool : List Record) (path : String) (j : 
       let i ← recordId q j
       let some f := forms.find? (·.id == i) | bad q "names none of this step's forms"
       pure f) o) (← req path kvs "orders")
-  let want := scenarioOutcome sp thing forms
+  let want := scenarioOutcome sp thing forms pairs
   for (o, i) in os.zip (List.range os.length) do
-    if (scenarioOutcome sp thing o).render 0 != want.render 0 then
+    if (o.map (·.id)).mergeSort (· ≤ ·) != ids.mergeSort (· ≤ ·) then
+      bad (idx (dot path "orders") i) "must name each step form exactly once"
+    if (scenarioOutcome sp thing o pairs).render 0 != want.render 0 then
       bad (idx (dot path "orders") i) s!"gives a different answer than {dot path "forms"}; every order must hold the same forms"
   pure want
 
+/-- An explicit rule names new and predecessor ids from the fixture pool. -/
+def replacementPairs (pool : List Record) (path : String) (j : Json) : Dec (List (Nat × Nat)) :=
+  each path (fun p pair => do
+    let .arr [a, b] := pair | bad p "expected a two-item [newRecordId, predecessorId] pair"
+    let readId (suffix : Nat) (v : Json) := do
+      let i ← recordId (idx p suffix) v
+      if !pool.any (·.id == i) then bad (idx p suffix) "names none of input.records"
+      pure i
+    return (← readId 0 a, ← readId 1 b)) j
+
 def scenarioRun (input : Json) : Dec J := do
-  let kvs ← members? "input" ["spec", "thing", "records", "steps", "lens"] input
+  let kvs ← members? "input" ["spec", "thing", "records", "steps", "lens", "mayReplace"] input
   let sp ← specOf "input.spec" (← req "input" kvs "spec")
   let thing ← text "input.thing" (← req "input" kvs "thing")
   let pool ← records "input.records" (← req "input" kvs "records")
   if !(pool.map (·.id)).Nodup then bad "input.records" "holds one id twice"
-  let steps ← each "input.steps" (step sp thing pool) (← req "input" kvs "steps")
-  let lk ← members? "input.lens" ["base", "text"] (← req "input" kvs "lens")
+  let pairs ← match kvs.lookup "mayReplace" with
+    | none => pure none
+    | some j => some <$> replacementPairs pool "input.mayReplace" j
+  let steps ← each "input.steps" (step sp thing pool pairs) (← req "input" kvs "steps")
+  let some lens := kvs.lookup "lens" | return .obj [("steps", .arr steps)]
+  let lk ← members? "input.lens" ["base", "text"] lens
   let base ← sections "input.lens.base" (← req "input.lens" lk "base")
   let edited ← lines "input.lens.text" (← req "input.lens" lk "text")
   let some os := edit base edited | bad "input.lens.text" "doesn't parse as keyed sections"

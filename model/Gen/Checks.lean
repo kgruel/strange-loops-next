@@ -15,6 +15,58 @@ def refused {α} : Except String α → Bool
   | .error _ => true
   | .ok _ => false
 
+/-- Exercise the scenario decoder through its CLI. It is an executable, not
+an importable library: importing Gen.Run would also import its main. -/
+def scenarioDecoderChecks (root : String) : IO Unit := do
+  let fixture := root ++ "/model/.lake/scenario-decoder-check.json"
+  let some bin := (← IO.appPath).parent | throw (IO.userError "checks executable has no parent directory")
+  let a : Record := {
+    id := 1, kind := "note", observer := "sl:test", about := ["thing:test"],
+    value := "base", prev := [], emitted := stampAt 100 }
+  let b := { a with id := 2, prev := [a.id], emitted := stampAt 200 }
+  let pair : J := .arr [.str (idText b.id), .str (idText a.id)]
+  let fields : List (String × J) := [
+    ("spec", .obj [("vertex", .str "decoder"), ("from", .arr [.obj [("store", .str ".")]]),
+      ("fold", .obj [("count", .obj [("count", .bool true)])])]),
+    ("thing", .str "thing:test"), ("records", .arr [jRecord a, jRecord b]),
+    ("steps", .arr [.obj [("name", .str "held"),
+      ("forms", .arr [.obj [("id", .str (idText a.id)), ("shown", .str "here")],
+        .obj [("id", .str (idText b.id)), ("shown", .str "here")]]),
+      ("orders", .arr [.arr [.str (idText a.id), .str (idText b.id)]])]])]
+  let runInput (input : J) := do
+    IO.FS.writeFile fixture ((J.obj [("layer", .str "scenario"), ("input", input)]).render 0)
+    IO.Process.output { cmd := (bin / "run").toString, args := #[fixture] }
+  let run (rule : Option J) := runInput (.obj (fields ++ rule.toList.map ("mayReplace", ·)))
+  try
+    for rule in [none, some (.arr []), some (.arr [pair])] do
+      let out ← run rule
+      ensure (out.exitCode == 0) s!"scenario decoder refuses valid rule: {out.stderr}"
+      let .ok (.obj kvs) := Read.parseJson out.stdout | throw (IO.userError "scenario decoder output")
+      let some (.arr [.obj step]) := kvs.lookup "steps" | throw (IO.userError "scenario decoder steps")
+      let some (.arr admitted) := step.lookup "admitted" | throw (IO.userError "scenario decoder admitted")
+      let expectedCount := if (rule.map (·.render 0)) == some ((J.arr []).render 0) then 1 else 2
+      ensure (admitted.length == expectedCount) "scenario decoder loses absent/empty/allowed distinction"
+      ensure ((step.lookup "refused").isSome == rule.isSome) "scenario refusal output presence"
+      ensure ((kvs.lookup "lens").isNone) "scenario adds an absent lens"
+    let unknown := J.str (idText 99)
+    for rule in [J.null, .obj [], .arr [.null], .arr [.arr []], .arr [.arr [.str (idText a.id)]],
+        .arr [.arr [.str (idText a.id), .str (idText b.id), .str (idText a.id)]],
+        .arr [.arr [.num 1, .str (idText a.id)]],
+        .arr [.arr [unknown, .str (idText a.id)]], .arr [.arr [.str (idText b.id), unknown]]] do
+      let out ← run (some rule)
+      ensure (out.exitCode != 0 && (out.stderr.splitOn "input.mayReplace").length > 1)
+        s!"scenario decoder admits malformed rule: {rule.render 0}"
+    let some (.arr [.obj step]) := fields.lookup "steps" | throw (IO.userError "scenario decoder fixture")
+    for order in [J.arr [.str (idText a.id)],
+        .arr [.str (idText a.id), .str (idText b.id), .str (idText b.id)]] do
+      let steps := J.arr [.obj (step.map fun (k, v) =>
+        (k, if k == "orders" then .arr [order] else v))]
+      let out ← runInput (.obj (fields.map fun (k, v) => (k, if k == "steps" then steps else v)))
+      ensure (out.exitCode != 0 && (out.stderr.splitOn "input.steps[0].orders[0]").length > 1)
+        "scenario decoder admits an order with missing or repeated forms"
+  finally
+    IO.FS.removeFile fixture
+
 def main (args : List String) : IO Unit := do
   let [root] := args | throw (IO.userError "expected repository root")
   let table ← IO.FS.readFile (root ++ "/vectors/standard/es6-numbers.txt")
@@ -100,4 +152,5 @@ def main (args : List String) : IO Unit := do
   ensure ((wholeHeads [a]).length == 1) "multi-thing head appears twice"
   ensure (Latest.winner (Latest.fold [a, b]) == some b) "latest misses newest whole-view head"
   ensure (Latest.others (Latest.fold [a, b]) == [a]) "latest misses whole-view conflict"
+  scenarioDecoderChecks root
   IO.println s!"runtime checks pass; {count} RFC binary64 bit patterns pass"

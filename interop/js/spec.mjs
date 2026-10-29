@@ -272,8 +272,8 @@ function runSlot(slot, spec, { records, taken, states }) {
 }
 
 // Every slot's value, by name.
-export function runSpec(spec, records) {
-  records = admit(records).admitted;
+export function runSpec(spec, records, may = () => true) {
+  records = admit(records, may).admitted;
   const ctx = { records, taken: records.filter((r) => takes(spec, r)), states: F.states(records) };
   const out = Object.create(null);
   for (const [name, slot] of Object.entries(spec.fold)) out[name] = runSlot(slot, spec, ctx);

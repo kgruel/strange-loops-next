@@ -159,8 +159,9 @@
     { "where": "Envelope", "note": "checked in this order", "codes": ["kind-empty", "observer-not-typed", "emitted-not-rfc3339", "occurred-not-span", "about-not-typed", "prev-not-record-id", "under-not-record-id", "erases-not-record-id"] },
     { "where": "Writing", "note": "after the envelope", "codes": ["salt-not-16-bytes", "member-duplicate", "number-out-of-range"] },
     { "where": "Batch", "note": "labels, then writing, then prev", "codes": ["label-duplicate", "label-unknown", "label-cycle", "prev-unknown", "prev-unrelated"] },
+    { "where": "Realm", "note": "related prev, then the admission rule", "codes": ["prev-unrelated", "prev-not-permitted"] },
     { "where": "Spec", "note": "the grammar's check order", "codes": ["member-duplicate", "spec-not-object", "unknown-key", "vertex-missing", "vertex-invalid", "from-missing", "from-invalid", "fold-invalid", "fold-type", "follow-missing", "follow-invalid", "limit-invalid", "fold-argument", "where-invalid"] },
-    { "where": "Not pinned yet", "note": "named in the laws, no vector", "pinned": false, "codes": ["prev-not-permitted", "sum-overflow"] }
+    { "where": "Not pinned yet", "note": "named in the laws, no vector", "pinned": false, "codes": ["sum-overflow"] }
   ],
   "provenance": [
     { "work": "Daniel Jackson, <a href=\"https://essenceofsoftware.com\"><i>The Essence of Software</i></a>", "here": "Every noun has one purpose, its own state and an operational principle: the card's three lines." },

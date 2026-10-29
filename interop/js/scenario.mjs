@@ -21,16 +21,18 @@ export function formOf(record, shown) {
 
 // One step: forms (records already in their forms) over a parsed spec,
 // looking at one thing.
-export function step(spec, thing, forms) {
-  const r = realm(forms);
+export function step(spec, thing, forms, may = () => true, reportRefused = false) {
+  const r = realm(forms, may);
   const hs = F.states(r.admitted).get(thing) ?? [];
-  return {
+  const result = {
     settled: r.settled,
     admitted: r.admitted.map((x) => x.id),
     heads: hs.map((x) => x.id),
     winner: hs.length ? hs[0].id : null,
-    slots: runSpec(spec, settle(forms)),
+    slots: runSpec(spec, settle(forms), may),
   };
+  if (reportRefused) result.refused = r.refused;
+  return result;
 }
 
 // The lens edit: the base rendered, the edited text read back against it.

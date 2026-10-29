@@ -256,6 +256,22 @@
    "states":
    "∀ (may : Loops.Record → Loops.Record → Bool) (xs : List Loops.Record) (r : Loops.Record), Loops.refusalOf may xs r = none ↔ Loops.entitled may xs r = true",
    "module": "Laws.Things"},
+  "Loops.realm_heads_erased":
+  {"uses":
+   ["Loops.Distinct.addressed",
+    "Loops.LatestBy.Inv.heads_mem",
+    "Loops.LatestBy.inv_of",
+    "Loops.admit_distinct",
+    "Loops.realm_erased",
+    "Loops.settle_distinct"],
+   "states":
+   "∀ {may : Loops.Record → Loops.Record → Bool} {xs : List Loops.Record} {i : Nat}, (∃ e, e ∈ xs ∧ i ∈ e.erases) → ∀ {t : String} {r : Loops.Record}, r ∈ (Loops.stateIn t (Loops.realm may xs)).heads → r.id = i → r.shown = Loops.Shown.erased",
+   "module": "Laws.Things"},
+  "Loops.realm_erased":
+  {"uses": ["Loops.mem_admit", "Loops.settle_erased"],
+   "states":
+   "∀ {may : Loops.Record → Loops.Record → Bool} {xs : List Loops.Record} {i : Nat}, (∃ e, e ∈ xs ∧ i ∈ e.erases) → ∀ {r : Loops.Record}, r ∈ Loops.realm may xs → r.id = i → r.shown = Loops.Shown.erased",
+   "module": "Laws.Things"},
   "Loops.qualifier_not_slash":
   {"uses": [],
    "states": "∀ {q : Char}, Loops.isQualifier q = true → q ≠ '/'",
@@ -1261,6 +1277,11 @@
    "states":
    "∀ {j : Loops.Json} {sp : Loops.Spec}, Loops.Spec.ofJson j = Except.ok sp → Loops.Spec.ofJson sp.toJson = Except.ok sp",
    "module": "Laws.Parse"},
+  "Loops.Spec.realm_set_decides":
+  {"uses": ["Loops.settle_eq"],
+   "states":
+   "∀ (sp : Loops.Spec) (may : Loops.Record → Loops.Record → Bool) {xs ys : List Loops.Record}, Loops.Forms xs → (∀ (r : Loops.Record), r ∈ xs ↔ r ∈ ys) → sp.run (Loops.settle xs) may = sp.run (Loops.settle ys) may",
+   "module": "Laws.Spec"},
   "Loops.Spec.parsed_iff":
   {"uses": ["Loops.Spec.ofJson_fits", "Loops.Spec.ofJson_toJson"],
    "states":

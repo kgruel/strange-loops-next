@@ -124,15 +124,65 @@ keeps (`settled`, as in `realm`), what is admitted (`admitted`),
 over the admitted records (`slots`, as in `spec/run`). Every rotation of a
 step's forms must give the same.
 Write `settled` and `admitted` in ascending record-id order, by unsigned digest bytes.
+Each step holds one form per id. An order names each form exactly once.
+The format does not represent repeated delivery or several simultaneous forms of one id.
+
+`input.mayReplace` is optional. It is an array of two-item arrays: `[newRecordId, predecessorId]`.
+Both ids must name records in `input.records`. Malformed pairs and unknown ids fail decoding.
+An absent list allows every related replacement. An empty list denies every replacement of a held predecessor.
+The rule tests ids only. It does not evaluate grants, signatures, owners, or payloads.
+Admission still refuses an unrelated held predecessor, even when the pair appears in the list.
+A predecessor not held in the step cannot be judged, so it does not cause refusal.
+All held records participate in admission checks, including records that admission later refuses.
+Settlement applies erasure before admission. A held eraser still erases its targets when admission later refuses it.
+The runner passes the same rule to admission and each spec run.
+
+Only inputs with `mayReplace` add `refused` to each output step.
+This array contains `{id, code}` for each refused settled record, in ascending digest-id order.
+The codes are `prev-unrelated` and `prev-not-permitted`. Unrelated predecessors take precedence.
+Inputs without the list keep their existing output shape, including when a record is refused.
+
+`input.lens` is optional. Record-only cases omit it and `expect.lens`.
 `input.lens.base` holds base sections, and `input.lens.text` holds edited lines.
 `expect.lens` holds the rendered base, outcomes, and applied sections.
 The scenario adapter splits a head's value at each LF and keeps all parts, including empty parts.
 It leaves CR unchanged; the lens itself does not split line elements.
+The scenario checker keeps the last-two-winners relation.
+The base is the selected thing's winner before the last step. The applied document is its winner after that step.
+This check supports one keyed section. It does not support an arbitrary multi-section document.
 See [`protocol/lens.md`](../protocol/lens.md).
 
 `01-decision` is the walk the grammar page draws: two people write, fork,
 merge and erase one decision, a reader holds less, and a lens edit comes
 back as a record.
+
+### Horizon cases
+
+Each new case has a top-level `description` that names its partial claim.
+The generator checks known heads, slot values, unread counts, or refusal codes in every rotation.
+These assertions are separate from the model-derived `expect`.
+The map in [`protocol/horizons.md`](../protocol/horizons.md) lists the wider workflows and their limits.
+
+| Case | Checked partial claim and limit |
+|---|---|
+| `02-editable-lenses` | A keyed edit becomes the next head. No file write or stale-base check occurs. Unknown and absent sections remain separate `lens/section` tests. |
+| `03-lsp-context` | Revised and forked ADRs share a supplied birth key. The case performs no Git discovery. |
+| `04-web-annotation` | An annotation and a Discord thread share a supplied URL key. Admission refuses an unrelated replacement. The case does not normalize URLs. |
+| `05-context-forms` | Held and withheld heads supersede erased history. The forms do not constitute a tick or bundle. |
+| `06-selective-disclosure` | Two reader forms preserve heads. Hidden payload tests change known yes or no answers to unread. The case evaluates no disclosure policy. |
+| `07-knowledge-build` | Equal inputs and an irrelevant addition preserve slots. A relevant addition changes slots. The case checks no hashes or cache. |
+| `08-bitemporal-questions` | Both emitted and occurred tests select historical records without `follow`. A head-filter contrast shows why selection after supersession is not as-of reconstruction. |
+| `09-fuzzy-dates` | Coarse and open spans determine content order by meaning. No adapter infers dates from text. |
+| `10-cross-store-query` | A supplied union shares keys and preserves multi-thing heads. Source store labels neither fetch records nor partition them by origin. |
+| `11-store-transfer` | An owner-claim revision retains history under one thing key. An owner claim does not transfer authority. |
+| `12-file-sync` | Supplied sets combine in different orders with the same result. The format checks neither a filesystem nor repeated delivery. |
+| `13-dispute-log` | Numeric claims retain corrections and disputed heads. The accumulating sum includes history; it is not a sum of current heads. |
+| `14-stale-review` | Explicit time thresholds select heads before and after a review. The case checks no clock or scheduler. |
+| `15-contradiction-queue` | An explicit id-only rule admits successors and refuses denied or unrelated replacements. Withholding preserves these decisions. No grant evaluator runs. |
+| `16-agent-tools` | Successive supplied record sets change open and closed query results. The case checks no MCP transport. |
+| `17-agent-lens` | A spec exposes forks while a supplied keyed document edits the winner. The case does not generate a full agent document. |
+| `18-collectors` | Distinct supplied observers share one target and fold deterministically. The case checks no importer, framing, or retries. |
+| `19-erasure` | A held eraser erases here, withheld, and falsely erased targets, even when admission refuses it. Later full targets cannot restore payloads. External deletion remains outside the check. |
 
 ## `occurred`
 

@@ -34,16 +34,18 @@ const thingsOf = (r) => (r.about?.length ? r.about : [r.id]);
 
 // A record whose prev names a held record it shares no thing with is
 // refused (prev-unrelated). A prev naming a record not held is admitted: the
-// reader can't judge it. The store's rule (prev-not-permitted) is step 3's;
-// here it allows everything.
-export function admit(records) {
+// reader can't judge it. An optional rule can deny related replacements.
+// By default, the rule allows every related replacement.
+export function admit(records, may = () => true) {
   const things = new Map(records.map((r) => [r.id, thingsOf(r)]));
   const admitted = [], refused = [];
   for (const r of records) {
     const mine = thingsOf(r);
     const unrelated = (r.prev ?? []).some((p) => things.has(p) && !things.get(p).some((t) => mine.includes(t)));
     if (unrelated) refused.push({ id: r.id, code: "prev-unrelated" });
-    else admitted.push(r);
+    else if ((r.prev ?? []).some((p) => records.some((q) => q.id === p && !may(r, q)))) {
+      refused.push({ id: r.id, code: "prev-not-permitted" });
+    } else admitted.push(r);
   }
   return { admitted, refused };
 }
@@ -53,8 +55,8 @@ const shownOf = (r) => ({ id: r.id, shown: r.shown });
 // What the reader keeps (settled, as { id, shown }), what it refuses, each
 // thing's state over the rest and Sum over them; the admitted records too,
 // in full, for a spec to run over.
-export function realm(forms) {
+export function realm(forms, may = () => true) {
   const settled = settle(forms);
-  const { admitted, refused } = admit(settled);
+  const { admitted, refused } = admit(settled, may);
   return { settled: settled.map(shownOf), refused, things: F.latestBy(admitted), sum: F.sum(admitted), admitted };
 }
