@@ -4,7 +4,9 @@ Records in, folds and ticks out, lenses back to text. A rewrite from first
 principles: the product is **the protocol, its vectors and one implementation**.
 
 Step 1 is in: layer 0, the record, in the model and in a small JS
-writer that must agree with it byte for byte.
+writer that must agree with it byte for byte. The readers (folds, specs,
+realms, lenses, batches) are in the model and in JS, the JS written from the
+prose and checked against every vector.
 
 ## Layout
 
@@ -13,7 +15,7 @@ writer that must agree with it byte for byte.
 | `model/` | Lean 4: the executable model (`Loops/`), its proofs (`Laws/`), `gen`, which writes the vectors, and `proofs`, which writes the proof graph the laws page draws |
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
-| `interop/js/` | a small, independent JS writer for layer 0 |
+| `interop/js/` | a small, independent JS implementation, written from the prose: the layer 0 writer (`loops.mjs`) and the readers (`fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`) |
 | `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `build.mjs` renders all four |
 | `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/` | the pages, written by `node design/build.mjs`, never by hand |
 
@@ -28,6 +30,7 @@ cd model
 lake build --wfail          # every proof checks; a `sorry` fails the build
 lake exe gen ../vectors     # rewrite the vectors from the model
 git diff --exit-code ../vectors
+lake exe run --check ../vectors   # recompute every expect from its input alone
 lake exe proofs ../design/laws/proofs.json   # which theorems each proof uses
 lake exe boundaries ../design/laws/boundaries.json   # laws without their premises
 git diff --exit-code ../design/laws
@@ -38,7 +41,7 @@ of the model, and the proof graph of the proofs: editing any of them by hand
 fails CI. Then:
 
 ```sh
-node interop/js/check.mjs vectors   # the JS writer passes every vector
+node interop/js/check.mjs vectors   # the JS implementation passes every vector
 ```
 
 ## The design page

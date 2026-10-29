@@ -99,9 +99,12 @@ export function joinLaws(root) {
   }
 
   // Who runs each vector.
+  // A checker claiming every directory ("*") holds itself to it: check.mjs fails on a
+  // vectors/ directory no family reads, and CI runs it.
   for (const impl of data.implementations) if (impl.checker) {
     const text = readFileSync(join(root, impl.checker), "utf8");
-    for (const d of impl.dirs) if (!text.includes(`join(dir, "${d}")`)) fail(`${impl.checker} doesn't read vectors/${d}`);
+    if (impl.dirs === "*" && !text.includes("no checker reads")) fail(`${impl.checker} claims every vector but doesn't refuse an unread directory`);
+    if (impl.dirs !== "*") for (const d of impl.dirs) if (!text.includes(`join(dir, "${d}")`)) fail(`${impl.checker} doesn't read vectors/${d}`);
   }
   const runBy = (paths) => data.implementations.filter((i) => paths.some((p) => i.dirs === "*" || i.dirs.includes(p.split("/")[0])));
 

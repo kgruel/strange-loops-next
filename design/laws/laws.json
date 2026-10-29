@@ -119,7 +119,7 @@
   },
   "implementations": [
     {"name": "the model", "what": "<code>lake exe gen</code> writes every vector and checks each against its laws", "dirs": "*"},
-    {"name": "the JS writer", "what": "<code>interop/js/check.mjs</code> runs every layer 0 vector", "dirs": ["record", "occurred"], "checker": "interop/js/check.mjs"}
+    {"name": "the JS implementation", "what": "<code>interop/js/check.mjs</code> runs every vector the model writes", "dirs": "*", "checker": "interop/js/check.mjs"}
   ],
   "demos": [
     {"law": "count.perm", "vector": "fold/count/02-three", "kind": "orders", "change": "Deliver them in another order", "stays": "count"},

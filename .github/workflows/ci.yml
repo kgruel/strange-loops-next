@@ -22,6 +22,9 @@ jobs:
           lake exe gen ../vectors
           git diff --exit-code -- ../vectors
           test -z "$(git status --porcelain -- ../vectors)"
+      - name: Every vector's expect follows from its input alone
+        working-directory: model
+        run: lake exe run --check ../vectors
       - name: The proof graph is a pure render of the proofs
         working-directory: model
         run: |
@@ -42,7 +45,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: The JS writer agrees on every vector
+      - name: The JS implementation agrees on every vector
         run: node interop/js/check.mjs vectors
 
   design:

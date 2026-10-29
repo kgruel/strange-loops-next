@@ -103,7 +103,7 @@ export function renderEvidence(root) {
     `    <div class="pan"><div class="cov-scroll"><table class="cov">\n      <thead><tr><th scope="col">law</th><th scope="col">shape</th>` +
     `<th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th>` +
     `<th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th>` +
-    `<th scope="col" title="the JS writer runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
+    `<th scope="col" title="the JS implementation runs at least one of its vectors">JS</th><th scope="col">demo</th>` +
     `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div></div>\n`;
 
   // What rests on what: the laws joined by a proof, laid out when the page is built.
