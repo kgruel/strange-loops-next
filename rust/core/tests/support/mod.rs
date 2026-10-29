@@ -1,4 +1,5 @@
 //! Test-only Gen.Read fixture ingestion and Gen.OccurredVectors.utc rendering.
+pub(super) mod batch;
 pub(super) mod fold;
 pub(super) mod lens;
 mod reader;

@@ -1,4 +1,4 @@
-# Layers one through three, realm, scenario, and lens: limits and review points
+# Layers one through three, realm, scenario, batch, and lens: limits and review points
 
 This port changes no model, vector, protocol, design, or interop files.
 The implemented reader surface follows Lean except for the explicit representation boundaries below.
@@ -10,8 +10,8 @@ Layer two covers all 37 fold vectors.
 Fold selection uses only the closed where grammar and its evaluation.
 Layer three covers all 70 spec vectors, the full parser, renderer, slots, execution, and admission.
 The realm layer covers all nine realm vectors, settlement, and admission (`model/Loops/Things.lean:47–92`).
-The scenario fixture and all ten lens vectors are checked.
-Batches, the CLI, and storage service remain future work.
+The scenario fixture, all ten lens vectors, and all 11 batch vectors are checked.
+The CLI and storage service remain future work.
 
 Lean requires commuting steps through `Acc.comm` (`model/Loops/Families.lean:33–39`).
 Rust callers must supply pure steps that commute.
@@ -142,8 +142,16 @@ The Lean numeric JSON model covers integers, not general binary64 values (`model
 Record signatures and stored lines follow `model/Gen/Records.lean:41–56`.
 `vectors/standard/README.md` describes separate JCS, binary64, and SUPERCOP Ed25519 data.
 
-The possible approaches include adding binary64, converting external numbers to integers, or deferring the external suite.
-This port defers the whole standard family because Lean does not define general binary64 behavior.
+**Stopping blocker:** the external binary64 suite has no corresponding Lean value type or formatter.
+RFC 8785 defines the required behavior. Lean mentions these tests but models only integer JSON (`model/Loops/Json.lean:3–7,12–18,76–84`).
+`vectors/standard/jcs/input/values.json:2` includes `333333333.33333329`, `1E30`, and `4.50`.
+`vectors/standard/es6-numbers.txt` adds 4,000 binary64 formatting cases.
+
+The readings include extending Lean JSON, adding a separate RFC formatter, converting numbers to integers, or deferring the suite.
+Adding floats changes the model domain. Converting numbers to integers loses values.
+A separate RFC formatter needs an explicit boundary outside the Lean port.
+This run stops before making that decision and keeps `standard` on the allowlist.
+Resume after a Lean definition or explicit approval for an external-standard adapter.
 That family includes 12 JCS JSON files, `es6-numbers.txt`, and `ed25519.input.gz`.
 The crypto corpus needs separate dependency checks; its deferral does not follow from the integer restriction.
 Current record tests compare model signatures through maintained crypto dependencies.
@@ -151,13 +159,13 @@ The port claims neither full RFC 8785 coverage nor independent SUPERCOP conforma
 
 | Deferred JSON family | Files |
 | --- | ---: |
-| batch | 11 |
 | standard | 12 |
-| Total | 23 |
+| Total | 12 |
 
-The registry checks 26 record, eight occurred, 37 fold, 70 spec, nine realm, one scenario, and ten lens files: 161 of 184 recursive JSON files.
+The registry checks 26 record, eight occurred, 37 fold, 70 spec, nine realm, one scenario, ten lens, and 11 batch files.
+It checks 172 of 184 recursive JSON files.
 Spec includes 61 parse files and nine run files.
-The remaining allowlist stays `batch` and `standard`.
+The remaining allowlist contains only `standard`.
 
 ## Canonicalization before validation
 
@@ -212,3 +220,20 @@ The harness compares outcomes, not order permutations.
 Duplicate ids keep first-match lookup and first accepted bodies (`model/Loops/Lens.lean:78–80,93–101`).
 Absent outcomes do not change the base (`model/Laws/Lens.lean:282–284`).
 Unknown outcomes also do not change the base (`model/Loops/Lens.lean:93–101`).
+
+## Batch behavior and proof premises
+
+`Meaning.unique` requires `Acyclic` and two `Meaning` proofs (`model/Laws/Batch.lean:37–44`).
+The port does not enforce these premises or claim unique meanings for arbitrary drafts.
+Resolution uses the previous round mapping and the first matching label.
+It preserves mapping order, duplicate entries, raw label text, and draft order.
+Only about and prev contain substituted labels.
+The writer and hash use raw text references; the reader `Digest` type does not constrain them.
+The batch fixture reader accepts arbitrary held id text and uses the first held match.
+It checks fixture shape before writer validation and preserves duplicate payload members and unbounded integers.
+
+Batch refusal order is label-duplicate, label-unknown, label-cycle, global writer rank, prev-unknown, then prev-unrelated.
+Global writer rank is kind-empty, observer-not-typed, emitted-not-rfc3339, occurred-not-span, about-not-typed, prev-not-record-id, and under-not-record-id.
+It continues with erases-not-record-id, salt-not-16-bytes, member-duplicate, and number-out-of-range.
+The rank applies across all drafts, not only the first invalid draft.
+Batch targets precede held targets; each lookup takes its first match.

@@ -1,7 +1,8 @@
-//! Record, fold, spec, realm, and lens execution from model/Loops.
+//! Record, fold, spec, realm, batch, and lens execution from model/Loops.
 //! Lean definitions are authoritative; see ../PORTING.md for representation choices.
 
 pub mod base32;
+pub mod batch;
 pub mod envelope;
 pub mod families;
 pub mod fold;

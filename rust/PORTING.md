@@ -1,9 +1,9 @@
-# Layers one through three, realm, scenario, and lens: Lean to Rust
+# Layers one through three, realm, scenario, batch, and lens: Lean to Rust
 
 Lean defines the behavior of this port.
-The port implements record primitives, fold families, per-thing state, specs, settlement, and admission.
-It checks ten lens, one scenario, nine realm, 70 spec, 37 fold, and 34 record and occurred vectors.
-Batches, the CLI, and storage service remain future work.
+The port implements record primitives, fold families, per-thing state, specs, settlement, admission, batches, and lenses.
+It checks 11 batch, ten lens, one scenario, nine realm, 70 spec, 37 fold, and 34 record and occurred vectors.
+The CLI and storage service remain future work.
 
 Layer two uses the closed where types, parser, and evaluation from layer three.
 Fold selection calls `parseWhere` and `Cond.all` directly (`model/Gen/Run.lean:112–122`).
@@ -17,6 +17,10 @@ Paths below start at the repository root. Public Rust docs also identify their L
 
 | Lean definition and source | Rust API |
 | --- | --- |
+| Draft, Draft.refs, Draft.commit, Draft.ready; model/Loops/Batch.lean | batch::Draft; Draft::{refs, commit, ready} |
+| isLabel, subst, substEnv, resolveRounds; model/Loops/Batch.lean | batch::{is_label, subst, subst_env, resolve_rounds} |
+| envThings, checkPrev, resolveBatch; model/Loops/Batch.lean | batch::{env_things, check_prev, resolve_batch} |
+| resolveBatch and checkPrev refusal strings; model/Loops/Batch.lean | batch::Error; Error::code |
 | Json, canon, keysDistinct, inRange; model/Loops/Json.lean:12–132 | json::{Json, str_cmp, canon_set, quote}; Json::{canon, keys_distinct, in_range} |
 | base32; model/Loops/Base32.lean:13 | base32::base32 |
 | Moment, instant?, validEmitted; model/Loops/Time.lean:32–79 | time::{Moment, instant, valid_emitted} |
@@ -232,6 +236,7 @@ Checks include public keys, signatures, both wire lines, and occurred ordering.
 | vectors/scenario: one | Same registry and tests/support/scenario.rs; all steps and arrival orders |
 | vectors/realm: nine | Same registry and tests/support/realm.rs; every rotation and complete settled, refused, things, and sum fields |
 | vectors/lens: ten | Same registry and tests/support/lens.rs; complete answers and refusal |
+| vectors/batch: 11 | Same registry and tests/support/batch.rs; complete records or refusal |
 
 The test reader follows `Gen.Read.record`, `recordId`, and `fieldsOf` (`model/Gen/Read.lean:238–248,286–331`).
 It requires payload fields for `Here` and refuses payload fields on hidden forms.
@@ -259,13 +264,16 @@ Two realm harness tests check strict input shapes, empty forms, every rotation, 
 The registry test also checks vector accounting.
 Three lens tests check law premises, counterexamples, first matches, and arbitrary character lists.
 Two lens harness tests check strict shapes, repeated keys, refusal, and empty documents.
-The suite runs 71 tests. Eleven shared helper tests run in each of two integration test binaries.
+The batch core tests cover raw mappings, lookup order, unbounded fuel, refusal rank, and input order.
+The batch reader tests cover strict shapes, canonical base32, raw duplicates, unbounded integers, optional fields, and first held lookup.
+The reader shares one canonical base32 decoder for salts and digests.
+The suite runs 92 test executions. Fifteen shared helper tests run in each of two integration test binaries.
 
-The registry accounts for 184 recursive JSON files: 161 checked and 23 explicitly deferred.
-The remaining allowlist stays `batch` and `standard`.
+The registry accounts for 184 recursive JSON files: 172 checked and 12 explicitly deferred.
+The remaining allowlist contains only `standard`.
 Layer two removes `fold` from the earlier allowlist. Layer three removes `spec`.
 The realm layer removes `realm`. The scenario layer removes `scenario`.
-The lens layer removes `lens`.
+The lens layer removes `lens`. The batch layer removes `batch`.
 Unknown families, root JSON, missing or stale registrations, count changes, and files outside accounted families fail.
 `GAPS.md` explains each deferred family and the external standard limits.
 
@@ -290,3 +298,20 @@ The no-op law requires unique base ids (`model/Laws/Lens.lean:143–144`).
 The put-get law also requires equal ordered ids (`model/Laws/Lens.lean:250–252`).
 Absent outcomes do not change the base (`model/Laws/Lens.lean:282–284`).
 Unknown outcomes also do not change it (`model/Loops/Lens.lean:93–101`).
+
+## Batch behavior and proof premises
+
+`Meaning.unique` requires `Acyclic` and two `Meaning` proofs (`model/Laws/Batch.lean:37–44`).
+The port does not enforce these premises or claim unique meanings for arbitrary drafts.
+Resolution uses the previous round mapping and the first matching label.
+It preserves mapping order, duplicate entries, raw label text, and draft order.
+Only about and prev contain substituted labels.
+The writer and hash use raw text references; the reader `Digest` type does not constrain them.
+The batch fixture reader accepts arbitrary held id text and uses the first held match.
+It checks fixture shape before writer validation and preserves duplicate payload members and unbounded integers.
+
+Batch refusal order is label-duplicate, label-unknown, label-cycle, global writer rank, prev-unknown, then prev-unrelated.
+Global writer rank is kind-empty, observer-not-typed, emitted-not-rfc3339, occurred-not-span, about-not-typed, prev-not-record-id, and under-not-record-id.
+It continues with erases-not-record-id, salt-not-16-bytes, member-duplicate, and number-out-of-range.
+The rank applies across all drafts, not only the first invalid draft.
+Batch targets precede held targets; each lookup takes its first match.

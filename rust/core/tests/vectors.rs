@@ -1,4 +1,4 @@
-//! Record, occurred, fold, spec, realm, scenario, and lens vectors from model/Gen.
+//! Record, occurred, fold, spec, realm, scenario, batch, and lens vectors from model/Gen.
 
 mod support;
 
@@ -19,10 +19,11 @@ const IMPLEMENTED: &[(&str, usize)] = &[
     ("realm", 9),
     ("scenario", 1),
     ("lens", 10),
+    ("batch", 11),
 ];
 // Shrink only. Standard includes external non-integer JCS and crypto fixtures;
 // it is not claimed as Lean integer-JSON conformance by this layer.
-const REMAINING: &[&str] = &["batch", "standard"];
+const REMAINING: &[&str] = &["standard"];
 
 fn json_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -218,7 +219,7 @@ fn every_registered_vector_and_every_expect() {
                 };
                 if matches!(
                     family.as_str(),
-                    "fold" | "spec" | "realm" | "scenario" | "lens"
+                    "fold" | "spec" | "realm" | "scenario" | "lens" | "batch"
                 ) {
                     let dispatch = match family.as_str() {
                         "fold" => support::fold::answers,
@@ -226,6 +227,7 @@ fn every_registered_vector_and_every_expect() {
                         "realm" => support::realm::answers,
                         "scenario" => support::scenario::answers,
                         "lens" => support::lens::answers,
+                        "batch" => support::batch::answers,
                         _ => unreachable!("raw checker family"),
                     };
                     let answers = dispatch(layer, member(&raw, "input"))
@@ -264,7 +266,7 @@ fn every_registered_vector_and_every_expect() {
     for family in REMAINING {
         assert!(seen.iter().any(|s| s == family), "stale allowlist {family}");
     }
-    assert_eq!(checked, 161);
+    assert_eq!(checked, 172);
     assert_eq!(checked + deferred, 184);
     assert_eq!(
         checked + deferred,

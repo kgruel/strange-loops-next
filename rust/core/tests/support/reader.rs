@@ -37,7 +37,7 @@ pub(super) fn required<'a>(
 ) -> Result<&'a Json, String> {
     optional(kvs, name).ok_or_else(|| format!("{path}: missing {name}"))
 }
-fn optional<'a>(kvs: &'a [(String, Json)], name: &str) -> Option<&'a Json> {
+pub(super) fn optional<'a>(kvs: &'a [(String, Json)], name: &str) -> Option<&'a Json> {
     kvs.iter().find(|(k, _)| k == name).map(|(_, v)| v)
 }
 /// Gen.Read.list (model/Gen/Read.lean), strict array shape.
@@ -66,15 +66,12 @@ pub(super) fn texts(path: &str, j: &Json) -> Result<Vec<String>, String> {
         .map(|(i, j)| text(&format!("{path}[{i}]"), j).map(str::to_owned))
         .collect()
 }
-pub(super) fn reader_id(path: &str, j: &Json) -> Result<Digest, String> {
-    let s = text(path, j)?;
-    if !envelope::record_id(s) {
-        return Err(format!("{path}: expected record id"));
-    }
+/// Gen.Read.unbase32 (model/Gen/Read.lean), canonical lowercase byte spelling.
+fn unbase32(path: &str, s: &str) -> Result<Vec<u8>, String> {
     let mut acc = 0_u32;
     let mut bits = 0;
     let mut bytes = Vec::new();
-    for c in s[2..].bytes() {
+    for c in s.bytes() {
         let digit = b"abcdefghijklmnopqrstuvwxyz234567"
             .iter()
             .position(|b| *b == c)
@@ -87,9 +84,21 @@ pub(super) fn reader_id(path: &str, j: &Json) -> Result<Digest, String> {
         }
         acc &= (1 << bits) - 1;
     }
-    if bytes.len() != 32 || base32::base32(&bytes) != s[2..] {
-        return Err(format!("{path}: noncanonical base32 digest"));
+    if base32::base32(&bytes) != s {
+        return Err(format!("{path}: noncanonical base32"));
     }
+    Ok(bytes)
+}
+/// Gen.Read.bytes (model/Gen/Read.lean), strict text and canonical byte decoding.
+pub(super) fn bytes(path: &str, j: &Json) -> Result<Vec<u8>, String> {
+    unbase32(path, text(path, j)?)
+}
+pub(super) fn reader_id(path: &str, j: &Json) -> Result<Digest, String> {
+    let s = text(path, j)?;
+    if !envelope::record_id(s) {
+        return Err(format!("{path}: expected record id"));
+    }
+    let bytes = unbase32(path, &s[2..])?;
     let digest = Digest::try_from(bytes.as_slice()).map_err(|e| format!("{path}: {e}"))?;
     if id_text(&digest) != s {
         return Err(format!("{path}: id does not round trip"));
