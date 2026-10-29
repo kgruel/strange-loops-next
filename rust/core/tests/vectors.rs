@@ -1,4 +1,4 @@
-//! Record, occurred, fold, and spec vectors from model/Gen.
+//! Record, occurred, fold, spec, and realm vectors from model/Gen.
 
 mod support;
 
@@ -11,11 +11,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
-const IMPLEMENTED: &[(&str, usize)] =
-    &[("record", 26), ("occurred", 8), ("fold", 37), ("spec", 70)];
+const IMPLEMENTED: &[(&str, usize)] = &[
+    ("record", 26),
+    ("occurred", 8),
+    ("fold", 37),
+    ("spec", 70),
+    ("realm", 9),
+];
 // Shrink only. Standard includes external non-integer JCS and crypto fixtures;
 // it is not claimed as Lean integer-JSON conformance by this layer.
-const REMAINING: &[&str] = &["realm", "scenario", "batch", "lens", "standard"];
+const REMAINING: &[&str] = &["scenario", "batch", "lens", "standard"];
 
 fn json_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -209,11 +214,12 @@ fn every_registered_vector_and_every_expect() {
                 let Json::Str(layer) = member(&raw, "layer") else {
                     panic!("vector layer text");
                 };
-                if family == "fold" || family == "spec" {
-                    let dispatch = if family == "fold" {
-                        support::fold::answers
-                    } else {
-                        support::spec::answers
+                if matches!(family.as_str(), "fold" | "spec" | "realm") {
+                    let dispatch = match family.as_str() {
+                        "fold" => support::fold::answers,
+                        "spec" => support::spec::answers,
+                        "realm" => support::realm::answers,
+                        _ => unreachable!("raw checker family"),
                     };
                     let answers = dispatch(layer, member(&raw, "input"))
                         .unwrap_or_else(|e| panic!("{file:?}: {e}"));
@@ -251,7 +257,7 @@ fn every_registered_vector_and_every_expect() {
     for family in REMAINING {
         assert!(seen.iter().any(|s| s == family), "stale allowlist {family}");
     }
-    assert_eq!(checked, 141);
+    assert_eq!(checked, 150);
     assert_eq!(checked + deferred, 184);
     assert_eq!(
         checked + deferred,

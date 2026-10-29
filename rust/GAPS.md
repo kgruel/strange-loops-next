@@ -1,4 +1,4 @@
-# Layers one through three: limits and review points
+# Layers one through three and realm: limits and review points
 
 This port changes no model, vector, protocol, design, or interop files.
 The implemented reader surface follows Lean except for the explicit representation boundaries below.
@@ -9,9 +9,8 @@ These notes identify review points. They do not propose new laws.
 Layer two covers all 37 fold vectors.
 Fold selection uses only the closed where grammar and its evaluation.
 Layer three covers all 70 spec vectors, the full parser, renderer, slots, execution, and admission.
-Realm settlement remains outside this layer.
-The deferred functions are `baseForm`, `pick`, `settle`, and `realm` (`model/Loops/Things.lean:53–65,91–92`).
-Batches, lenses, the CLI, and storage service also remain future work.
+The realm layer covers all nine realm vectors, settlement, and admission (`model/Loops/Things.lean:47–92`).
+Scenarios, batches, lenses, the CLI, and storage service remain future work.
 
 Lean requires commuting steps through `Acc.comm` (`model/Loops/Families.lean:33–39`).
 Rust callers must supply pure steps that commute.
@@ -64,6 +63,29 @@ Latest-by counts distinct unknown ids across things. Collect counts unknown raw 
 A hidden head with no payload tests can be a known match.
 The collect limit applies to known matches, not unknown counts or readable records alone.
 Large limits take every match without truncating to machine width.
+
+## Realm premises and raw forms
+
+`Forms` requires equal envelopes for equal ids and equal records for two `Here` forms (`model/Loops/Things.lean:67–70`).
+The `settle_eq` order and repeat law requires `Forms` (`model/Laws/Things.lean:124–125`).
+The port does not check that premise or reject conflicting forms.
+`base_form` keeps the first `Here` form, or withholds the first form when none is `Here`.
+Outside `Forms`, input order can therefore change the chosen envelope or payload.
+A hidden form with unchecked payload fields loses those fields through `Record::withhold`.
+An erased form alone becomes withheld without an original erasure link.
+
+Erasure reads all original forms, including discarded forms and records that admission later refuses.
+The eraser's kind and visibility do not affect erasure (`model/Loops/Things.lean:49–61`).
+Erasure does not add absent ids. Settlement returns held ids in sorted digest order.
+`settle_distinct` and `settle_erased` need no `Forms` premise (`model/Laws/Things.lean:137–146`).
+`realm` settles before admission. It does not admit forms before checking erasure.
+
+`refusal_of` reports unrelated predecessors before denied permission across the whole list (`model/Loops/Things.lean:82–85`).
+The typed enum retains both exact codes through `Display` and implements `Error`.
+This check includes every held matching form. Missing predecessors pass.
+Admission view laws require `EnvOnly` (`model/Laws/Things.lean:255–277`).
+Raw functions still accept closures outside that premise, including rules that inspect settled payload visibility.
+These functions add no unconditional order or view law.
 
 ## Digest ids
 
@@ -128,16 +150,15 @@ The port claims neither full RFC 8785 coverage nor independent SUPERCOP conforma
 
 | Deferred JSON family | Files |
 | --- | ---: |
-| realm | 9 |
 | scenario | 1 |
 | batch | 11 |
 | lens | 10 |
 | standard | 12 |
-| Total | 43 |
+| Total | 34 |
 
-The registry checks 26 record, eight occurred, 37 fold, and 70 spec files: 141 of 184 recursive JSON files.
+The registry checks 26 record, eight occurred, 37 fold, 70 spec, and nine realm files: 150 of 184 recursive JSON files.
 Spec includes 61 parse files and nine run files.
-The remaining allowlist stays `realm`, `scenario`, `batch`, `lens`, and `standard`.
+The remaining allowlist stays `scenario`, `batch`, `lens`, and `standard`.
 
 ## Canonicalization before validation
 

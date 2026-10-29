@@ -1,14 +1,15 @@
-# Layers one through three: Lean to Rust
+# Layers one through three and realm: Lean to Rust
 
 Lean defines the behavior of this port.
-The port implements record primitives, fold families, per-thing state, specs, and admission.
-It checks 70 spec vectors, 37 fold vectors, and 34 record and occurred vectors.
-Realm settlement, batches, lenses, the CLI, and storage service remain future work.
+The port implements record primitives, fold families, per-thing state, specs, settlement, and admission.
+It checks nine realm vectors, 70 spec vectors, 37 fold vectors, and 34 record and occurred vectors.
+Scenarios, batches, lenses, the CLI, and storage service remain future work.
 
 Layer two uses the closed where types, parser, and evaluation from layer three.
 Fold selection calls `parseWhere` and `Cond.all` directly (`model/Gen/Run.lean:112–122`).
 It does not call the full spec parser or runner.
 Layer three adds the full spec parser, renderer, and runner.
+The realm layer adds settlement before admission.
 
 ## API mapping
 
@@ -38,7 +39,8 @@ Paths below start at the repository root. Public Rust docs also identify their L
 | Record.unlinked, newestFirst, limitTo, shownIds; model/Loops/Spec.lean:247–257 | Record::unlinked; spec::{newest_first, limit_to, shown_ids} |
 | chosen, payTest, latestOf, collectOf, Slot.run; model/Loops/Spec.lean:260–296 | spec::{chosen, pay_test, latest_of, collect_of}; Slot::run |
 | Source, Spec, takes, select, run; model/Loops/Spec.lean:301–328 | spec::{Source, Spec}; Source::takes; Spec::{takes, select, run, run_with} |
-| idsOf, entitled, admit; model/Loops/Things.lean:47,78–88 | things::{ids_of, entitled, admit}; no settlement |
+| idsOf, erasedIn, baseForm, pick, settle; model/Loops/Things.lean:47–65 | things::{ids_of, erased_in, base_form, pick, settle} |
+| entitled, refusalOf, admit, realm; model/Loops/Things.lean:78–92 | things::{entitled, refusal_of, Refusal, admit, realm}; typed refusal codes |
 | memberPath, parser keys and helpers; model/Loops/Spec.lean:376–378,398–500,524–538 | spec::{member_path, FOLD_TYPES, SLOT_KEYS, SOURCE_KEYS, SPEC_KEYS}; matching snake-case parser helpers |
 | Json.repeatAt/repeatIn/repeatMember, Spec.ofObject/ofJson; model/Loops/Spec.lean:507–555 | Json::repeat_at; Spec::{of_object, of_json} |
 | Val/Arg/Op/Tests/Slot/Source/Spec.toJson; model/Loops/Spec.lean:559–605 | Val/Arg/Op/Tests/Slot/Source/Spec::to_json |
@@ -183,6 +185,29 @@ Collect counts unknown raw heads before the limit.
 Its limit applies only to known matches, including hidden heads when no payload tests exist.
 Numeric slots use `Cond.all` and `Acc.select`; they do not add settlement or duplicate removal.
 
+## Realm settlement and refusals
+
+`base_form` keeps the first `Here` form. If none exists, it withholds the first form.
+This fallback clears payload fields, even on unchecked hidden forms.
+`pick` filters forms by id before choosing the base form.
+Erasure checks every original form's links, regardless of kind, visibility, chosen form, or later admission.
+Erasure does not create a record for an absent id.
+`settle` uses the existing sorted ids and record transformations.
+`realm` settles first, then admits against the whole settled list.
+
+`Forms` requires equal envelopes for equal ids and equal records when both forms are `Here` (`model/Loops/Things.lean:67–70`).
+`settle_eq` requires this premise (`model/Laws/Things.lean:124–125`).
+Unchecked conflicting forms keep their first `Here` payload, or the first envelope when none is `Here`.
+The port adds no validation for `Forms`.
+`settle_distinct` and `settle_erased` do not require `Forms` (`model/Laws/Things.lean:137–146`).
+Admission under views requires a pure `EnvOnly` rule (`model/Laws/Things.lean:255–277`).
+
+`refusal_of` checks every link for unrelated predecessors before it checks permission.
+`things::Refusal` has two variants and implements `Display` and `Error`.
+Its display text retains `prev-unrelated` and `prev-not-permitted`.
+Missing predecessors pass. Every held form with a matching id participates.
+`refusalOf_none` relates no refusal to entitlement (`model/Laws/Things.lean:203–205`).
+
 ## Hashes and signatures
 
 Hash functions remain supplied byte-to-byte functions, as `Stored.Hash` specifies.
@@ -203,13 +228,14 @@ Checks include public keys, signatures, both wire lines, and occurred ordering.
 | vectors/fold/count: three; sum: three; extrema: four; latest: four | Same registry and tests/support/fold.rs; raw primitive folds |
 | vectors/fold/latest-by: 13; heads: three; view: four; select: three | Same registry; per_thing, max_heads, limit, Cond.all, and Acc.select |
 | vectors/spec/parse: 61; run: nine | Same registry and tests/support/spec.rs; every refusal, parsed result, and arrival order |
+| vectors/realm: nine | Same registry and tests/support/realm.rs; every rotation and complete settled, refused, things, and sum fields |
 
 The test reader follows `Gen.Read.record`, `recordId`, and `fieldsOf` (`model/Gen/Read.lean:238–248,286–331`).
 It requires payload fields for `Here` and refuses payload fields on hidden forms.
 It preserves exact defaults and ordered fields, decodes canonical 32-byte ids, and applies no writer-only kind or reference checks.
 The serde reader captures integer text before parsing `Int` and refuses fractions and exponent notation.
 Objects keep member order and repeats, including `payload_text`.
-Fold and spec answers and expectations remain integer JSON without a floating-point conversion.
+Fold, spec, and realm answers and expectations remain integer JSON without a floating-point conversion.
 Spec inputs reach core JSON before any serde value conversion.
 The harness uses raw `spec_text` when supplied, so repeated names reach the spec parser.
 Each successful parse also passes a parse-render-parse equality check.
@@ -225,16 +251,19 @@ Three fold harness tests check strict fixture shapes, unbounded input and answer
 One spec harness test checks unknown layers, strict input shapes, missing fields, and missing arrival orders.
 Nine spec tests check refusal precedence, lower parser domains, roundtrips, admission, supersession, hidden heads, raw repeats, and unbounded numbers.
 They also check empty-key paths, hidden duplicate metadata, original-input admission, and distinct unknown ids across things.
+Eight realm tests cover first-form choices, raw conflicting forms, erasure before admission, sorted ids, absent targets, duplicate predecessors, and refusal precedence.
+Two realm harness tests check strict input shapes, empty forms, every rotation, and unbounded answers.
 The registry test also checks vector accounting.
-The suite runs 47 tests. Six shared helper tests run in each of two integration test binaries.
+The suite runs 59 tests. Eight shared helper tests run in each of two integration test binaries.
 
-The registry accounts for 184 recursive JSON files: 141 checked and 43 explicitly deferred.
-The remaining allowlist stays `realm`, `scenario`, `batch`, `lens`, and `standard`.
+The registry accounts for 184 recursive JSON files: 150 checked and 34 explicitly deferred.
+The remaining allowlist stays `scenario`, `batch`, `lens`, and `standard`.
 Layer two removes `fold` from the earlier allowlist. Layer three removes `spec`.
+The realm layer removes `realm`.
 Unknown families, root JSON, missing or stale registrations, count changes, and files outside accounted families fail.
 `GAPS.md` explains each deferred family and the external standard limits.
 
-The local checks use `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, and `cargo doc --no-deps`.
+The local checks use `cargo fmt --check`, `cargo clippy --all-targets --all-features -- -D warnings`, `cargo test`, and `cargo doc --no-deps`.
 `git diff --check` also checks whitespace.
 CI runs formatting, Clippy, and tests.
 Compiler checks and the vector registry provide evidence; an empty LSP cache does not prove correctness.

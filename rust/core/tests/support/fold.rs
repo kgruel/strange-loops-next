@@ -9,7 +9,7 @@ use loops::{
     things::per_thing,
     where_::{Cond, parse_where},
 };
-fn integer(i: impl std::fmt::Display) -> Json {
+pub(super) fn integer(i: impl std::fmt::Display) -> Json {
     Json::Int(i.to_string().parse().expect("unbounded integer result"))
 }
 fn object(kvs: Vec<(&str, Json)>) -> Json {
@@ -33,6 +33,24 @@ fn winner(s: &LatestBy) -> Json {
 fn latest(s: &LatestBy) -> Json {
     object(vec![("winner", winner(s)), ("others", ids(s.others()))])
 }
+/// Gen.Encode.jPerThing (model/Gen/Encode.lean), complete per-thing fold state.
+pub(super) fn thing_states(xs: &[Record]) -> Json {
+    Json::Obj(
+        per_thing(xs)
+            .into_iter()
+            .map(|(thing, s)| {
+                (
+                    thing,
+                    object(vec![
+                        ("heads", ids(&s.heads)),
+                        ("winner", winner(&s)),
+                        ("others", ids(s.others())),
+                    ]),
+                )
+            })
+            .collect(),
+    )
+}
 fn one(layer: &str, xs: &[Record], cs: &[Cond]) -> Result<Json, String> {
     Ok(match layer {
         "fold/count" => integer(fold::count_fold(0_u64.into(), xs)),
@@ -42,21 +60,7 @@ fn one(layer: &str, xs: &[Record], cs: &[Cond]) -> Result<Json, String> {
             ("max", optional_int(fold::max_fold(None, xs))),
         ]),
         "fold/latest" => latest(&fold::latest_fold(xs)),
-        "fold/latest-by" => Json::Obj(
-            per_thing(xs)
-                .into_iter()
-                .map(|(thing, s)| {
-                    (
-                        thing,
-                        object(vec![
-                            ("heads", ids(&s.heads)),
-                            ("winner", winner(&s)),
-                            ("others", ids(s.others())),
-                        ]),
-                    )
-                })
-                .collect(),
-        ),
+        "fold/latest-by" => thing_states(xs),
         "fold/heads" => families::over_heads(
             |s| {
                 object(vec![

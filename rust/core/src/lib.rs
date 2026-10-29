@@ -1,4 +1,4 @@
-//! Record, fold, and spec execution from model/Loops, with admission but no realm settlement.
+//! Record, fold, spec, and realm execution from model/Loops.
 //! Lean definitions are authoritative; see ../PORTING.md for representation choices.
 
 pub mod base32;
