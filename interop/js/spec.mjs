@@ -3,7 +3,7 @@
 // over records per protocol/laws.md, reusing the folds and where-tests.
 // Written from protocol/ and vectors/README.md. No dependencies.
 
-import { occurredSpan, problem } from "./loops.mjs";
+import { occurredSpan, problem } from "./record.mjs";
 import { answer, held, YES, UNKNOWN } from "./where.mjs";
 import * as F from "./fold.mjs";
 import { admit } from "./realm.mjs";
@@ -84,7 +84,7 @@ export function repeatAt(n, path = []) {
   return null;
 }
 
-// What layer 0 accepts in a field, asked of loops.mjs's own envelope check
+// What layer 0 accepts in a field, asked of the shared envelope check
 // (an envelope valid but for that one field) so the two can't drift apart.
 const VALID = { kind: "k", observer: "x:y", emitted: "1970-01-01T00:00:00Z" };
 const text = (v) => typeof v === "string" && v !== "";

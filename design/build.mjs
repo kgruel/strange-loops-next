@@ -1,4 +1,4 @@
-// Build the design pages: design/rethink/, design/grammar/, design/laws/ and design/evidence/.
+// Build the design pages: rethink, grammar, laws, evidence, and workbench.
 //
 //   node design/build.mjs                    writes out/<page>/index.html for each
 //   node design/build.mjs --fragment <file>  writes the rethink page as the claude.ai artifact takes it
@@ -15,6 +15,7 @@ import { renderEvidence } from "./evidence/render.mjs";
 import { renderGrammar } from "./grammar/render.mjs";
 import { fill } from "./page.mjs";
 import { renderLaws } from "./laws/render.mjs";
+import { renderWorkbench } from "./workbench/render.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const src = join(root, "design", "rethink");
@@ -75,15 +76,22 @@ const outputs = at >= 0
   : [[join(root, "out", "rethink", "index.html"), full],
      [join(root, "out", "grammar", "index.html"), renderGrammar(root)],
      [join(root, "out", "laws", "index.html"), renderLaws(root)],
-     [join(root, "out", "evidence", "index.html"), renderEvidence(root)]];
+     [join(root, "out", "evidence", "index.html"), renderEvidence(root)],
+     [join(root, "out", "workbench", "index.html"), renderWorkbench(root)]];
 // The pages link to places on each other: a law's sentence, its evidence, a demo. Every such
 // link, ../<page>/#<id>, must land on an id that page has. The grammar page also carries law
 // anchors as data for its walk, which links them to the laws page when it runs.
 if (at < 0) {
   const pages = new Map(outputs.map(([file, text]) => [basename(dirname(file)), text]));
   const ids = new Map([...pages].map(([p, text]) => [p, new Set([...text.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]))]));
+  const workbench = JSON.parse(pages.get("workbench").match(/<script type="application\/json" id="workbench-data">([\s\S]*?)<\/script>/)[1]);
+  const presets = new Set(workbench.presets.map((p) => p.path));
   for (const [p, text] of pages) {
+    for (const m of text.matchAll(/href="\.\.\/workbench\/#preset=([^"]+)"/g)) {
+      if (!presets.has(decodeURIComponent(m[1]))) throw new Error(`${p}: no workbench preset ${m[1]}`);
+    }
     const links = [...text.matchAll(/href="\.\.\/([a-z]+)\/#([a-z0-9-]+)"/g)].map((m) => [m[1], m[2]]);
+    if (p === "workbench") links.push(...Object.values(workbench.lawAt).flatMap((id) => [["laws", id], ["evidence", id]]));
     if (p === "grammar") links.push(...[...text.matchAll(/"(law-[a-z0-9-]+)"/g)].map((m) => ["laws", m[1]]));
     const lost = [...new Set(links.filter(([q, id]) => !ids.get(q)?.has(id)).map(([q, id]) => `../${q}/#${id}`))];
     if (lost.length) throw new Error(`${p} links to places no page has: ${lost.slice(0, 5).join(", ")}${lost.length > 5 ? `, and ${lost.length - 5} more` : ""}`);

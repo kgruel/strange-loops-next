@@ -1,0 +1,128 @@
+<!-- build:header -->
+<main class="workbench">
+  <section class="wrap intro" aria-labelledby="workbench-title">
+    <p class="eyebrow">A working draft · browser only</p>
+    <h1 id="workbench-title">Build a scenario.</h1>
+    <p class="lede">Change what a reader holds. Compare arrival orders. See the fold and the lens answer.</p>
+    <p class="scope">These are fixture records, not signed layer-0 records. Changing a payload does not rehash its id.</p>
+    <div class="sheet preset-sheet">
+      <label for="preset">Start from a vector</label>
+      <select id="preset"></select>
+      <p id="description"></p>
+      <p class="hint" id="fixture-meta"></p>
+      <div id="law-links" class="law-links"></div>
+    </div>
+    <p id="draft-status" class="status" role="status" aria-live="polite"></p>
+    <p id="draft-error" class="error" role="alert" hidden></p>
+    <p id="url-error" class="error" role="alert" hidden></p>
+    <noscript><p class="scope">Enable JavaScript to edit and run scenarios. The grammar and laws pages also have static examples.</p></noscript>
+  </section>
+
+  <section class="wrap block" id="edit" aria-labelledby="edit-title">
+    <div class="side">
+      <p class="eyebrow">01 / Input</p>
+      <h2 id="edit-title">What does the reader hold?</h2>
+      <p>Things are strings in <code>about</code>. A step supplies forms of the records and their arrival orders.</p>
+      <p>Changes keep the stored <code>expect</code> as a baseline. The app never replaces it with a live answer.</p>
+      <p class="hint">Common fields apply when you leave the field. JSON panels run after a short pause.</p>
+    </div>
+    <div class="stack">
+      <fieldset id="structured-edit" class="bare stack">
+        <div class="sheet stack">
+          <label for="thing">Thing whose heads to show</label>
+          <input id="thing" list="things" type="text" autocomplete="off">
+          <datalist id="things"></datalist>
+          <div class="toolbar"><h3>Records</h3><button id="add-record" type="button">Add record</button><button id="remove-record" type="button">Remove record</button></div>
+          <label for="record-select">Edit one record</label>
+          <select id="record-select"></select>
+          <p class="hint">Letters identify records in this draft. Full ids stay in JSON and each record's details.</p>
+          <div id="record-editor"></div>
+        </div>
+        <div class="sheet stack">
+          <div class="toolbar"><h3>Steps</h3><button id="add-step" type="button">Add step</button><button id="remove-step" type="button">Remove step</button></div>
+          <label for="step-select">Edit one step</label>
+          <select id="step-select"></select>
+          <label for="step-name">Step name</label><input id="step-name" type="text">
+          <h3>Forms in this step</h3>
+          <p class="hint">Choose absent to leave a record out. Membership changes keep each order a permutation.</p>
+          <div id="forms-editor" class="forms-editor"></div>
+          <label for="orders">Arrival orders · JSON arrays of full record ids</label>
+          <textarea id="orders" class="json-editor" rows="7" spellcheck="false" data-json="orders"></textarea>
+          <button id="reverse-order" type="button">Add reverse order</button>
+        </div>
+        <div class="sheet stack">
+          <h3>Spec</h3>
+          <label for="vertex">Vertex</label><input id="vertex" type="text">
+          <button id="spec-template" type="button">Use count + current template</button>
+          <p class="hint">The template replaces the full spec. It reads every kind from the supplied records.</p>
+          <details><summary>Advanced spec · JSON</summary><label for="spec-json" class="sr">Full spec JSON</label><textarea id="spec-json" class="json-editor" data-json="spec" rows="14" spellcheck="false"></textarea></details>
+          <details><summary>Replacement permission · JSON</summary><p class="hint">An absent list allows related replacements. An empty list denies held predecessors. Use null to omit the list.</p><label for="may-replace" class="sr">mayReplace pairs or null</label><textarea id="may-replace" class="json-editor" data-json="mayReplace" rows="6" spellcheck="false"></textarea></details>
+        </div>
+        <div class="sheet stack">
+          <label class="check"><input id="lens-enabled" type="checkbox"> Include a lens edit</label>
+          <p class="hint">This runs the lens over supplied sections. It does not write files or emit a record.</p>
+          <div id="lens-editor" class="stack" hidden>
+            <label for="lens-base">Base sections · JSON</label>
+            <textarea id="lens-base" class="json-editor" data-json="lensBase" rows="7" spellcheck="false"></textarea>
+            <label for="lens-text">Edited lens text</label>
+            <textarea id="lens-text" rows="8" spellcheck="false"></textarea>
+          </div>
+        </div>
+      </fieldset>
+      <details class="sheet raw-panel"><summary>Full vector · raw JSON</summary>
+        <p class="hint">This includes metadata, input, and the stored baseline expect. You can edit all of them.</p>
+        <label for="raw" class="sr">Full vector JSON</label>
+        <textarea id="raw" rows="22" spellcheck="false"></textarea>
+        <button id="run-raw" type="button">Parse and run JSON</button>
+      </details>
+    </div>
+  </section>
+
+  <section class="wrap block" id="results" aria-labelledby="results-title">
+    <div class="side">
+      <p class="eyebrow">02 / Output</p><h2 id="results-title">Same records. Each order.</h2>
+      <p>The JavaScript scenario runner computes every order. Scroll within the lanes to compare them.</p>
+      <p class="hint">A match is a match to the stored baseline. It is not a new proof or a layer-0 check.</p>
+    </div>
+    <div class="stack">
+      <p id="scenario-status" class="status" aria-live="polite"></p>
+      <label for="result-step">Result step</label><select id="result-step"></select>
+      <p id="step-status" class="status"></p>
+      <div id="order-lanes" class="lanes" role="region" aria-label="All arrival order results" tabindex="0"></div>
+      <div id="comparison" class="sheet stack"></div>
+      <div id="lens-results" class="sheet stack" hidden></div>
+    </div>
+  </section>
+
+  <section class="wrap block" id="break" aria-labelledby="break-title">
+    <div class="side"><p class="eyebrow">03 / Premises</p><h2 id="break-title">Break it.</h2>
+      <p>These fixed examples are independent of your current edit. Not every boundary fits the valid scenario format.</p>
+      <p>Live results and reference model answers have separate labels. Model-only evidence does not run as a live scenario.</p>
+    </div>
+    <div class="sheet stack">
+      <label for="boundary-select">Law to test</label><select id="boundary-select"></select>
+      <label class="check"><input id="remove-premise" type="checkbox"> Remove the premise</label>
+      <div id="boundary-result" class="stack"></div>
+    </div>
+  </section>
+
+  <section class="wrap block" id="keep" aria-labelledby="keep-title">
+    <div class="side"><p class="eyebrow">04 / Keep</p><h2 id="keep-title">Keep this draft.</h2>
+      <p>The URL holds the full valid vector. It can be long. Copy the address to share it.</p>
+      <p>The link includes payloads. Do not share private data in a link.</p>
+      <p>Named slots stay in this browser. Export a file to keep a separate copy.</p>
+    </div>
+    <div class="sheet stack">
+      <label for="slot-name">Slot name · saving replaces the same name</label><input id="slot-name" type="text" placeholder="My draft">
+      <div class="toolbar"><button id="save-slot" class="requires-valid" type="button">Save slot</button><button id="refresh-slots" type="button">Refresh list</button></div>
+      <label for="slots">Saved slots</label><select id="slots"></select>
+      <div class="toolbar"><button id="load-slot" type="button">Load slot</button><button id="delete-slot" type="button">Delete slot</button></div>
+      <hr>
+      <label for="import-file">Import a vector JSON file</label><input id="import-file" type="file" accept=".json,application/json">
+      <button id="export-vector" class="requires-valid" type="button">Export vector JSON</button>
+      <p id="keep-status" role="status" aria-live="polite" class="hint"></p>
+      <p id="keep-error" class="error" role="alert" hidden></p>
+    </div>
+  </section>
+</main>
+<footer class="wrap foot">Draft workbench · fixture input, live JavaScript output, stored model baseline.</footer>

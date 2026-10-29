@@ -16,8 +16,8 @@ prose and checked against every vector.
 | `vectors/` | written by `gen`, never by hand; every implementation must pass them |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/lens.md`](protocol/lens.md) the lens contract, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | a small, independent JS implementation, written from the prose: the layer 0 writer (`loops.mjs`) and the readers (`fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`) |
-| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `build.mjs` renders all four |
-| `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/` | the pages, written by `node design/build.mjs`, never by hand |
+| `design/` | the design pages' source: `rethink/` holds its sections, styles, script and the decision ledger (`ledger.json`); `grammar/` the grammar page's words and walk; `laws/` the laws page's sentences, questions and the proof graph; `evidence/` the evidence page; `workbench/` the live scenario editor; `build.mjs` renders all five |
+| `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/`, `out/workbench/` | the pages, written by `node design/build.mjs`, never by hand |
 
 End-to-end scenarios live in `vectors/scenario/`.
 [`protocol/horizons.md`](protocol/horizons.md) maps the horizon cases to model checks and missing steps.
@@ -60,7 +60,7 @@ one HTML file per tab under `sections/`, the decision ledger as records in
 node design/build.mjs       # writes out/rethink/index.html; commit it with the source
 ```
 
-Three more pages share a shell (`design/page.mjs`, `design/register.css`) and
+Four more pages share a shell (`design/page.mjs`, `design/register.css`) and
 read the protocol through `design/protocol.mjs`:
 
 * `design/grammar/`: the protocol's nouns, verbs and layers. Its words are
@@ -100,6 +100,14 @@ read the protocol through `design/protocol.mjs`:
   is built (`design/evidence/layout.mjs`). A law's sentence on the laws page
   and its card here share an anchor (`#law-<name>`), and the build fails on
   any link between the pages that lands on no anchor.
+
+* `design/workbench/`: a draft scenario editor with live JavaScript results.
+  Each scenario vector is a preset. The build checks every order against its stored baseline.
+  The page bundles the existing readers through a native import map. It has no runtime network dependency.
+  Shared record helpers live in `interop/js/record.mjs`. The Node writer still exports them through `loops.mjs`.
+  Edits retain the baseline. Named browser slots, JSON files, and whole-vector URL fragments keep a draft.
+  Premise examples stay separate from the draft. The page labels model-only evidence.
+  See [the workbench notes](design/workbench/README.md) for checks and limits.
 
 `node design/mutants.mjs` holds those checks to account: it applies plausible
 wrong edits to a copy of the sources and fails unless the build refuses each

@@ -17,6 +17,7 @@ export const PAGES = [
   { id: "grammar", name: "Grammar" },
   { id: "laws", name: "Laws" },
   { id: "evidence", name: "Evidence" },
+  { id: "workbench", name: "Workbench" },
 ];
 
 export function header(current, sections) {

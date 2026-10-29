@@ -5,7 +5,7 @@
 // none keeps state, so a late record is folding the longer list again.
 // No dependencies.
 
-import { base32Decode, occurredSpan, spanBefore, momentBefore } from "./loops.mjs";
+import { base32Decode, occurredSpan, spanBefore, momentBefore } from "./record.mjs";
 import { answer, held, payloadOf, YES, UNKNOWN } from "./where.mjs";
 
 // Content order: the record's span (a record without `occurred` is an instant

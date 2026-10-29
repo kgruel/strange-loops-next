@@ -44,3 +44,16 @@ export function lensEdit({ base, text }) {
 
 // A thing's head as a keyed section: its id, and the head's value as lines.
 export const sectionOf = (thing, head) => ({ id: thing, body: String(head.value).split("\n") });
+
+// Fixture rules name pool ids only. Absence differs from an empty rule.
+export function replacementRule(input, records) {
+  if (!Object.hasOwn(input, "mayReplace")) return () => true;
+  if (!Array.isArray(input.mayReplace)) throw new Error("input.mayReplace: expected an array");
+  for (const pair of input.mayReplace) {
+    if (!Array.isArray(pair) || pair.length !== 2) throw new Error("input.mayReplace: expected two-item pairs");
+    if (!pair.every((id) => typeof id === "string" && records.has(id))) {
+      throw new Error("input.mayReplace: names none of input.records");
+    }
+  }
+  return (r, q) => input.mayReplace.some(([next, prev]) => next === r.id && prev === q.id);
+}

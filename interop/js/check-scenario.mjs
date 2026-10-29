@@ -6,21 +6,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { canonical } from "./loops.mjs";
 import * as S from "./spec.mjs";
-import { formOf, step, lensEdit, sectionOf } from "./scenario.mjs";
+import { formOf, step, lensEdit, sectionOf, replacementRule } from "./scenario.mjs";
 import { tally, jsonFiles, runAlone } from "./tally.mjs";
 
-// Fixture rules name pool ids only. Absence differs from an empty rule.
-export function replacementRule(input, records) {
-  if (!Object.hasOwn(input, "mayReplace")) return () => true;
-  if (!Array.isArray(input.mayReplace)) throw new Error("input.mayReplace: expected an array");
-  for (const pair of input.mayReplace) {
-    if (!Array.isArray(pair) || pair.length !== 2) throw new Error("input.mayReplace: expected two-item pairs");
-    if (!pair.every((id) => typeof id === "string" && records.has(id))) {
-      throw new Error("input.mayReplace: names none of input.records");
-    }
-  }
-  return (r, q) => input.mayReplace.some(([next, prev]) => next === r.id && prev === q.id);
-}
+export { replacementRule } from "./scenario.mjs";
 
 export function check(dir) {
   const t = tally();

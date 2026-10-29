@@ -4,7 +4,7 @@
 // spec.md says what parses); records are in the vectors' JSON form. No
 // dependencies.
 
-import { occurredSpan, momentBefore } from "./loops.mjs";
+import { occurredSpan, momentBefore } from "./record.mjs";
 
 export const YES = "yes", NO = "no", UNKNOWN = "unknown";
 

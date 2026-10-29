@@ -51,7 +51,8 @@ h3{font-size:15.5px}
 /* top */
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--ground) 86%,transparent);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px)}
 .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:12px}
-.mark{font-weight:600;font-size:14px;white-space:nowrap;display:flex;gap:10px;align-items:baseline}
+.mark{font-weight:600;font-size:14px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.mark a{white-space:nowrap}
 .mark a{text-decoration:none}
 .mark .page{font-weight:500;color:var(--muted)}
 .mark .page[aria-current="page"]{color:var(--ink)}

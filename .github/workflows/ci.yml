@@ -71,5 +71,7 @@ jobs:
           node design/build.mjs
           git diff --exit-code -- out
           test -z "$(git status --porcelain -- out)"
+      - name: The workbench adapter guards hold
+        run: node --test design/workbench/*.test.mjs
       - name: The design build refuses every mutant it should
         run: node design/mutants.mjs

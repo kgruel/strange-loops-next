@@ -24,6 +24,11 @@ const swap = (from, to) => (t) => {
 const json = (f) => (t) => { const d = JSON.parse(t); f(d); return JSON.stringify(d, null, 2); };
 
 const MUTANTS = [
+  ["a workbench preset with a changed baseline", "vectors/scenario/01-decision.json", json((d) => { d.expect.extra = true; })],
+  ["a workbench arrival order that repeats a form", "vectors/scenario/01-decision.json", json((d) => { d.input.steps[0].orders[0].push(d.input.steps[0].orders[0][0]); })],
+  ["a workbench link to no preset", "design/workbench/page.html", (t) => t + '<a href="../workbench/#preset=scenario%2Fno-such">Missing</a>\n'],
+  ["a workbench law link that lands nowhere", "design/workbench/render.mjs", swap('`law-${slug(r.key)}`', '`law-no-such`')],
+  ["a browser module that imports a Node builtin", "design/workbench/app.mjs", (t) => 'import fs from "node:fs";\n' + t],
   ["a law with no sentence", "design/laws/laws.json", json((d) => { delete d.laws["count.perm"]; })],
   ["a sentence for no law", "design/laws/laws.json", json((d) => { d.laws["no.such"] = { ...d.laws["count.perm"] }; })],
   ["an unknown shape", "design/laws/laws.json", json((d) => { d.laws["count.perm"].shape = "circle"; })],
