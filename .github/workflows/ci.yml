@@ -4,6 +4,28 @@ on:
   pull_request:
 
 jobs:
+  rust:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+        with:
+          persist-credentials: false
+      # dtolnay/rust-toolchain stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          components: rustfmt, clippy
+      - name: Rust formatting
+        run: cargo fmt --check
+      - name: Rust lints
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Rust vectors and characterization
+        run: cargo test
+
   model:
     runs-on: ubuntu-latest
     steps:
