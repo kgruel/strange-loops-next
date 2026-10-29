@@ -296,6 +296,11 @@ theorem Spec.select_view {f : Record → Record} (hf : View f) (sp : Spec) (xs :
   intro r _
   simp [Function.comp, Spec.takes_view hf]
 
+/-- Selection contains exactly the input records that the spec takes. -/
+theorem Spec.mem_select (sp : Spec) (xs : List Record) (r : Record) :
+    r ∈ sp.select xs ↔ r ∈ xs ∧ sp.takes r = true := by
+  simp [Spec.select]
+
 /-! ## The set decides, for every spec -/
 
 theorem Addressed.filter {xs : List Record} (p : Record → Bool) (h : Addressed xs) :

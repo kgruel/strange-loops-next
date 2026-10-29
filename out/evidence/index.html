@@ -297,7 +297,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
     <p>A filled cell says the evidence exists, not that it is complete: a law cited by one vector is pinned at one point.</p>
   </div>
   <div class="stack">
-    <p class="cov-sum">68 laws are theorems and 3 hold by construction; for 32, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>
+    <p class="cov-sum">72 laws are theorems and 3 hold by construction; for 32, the vectors laws.md cites and the vectors that name the law disagree (hover the cell to see which).</p>
     <div class="pan"><div class="cov-scroll"><table class="cov">
       <thead><tr><th scope="col">law</th><th scope="col">shape</th><th scope="col" title="theorems named, or c: by construction">proved</th><th scope="col" title="vector files laws.md cites">cited</th><th scope="col" title="vector files whose laws field names it">named by</th><th scope="col" title="cited and naming agree">agree</th><th scope="col" title="the JS implementation runs at least one of its vectors">JS</th><th scope="col">demo</th><th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>
       <tbody>
@@ -350,6 +350,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row"><a href="#law-extrema-set"><code>extrema.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>4</td><td>4</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-acc-set"><code>acc.set</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / 1</td></tr>
         <tr><th scope="row"><a href="#law-acc-late"><code>acc.late</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>1 / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-sum-on-missing"><code>sum.on-missing</code></a></th><td class="sh">Exactness</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-max-acc-readable"><code>max.acc-readable</code></a></th><td class="sh">Exactness</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-min-acc-readable"><code>min.acc-readable</code></a></th><td class="sh">Exactness</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-heads-set"><code>heads.set</code></a></th><td class="sh">Invariance</td><td>1</td><td>4</td><td>4</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td>1 / 1</td></tr>
         <tr><th scope="row"><a href="#law-heads-late"><code>heads.late</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td>2 / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-heads-why"><code>heads.why</code></a></th><td class="sh">Limit</td><td>1</td><td>2</td><td><span class="z">–</span></td><td><span class="off" title="cited, not naming it: fold/heads/01-max-follows-prev, fold/heads/02-superseded-max-leaves">−2</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
@@ -364,6 +367,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <tr><th scope="row"><a href="#law-where-total"><code>where.total</code></a></th><td class="sh">Exactness</td><td>2</td><td>17</td><td>3</td><td><span class="off" title="cited, not naming it: spec/run/01-tasks, spec/run/02-withheld-payload, spec/run/03-withheld-successor, spec/run/04-kind-change, spec/run/05-about-is-a-set, spec/run/07-numeric-bounds, spec/run/09-from-about-anchor, spec/run/gap04-unread-multi-thing, spec/run/gap05-unread-before-limit, spec/run/gap06-direct-admission, spec/run/gap07-store-other, spec/run/gap07-store-team, spec/run/gap12-no-unknown, spec/run/gap14-field-types">−14</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-where-set"><code>where.set</code></a></th><td class="sh">Invariance</td><td>1</td><td><span class="z">–</span></td><td>1</td><td><span class="off" title="naming it, not cited: spec/run/gap12-no-unknown">+1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-spec-select"><code>spec.select</code></a></th><td class="sh">Invariance</td><td>2</td><td>17</td><td>1</td><td><span class="off" title="cited, not naming it: spec/run/02-withheld-payload, spec/run/03-withheld-successor, spec/run/04-kind-change, spec/run/05-about-is-a-set, spec/run/06-times, spec/run/07-numeric-bounds, spec/run/08-envelope-fields, spec/run/09-from-about-anchor, spec/run/gap04-unread-multi-thing, spec/run/gap05-unread-before-limit, spec/run/gap06-direct-admission, spec/run/gap07-store-other, spec/run/gap07-store-team, spec/run/gap12-no-unknown, spec/run/gap13-missing-and-withheld, spec/run/gap14-field-types">−16</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
+        <tr><th scope="row"><a href="#law-spec-select-membership"><code>spec.select-membership</code></a></th><td class="sh">Exactness</td><td>1</td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-spec-from-thing"><code>spec.from-thing</code></a></th><td class="sh">Exactness</td><td>1</td><td>1</td><td>1</td><td><span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td><span class="z">–</span> / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-spec-set"><code>spec.set</code></a></th><td class="sh">Invariance</td><td>2</td><td>17</td><td>13</td><td><span class="off" title="cited, not naming it: spec/run/gap04-unread-multi-thing, spec/run/gap05-unread-before-limit, spec/run/gap12-no-unknown, spec/run/gap13-missing-and-withheld, spec/run/gap14-field-types; naming it, not cited: scenario/01-decision">−5 +1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td>5 / <span class="z">–</span></td></tr>
         <tr><th scope="row"><a href="#law-spec-after-supersession"><code>spec.after-supersession</code></a></th><td class="sh">Exactness</td><td>3</td><td>3</td><td>2</td><td><span class="off" title="cited, not naming it: spec/run/03-withheld-successor">−1</span></td><td><span class="ok">✓</span></td><td><span class="z">–</span></td><td>4 / <span class="z">–</span></td></tr>
@@ -480,7 +484,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 </svg>
     </div></div>
     <p class="map-note" id="map-note" aria-live="polite"></p>
-    <p class="note">35 laws stand alone: their proofs use no other law's theorem. <a class="lawref" href="#law-count-perm"><code>count.perm</code></a> <a class="lawref" href="#law-count-repeats"><code>count.repeats</code></a> <a class="lawref" href="#law-numeric-safe-whole"><code>numeric.safe-whole</code></a> <a class="lawref" href="#law-sum-perm"><code>sum.perm</code></a> <a class="lawref" href="#law-sum-repeats"><code>sum.repeats</code></a> <a class="lawref" href="#law-extrema-set"><code>extrema.set</code></a> <a class="lawref" href="#law-heads-why"><code>heads.why</code></a> <a class="lawref" href="#law-view-refines"><code>view.refines</code></a> <a class="lawref" href="#law-result-full"><code>result.full</code></a> <a class="lawref" href="#law-settle-set"><code>settle.set</code></a> <a class="lawref" href="#law-settle-keeps"><code>settle.keeps</code></a> <a class="lawref" href="#law-settle-erased"><code>settle.erased</code></a> <a class="lawref" href="#law-admit-no-cross"><code>admit.no-cross</code></a> <a class="lawref" href="#law-where-complements"><code>where.complements</code></a> <a class="lawref" href="#law-where-fields"><code>where.fields</code></a> <a class="lawref" href="#law-where-time"><code>where.time</code></a> <a class="lawref" href="#law-where-total"><code>where.total</code></a> <a class="lawref" href="#law-where-set"><code>where.set</code></a> <a class="lawref" href="#law-view-refines-where"><code>view.refines (where)</code></a> <a class="lawref" href="#law-spec-select"><code>spec.select</code></a> <a class="lawref" href="#law-spec-from-thing"><code>spec.from-thing</code></a> <a class="lawref" href="#law-batch-meaning"><code>batch.meaning</code></a> <a class="lawref" href="#law-batch-refuse"><code>batch.refuse</code></a> <a class="lawref" href="#law-batch-refuse-order"><code>batch.refuse-order</code></a> <a class="lawref" href="#law-lens-put-get"><code>lens.put-get</code></a> <a class="lawref" href="#law-lens-nothing-dropped"><code>lens.nothing-dropped</code></a> <a class="lawref" href="#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a> <a class="lawref" href="#law-record-erasure"><code>record.erasure</code></a> <a class="lawref" href="#law-record-commit"><code>record.commit</code></a> <a class="lawref" href="#law-record-refuse"><code>record.refuse</code></a> <a class="lawref" href="#law-write-checked"><code>write.checked</code></a> <a class="lawref" href="#law-occurred-span"><code>occurred.span</code></a> <a class="lawref" href="#law-occurred-qualifier"><code>occurred.qualifier</code></a> <a class="lawref" href="#law-occurred-moment"><code>occurred.moment</code></a> <a class="lawref" href="#law-occurred-refuse"><code>occurred.refuse</code></a></p>
+    <p class="note">39 laws stand alone: their proofs use no other law's theorem. <a class="lawref" href="#law-count-perm"><code>count.perm</code></a> <a class="lawref" href="#law-count-repeats"><code>count.repeats</code></a> <a class="lawref" href="#law-numeric-safe-whole"><code>numeric.safe-whole</code></a> <a class="lawref" href="#law-sum-perm"><code>sum.perm</code></a> <a class="lawref" href="#law-sum-repeats"><code>sum.repeats</code></a> <a class="lawref" href="#law-extrema-set"><code>extrema.set</code></a> <a class="lawref" href="#law-sum-on-missing"><code>sum.on-missing</code></a> <a class="lawref" href="#law-max-acc-readable"><code>max.acc-readable</code></a> <a class="lawref" href="#law-min-acc-readable"><code>min.acc-readable</code></a> <a class="lawref" href="#law-heads-why"><code>heads.why</code></a> <a class="lawref" href="#law-view-refines"><code>view.refines</code></a> <a class="lawref" href="#law-result-full"><code>result.full</code></a> <a class="lawref" href="#law-settle-set"><code>settle.set</code></a> <a class="lawref" href="#law-settle-keeps"><code>settle.keeps</code></a> <a class="lawref" href="#law-settle-erased"><code>settle.erased</code></a> <a class="lawref" href="#law-admit-no-cross"><code>admit.no-cross</code></a> <a class="lawref" href="#law-where-complements"><code>where.complements</code></a> <a class="lawref" href="#law-where-fields"><code>where.fields</code></a> <a class="lawref" href="#law-where-time"><code>where.time</code></a> <a class="lawref" href="#law-where-total"><code>where.total</code></a> <a class="lawref" href="#law-where-set"><code>where.set</code></a> <a class="lawref" href="#law-view-refines-where"><code>view.refines (where)</code></a> <a class="lawref" href="#law-spec-select"><code>spec.select</code></a> <a class="lawref" href="#law-spec-select-membership"><code>spec.select-membership</code></a> <a class="lawref" href="#law-spec-from-thing"><code>spec.from-thing</code></a> <a class="lawref" href="#law-batch-meaning"><code>batch.meaning</code></a> <a class="lawref" href="#law-batch-refuse"><code>batch.refuse</code></a> <a class="lawref" href="#law-batch-refuse-order"><code>batch.refuse-order</code></a> <a class="lawref" href="#law-lens-put-get"><code>lens.put-get</code></a> <a class="lawref" href="#law-lens-nothing-dropped"><code>lens.nothing-dropped</code></a> <a class="lawref" href="#law-lens-absence-not-edit"><code>lens.absence-not-edit</code></a> <a class="lawref" href="#law-record-erasure"><code>record.erasure</code></a> <a class="lawref" href="#law-record-commit"><code>record.commit</code></a> <a class="lawref" href="#law-record-refuse"><code>record.refuse</code></a> <a class="lawref" href="#law-write-checked"><code>write.checked</code></a> <a class="lawref" href="#law-occurred-span"><code>occurred.span</code></a> <a class="lawref" href="#law-occurred-qualifier"><code>occurred.qualifier</code></a> <a class="lawref" href="#law-occurred-moment"><code>occurred.moment</code></a> <a class="lawref" href="#law-occurred-refuse"><code>occurred.refuse</code></a></p>
   </div>
 </section>
 
@@ -493,9 +497,9 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
   </div>
   <div class="stack">
     <div class="tiles">
-    <div class="tile"><p class="tile-n">71</p><p class="tile-k">laws</p><p class="tile-w">rows of <code>protocol/laws.md</code>, each a sentence on the laws page</p></div>
+    <div class="tile"><p class="tile-n">75</p><p class="tile-k">laws</p><p class="tile-w">rows of <code>protocol/laws.md</code>, each a sentence on the laws page</p></div>
     <div class="tile-arrow" aria-hidden="true">→</div>
-    <div class="tile"><p class="tile-n">137</p><p class="tile-k">theorems</p><p class="tile-w">the declarations they name, found in the proofs Lean checked</p></div>
+    <div class="tile"><p class="tile-n">141</p><p class="tile-k">theorems</p><p class="tile-w">the declarations they name, found in the proofs Lean checked</p></div>
     <div class="tile-arrow" aria-hidden="true">→</div>
     <div class="tile"><p class="tile-n">208</p><p class="tile-k">vectors</p><p class="tile-w">the files they cite, every one found on disk</p></div>
     <div class="tile-arrow" aria-hidden="true">→</div>
@@ -848,7 +852,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       </div>
     </div>
     <div class="layer-group" id="layer-state">
-      <h3>State <span>35 laws</span></h3>
+      <h3>State <span>39 laws</span></h3>
       <div class="laws-grid">
     <article class="law" id="law-incremental-batch" data-shape="invariance">
       <div class="law-h"><h4>incremental = batch</h4><span class="chip">Invariance</span></div>
@@ -1051,6 +1055,39 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
       </dl>
       <p class="law-back"><a href="../laws/#law-acc-late">In its question</a></p>
     </article>
+    <article class="law" id="law-sum-on-missing" data-shape="exactness">
+      <div class="law-h"><h4>sum.on-missing</h4><span class="chip">Exactness</span></div>
+      <p class="law-s">If the numeric reader returns no value for the field, a raw <code>Sum.on</code> step leaves the state unchanged.</p>
+      <p class="law-scope"><span class="holds">Holds when</span> the record's numeric reader returns no value for the field. This law covers the raw step, not selection or the unread count.</p>
+      <p class="law-md"><span>laws.md</span> If the numeric reader returns no value for the field, a raw <code>Sum.on</code> step leaves the state unchanged.</p>
+      <dl class="chain">
+        <dt>proved by</dt><dd><details class="thm"><summary><code>Sum.on_step_missing</code></summary><p class="thm-m">Laws.Families</p><pre>∀ (field : String) (s : Int) (r : Record), r.num field = none → (Sum.on field).step s r = s</pre></details></dd>
+        <dt>pinned by</dt><dd><span>(low-level helper; no vector route)</span></dd>
+      </dl>
+      <p class="law-back"><a href="../laws/#law-sum-on-missing">In its question</a></p>
+    </article>
+    <article class="law" id="law-max-acc-readable" data-shape="exactness">
+      <div class="law-h"><h4>max.acc-readable</h4><span class="chip">Exactness</span></div>
+      <p class="law-s">The concrete <code>Max.acc</code> marks a record readable exactly when its numeric reader returns a value for <code>n</code>.</p>
+      <p class="law-scope">A held payload alone does not meet this condition. This law does not describe the raw step.</p>
+      <p class="law-md"><span>laws.md</span> The concrete <code>Max.acc</code> marks a record readable exactly when its numeric reader returns a value for <code>n</code>.</p>
+      <dl class="chain">
+        <dt>proved by</dt><dd><details class="thm"><summary><code>Max.acc_readable</code></summary><p class="thm-m">Laws.Families</p><pre>∀ (r : Record), Max.acc.readable r = (r.num "n").isSome</pre></details></dd>
+        <dt>pinned by</dt><dd><span>(low-level helper; no vector route)</span></dd>
+      </dl>
+      <p class="law-back"><a href="../laws/#law-max-acc-readable">In its question</a></p>
+    </article>
+    <article class="law" id="law-min-acc-readable" data-shape="exactness">
+      <div class="law-h"><h4>min.acc-readable</h4><span class="chip">Exactness</span></div>
+      <p class="law-s">The concrete <code>Min.acc</code> marks a record readable exactly when its numeric reader returns a value for <code>n</code>.</p>
+      <p class="law-scope">A held payload alone does not meet this condition. This law does not describe the raw step.</p>
+      <p class="law-md"><span>laws.md</span> The concrete <code>Min.acc</code> marks a record readable exactly when its numeric reader returns a value for <code>n</code>.</p>
+      <dl class="chain">
+        <dt>proved by</dt><dd><details class="thm"><summary><code>Min.acc_readable</code></summary><p class="thm-m">Laws.Families</p><pre>∀ (r : Record), Min.acc.readable r = (r.num "n").isSome</pre></details></dd>
+        <dt>pinned by</dt><dd><span>(low-level helper; no vector route)</span></dd>
+      </dl>
+      <p class="law-back"><a href="../laws/#law-min-acc-readable">In its question</a></p>
+    </article>
     <article class="law" id="law-heads-set" data-shape="invariance">
       <div class="law-h"><h4>heads.set</h4><span class="chip">Invariance</span></div>
       <p class="law-s">Change <span class="var">how the records arrive, the set kept</span>, and <span class="inv">any answer worked out from the heads</span> stays.</p>
@@ -1220,6 +1257,17 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
         <dt>run by</dt><dd>the model, the JS implementation</dd>
       </dl>
       <p class="law-back"><a href="../laws/#law-spec-select">In its question</a></p>
+    </article>
+    <article class="law" id="law-spec-select-membership" data-shape="exactness">
+      <div class="law-h"><h4>spec.select-membership</h4><span class="chip">Exactness</span></div>
+      <p class="law-s">A record belongs to <code>Spec.select</code>'s output exactly when it belongs to the input and <code>Spec.takes</code> returns true for it.</p>
+      <p class="law-scope">This law covers the selection helper, not slot results or admission.</p>
+      <p class="law-md"><span>laws.md</span> A record belongs to <code>Spec.select</code>'s output exactly when it belongs to the input and <code>Spec.takes</code> returns true for it.</p>
+      <dl class="chain">
+        <dt>proved by</dt><dd><details class="thm"><summary><code>Spec.mem_select</code></summary><p class="thm-m">Laws.Spec</p><pre>∀ (sp : Spec) (xs : List Record) (r : Record), r ∈ sp.select xs ↔ r ∈ xs ∧ sp.takes r = true</pre></details></dd>
+        <dt>pinned by</dt><dd><span>(low-level helper; no vector route)</span></dd>
+      </dl>
+      <p class="law-back"><a href="../laws/#law-spec-select-membership">In its question</a></p>
     </article>
     <article class="law" id="law-spec-from-thing" data-shape="exactness">
       <div class="law-h"><h4>spec.from-thing</h4><span class="chip">Exactness</span></div>

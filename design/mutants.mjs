@@ -65,6 +65,7 @@ const MUTANTS = [
   ["a lens roundtrip without section validity", "design/laws/laws.json", json((d) => { d.laws["lens.round-trip"].premises = []; })],
   ["escaping without a nonempty id", "design/laws/laws.json", json((d) => { d.laws["lens.escaping"].premises = []; })],
   ["one-thing equality without its thing premise", "design/laws/laws.json", json((d) => { d.laws["latest.one-thing"].premises = []; })],
+  ["a missing-number step without its premise", "design/laws/laws.json", json((d) => { d.laws["sum.on-missing"].premises = []; })],
   ["a law that lists a premise none of its theorems takes", "design/laws/laws.json", json((d) => { d.laws["count.perm"].premises = ["EnvOnly"]; })],
   ["a law that lists a premise the page says for every law", "design/laws/laws.json", json((d) => { d.laws["latest-by.set"].premises = ["Addressed"]; })],
   ["a law that lists a premise that is another law's subject", "design/laws/laws.json", json((d) => { d.laws["count.perm"].premises = ["View"]; })],

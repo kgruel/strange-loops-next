@@ -123,6 +123,20 @@ theorem Sum.acc_fold (xs : List Record) : Sum.acc.fold xs = Sum.fold 0 xs := rfl
 theorem Max.acc_fold (xs : List Record) : Max.acc.fold xs = Max.fold none xs := rfl
 theorem Min.acc_fold (xs : List Record) : Min.acc.fold xs = Min.fold none xs := rfl
 
+/-- A missing number leaves the sum unchanged. -/
+theorem Sum.on_step_missing (field : String) (s : Int) (r : Record)
+    (h : r.num field = none) :
+    (Sum.on field).step s r = s := by
+  simp [Sum.on, h]
+
+/-- Max marks a record readable exactly when its numeric reader returns a value for `n`. -/
+theorem Max.acc_readable (r : Record) :
+    Max.acc.readable r = (r.num "n").isSome := rfl
+
+/-- Min marks a record readable exactly when its numeric reader returns a value for `n`. -/
+theorem Min.acc_readable (r : Record) :
+    Min.acc.readable r = (r.num "n").isSome := rfl
+
 /-! ## Folds over heads -/
 
 /-- The set decides, for every answer worked out from the heads. -/

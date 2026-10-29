@@ -1172,6 +1172,11 @@
    "states":
    "∀ {xs ys : List Loops.Record}, xs.Perm ys → ∀ (s : Int), Loops.Sum.fold s xs = Loops.Sum.fold s ys",
    "module": "Laws.Numeric"},
+  "Loops.Sum.on_step_missing":
+  {"uses": [],
+   "states":
+   "∀ (field : String) (s : Int) (r : Loops.Record), r.num field = none → (Loops.Sum.on field).step s r = s",
+   "module": "Laws.Families"},
   "Loops.Sum.fold_eq":
   {"uses": [],
    "states":
@@ -1312,6 +1317,11 @@
    "states":
    "∀ {vertex : String} {sources : List Loops.Source} {slots : List Loops.Slot} {vertex_1 : String} {sources_1 : List Loops.Source} {slots_1 : List Loops.Slot}, { vertex := vertex, sources := sources, slots := slots } = { vertex := vertex_1, sources := sources_1, slots := slots_1 } → vertex = vertex_1 ∧ sources = sources_1 ∧ slots = slots_1",
    "module": "Loops.Spec"},
+  "Loops.Spec.mem_select":
+  {"uses": [],
+   "states":
+   "∀ (sp : Loops.Spec) (xs : List Loops.Record) (r : Loops.Record), r ∈ sp.select xs ↔ r ∈ xs ∧ sp.takes r = true",
+   "module": "Laws.Spec"},
   "Loops.Span.ok":
   {"uses": [],
    "states":
@@ -1792,6 +1802,11 @@
    "states":
    "∀ (s : Option Int) (xs ys : List Loops.Record), Loops.Min.fold (Loops.Min.fold s xs) ys = Loops.Min.fold s (xs ++ ys)",
    "module": "Laws.Numeric"},
+  "Loops.Min.acc_readable":
+  {"uses": [],
+   "states":
+   "∀ (r : Loops.Record), Loops.Min.acc.readable r = (r.num \"n\").isSome",
+   "module": "Laws.Families"},
   "Loops.Min.acc_fold":
   {"uses": [],
    "states":
@@ -1838,6 +1853,11 @@
    "states":
    "∀ (s : Option Int) (xs ys : List Loops.Record), Loops.Max.fold (Loops.Max.fold s xs) ys = Loops.Max.fold s (xs ++ ys)",
    "module": "Laws.Numeric"},
+  "Loops.Max.acc_readable":
+  {"uses": [],
+   "states":
+   "∀ (r : Loops.Record), Loops.Max.acc.readable r = (r.num \"n\").isSome",
+   "module": "Laws.Families"},
   "Loops.Max.acc_fold":
   {"uses": [],
    "states":
@@ -3006,6 +3026,11 @@
    "states":
    "∀ {σ : Type} {init : σ} {step : σ → Loops.Record → σ} {comm : ∀ (s : σ) (a b : Loops.Record), step (step s a) b = step (step s b) a} {readable : Loops.Record → Bool} {init_1 : σ} {step_1 : σ → Loops.Record → σ} {comm_1 : ∀ (s : σ) (a b : Loops.Record), step_1 (step_1 s a) b = step_1 (step_1 s b) a} {readable_1 : Loops.Record → Bool}, { init := init, step := step, comm := comm, readable := readable } = { init := init_1, step := step_1, comm := comm_1, readable := readable_1 } → init = init_1 ∧ step = step_1 ∧ readable = readable_1",
    "module": "Loops.Families"},
+  "Loops.Acc.mk.congr_simp":
+  {"uses": [],
+   "states":
+   "∀ {σ : Type} (init init_1 : σ), init = init_1 → ∀ (step step_1 : σ → Loops.Record → σ) (e_step : step = step_1) (comm : ∀ (s : σ) (a b : Loops.Record), step (step s a) b = step (step s b) a) (readable readable_1 : Loops.Record → Bool), readable = readable_1 → { init := init, step := step, comm := comm, readable := readable } = { init := init_1, step := step_1, comm := ⋯, readable := readable_1 }",
+   "module": "Laws.Families"},
   "Loops.Acc.late":
   {"uses": ["Loops.Acc.set_decides"],
    "states":

@@ -57,6 +57,9 @@ the cached state in both, so there is no partial rewind.
 | `input.union` | `dedup_union` | the union doesn't depend on which place is read first | (the read path) |
 | `acc.set` | `Acc.set_decides` | any step that commutes gives the same state for the same set | every count, sum, extrema vector |
 | `acc.late` | `Acc.late` | a late record folds onto the cached state | (follows from `acc.set`) |
+| `sum.on-missing` | `Sum.on_step_missing` | If the numeric reader returns no value for the field, a raw `Sum.on` step leaves the state unchanged. | (low-level helper; no vector route) |
+| `max.acc-readable` | `Max.acc_readable` | The concrete `Max.acc` marks a record readable exactly when its numeric reader returns a value for `n`. | (low-level helper; no vector route) |
+| `min.acc-readable` | `Min.acc_readable` | The concrete `Min.acc` marks a record readable exactly when its numeric reader returns a value for `n`. | (low-level helper; no vector route) |
 | `heads.set` | `OverHeads.set_decides` | any answer worked out from the heads depends only on the set | `fold/heads/*` |
 | `heads.late` | `OverHeads.late` | a late record folds onto the cached heads | (follows from `heads.set`) |
 | `heads.why` | `Max.cannot_follow_prev` | Max can't follow `prev`: no step from Max's state and the next record keeps the current maximum | `fold/heads/01`, `02` |
@@ -164,6 +167,7 @@ pinned by the vectors rather than proved.
 | `where.set` | `Cond.all_perm` | the tests of a `where` map can come in any order | (by construction) |
 | `view.refines` (where) | `Cond.eval_view`, `Cond.all_view`, `Tri.and_refines` | under a view a test, and a `where` map, keeps its answer or becomes unknown | `spec/run/02` |
 | `spec.select` | `Spec.select_view`, `Source.takes_view` | selection reads only envelopes, so a view selects the same records | `spec/run/*` |
+| `spec.select-membership` | `Spec.mem_select` | A record belongs to `Spec.select`'s output exactly when it belongs to the input and `Spec.takes` returns true for it. | (low-level helper; no vector route) |
 | `spec.from-thing` | `Source.takes_about` | `from`'s `about` takes exactly the records about the thing, and a record about nothing is about its own id and nothing else | `spec/run/09` |
 | `spec.set` | `Slot.set_decides`, `Spec.set_decides` | every slot of every spec gives the same value for the same set | `spec/run/*` |
 | `spec.after-supersession` | `latestOf_heads`, `collectOf_heads`, `Spec.view_state` | slots over heads return only heads, records no record about their thing has superseded, and only those `from` takes and every test holds for, so selection never brings back what was superseded; under a view, and a rule that reads only envelopes, each thing's state is the full reader's with payloads hidden | `spec/run/03`, `04`, `08` |
