@@ -1,5 +1,10 @@
 {"theorems":
- {"Loops.writeProblem_none":
+ {"Std.Legacy.Range.mk.congr_simp":
+  {"uses": [],
+   "states":
+   "∀ (start start_1 : Nat), start = start_1 → ∀ (stop stop_1 : Nat), stop = stop_1 → ∀ (step step_1 : Nat) (e_step : step = step_1) (step_pos : 0 < step), [start:stop:step] = [start_1:stop_1:step_1]",
+   "module": "Laws.IdSource"},
+  "Loops.writeProblem_none":
   {"uses": [],
    "states":
    "∀ {env : Loops.Env} {salt : List UInt8} {payload : Loops.Json}, Loops.writeProblem env salt payload = none ↔ Loops.Writable env salt payload",
@@ -680,6 +685,35 @@
   {"uses": ["Loops.digestDigits_lt"],
    "states": "∀ (a b : Nat), Loops.idDigest a < Loops.idDigest b ↔ a < b",
    "module": "Laws.Order"},
+  "Loops.idText_injective":
+  {"uses": ["Loops.base32_injective", "Loops.idDigest_bytes_roundtrip"],
+   "states":
+   "∀ {a b : Nat}, Loops.BoundedId a → Loops.BoundedId b → Loops.idText a = Loops.idText b → a = b",
+   "module": "Laws.IdText"},
+  "Loops.idOf_eq_idText":
+  {"uses": ["Loops.bytes_idDigest"],
+   "states":
+   "∀ (H : Loops.Hash) (env : Loops.Env) (commit : String), (H (Loops.utf8 (Loops.idPreimage env commit))).length = 32 → Loops.idOf H env commit = Loops.idText (List.foldl (fun a b => 256 * a + b.toNat) 0 (H (Loops.utf8 (Loops.idPreimage env commit))))",
+   "module": "Laws.IdText"},
+  "Loops.idDigest_roundtrip":
+  {"uses": [],
+   "states":
+   "∀ {n : Nat}, Loops.BoundedId n → List.foldl (fun a d => 256 * a + d) 0 (Loops.idDigest n) = n",
+   "module": "Laws.Id"},
+  "Loops.idDigest_length":
+  {"uses": [],
+   "states": "∀ (n : Nat), (Loops.idDigest n).length = 32",
+   "module": "Laws.Id"},
+  "Loops.idDigest_bytes_roundtrip":
+  {"uses": ["Loops.idDigest_byte", "Loops.idDigest_roundtrip"],
+   "states":
+   "∀ {n : Nat}, Loops.BoundedId n → List.foldl (fun a b => 256 * a + b.toNat) 0 (List.map Nat.toUInt8 (Loops.idDigest n)) = n",
+   "module": "Laws.Id"},
+  "Loops.idDigest_byte":
+  {"uses": [],
+   "states":
+   "∀ {n : Nat}, Loops.BoundedId n → ∀ (d : Nat), d ∈ Loops.idDigest n → d < 256",
+   "module": "Laws.Id"},
   "Loops.halves_of_not_mem":
   {"uses": ["Loops.dropWhile_slash", "Loops.takeWhile_slash"],
    "states": "∀ {cs : List Char}, ¬'/' ∈ cs → Loops.halves cs = (cs, none)",
@@ -889,6 +923,16 @@
    "states":
    "∀ (kvs : List (String × Loops.Json)), Loops.Json.canonMembers kvs = List.map (fun kv => (kv.fst, kv.snd.canon)) kvs",
    "module": "Laws.Record"},
+  "Loops.bytes_idDigest":
+  {"uses": [],
+   "states":
+   "∀ (bs : List UInt8), bs.length = 32 → List.map Nat.toUInt8 (Loops.idDigest (List.foldl (fun a b => 256 * a + b.toNat) 0 bs)) = bs",
+   "module": "Laws.Id"},
+  "Loops.bytes_bounded":
+  {"uses": [],
+   "states":
+   "∀ (bs : List UInt8), bs.length = 32 → Loops.BoundedId (List.foldl (fun a b => 256 * a + b.toNat) 0 bs)",
+   "module": "Laws.Id"},
   "Loops.baseForm_mem":
   {"uses": ["Loops.SameEnvelope.refl", "Loops.withhold_envelope"],
    "states":
@@ -899,6 +943,15 @@
    "states":
    "∀ {F G : List Loops.Record} {i : Nat}, Loops.Forms F → (∀ (a : Loops.Record), a ∈ F → a.id = i) → (∀ (r : Loops.Record), r ∈ F ↔ r ∈ G) → Loops.baseForm F = Loops.baseForm G",
    "module": "Laws.Things"},
+  "Loops.base32_injective":
+  {"uses": [],
+   "states": "∀ (a b : List UInt8), Loops.base32 a = Loops.base32 b → a = b",
+   "module": "Laws.Base32"},
+  "Loops.base32.go.eq_def":
+  {"uses": [],
+   "states":
+   "∀ (fuel : Nat) (bs : List Bool) (acc : List Char), Loops.base32.go fuel bs acc = match fuel with | 0 => acc.reverse | fuel.succ => if bs.isEmpty = true then acc.reverse else have group := List.take 5 bs ++ List.replicate (5 - (List.take 5 bs).length) false; have n := List.foldl (fun n b => 2 * n + if b = true then 1 else 0) 0 group; Loops.base32.go fuel (List.drop 5 bs) (Loops.base32Alphabet.getD n 'a' :: acc)",
+   "module": "Laws.Base32"},
   "Loops.admit_view":
   {"uses": ["Loops.entitled_view"],
    "states":
@@ -2904,4 +2957,18 @@
   {"uses": [],
    "states":
    "∀ {α : Type u} {β : Type v} [inst : BEq α] (x : α) (x_1 : List (α × β)), List.lookup x x_1 = match x, x_1 with | x, [] => none | a, (k, b) :: as => match a == k with | true => some b | false => List.lookup a as",
-   "module": "Laws.Parse"}}}
+   "module": "Laws.Parse"},
+  "Gen.sha256_length":
+  {"uses": [],
+   "states": "∀ (msg : List UInt8), (Gen.sha256 msg).length = 32",
+   "module": "Laws.IdSource"},
+  "Gen.sha256_bounded":
+  {"uses": ["Gen.sha256_length", "Loops.bytes_bounded"],
+   "states":
+   "∀ (msg : List UInt8), Loops.BoundedId (List.foldl (fun a b => 256 * a + b.toNat) 0 (Gen.sha256 msg))",
+   "module": "Laws.IdSource"},
+  "Gen.Read.recordId_bounded":
+  {"uses": ["Loops.bytes_bounded"],
+   "states":
+   "∀ {path : String} {j : Loops.Json} {n : Nat}, Gen.Read.recordId path j = Except.ok n → Loops.BoundedId n",
+   "module": "Laws.IdSource"}}}

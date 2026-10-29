@@ -70,6 +70,8 @@ const MUTANTS = [
   ["a subject list naming a law whose theorems don't take it", "design/laws/laws.json", json((d) => { d.premises.vocabulary.View.laws.push("count.perm"); })],
   ["a subject premise dropped from its law's list", "design/laws/laws.json", json((d) => { d.premises.vocabulary.View.laws = d.premises.vocabulary.View.laws.filter((k) => k !== "spec.select"); })],
   ["an exemption its theorem no longer needs", "design/laws/laws.json", json((d) => { d.premises.exempt["Spec.view_state"] = "x"; })],
+  ["digest law without its id bound", "design/laws/laws.json", json((d) => { delete d.laws["id.digest"].premises; })],
+  ["digest bound missing from the vocabulary", "design/laws/laws.json", json((d) => { delete d.premises.vocabulary.BoundedId; d.laws["id.digest"].premises = []; })],
   ["spec state without its envelope-only rule", "design/laws/laws.json", json((d) => { delete d.laws["spec.after-supersession"].premises; })],
   ["spec state without its view subject", "design/laws/laws.json", json((d) => { d.premises.vocabulary.View.laws = d.premises.vocabulary.View.laws.filter((k) => k !== "spec.after-supersession"); })],
   ["an exemption for a theorem no law names", "design/laws/laws.json", json((d) => { d.premises.exempt["No.such"] = "x"; })],
