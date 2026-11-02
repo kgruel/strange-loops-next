@@ -134,6 +134,20 @@ fn ascii_predicates_and_record_id_quirks() {
     assert!(time::instant("２０２６-01-01T00:00:00Z").is_none());
 }
 #[test]
+fn raw_envelope_keys_and_canonical_base32() {
+    assert!(envelope::check_keys(["kind", "observer", "emitted"]).is_ok());
+    assert_eq!(
+        envelope::check_keys(["kind", "extra"])
+            .expect_err("unknown key")
+            .to_string(),
+        "envelope-field-unknown"
+    );
+    assert_eq!(loops::base32::decode("00"), Some(vec![0]));
+    assert_eq!(loops::base32::decode("01"), None);
+    assert_eq!(loops::base32::decode("000"), None);
+}
+
+#[test]
 fn precise_times_span_order_and_text_proofs() {
     let a = Stamp::of("1969-12-31T23:59:59.5Z").expect("valid");
     assert!(Stamp::of("1969-12-31T23:59:59.5000Z").is_none());

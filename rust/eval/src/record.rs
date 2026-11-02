@@ -1,6 +1,6 @@
 //! Gen.Run.recordRun, with all Cartesian variants retained for agreement.
 use super::{
-    batch::env,
+    batch::{env, preflight_envs},
     parse_json,
     reader::{bytes, list, members, optional, required, text},
 };
@@ -78,7 +78,9 @@ fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
         &["envs", "payloads", "payload_text", "salt", "seed"],
         input,
     )?;
-    let envs = list("input.envs", required("input", kvs, "envs")?)?
+    let raw_envs = list("input.envs", required("input", kvs, "envs")?)?;
+    preflight_envs(raw_envs.iter())?;
+    let envs = raw_envs
         .iter()
         .enumerate()
         .map(|(i, j)| env(&format!("input.envs[{i}]"), j))
@@ -161,6 +163,19 @@ mod tests {
             Vec::<String>::new(),
             "all record variants executed"
         );
+    }
+
+    #[test]
+    fn all_shapes_precede_envelope_values_and_salt() {
+        for envs in [r#"[{"kind":7},{"extra":1}]"#, r#"[{"extra":1},{"kind":7}]"#] {
+            let input = parse(&format!(
+                r#"{{"envs":{envs},"salt":"!","payloads":[null]}}"#
+            ));
+            assert_eq!(
+                answers("record", &input).expect("shape refusal"),
+                vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
+            );
+        }
     }
 
     #[test]

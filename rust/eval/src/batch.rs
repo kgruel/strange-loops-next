@@ -11,14 +11,9 @@ pub(super) fn env(path: &str, j: &Json) -> Result<Env, String> {
     let Json::Obj(raw) = j else {
         return Err(format!("{path}: expected object"));
     };
-    let allowed = [
-        "kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases",
-    ];
     let names: Vec<_> = raw.iter().map(|(k, _)| k.as_str()).collect();
     let kvs = members(path, &names, j)?;
-    if kvs.iter().any(|(k, _)| !allowed.contains(&k.as_str())) {
-        return Err("envelope-field-unknown".into());
-    }
+    loops::envelope::check_keys(raw.iter().map(|(k, _)| k.as_str())).map_err(|e| e.to_string())?;
     let required_text =
         |k: &str| text(&format!("{path}.{k}"), required(path, kvs, k)?).map(str::to_owned);
     let optional_text = |k: &str| {
@@ -49,6 +44,16 @@ pub(super) fn env(path: &str, j: &Json) -> Result<Env, String> {
     })
 }
 
+pub(super) fn preflight_envs<'a>(envs: impl IntoIterator<Item = &'a Json>) -> Result<(), String> {
+    for env in envs {
+        if let Json::Obj(fields) = env {
+            loops::envelope::check_keys(fields.iter().map(|(key, _)| key.as_str()))
+                .map_err(|e| e.to_string())?;
+        }
+    }
+    Ok(())
+}
+
 fn draft(path: &str, j: &Json) -> Result<Draft, String> {
     let kvs = members(path, &["label", "env", "salt", "payload"], j)?;
     Ok(Draft {
@@ -77,6 +82,16 @@ fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
         return Err(format!("unknown layer {layer}"));
     }
     let kvs = members("input", &["held", "drafts"], input)?;
+    let raw_drafts = list("input.drafts", required("input", kvs, "drafts")?)?;
+    preflight_envs(raw_drafts.iter().flat_map(|draft| {
+        match draft {
+            Json::Obj(fields) => fields
+                .iter()
+                .filter_map(|(key, value)| (key == "env").then_some(value))
+                .collect::<Vec<_>>(),
+            _ => Vec::new(),
+        }
+    }))?;
     let held: Vec<(String, Vec<String>)> = list("input.held", required("input", kvs, "held")?)?
         .iter()
         .enumerate()
@@ -89,7 +104,7 @@ fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
             ))
         })
         .collect::<Result<_, String>>()?;
-    let drafts: Vec<_> = list("input.drafts", required("input", kvs, "drafts")?)?
+    let drafts: Vec<_> = raw_drafts
         .iter()
         .enumerate()
         .map(|(i, j)| draft(&format!("input.drafts[{i}]"), j))
@@ -126,6 +141,22 @@ mod tests {
     use super::{answers, bytes, draft, env};
     use crate::parse;
     use loops::json::Json;
+
+    #[test]
+    fn shape_preflight_precedes_all_draft_and_held_values() {
+        let bad = r#"{"env":{"extra":1}}"#;
+        let malformed = r#"{"label":7,"env":{"kind":7},"salt":"!"}"#;
+        for drafts in [
+            format!("[{bad},{malformed}]"),
+            format!("[{malformed},{bad}]"),
+        ] {
+            let input = parse(&format!(r#"{{"held":null,"drafts":{drafts}}}"#));
+            assert_eq!(
+                answers("batch", &input).expect("shape refusal"),
+                vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
+            );
+        }
+    }
 
     #[test]
     fn strict_shapes_and_base32() {

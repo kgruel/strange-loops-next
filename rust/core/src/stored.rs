@@ -6,8 +6,6 @@ use std::fmt;
 /// Each value names one writer refusal, including envelope checks from `model/Loops/Envelope.lean`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Error {
-    /// The raw envelope contains an unknown field.
-    EnvelopeFieldUnknown,
     /// The kind name is empty.
     KindEmpty,
     /// The observer text breaks the typed reference grammar.
@@ -36,7 +34,6 @@ impl Error {
     /// Returns the exact wire code for this refusal.
     pub fn code(self) -> &'static str {
         match self {
-            Self::EnvelopeFieldUnknown => "envelope-field-unknown",
             Self::KindEmpty => "kind-empty",
             Self::ObserverNotTyped => "observer-not-typed",
             Self::EmittedNotRfc3339 => "emitted-not-rfc3339",

@@ -6,6 +6,32 @@ use crate::{
     time,
 };
 
+/// The raw envelope has an unknown field.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ShapeError;
+
+impl std::fmt::Display for ShapeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("envelope-field-unknown")
+    }
+}
+impl std::error::Error for ShapeError {}
+
+/// Checks raw envelope member names without inspecting values.
+///
+/// # Errors
+/// Returns `ShapeError` if any member name is unknown.
+pub fn check_keys<'a>(keys: impl IntoIterator<Item = &'a str>) -> Result<(), ShapeError> {
+    const KEYS: &[&str] = &[
+        "kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases",
+    ];
+    if keys.into_iter().any(|key| !KEYS.contains(&key)) {
+        Err(ShapeError)
+    } else {
+        Ok(())
+    }
+}
+
 /// Lean: `Loops.Env`, model/Loops/Envelope.lean.
 /// An unchecked writer envelope keeps text spellings and raw lists.
 /// Only `to_json` sorts its set fields and removes repeats.

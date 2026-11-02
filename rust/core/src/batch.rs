@@ -224,7 +224,6 @@ pub fn check_prev(
 // Lean: Loops.writeCodes. The order is explicit and independent of enum layout.
 fn writer_priority(error: stored::Error) -> u8 {
     match error {
-        stored::Error::EnvelopeFieldUnknown => 0,
         stored::Error::KindEmpty => 1,
         stored::Error::ObserverNotTyped => 2,
         stored::Error::EmittedNotRfc3339 => 3,

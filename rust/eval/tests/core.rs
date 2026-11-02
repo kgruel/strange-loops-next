@@ -262,11 +262,12 @@ fn serialization_retains_spelling_orders_and_only_runtime_members() {
     );
     assert_eq!(sp.to_json(), expected);
     assert_eq!(Spec::of_json(&expected).expect("round trip"), sp);
-    let other = spec(&input.replace("2026-10-01T01:00:00Z", "2026-10-01T00:00:00Z"));
+    let other = spec(&input.replace("2026-09\"", "2026-09?\""));
     assert_ne!(sp, other, "full spec equality includes claim text");
-    assert_ne!(
-        loops::time::instant("2026-10-01T01:00:00Z"),
-        loops::time::instant("2026-10-01T00:00:00Z")
+    assert_ne!(sp.to_json(), other.to_json());
+    assert_eq!(
+        loops::occurred::occurred_span("2026-09"),
+        loops::occurred::occurred_span("2026-09?")
     );
     let raw = json(
         r#"{"z":{"is":true,"not":false,"present":true,"absent":true},"a":{"below":5,"at-least":-3},"z":{"is":""}}"#,
