@@ -8,13 +8,17 @@ use loops::{
 use sha2::{Digest, Sha256};
 
 pub(super) fn env(path: &str, j: &Json) -> Result<Env, String> {
-    let kvs = members(
-        path,
-        &[
-            "kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases",
-        ],
-        j,
-    )?;
+    let Json::Obj(raw) = j else {
+        return Err(format!("{path}: expected object"));
+    };
+    let allowed = [
+        "kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases",
+    ];
+    let names: Vec<_> = raw.iter().map(|(k, _)| k.as_str()).collect();
+    let kvs = members(path, &names, j)?;
+    if kvs.iter().any(|(k, _)| !allowed.contains(&k.as_str())) {
+        return Err("envelope-field-unknown".into());
+    }
     let required_text =
         |k: &str| text(&format!("{path}.{k}"), required(path, kvs, k)?).map(str::to_owned);
     let optional_text = |k: &str| {
@@ -60,6 +64,15 @@ fn draft(path: &str, j: &Json) -> Result<Draft, String> {
 /// Lean: `Gen.batchRun`, model/Gen/Run.lean.
 /// Computes complete batch answers after strict fixture decoding.
 pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
+    match answers_decoded(layer, input) {
+        Err(e) if e == "envelope-field-unknown" => {
+            Ok(vec![Json::Obj(vec![("refused".into(), Json::Str(e))])])
+        }
+        other => other,
+    }
+}
+
+fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
     if layer != "batch" {
         return Err(format!("unknown layer {layer}"));
     }
@@ -129,13 +142,36 @@ mod tests {
         for s in ["A", "a", "ab", "aaa", "aa="] {
             assert!(bytes("salt", &Json::Str(s.into())).is_err(), "{s}");
         }
-        assert!(bytes("salt", &Json::Str("aa".into())).is_ok());
+        assert!(bytes("salt", &Json::Str("00".into())).is_ok());
         let empty = parse(r#"{"held":[],"drafts":[]}"#);
         assert_eq!(
             answers("batch", &empty).expect("shape"),
             vec![parse(r#"{"records":[]}"#)]
         );
         assert!(answers("batch/other", &empty).is_err());
+    }
+
+    #[test]
+    fn unknown_envelope_field_precedes_values() {
+        for raw in [r#"{"extra":1,"kind":""}"#, r#"{"kind":3,"extra":1}"#] {
+            assert_eq!(
+                env("env", &parse(raw)),
+                Err("envelope-field-unknown".into())
+            );
+        }
+        let raw = parse(
+            r#"{"held":[],"drafts":[{"env":{"extra":1,"kind":""},"salt":"","payload":null}]}"#,
+        );
+        assert_eq!(
+            answers("batch", &raw).expect("refusal"),
+            vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
+        );
+        let duplicate = parse(r#"{"extra":1,"extra":2}"#);
+        assert!(
+            env("env", &duplicate)
+                .expect_err("duplicate")
+                .contains("duplicate")
+        );
     }
 
     #[test]
@@ -168,9 +204,9 @@ mod tests {
 
     #[test]
     fn held_first_match_and_arbitrary_ids() {
-        let id = format!("r:{}", "a".repeat(52));
+        let id = format!("r:{}", "0".repeat(52));
         let input = format!(
-            r#"{{"held":[{{"id":"arbitrary","about":[]}},{{"id":"{id}","about":["thing:one"]}},{{"id":"{id}","about":["thing:two"]}}],"drafts":[{{"env":{{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z","about":["thing:one"],"prev":["{id}"]}},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":null}}]}}"#
+            r#"{{"held":[{{"id":"arbitrary","about":[]}},{{"id":"{id}","about":["thing:one"]}},{{"id":"{id}","about":["thing:two"]}}],"drafts":[{{"env":{{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z","about":["thing:one"],"prev":["{id}"]}},"salt":"00000000000000000000000000","payload":null}}]}}"#
         );
         let result = answers("batch", &parse(&input)).expect("shape");
         assert!(matches!(&result[0], Json::Obj(m) if m[0].0 == "records"));
@@ -179,14 +215,14 @@ mod tests {
     #[test]
     fn raw_payload_and_optional_fields() {
         let input = parse(
-            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":{"x":1,"x":2}}]}"#,
+            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"00000000000000000000000000","payload":{"x":1,"x":2}}]}"#,
         );
         assert_eq!(
             answers("batch", &input).expect("shape"),
             vec![parse(r#"{"refused":"member-duplicate"}"#)]
         );
         let large = parse(
-            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":999999999999999999999999999999999999999999999999999999}]}"#,
+            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"00000000000000000000000000","payload":999999999999999999999999999999999999999999999999999999}]}"#,
         );
         assert_eq!(
             answers("batch", &large).expect("finite binary64 payload"),
@@ -222,7 +258,7 @@ mod tests {
             vec![parse(r#"{"refused":"number-out-of-range"}"#)]
         );
         let input = parse(
-            r#"{"held":[],"drafts":[{"label":null,"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":null}]}"#,
+            r#"{"held":[],"drafts":[{"label":null,"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"00000000000000000000000000","payload":null}]}"#,
         );
         assert!(answers("batch", &input).is_err());
     }

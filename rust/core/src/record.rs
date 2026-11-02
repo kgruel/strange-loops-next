@@ -93,7 +93,7 @@ pub const fn id_digest(id: &Digest) -> &[u8; 32] {
     &id.0
 }
 /// Lean: `Loops.idText`, model/Loops/Record.lean.
-/// Encodes all digest bytes as lowercase base32 after `r:`.
+/// Encodes all digest bytes as lowercase base32hex after `r:`.
 pub fn id_text(id: &Digest) -> String {
     format!("r:{}", base32::base32(id_digest(id)))
 }

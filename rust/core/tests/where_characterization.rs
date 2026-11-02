@@ -251,14 +251,14 @@ fn parser_domains_bounds_and_true_only_operators_are_closed() {
         (FieldType::Refs, "t:thing"),
         (
             FieldType::Ids,
-            "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+            "r:0000000000000000000000000000000000000000000000000000",
         ),
         (FieldType::Time, "2026-01"),
         (FieldType::Time, "2026-01-01?"),
     ] {
         assert!(parse_arg(ty, "p", &text(s)).is_ok(), "{ty:?}: {s}");
     }
-    // Id arguments use envelope.recordId, not the stricter fixture base32 decoder.
+    // Id arguments and fixture readers share the canonical decoder.
     assert!(parse_arg(FieldType::Ids, "p", &text("r:bad")).is_err());
     assert!(parse_arg(FieldType::Refs, "p", &text("not a ref")).is_err());
     for n in [-9_007_199_254_740_991_i64, 9_007_199_254_740_991] {

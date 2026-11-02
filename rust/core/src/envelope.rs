@@ -15,7 +15,7 @@ pub struct Env {
     pub kind: String,
     /// The typed reference for the observer who emits the record.
     pub observer: String,
-    /// The observer's current time, with its written offset.
+    /// The observer's current time in UTC.
     pub emitted: String,
     /// The observer's claim about past time, if any.
     pub occurred: Option<String>,
@@ -40,14 +40,11 @@ pub fn typed_ref(s: &str) -> bool {
         && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
 }
 /// Lean: `Loops.recordId`, model/Loops/Envelope.lean.
-/// Checks the `r:` prefix and 52 lowercase base32 characters, but not final padding bits.
+/// Checks the `r:` prefix and canonical encoding of a 32-byte digest.
 pub fn record_id(s: &str) -> bool {
-    s.strip_prefix("r:").is_some_and(|rest| {
-        rest.len() == 52
-            && rest
-                .bytes()
-                .all(|c| c.is_ascii_lowercase() || (b'2'..=b'7').contains(&c))
-    })
+    s.strip_prefix("r:")
+        .and_then(crate::base32::decode)
+        .is_some_and(|bytes| bytes.len() == 32)
 }
 impl Env {
     /// Lean: `Loops.Env.toJson`, model/Loops/Envelope.lean.

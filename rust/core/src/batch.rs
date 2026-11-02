@@ -224,17 +224,18 @@ pub fn check_prev(
 // Lean: Loops.writeCodes. The order is explicit and independent of enum layout.
 fn writer_priority(error: stored::Error) -> u8 {
     match error {
-        stored::Error::KindEmpty => 0,
-        stored::Error::ObserverNotTyped => 1,
-        stored::Error::EmittedNotRfc3339 => 2,
-        stored::Error::OccurredNotSpan => 3,
-        stored::Error::AboutNotTyped => 4,
-        stored::Error::PrevNotRecordId => 5,
-        stored::Error::UnderNotRecordId => 6,
-        stored::Error::ErasesNotRecordId => 7,
-        stored::Error::SaltNot16Bytes => 8,
-        stored::Error::MemberDuplicate => 9,
-        stored::Error::NumberOutOfRange => 10,
+        stored::Error::EnvelopeFieldUnknown => 0,
+        stored::Error::KindEmpty => 1,
+        stored::Error::ObserverNotTyped => 2,
+        stored::Error::EmittedNotRfc3339 => 3,
+        stored::Error::OccurredNotSpan => 4,
+        stored::Error::AboutNotTyped => 5,
+        stored::Error::PrevNotRecordId => 6,
+        stored::Error::UnderNotRecordId => 7,
+        stored::Error::ErasesNotRecordId => 8,
+        stored::Error::SaltNot16Bytes => 9,
+        stored::Error::MemberDuplicate => 10,
+        stored::Error::NumberOutOfRange => 11,
     }
 }
 
@@ -577,7 +578,7 @@ mod tests {
                 }
             }
             let mut unknown_prev = draft(None);
-            unknown_prev.env.prev = vec![format!("r:{}", "a".repeat(52))];
+            unknown_prev.env.prev = vec![format!("r:{}", crate::base32::base32(&[0; 32]))];
             assert_eq!(
                 resolve_batch(&hash, &no_held, &[unknown_prev, earlier.clone()]),
                 Err(Error::Write(*error)),
@@ -762,8 +763,8 @@ mod tests {
 
     #[test]
     fn batch_prev_refusals_are_global_after_writer_checks() {
-        let held_id = format!("r:{}", "a".repeat(52));
-        let missing_id = format!("r:{}", "b".repeat(52));
+        let held_id = format!("r:{}", crate::base32::base32(&[0; 32]));
+        let missing_id = format!("r:{}", crate::base32::base32(&[1; 32]));
         let held = |p: &str| (p == held_id).then(|| texts(&["thing:held"]));
         let mut unrelated = draft(None);
         unrelated.env.about = texts(&["thing:other"]);

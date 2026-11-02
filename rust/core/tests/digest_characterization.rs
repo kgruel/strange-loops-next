@@ -62,8 +62,8 @@ fn digest_order_uses_unsigned_bytes_from_most_significant_to_least() {
     assert!(Digest(low) < Digest(high));
     assert!(Digest([208; 32]) > Digest(high));
     assert!(
-        id_text(&Digest([208; 32])) < id_text(&Digest(high)),
-        "text order differs"
+        id_text(&Digest([208; 32])) > id_text(&Digest(high)),
+        "text order follows bytes"
     );
 }
 
@@ -72,9 +72,9 @@ fn digest_text_and_consumers_keep_leading_and_high_bytes() {
     let mut high = [0; 32];
     high[0] = 128;
     for (digest, text) in [
-        (Digest([0; 32]), format!("r:{}", "a".repeat(52))),
-        (Digest([255; 32]), format!("r:{}q", "7".repeat(51))),
-        (Digest(high), format!("r:q{}", "a".repeat(51))),
+        (Digest([0; 32]), format!("r:{}", "0".repeat(52))),
+        (Digest([255; 32]), format!("r:{}g", "v".repeat(51))),
+        (Digest(high), format!("r:g{}", "0".repeat(51))),
     ] {
         assert_eq!(id_text(&digest), text);
         let r = Record {

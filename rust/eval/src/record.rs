@@ -61,6 +61,15 @@ fn one(e: &Env, salt: &[u8], payload: &Json, seed: Option<&[u8; 32]>) -> Result<
 }
 
 pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
+    match answers_decoded(layer, input) {
+        Err(e) if e == "envelope-field-unknown" => {
+            Ok(vec![Json::Obj(vec![("refused".into(), Json::Str(e))])])
+        }
+        other => other,
+    }
+}
+
+fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
     if layer != "record" {
         return Err(format!("unknown record layer {layer}"));
     }
@@ -159,7 +168,7 @@ mod tests {
         let env = r#"{"kind":"note","observer":"sl:a","emitted":"2026-01-01T00:00:00Z","about":["thing:a"]}"#;
         for seed in [r#""""#, r#""a""#, r#""aa""#, r#""A""#, "null"] {
             let input = parse(&format!(
-                r#"{{"envs":[{env}],"payloads":[null],"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","seed":{seed}}}"#
+                r#"{{"envs":[{env}],"payloads":[null],"salt":"00000000000000000000000000","seed":{seed}}}"#
             ));
             assert!(answers("record", &input).is_err(), "{seed}");
         }

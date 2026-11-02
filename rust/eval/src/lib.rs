@@ -5,6 +5,7 @@
 //! fixture's `expect`, route sources, or perform storage/network operations.
 //! Arrival-order answers remain separate until agreement is checked.
 mod batch;
+mod byte_text;
 mod fold;
 mod json;
 mod lens;
@@ -57,6 +58,7 @@ pub fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, Error> {
         Some("scenario") => scenario::answers,
         Some("lens") => lens::answers,
         Some("batch") => batch::answers,
+        Some("byte-text") => byte_text::answers,
         _ => return Err(Error(format!("layer: unknown layer {layer}"))),
     };
     run(layer, input).map_err(Error::from)
@@ -157,7 +159,7 @@ mod tests {
 
     #[test]
     fn differing_orders_are_not_silently_selected() {
-        let form = r#"{"id":"r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":0}"#;
+        let form = r#"{"id":"r:0000000000000000000000000000000000000000000000000000","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":0}"#;
         let input = format!(r#"{{"orders":[[],[{form}]]}}"#);
         assert_eq!(
             answers("fold/count", &parse_json(&input).expect("JSON"))

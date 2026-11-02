@@ -257,7 +257,7 @@ mod tests {
                         Json::Str(if variant == 3 {
                             "bad".into()
                         } else {
-                            format!("r:{}", "a".repeat(52))
+                            format!("r:{}", loops::base32::base32(&[0; 32]))
                         });
                 }
                 5 => {
@@ -272,7 +272,7 @@ mod tests {
                         .expect("orders")
                         .1 = Json::Arr(vec![Json::Arr(vec![Json::Str(format!(
                         "r:{}",
-                        "a".repeat(52)
+                        loops::base32::base32(&[0; 32])
                     ))])]);
                 }
                 _ => (),

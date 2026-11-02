@@ -175,7 +175,7 @@ mod tests {
 
     #[test]
     fn decoder_has_no_hidden_defaults_or_payloads() {
-        let valid = r#"{"id":"r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":0}"#;
+        let valid = r#"{"id":"r:0000000000000000000000000000000000000000000000000000","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":0}"#;
         let raw = parse(valid);
         assert!(
             record("r", &raw).is_ok(),
@@ -213,8 +213,8 @@ mod tests {
         assert_eq!(r.n, loops::number::Int::default());
         assert_eq!(r.value, "");
         let bad_id = valid.replace(
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+            "0000000000000000000000000000000000000000000000000000",
+            "0000000000000000000000000000000000000000000000000001",
         );
         assert!(
             record("r", &parse(&bad_id)).is_err(),
@@ -226,7 +226,7 @@ mod tests {
     fn fixture_numbers_round_to_binary64_before_whole_readability() {
         let n = "170141183460469231731687303715884105728000";
         let input = format!(
-            r#"{{"orders":[[{{"id":"r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":{n}}}]]}}"#
+            r#"{{"orders":[[{{"id":"r:0000000000000000000000000000000000000000000000000000","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":{n}}}]]}}"#
         );
         let raw = parse(&input);
         let loops::json::Json::Obj(root) = &raw else {
