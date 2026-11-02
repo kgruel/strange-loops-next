@@ -1,0 +1,737 @@
+{
+  "examples": {
+    "raw": {
+      "layer": "lens/section",
+      "input": {
+        "base": [
+          {
+            "id": "t:repeat",
+            "body": [
+              "first"
+            ]
+          },
+          {
+            "id": "t:repeat",
+            "body": [
+              "second"
+            ]
+          }
+        ],
+        "text": [
+          "::: t:repeat",
+          "first",
+          ":::"
+        ]
+      },
+      "answers": {
+        "js": {
+          "parsed": [
+            {
+              "id": "t:repeat",
+              "body": [
+                "first"
+              ]
+            }
+          ],
+          "normalized": [
+            "::: t:repeat",
+            "first",
+            ":::"
+          ],
+          "outcomes": [
+            {
+              "accepted": "t:repeat",
+              "body": [
+                "first"
+              ]
+            }
+          ],
+          "applied": [
+            {
+              "id": "t:repeat",
+              "body": [
+                "first"
+              ]
+            },
+            {
+              "id": "t:repeat",
+              "body": [
+                "first"
+              ]
+            }
+          ]
+        },
+        "lean": {
+          "parsed": [
+            {
+              "id": "t:repeat",
+              "body": [
+                "first"
+              ]
+            }
+          ],
+          "normalized": [
+            "::: t:repeat",
+            "first",
+            ":::"
+          ],
+          "outcomes": [],
+          "applied": [
+            {
+              "id": "t:repeat",
+              "body": [
+                "first"
+              ]
+            },
+            {
+              "id": "t:repeat",
+              "body": [
+                "second"
+              ]
+            }
+          ]
+        },
+        "rust": {
+          "applied": [
+            {
+              "body": [
+                "first"
+              ],
+              "id": "t:repeat"
+            },
+            {
+              "body": [
+                "second"
+              ],
+              "id": "t:repeat"
+            }
+          ],
+          "normalized": [
+            "::: t:repeat",
+            "first",
+            ":::"
+          ],
+          "outcomes": [],
+          "parsed": [
+            {
+              "body": [
+                "first"
+              ],
+              "id": "t:repeat"
+            }
+          ]
+        }
+      }
+    },
+    "reduced": {
+      "layer": "lens/section",
+      "input": {
+        "base": [
+          {
+            "id": "t:repeat",
+            "body": [
+              ""
+            ]
+          },
+          {
+            "id": "t:repeat",
+            "body": []
+          }
+        ],
+        "text": [
+          "::: t:repeat",
+          ":::"
+        ]
+      },
+      "answers": {
+        "js": {
+          "parsed": [
+            {
+              "id": "t:repeat",
+              "body": []
+            }
+          ],
+          "normalized": [
+            "::: t:repeat",
+            ":::"
+          ],
+          "outcomes": [],
+          "applied": [
+            {
+              "id": "t:repeat",
+              "body": [
+                ""
+              ]
+            },
+            {
+              "id": "t:repeat",
+              "body": []
+            }
+          ]
+        },
+        "lean": {
+          "parsed": [
+            {
+              "id": "t:repeat",
+              "body": []
+            }
+          ],
+          "normalized": [
+            "::: t:repeat",
+            ":::"
+          ],
+          "outcomes": [
+            {
+              "accepted": "t:repeat",
+              "body": []
+            }
+          ],
+          "applied": [
+            {
+              "id": "t:repeat",
+              "body": []
+            },
+            {
+              "id": "t:repeat",
+              "body": []
+            }
+          ]
+        },
+        "rust": {
+          "applied": [
+            {
+              "body": [],
+              "id": "t:repeat"
+            },
+            {
+              "body": [],
+              "id": "t:repeat"
+            }
+          ],
+          "normalized": [
+            "::: t:repeat",
+            ":::"
+          ],
+          "outcomes": [
+            {
+              "accepted": "t:repeat",
+              "body": []
+            }
+          ],
+          "parsed": [
+            {
+              "body": [],
+              "id": "t:repeat"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "seed": "step1-1",
+      "index": 7,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 23,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 55,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 87,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 103,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 119,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 135,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 151,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 167,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 199,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 215,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 247,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 263,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 279,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 295,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 311,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 327,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 359,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 375,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 391,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 407,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 423,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 439,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 455,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 471,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 487,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 503,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 535,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 551,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 567,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 583,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 599,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 615,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 631,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 647,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 663,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 695,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 711,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 727,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 743,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 759,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    },
+    {
+      "seed": "step1-1",
+      "index": 775,
+      "family": "lens",
+      "raw": "raw",
+      "reduced": "reduced",
+      "shrink": {
+        "trials": 76,
+        "rounds": 3,
+        "bounded": false
+      }
+    }
+  ]
+}

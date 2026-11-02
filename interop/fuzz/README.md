@@ -154,7 +154,7 @@ A shared Lean/Rust decoder refusal remains a decoder refusal, not protocol agree
 A one-sided decoder refusal is always a mismatch.
 The summary counts shared decoder refusals separately and saves both field diagnostics.
 A realm's `refused` record list remains part of a normal realm answer, not a top-level protocol refusal.
-Only explicit writer refusal codes normalize caught writer exceptions.
+Only explicit shape or writer refusal codes normalize caught record exceptions.
 Unexpected JS exceptions remain mismatches.
 Transport failures never become protocol refusals.
 
@@ -203,6 +203,6 @@ The fuzz runner has no mismatch allowlist or ignored disagreement.
 A test reproduces both recorded answers for the duplicate-base candidate.
 The official gap17 vectors test the resolved repeated and empty edited IDs.
 The human ruling resolves gap17. Duplicate-base behavior remains a protocol-domain question.
-The Step-1 campaign finds 42 such lens mismatches in 5,600 cases.
+The original `step1-1` campaign finds 42 such lens mismatches in 5,600 cases.
 
 [REPORT.md](REPORT.md) records the Step-1 result and historical two-way and three-way results.

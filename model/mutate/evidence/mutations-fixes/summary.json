@@ -1,0 +1,2687 @@
+{
+  "baseline": {
+    "build": {
+      "status": "ok",
+      "code": 0,
+      "signal": null,
+      "error": null
+    },
+    "gen": {
+      "status": "ok",
+      "code": 0,
+      "signal": null,
+      "error": null
+    },
+    "changedPaths": []
+  },
+  "finalBaseline": {
+    "status": "ok",
+    "code": 0,
+    "signal": null,
+    "error": null
+  },
+  "mutants": [
+    {
+      "id": "things-prev-or",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "things-drop-may",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "things-drop-erasure",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "fold-drop-prev-filter",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "fold-drop-named-guard",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-unread-duplicates",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-below-time-inclusive",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-atleast-time-strict",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-source-all-any",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: scenario/phase2-thing-state: the spec must retain each thing's own head"
+    },
+    {
+      "id": "families-unknown-no",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "families-drop-readable",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "families-unread-zero",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "things-here-last",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "things-no-self-anchor",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "things-negate-erases",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: scenario/phase2-thing-state: the spec must retain each thing's own head"
+    },
+    {
+      "id": "fold-winner-last",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "fold-insert-nonstrict",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "fold-count-zero",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-drop-head-choice",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-drop-collect-choice",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-collect-unknown-yes",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "spec-below-number-inclusive",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "stored-salt-check",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "stored-commit-order",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "stored-refusal-last",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "record-newer-id-flip",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "record-num-hidden",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "occurred-month-end",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "occurred-open-stop",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "occurred-qualifier-and",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: occurred/03-qualifiers: 2009? refused"
+    },
+    {
+      "id": "record-num-drop-int",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-batch-003",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-batch-004",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-batch-005",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-batch-006",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-batch-007",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-envelope-008",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/01-minimal: unexpectedly refused: observer-not-typed"
+    },
+    {
+      "id": "wide-envelope-009",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/35-observer-prefix-start: expected a refusal"
+    },
+    {
+      "id": "wide-envelope-010",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/02-full-envelope: unexpectedly refused: prev-not-record-id"
+    },
+    {
+      "id": "wide-envelope-011",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/01-minimal: unexpectedly refused: kind-empty"
+    },
+    {
+      "id": "wide-families-012",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-families-013",
+      "status": "survived",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-families-014",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-families-015",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-families-016",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-families-017",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-fold-019",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-fold-020",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-021",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-022",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-023",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-025",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-026",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-027",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-json-028",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/12-negative-exact-boundary: unexpectedly refused: number-out-of-range"
+    },
+    {
+      "id": "wide-json-029",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/29-number-out-of-range: expected a refusal"
+    },
+    {
+      "id": "wide-json-030",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/29-number-out-of-range: expected a refusal"
+    },
+    {
+      "id": "wide-lens-031",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-032",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-033",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-034",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-036",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-037",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-038",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-039",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-lens-041",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-occurred-042",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-occurred-043",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-record-044",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-record-049",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-record-050",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-051",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-052",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-053",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-054",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: fold/select/phase2-exact-output: its test is refused (where-invalid)"
+    },
+    {
+      "id": "wide-spec-055",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-056",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-057",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-059",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-061",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-062",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-063",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-064",
+      "status": "survived",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-066",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-067",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-068",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-069",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-070",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-073",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-074",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-spec-076",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-stored-081",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-things-083",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-things-084",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-091",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-092",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-093",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-094",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-095",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-096",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "wide-time-097",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: record/01-minimal: unexpectedly refused: emitted-not-rfc3339"
+    },
+    {
+      "id": "coverage-json-json-alldistinct",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-json-json-membersdistinct",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-parsearg",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-parsebound",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-parseop",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-parsewhere",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-slotfollow",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-parseslot",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-parsekinds",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-sourcestore",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-json-repeatin",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-json-repeatmember",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-occurred-span-closed-",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-occurred-between",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-time-instant-",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-slottests",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-sourcekinds",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-spec-specslots",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "coverage-base32-bit-order",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-batch-subst",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-batch-envthings",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-batch-checkprev",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-envelope-env-tojson",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-families-acc-fold",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-families-tri-ofbool",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-count-fold",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-insertrec",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-latestby-fold",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-latestby-others",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-latest-others",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-sum-fold",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-max-fold",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-fold-min-fold",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-json-sortby",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-json-hexdigit",
+      "status": "survived",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-json-json-canonall",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-json-json-canonmembers",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-occurred-halves",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-occurred-claim-of",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-record-digestdigits",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-record-record-span",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-field-name",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-field-onenvelope",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-arg-matches",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-cond-eval",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-cond-all",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-chosen",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-memberpath",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-slottype",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-parsesource",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-json-repeatat",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-specvertex",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-specsources",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-spec-ofobject",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-arg-tojson",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-slot-tojson",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-spec-source-tojson",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-stored-stored-commit",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-stored-write",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-things-idsof",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-things-refusalof",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-things-admit",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "finish-things-statein",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-lens-apply",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-spec-parsefield",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-lens-render",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-lens-diff",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-fold-latest-winner",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-occurred-span-before",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-record-addressed",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-things-thingsof",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-things-settle",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-things-perthing",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-spec-shownids",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-spec-spec-run",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-spec-tests-tojson",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-spec-spec-tojson",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-families-sum-acc",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-families-max-acc",
+      "status": "survived",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "extra-families-min-acc",
+      "status": "survived",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-families-count-acc",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-families-tri-refines",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-things-forms",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-things-envonly",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-spec-tests-conds",
+      "status": "survived",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-json-utf16",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "last-json-quote",
+      "status": "killed-by-vector",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "step1-base32-reencode",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "step1-fraction-final-zero",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "step1-seconds-bound",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "step1-zone-only-z",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "step1-envelope-keys-remove",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: R6 raw keys must precede envelope values"
+    },
+    {
+      "id": "step1-envelope-keys-after-value",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: R6 raw keys must precede envelope values"
+    },
+    {
+      "id": "step1-draft-keys-after-values",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: batch/19-shape-before-values-0: raw shape did not precede labels and values"
+    },
+    {
+      "id": "step1-record-keys-after-values",
+      "status": "error",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "assertion": "uncaught exception: R6 every envelope variant must pass shape before value decoding"
+    }
+  ]
+}
