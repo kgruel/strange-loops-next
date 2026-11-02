@@ -1,0 +1,28 @@
+{
+  "vector": "r6-two-envs-unknown-last",
+  "layer": "record",
+  "laws": ["record.refuse", "batch.refuse-order"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
+      },
+      {
+        "extra": null,
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
+      }
+    ],
+    "salt": "1mc5n8286st2bg1iairln7951k",
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "envelope-field-unknown"
+  }
+}
