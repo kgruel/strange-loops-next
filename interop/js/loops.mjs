@@ -162,10 +162,14 @@ const recordId = (s) => {
 };
 const ENV_KEYS = new Set(["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"]);
 
-export const unknownEnvelopeKeys = (env) => Reflect.ownKeys(env).some((key) => !ENV_KEYS.has(key));
+export const unknownEnvelopeKeys = (env) => env !== null && typeof env === "object" && !Array.isArray(env) && Reflect.ownKeys(env).some((key) => !ENV_KEYS.has(key));
+
+// Check all raw envelope shapes before reading any of their values.
+export function checkEnvelopeKeys(envs) {
+  if (envs.some(unknownEnvelopeKeys)) throw new Error("envelope-field-unknown");
+}
 
 export function problem(env) {
-  if (unknownEnvelopeKeys(env)) return "envelope-field-unknown";
   if (!env.kind) return "kind-empty";
   if (!typedRef(env.observer)) return "observer-not-typed";
   if (!validEmitted(env.emitted)) return "emitted-not-rfc3339";
@@ -252,6 +256,7 @@ const saltProblem = (salt) => (salt.length === 16 ? null : "salt-not-16-bytes");
 // Write a record from its payload as JSON text, checking in the model's order:
 // the envelope, the salt, repeated member names, then numbers.
 export function writeText(env, salt, text, seed) {
+  checkEnvelopeKeys([env]);
   const why = problem(env) ?? saltProblem(salt);
   if (why) throw new Error(why);
   return seal(env, salt, parse(text), seed);
@@ -259,12 +264,14 @@ export function writeText(env, salt, text, seed) {
 
 // Seal a record: the stored line, and the line after erasure. Refuses a bad
 // envelope, a salt that isn't 16 bytes, then a nonfinite or out-of-range payload number.
+// A seed supplier defers fixture seed decoding until all write checks pass.
 export function seal(env, salt, payload, seed) {
+  checkEnvelopeKeys([env]);
   const why = problem(env) ?? saltProblem(salt) ?? (inRange(payload) ? null : "number-out-of-range");
   if (why) throw new Error(why);
   const commit = commitOf(salt, payload);
   const id = idOf(env, commit);
-  const sig = signId(seed, id);
+  const sig = signId(typeof seed === "function" ? seed() : seed, id);
   return {
     commit, id, sig,
     line: canonical({ id, env: envJson(env), salt: base32(salt), payload, sig }),

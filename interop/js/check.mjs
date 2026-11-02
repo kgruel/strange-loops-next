@@ -41,15 +41,16 @@ function checkRecord(dir) {
     if (v.expect.refused) {
       let got = null;
       try {
-        if (envs.some(L.unknownEnvelopeKeys)) throw new Error("envelope-field-unknown");
+        L.checkEnvelopeKeys(envs);
         L.writeText(envs[0], L.base32Decode(v.input.salt), v.input.payload_text, new Uint8Array(32));
       }
       catch (e) { got = e.message; }
       t.expect(`${n} refused`, got, v.expect.refused);
       continue;
     }
+    L.checkEnvelopeKeys(envs);
     const salt = L.base32Decode(v.input.salt);
-    const seed = L.base32Decode(v.input.seed);
+    const seed = () => L.base32Decode(v.input.seed);
     const r = L.seal(envs[0], salt, v.input.payloads[0], seed);
     t.expect(`${n} env`, L.canonical(L.envJson(envs[0])), v.expect.env_canonical);
     t.expect(`${n} payload`, L.canonical(v.input.payloads[0]), v.expect.payload_canonical);

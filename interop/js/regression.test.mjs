@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { base32, base32Decode, fixedBytes, canonical, seal, writeText, problem, validEmitted, occurredSpan, signId, verifyId } from "./loops.mjs";
+import { base32, base32Decode, fixedBytes, canonical, checkEnvelopeKeys, seal, writeText, problem, validEmitted, occurredSpan, signId, verifyId } from "./loops.mjs";
 import { resolveBatch } from "./batch.mjs";
 import { heads, latest, sum, min, max } from "./fold.mjs";
 import { parse } from "./lens.mjs";
@@ -77,12 +77,31 @@ test("canonical UTC instants and envelope key priority", () => {
     for (const occurred of [s, `${s}/..`, `${s}/2025`, `2020/${s}`]) assert.equal(occurredSpan(occurred), null, occurred);
   }
   const env = { ...writerEnv, kind: "", unexpected: 1 };
-  assert.equal(problem(env), "envelope-field-unknown");
-  assert.equal(problem(JSON.parse('{"__proto__":0,"kind":""}')), "envelope-field-unknown");
-  assert.equal(problem(Object.defineProperty({ ...writerEnv }, "hidden", { value: 1 })), "envelope-field-unknown");
+  assert.throws(() => seal(env, writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  assert.throws(() => seal(JSON.parse('{"__proto__":0,"kind":""}'), writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  assert.throws(() => seal(Object.defineProperty({ ...writerEnv }, "hidden", { value: 1 }), writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  const guarded = { get kind() { throw new Error('value read'); }, unexpected: 1 };
+  assert.throws(() => seal(guarded, writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  assert.throws(() => writeText(guarded, writerSalt, '{', writerSeed), /envelope-field-unknown/);
   const draft = { env, salt: base32(writerSalt), payload: {} };
   assert.deepEqual(resolveBatch([draft], []), { refused: "envelope-field-unknown" });
   assert.deepEqual(resolveBatch([{ ...draft, env: { ...env, about: ["@missing"] } }], []), { refused: "envelope-field-unknown" });
+});
+
+test("raw shape precedes every variant value, batch label and seed", () => {
+  const unread = { get kind() { throw new Error("value read"); } };
+  const unknown = { ...writerEnv, extra: true };
+  for (const envs of [[unread, unknown], [unknown, unread]]) {
+    assert.throws(() => checkEnvelopeKeys(envs), /envelope-field-unknown/);
+    const drafts = envs.map(env => ({
+      env, get label() { throw new Error("label read"); },
+      get salt() { throw new Error("salt read"); },
+    }));
+    assert.deepEqual(resolveBatch(drafts, []), { refused: "envelope-field-unknown" });
+  }
+  const seed = () => { throw new Error("seed read"); };
+  assert.throws(() => seal({ ...writerEnv, kind: "" }, writerSalt, {}, seed), /kind-empty/);
+  assert.throws(() => seal(writerEnv, writerSalt, {}, seed), /seed read/);
 });
 
 test("writers accept limits and within-range fractions after binary64 rounding", () => {

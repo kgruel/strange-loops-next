@@ -2,14 +2,14 @@
 // resolved to real ids, written with loops.mjs's writer so the ids match
 // layer 0's. Written from vectors/batch and protocol/; no dependencies.
 
-import { base32Decode, canonical, envJson, idOf, commitOf, unknownEnvelopeKeys, seal } from "./loops.mjs";
+import { base32Decode, canonical, envJson, idOf, commitOf, checkEnvelopeKeys, seal } from "./loops.mjs";
 
 const isLabel = (s) => typeof s === "string" && s.startsWith("@");
 const labelsOf = (d) => [...(d.env.about ?? []), ...(d.env.prev ?? [])].filter(isLabel);
 
 // What writing refuses, in the order protocol/record.md checks it.
 const WRITE_CODES = [
-  "envelope-field-unknown", "kind-empty", "observer-not-typed", "emitted-not-rfc3339", "occurred-not-span",
+  "kind-empty", "observer-not-typed", "emitted-not-rfc3339", "occurred-not-span",
   "about-not-typed", "prev-not-record-id", "under-not-record-id", "erases-not-record-id",
   "salt-not-16-bytes", "member-duplicate", "number-out-of-range",
 ];
@@ -60,7 +60,8 @@ const thingsOf = (id, about) => (about.length ? about : [id]);
 // Each stage looks at the whole batch, so no draft order changes the answer.
 export function resolveBatch(drafts, held) {
   // The model's raw decoder refuses unknown keys before resolving labels.
-  if (drafts.some((d) => unknownEnvelopeKeys(d.env))) return { refused: "envelope-field-unknown" };
+  try { checkEnvelopeKeys(drafts.flatMap(d => d && typeof d === "object" ? [d.env] : [])); }
+  catch (e) { if (e.message === "envelope-field-unknown") return { refused: e.message }; throw e; }
   const byLabel = new Map();
   for (const d of drafts) {
     if (d.label === undefined) continue;
