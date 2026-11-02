@@ -33,7 +33,7 @@ test('collect limits are positive safe whole numbers', () => {
 });
 
 test('latest-by retains things with no heads and a null winner', () => {
-  const id = `r:${'a'.repeat(52)}`;
+  const id = `r:${'0'.repeat(52)}`;
   for (const about of [[], ['t:x']]) {
     const out = latestBy([{ id, about, prev: [id] }]);
     assert.deepEqual({ ...out }, { [about[0] ?? id]: { heads: [], winner: null, others: [] } });
@@ -85,7 +85,7 @@ test('fold, spec, realm and scenario checkers reject wrong exact sums', async ()
     for (const family of ['fold/sum', 'fold/select', 'spec/parse', 'spec/run', 'realm', 'scenario']) {
       await mkdir(join(dir, family), { recursive: true });
     }
-    const ids = [`r:${'a'.repeat(52)}`, `r:${'b'.repeat(51)}a`, `r:${'c'.repeat(51)}a`];
+    const ids = [`r:${'0'.repeat(52)}`, `r:${'1'.repeat(51)}0`, `r:${'2'.repeat(51)}0`];
     const records = ids.map((id, i) => ({ id, kind: 'note', observer: 'o:x', emitted: `2024-01-01T00:00:0${i}Z`,
       about: ['t:x'], prev: [], shown: 'here', value: '9007199254740993', n: [Number.MAX_SAFE_INTEGER, 2, 'UNSAFE_INPUT'][i] }));
     const spec = { ...sourceSpec, fold: { total: { sum: 'n' } } };

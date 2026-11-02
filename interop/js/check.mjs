@@ -40,7 +40,10 @@ function checkRecord(dir) {
     const envs = v.input.envs;
     if (v.expect.refused) {
       let got = null;
-      try { L.writeText(envs[0], L.base32Decode(v.input.salt), v.input.payload_text, new Uint8Array(32)); }
+      try {
+        if (envs.some(L.unknownEnvelopeKeys)) throw new Error("envelope-field-unknown");
+        L.writeText(envs[0], L.base32Decode(v.input.salt), v.input.payload_text, new Uint8Array(32));
+      }
       catch (e) { got = e.message; }
       t.expect(`${n} refused`, got, v.expect.refused);
       continue;
@@ -125,9 +128,23 @@ function checkStandard(dir) {
   return t;
 }
 
+// Exercise the public fixed-width decoder, including prefix and padding checks.
+function checkByteText(dir) {
+  const t = exact();
+  for (const file of jsonFiles(join(dir, "byte-text"))) {
+    const v = readVector(readFileSync(file, "utf8"));
+    t.files++;
+    const accepted = v.input.texts.map((text) => {
+      try { L.fixedBytes(text, v.input.prefix, v.input.bytes); return true; } catch { return false; }
+    });
+    t.expect(`byte-text/${v.vector}`, JSON.stringify(accepted), JSON.stringify(v.expect.accepted));
+  }
+  return t;
+}
+
 // Each family: the vectors/ directory it reads, and its checker.
 const FAMILIES = [
-  ["record", checkRecord], ["occurred", checkOccurred],
+  ["record", checkRecord], ["occurred", checkOccurred], ["byte-text", checkByteText],
   ["fold", fold.check], ["lens", lens.check], ["batch", batch.check],
   ["spec", spec.check], ["realm", realm.check], ["scenario", scenario.check],
 ];

@@ -4,7 +4,7 @@
 
 import { createHash, createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
 
-const B32 = "abcdefghijklmnopqrstuvwxyz234567";
+const B32 = "0123456789abcdefghijklmnopqrstuv";
 
 export function base32(bytes) {
   let out = "", bits = 0, value = 0;
@@ -25,7 +25,7 @@ export function base32Decode(text) {
   let bits = 0, value = 0;
   for (const c of text) {
     const v = B32.indexOf(c);
-    if (v < 0) throw new Error(`not base32: ${c}`);
+    if (v < 0) throw new Error(`not base32hex: ${c}`);
     value = (value << 5) | v;
     bits += 5;
     if (bits >= 8) {
@@ -33,7 +33,17 @@ export function base32Decode(text) {
       bits -= 8;
     }
   }
-  return Uint8Array.from(out);
+  const bytes = Uint8Array.from(out);
+  if (base32(bytes) !== text) throw new Error("not canonical base32hex");
+  return bytes;
+}
+
+// Decode the same canonical text at every fixed-width byte boundary.
+export function fixedBytes(text, prefix, length) {
+  if (typeof text !== "string" || !text.startsWith(prefix)) throw new Error("bad byte prefix");
+  const bytes = base32Decode(text.slice(prefix.length));
+  if (bytes.length !== length) throw new Error("bad byte length");
+  return bytes;
 }
 
 // RFC 8785. Numbers use ECMAScript's own formatting, which is the RFC's.
@@ -67,18 +77,17 @@ const DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const leap = (y) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
 export function validEmitted(s) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[+-](\d{2}):(\d{2}))$/.exec(s);
-  if (!m) return false;
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{0,8}[1-9]))?Z$/.exec(s);
+  if (!m || m[0] !== s) return false;
   const [y, mo, d, h, mi, se] = m.slice(1, 7).map(Number);
   if (mo < 1 || mo > 12) return false;
   const days = mo === 2 && leap(y) ? 29 : DAYS[mo - 1];
-  if (d < 1 || d > days || h > 23 || mi > 59 || se > 60) return false;
-  if (m[8] !== "Z" && (Number(m[9]) > 23 || Number(m[10]) > 59)) return false;
+  if (d < 1 || d > days || h > 23 || mi > 59 || se > 59) return false;
   return true;
 }
 
 // A moment: whole seconds since 1970-01-01T00:00:00Z, then the fraction's
-// digits with trailing zeros dropped. A leap second is the next minute's first.
+// canonical fraction digits.
 // setUTCFullYear, because Date.UTC reads years 0 to 99 as 1900 to 1999.
 const daySecs = (y, m, d) => {
   const t = new Date(0);
@@ -88,10 +97,9 @@ const daySecs = (y, m, d) => {
 
 function instantMoment(s) {
   if (!validEmitted(s)) return null;
-  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(?:Z|([+-])(\d{2}):(\d{2}))$/.exec(s);
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(s);
   const [y, mo, d, h, mi, se] = m.slice(1, 7).map(Number);
-  const off = m[8] === undefined ? 0 : (m[8] === "+" ? 1 : -1) * (Number(m[9]) * 3600 + Number(m[10]) * 60);
-  return [daySecs(y, mo, d) + h * 3600 + mi * 60 + se - off, (m[7] ?? "").replace(/0+$/, "")];
+  return [daySecs(y, mo, d) + h * 3600 + mi * 60 + se, m[7] ?? ""];
 }
 
 // A calendar date's first moment and the moment after its last.
@@ -149,9 +157,15 @@ export function spanBefore(a, b) {
 }
 
 const typedRef = (s) => /^[a-z][a-z0-9-]*:./su.test(s);
-const recordId = (s) => /^r:[a-z2-7]{52}$/.test(s);
+const recordId = (s) => {
+  try { fixedBytes(s, "r:", 32); return true; } catch { return false; }
+};
+const ENV_KEYS = new Set(["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"]);
+
+export const unknownEnvelopeKeys = (env) => Reflect.ownKeys(env).some((key) => !ENV_KEYS.has(key));
 
 export function problem(env) {
+  if (unknownEnvelopeKeys(env)) return "envelope-field-unknown";
   if (!env.kind) return "kind-empty";
   if (!typedRef(env.observer)) return "observer-not-typed";
   if (!validEmitted(env.emitted)) return "emitted-not-rfc3339";
@@ -184,9 +198,9 @@ export function signId(seed, id) {
 }
 
 export function verifyId(sig, id) {
-  const spki = Buffer.concat([Buffer.from("302a300506032b6570032100", "hex"), Buffer.from(base32Decode(sig.key.slice(2)))]);
+  const spki = Buffer.concat([Buffer.from("302a300506032b6570032100", "hex"), Buffer.from(fixedBytes(sig.key, "k:", 32))]);
   const key = createPublicKey({ key: spki, format: "der", type: "spki" });
-  return verify(null, utf8(signingInput(id)), key, Buffer.from(base32Decode(sig.ed25519)));
+  return verify(null, utf8(signingInput(id)), key, Buffer.from(fixedBytes(sig.ed25519, "", 64)));
 }
 
 // Writers bound magnitude, whole or not; numeric readers additionally require whole values.
