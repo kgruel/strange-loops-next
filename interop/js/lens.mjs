@@ -1,7 +1,7 @@
-// A small, independent lens for keyed sections: render a document (a list of
-// sections, each an id and its body lines) as text, parse edited text back,
-// diff it against a base by section id and apply the outcomes. Written from the
-// vectors in vectors/lens/section; protocol/ doesn't describe it yet. No dependencies.
+// This independent keyed-section lens renders, parses, diffs and applies edits.
+// See protocol/lens.md for the protocol and law premises.
+// No-op and put-get laws require distinct base ids.
+// Put-get also requires the same ordered ids. This module has no dependencies.
 
 const FENCE = ":::";
 

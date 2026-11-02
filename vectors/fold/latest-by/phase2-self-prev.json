@@ -1,0 +1,30 @@
+{
+  "vector": "phase2-self-prev",
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set", "thing.local"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaatq",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": ["topic:auth"],
+          "value": "v39",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaatq"],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "topic:auth": {
+      "heads": [],
+      "winner": null,
+      "others": []
+    }
+  }
+}

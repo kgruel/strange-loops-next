@@ -1,0 +1,61 @@
+{
+  "vector": "phase2-exact-output",
+  "layer": "realm",
+  "laws": ["settle.set", "sum.perm", "numeric.safe-whole"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "kind": "load",
+        "observer": "sl:kyle",
+        "about": ["host:a"],
+        "value": "",
+        "prev": [],
+        "emitted": "2026-10-01T00:01:40Z",
+        "occurred": "2026-10-01T00:01:40Z",
+        "n": 9007199254740991
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "kind": "load",
+        "observer": "sl:kyle",
+        "about": ["host:b"],
+        "value": "",
+        "prev": [],
+        "emitted": "2026-10-01T00:01:50Z",
+        "occurred": "2026-10-01T00:01:50Z",
+        "n": 2
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "shown": "here"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "host:a": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "others": []
+      },
+      "host:b": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 9007199254740993,
+      "unread": 0
+    }
+  }
+}

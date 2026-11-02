@@ -27,26 +27,12 @@ hold into one set:
 
 namespace Loops
 
-/-! ## Things -/
-
-/-- The things a record is about. A record about nothing anchors a thing of
-its own, named by its id, so two unrelated records about nothing never share
-a thing. -/
-def Record.things (r : Record) : List String := if r.about.isEmpty then [idText r.id] else r.about
-
-def Record.isAbout (r : Record) (t : String) : Bool := r.things.contains t
-
-def shares (a b : Record) : Bool := a.things.any b.things.contains
-
-/-- Every thing the records are about, each once, in canonical order. -/
-def thingsOf (xs : List Record) : List String := canonSet (xs.flatMap Record.things)
-
 /-! ## Settling the forms several places hold -/
 
 /-- Ids in ascending order, each once. -/
-def idsOf (xs : List Record) : List Nat := xs.foldl (fun ns r => insertId r.id ns) []
+def idsOf (xs : List Record) : List RecordId := xs.foldl (fun ns r => insertId r.id ns) []
 
-def erasedIn (xs : List Record) (i : Nat) : Bool :=
+def erasedIn (xs : List Record) (i : RecordId) : Bool :=
   xs.any fun e => e.erases.contains i
 
 /-- From the forms of one record: one that is here, or else the withheld form. -/
@@ -56,7 +42,7 @@ def baseForm (forms : List Record) : Option Record :=
   | none => forms.head?.map Record.withhold
 
 /-- The one record a reader keeps for id `i`. -/
-def pick (xs : List Record) (i : Nat) : Option Record :=
+def pick (xs : List Record) (i : RecordId) : Option Record :=
   (baseForm (xs.filter (·.id == i))).map fun r => if erasedIn xs i then r.erase else r
 
 /-- One record per id, from every form the reader's places hold. -/
@@ -90,14 +76,5 @@ def admit (may : Record → Record → Bool) (xs : List Record) : List Record :=
 /-- What a reader folds: its places' forms settled, then admitted. -/
 def realm (may : Record → Record → Bool) (xs : List Record) : List Record :=
   admit may (settle xs)
-
-/-! ## Per thing -/
-
-/-- A thing's state: LatestBy over the records about it. -/
-def stateIn (t : String) (xs : List Record) : LatestBy :=
-  LatestBy.fold .empty (xs.filter (·.isAbout t))
-
-def perThing (xs : List Record) : List (String × LatestBy) :=
-  (thingsOf xs).map fun t => (t, stateIn t xs)
 
 end Loops

@@ -1,0 +1,30 @@
+{
+  "vector": "gap08-below-9007199254740992",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true,
+          "where": {
+            "est": {
+              "below": 9007199254740992
+            }
+          }
+        }
+      }
+    }
+  },
+  "expect": {
+    "refused": "where-invalid",
+    "path": "fold.c.where.est"
+  }
+}

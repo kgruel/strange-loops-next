@@ -1,0 +1,61 @@
+{
+  "vector": "10-successor-expands-things",
+  "layer": "realm",
+  "laws": ["admit.no-cross", "thing.local"],
+  "source": "model",
+  "input": {
+    "forms": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["thing:A"],
+        "value": "",
+        "prev": [],
+        "emitted": "2026-10-01T00:00:01Z",
+        "occurred": "2026-10-01T00:00:01Z",
+        "n": 0
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "kind": "note",
+        "observer": "sl:kyle",
+        "about": ["thing:A", "thing:B"],
+        "value": "",
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq"],
+        "emitted": "2026-10-01T00:00:02Z",
+        "occurred": "2026-10-01T00:00:02Z",
+        "n": 0
+      }
+    ]
+  },
+  "expect": {
+    "settled": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+        "shown": "here"
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "shown": "here"
+      }
+    ],
+    "refused": [],
+    "things": {
+      "thing:A": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "others": []
+      },
+      "thing:B": {
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "others": []
+      }
+    },
+    "sum": {
+      "value": 0,
+      "unread": 0
+    }
+  }
+}

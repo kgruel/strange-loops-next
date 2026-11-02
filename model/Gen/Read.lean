@@ -13,15 +13,15 @@ Two rules shape it:
 
 * **The text parser keeps what JSON parsers may drop.** Members stay in the
   order written and a repeated name is kept, since a spec's refusal depends
-  on both (`member-duplicate`, errors in written order). Numbers are
-  integers, as the model's are; a fraction or an exponent is refused rather
-  than rounded.
+  on both (`member-duplicate`, errors in written order). Numbers round to binary64.
+  Safe-whole values become integers; other numbers retain their binary64 bits.
+  The checker's exact-integer mode keeps lexical integers for output comparison;
+  it is never used to decode inputs.
 * **Decoding refuses, naming the field.** Inputs will come from people, so
   every refusal says where (`input.orders[0][1].prev[0]`) and what was
   wanted. A record is decoded as far as the model's `Record` needs: ids
   that are record ids and times that read. Layer 0's other envelope rules
-  (a kind, typed references) are `write`'s, which a batch's drafts go
-  through; the folds read records as they are handed them.
+  remain `write`'s, which a batch's drafts go through. The decoder checks typed `about` members.
 -/
 
 namespace Gen.Read
@@ -100,69 +100,98 @@ partial def stringBody (acc : List Char) : Parser String := do
 
 def str : Parser String := do expectChar '"'; stringBody []
 
-/-- An integer, as JSON writes one: no leading zeros, no `+`. -/
-def number : Parser Json := do
+/-- Inputs round once to binary64; expected outputs may carry unbounded integers. -/
+inductive NumericMode where
+  | binary64
+  | exactIntegers
+  deriving BEq
+
+/-- RFC 8259 numbers, with exact lexical integers only when explicitly requested.
+Fraction and exponent spellings retain the ordinary binary64 behavior in both modes. -/
+def number (mode : NumericMode := .binary64) : Parser Json := do
   let cs ← get
   let neg := cs.head? == some '-'
   let cs := if neg then cs.drop 1 else cs
   let ds := cs.takeWhile Char.isDigit
   if ds.isEmpty then fail "expected a value"
-  else if ds.length > 1 && ds.head? == some '0' then fail "a number with a leading zero"
-  else
-    let rest := cs.drop ds.length
-    if rest.head?.any fun c => c == '.' || c == 'e' || c == 'E' then
-      set rest; fail "a fraction or exponent: the model's numbers are integers"
-    else
-      set rest
-      let n : Nat := ds.foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
-      pure (.int (if neg then -(n : Int) else n))
+  if ds.length > 1 && ds.head? == some '0' then fail "a number with a leading zero"
+  let mut rest := cs.drop ds.length
+  let mut frac : List Char := []
+  let hasFraction := rest.head? == some '.'
+  if hasFraction then
+    frac := (rest.drop 1).takeWhile Char.isDigit
+    if frac.isEmpty then set rest; fail "expected digits after the decimal point"
+    rest := rest.drop (frac.length + 1)
+  let mut exp : Int := 0
+  let hasExponent := rest.head? == some 'e' || rest.head? == some 'E'
+  if hasExponent then
+    rest := rest.drop 1
+    let minus := rest.head? == some '-'
+    if minus || rest.head? == some '+' then rest := rest.drop 1
+    let digits := rest.takeWhile Char.isDigit
+    if digits.isEmpty then set rest; fail "expected exponent digits"
+    let e := digits.foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
+    exp := if minus then -(e : Int) else e
+    rest := rest.drop digits.length
+  set rest
+  let m := (ds ++ frac).foldl (fun n c => 10 * n + (c.toNat - '0'.toNat)) 0
+  if mode == .exactIntegers && !hasFraction && !hasExponent then
+    return .int (if neg then -(m : Int) else m)
+  let n := Number.ofScientific neg m (exp - frac.length)
+  pure (match n.whole? with | some i => .int i | none => .number n)
 
 mutual
-partial def value : Parser Json := do
+partial def value (mode : NumericMode := .binary64) : Parser Json := do
   skipWs
   match ← peek with
-  | some '{' => expectChar '{'; skipWs; members []
-  | some '[' => expectChar '['; skipWs; elements []
+  | some '{' => expectChar '{'; skipWs; members [] mode
+  | some '[' => expectChar '['; skipWs; elements [] mode
   | some '"' => .str <$> str
   | some 't' => word "true" (.bool true)
   | some 'f' => word "false" (.bool false)
   | some 'n' => word "null" .null
-  | some _ => number
+  | some _ => number mode
   | none => fail "expected a value, found the end"
 
 /-- Members in the order written; a repeated name is kept. -/
-partial def members (acc : List (String × Json)) : Parser Json := do
+partial def members (acc : List (String × Json)) (mode : NumericMode := .binary64) : Parser Json := do
   if acc.isEmpty && (← peek) == some '}' then expectChar '}'; return .obj []
   skipWs
   let k ← str
   skipWs; expectChar ':'
-  let v ← value
+  let v ← value mode
   skipWs
   match ← peek with
-  | some ',' => expectChar ','; skipWs; members ((k, v) :: acc)
+  | some ',' => expectChar ','; skipWs; members ((k, v) :: acc) mode
   | some '}' => expectChar '}'; pure (.obj ((k, v) :: acc).reverse)
   | _ => fail "expected ',' or '}'"
 
-partial def elements (acc : List Json) : Parser Json := do
+partial def elements (acc : List Json) (mode : NumericMode := .binary64) : Parser Json := do
   if acc.isEmpty && (← peek) == some ']' then expectChar ']'; return .arr []
-  let v ← value
+  let v ← value mode
   skipWs
   match ← peek with
-  | some ',' => expectChar ','; elements (v :: acc)
+  | some ',' => expectChar ','; elements (v :: acc) mode
   | some ']' => expectChar ']'; pure (.arr (v :: acc).reverse)
   | _ => fail "expected ',' or ']'"
 end
 
-/-- Parse JSON text, or say where it stops being JSON. -/
-def parseJson (text : String) : Except String Json :=
+/-- The shared text parser; only numeric representation varies by mode. -/
+def parseJsonWith (text : String) (mode : NumericMode := .binary64) : Except String Json :=
   let cs := text.toList
-  match (do let v ← value; skipWs; if (← get).isEmpty then pure v else fail "text after the value").run cs with
+  match (do let v ← value mode; skipWs; if (← get).isEmpty then pure v else fail "text after the value").run cs with
   | .ok (v, _) => .ok v
   | .error (left, what) =>
     let before := cs.take (cs.length - left)
     let line := (before.filter (· == '\n')).length + 1
     let col := (before.reverse.takeWhile (· != '\n')).length + 1
     .error s!"line {line}, column {col}: {what}"
+
+/-- Parse inputs as binary64 JSON, or say where the text stops being JSON. -/
+def parseJson (text : String) : Except String Json := parseJsonWith text .binary64
+
+/-- Preserve unbounded lexical integers in expected outputs, not input values. -/
+def parseExactIntegers (text : String) : Except String Json := parseJsonWith text .exactIntegers
 
 /-! ## Decoding, with the path of each field -/
 
@@ -235,15 +264,18 @@ def unbase32 (s : String) : Except String (List UInt8) := do
 
 /-- A record id: `r:` and the base32 of a 32-byte digest, read as a number
 the way `idText` writes one. -/
-def recordId (path : String) (j : Json) : Dec Nat := do
+def recordId (path : String) (j : Json) : Dec RecordId := do
   let s ← text path j
-  let bytes ← match s.toList with
-    | 'r' :: ':' :: rest => match unbase32 (String.ofList rest) with
-      | .ok bs => if bs.length == 32 then pure bs else bad path s!"\"{s}\" is not a 32-byte digest"
-      | .error why => bad path s!"\"{s}\" {why}"
-    | _ => bad path s!"\"{s}\" is not a record id (r:<base32 digest>)"
-  let n := bytes.foldl (fun n b => 256 * n + b.toNat) 0
-  if idText n == s then pure n else bad path s!"\"{s}\" does not read back as itself"
+  match s.toList with
+  | 'r' :: ':' :: rest =>
+    match unbase32 (String.ofList rest) with
+    | .ok bs =>
+      if h : bs.length = 32 then
+        let n : RecordId := ⟨bs.foldl (fun n b => 256 * n + b.toNat) 0, bytes_bounded bs h⟩
+        if idText n == s then pure n else bad path s!"\"{s}\" does not read back as itself"
+      else bad path s!"\"{s}\" is not a 32-byte digest"
+    | .error why => bad path s!"\"{s}\" {why}"
+  | _ => bad path s!"\"{s}\" is not a record id (r:<base32 digest>)"
 
 /-- Bytes written in base32: a salt, a seed. -/
 def bytes (path : String) (j : Json) : Dec (List UInt8) := do
@@ -276,8 +308,9 @@ def shownOf (path : String) (j : Json) : Dec Shown := do
 def valOf (path : String) : Json → Dec Val
   | .str s => pure (.str s)
   | .int i => pure (.int i)
+  | .number n => if n.finite then pure (.number n) else bad path "number-out-of-range"
   | .bool b => pure (.bool b)
-  | _ => bad path "a payload field is text, an integer or a boolean"
+  | _ => bad path "a payload field is text, a number or a boolean"
 
 def fieldsOf (path : String) (j : Json) : Dec (List (String × Val)) := do
   let kvs ← object path j
@@ -298,7 +331,9 @@ def record (path : String) (j : Json) : Dec Record := do
   let id ← recordId (dot path "id") idJ
   let kind ← text (dot path "kind") (← req path kvs "kind")
   let observer ← text (dot path "observer") (← req path kvs "observer")
-  let about ← texts (dot path "about") (← req path kvs "about")
+  let about ← each (dot path "about") (fun p j => do
+    let s ← text p j
+    if typedRef s then pure s else bad p "expected a typed reference") (← req path kvs "about")
   let prev ← each (dot path "prev") recordId (← req path kvs "prev")
   let under ← opt kvs "under" (recordId (dot path "under"))
   let emitted ← stampOf (dot path "emitted") (← req path kvs "emitted")
@@ -309,9 +344,13 @@ def record (path : String) (j : Json) : Dec Record := do
   match shown with
   | .here =>
     let value ← text (dot path "value") (← req path kvs "value")
-    let n ← int (dot path "n") (← req path kvs "n")
+    let nVal ← valOf (dot path "n") (← req path kvs "n")
+    let (n, nNumber) ← match nVal with
+      | .int i => pure (i, none)
+      | .number x => pure (0, some x)
+      | _ => bad (dot path "n") "expected a number"
     let fields ← (opt kvs "fields" (fieldsOf (dot path "fields"))).map (·.getD [])
-    pure { base with value, n, fields }
+    pure { base with value, n, nNumber, fields }
   | _ =>
     for k in ["value", "n", "fields"] do
       if (kvs.lookup k).isSome then bad path s!"its payload isn't here, so it carries no \"{k}\""

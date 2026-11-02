@@ -1,0 +1,140 @@
+{
+  "vector": "gap13-missing-and-withheld",
+  "layer": "spec/run",
+  "laws": ["where.total", "result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "is": {
+          "count": true,
+          "where": {
+            "missing": {
+              "is": "open"
+            }
+          }
+        },
+        "not": {
+          "count": true,
+          "where": {
+            "missing": {
+              "not": "open"
+            }
+          }
+        },
+        "present": {
+          "count": true,
+          "where": {
+            "missing": {
+              "present": true
+            }
+          }
+        },
+        "absent": {
+          "count": true,
+          "where": {
+            "missing": {
+              "absent": true
+            }
+          }
+        },
+        "at-least": {
+          "count": true,
+          "where": {
+            "missing": {
+              "at-least": 1
+            }
+          }
+        },
+        "below": {
+          "count": true,
+          "where": {
+            "missing": {
+              "below": 1
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadja",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:b"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
+          "shown": "withheld"
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadja",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:b"],
+          "prev": [],
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
+          "shown": "withheld"
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadiq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:a"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "is": {
+      "value": 0,
+      "unread": 1
+    },
+    "not": {
+      "value": 1,
+      "unread": 1
+    },
+    "present": {
+      "value": 0,
+      "unread": 1
+    },
+    "absent": {
+      "value": 1,
+      "unread": 1
+    },
+    "at-least": {
+      "value": 0,
+      "unread": 1
+    },
+    "below": {
+      "value": 0,
+      "unread": 1
+    }
+  }
+}

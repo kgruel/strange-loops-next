@@ -56,12 +56,10 @@ def erase (H : Hash) (r : Stored) : Stored := ⟨r.env, .erased (r.commit H)⟩
 
 /-! ## Writing
 
-Every record is written through `write`, one at a time or in a batch. It
-refuses, in this order: a bad envelope (`Env.problem`), a salt that isn't 16
-bytes (`salt-not-16-bytes`), a payload with a repeated member name at any
-depth (`member-duplicate`), and a payload number outside ±(2^53 − 1)
-(`number-out-of-range`). What it returns carries the proof that every check
-passed, so the laws that need those facts take them from the record itself.
+Every record is written through `write`, one at a time or in a batch.
+It checks the envelope (`Env.problem`), then salt length (`salt-not-16-bytes`), then repeated payload members at any depth (`member-duplicate`).
+Last, it refuses nonfinite numbers or any number outside ±(2^53 − 1), whole or not (`number-out-of-range`).
+What it returns carries the proof that every check passed, so laws needing those facts take them from the record itself.
 -/
 
 /-- Why a record is refused when it is written, if it is. -/

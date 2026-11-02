@@ -1,0 +1,96 @@
+{
+  "vector": "phase2-exact-output",
+  "layer": "spec/run",
+  "laws": ["spec.set", "sum.perm", "numeric.safe-whole"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "exact-output",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "n": {
+          "sum": "n"
+        },
+        "field": {
+          "sum": "est"
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 9007199254740991,
+          "fields": {
+            "est": 9007199254740991
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
+          "n": 2,
+          "fields": {
+            "est": 2
+          }
+        }
+      ],
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:2"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:50Z",
+          "occurred": "2026-10-01T00:01:50Z",
+          "n": 2,
+          "fields": {
+            "est": 2
+          }
+        },
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 9007199254740991,
+          "fields": {
+            "est": 9007199254740991
+          }
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "n": {
+      "value": 9007199254740993,
+      "unread": 0
+    },
+    "field": {
+      "value": 9007199254740993,
+      "unread": 0
+    }
+  }
+}

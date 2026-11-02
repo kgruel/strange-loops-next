@@ -20,6 +20,7 @@ partial def ofJson : Json → J
   | .null => .null
   | .bool b => .bool b
   | .int i => .int i
+  | .number n => .number n
   | .str s => .str s
   | .arr xs => .arr (xs.map ofJson)
   | .obj kvs => .obj (kvs.map fun (k, v) => (k, ofJson v))
@@ -181,7 +182,15 @@ def storedCases : List Case := [
     envs := [
       { note with prev := [r1Id], erases := [r1Id, grantId] },
       { note with prev := [r1Id], erases := [grantId, r1Id, grantId] }],
-    payloads := [.obj [("body", .str "hello, without the number")]] }
+    payloads := [.obj [("body", .str "hello, without the number")]] },
+  { name := "12-negative-exact-boundary", laws := ["record.canonical"],
+    envs := [note], payloads := [.int (-9007199254740991)] },
+  { name := "13-offset-hour-23", laws := ["record.emitted"],
+    envs := [note "2026-10-21T00:00:00+23:00"], payloads := [.obj []] },
+  { name := "38-native-shortest-tie", laws := ["record.canonical"],
+    envs := [note], payloads := [.obj [
+      ("positive", .number ⟨0x43143ff3c1cb0959⟩),
+      ("negative", .number ⟨0xc3143ff3c1cb0959⟩)]] }
 ]
 
 def refusedCases : List (String × Env) := [
@@ -195,18 +204,23 @@ def refusedCases : List (String × Env) := [
   ("27-prev-not-record", { note with prev := ["topic:auth"] }),
   ("28-under-not-record", { note with under := some "r:short" }),
   ("33-erases-not-record", { note with erases := ["topic:auth"] }),
-  ("34-occurred-duration", { note with occurred := some "2026-10-17T09:14/PT4M" })
+  ("34-occurred-duration", { note with occurred := some "2026-10-17T09:14/PT4M" }),
+  ("35-observer-prefix-start", { note with observer := "1:x" }),
+  ("36-observer-prefix-tail", { note with observer := "a!:x" })
 ]
 
-/-- Payloads refused under a good envelope. The largest exact integer is
-kept; one past the smallest, nested, is refused. A repeated member name is
-refused at any depth. -/
+/-- Unsafe magnitudes and repeated member names are refused at any depth under a good envelope. -/
 def refusedPayloads : List (String × Json) := [
   ("29-number-out-of-range", .obj [("largest", .int 9007199254740991),
-    ("deep", .arr [.obj [("n", .int (-9007199254740992))]])]),
+    ("deep", .arr [.obj [("n", .number (Number.ofScientific true 9007199254740992 0))]])]),
+  ("32-proto-out-of-range", .obj [("__proto__", .number (Number.ofScientific false 9007199254740992 0))]),
+  ("39-huge-out-of-range", .obj [
+    ("positive", .number (Number.ofScientific false 1 30)),
+    ("negative", .number (Number.ofScientific true 1 30)),
+    ("max", .number ⟨0x7fefffffffffffff⟩),
+    ("min", .number ⟨0xffefffffffffffff⟩)]),
   ("31-member-duplicate", .obj [("body", .str "hello"),
-    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])]),
-  ("32-proto-out-of-range", .obj [("__proto__", .int 9007199254740992)])
+    ("meta", .obj [("tag", .str "a"), ("tag", .str "b")])])
 ]
 
 /-- A salt that isn't 16 bytes. An empty salt would let anyone confirm a guess
@@ -249,6 +263,7 @@ def vectors : Except String (List (String × J)) := do
   let refused ← refusedCases.mapM fun (n, e) => do pure (n, ← refusedVector n e)
   let payloads ← refusedPayloads.mapM fun (n, p) => do pure (n, ← refusedVector n note p)
   let salt ← refusedVector "30-salt-short" note (salt := shortSalt)
-  return stored ++ refused ++ payloads ++ [("30-salt-short", salt)]
+  let envelopeFirst ← refusedVector "37-empty-salt-envelope-first" { note with kind := "" } (.obj []) []
+  return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst)]
 
 end Gen.Records

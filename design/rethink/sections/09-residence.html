@@ -1,6 +1,6 @@
 <section class="panel" id="residence" role="tabpanel" aria-labelledby="t-residence">
   <div class="panel-head"><h2>Layer 4: places</h2><button class="toggle-all" type="button">Unfold all</button></div>
-  <p class="gist">Places owe the layers above very little: list records, get one by id, what's new since a checkpoint, a blob by hash, and a disposable index. Everything else is a per-store, per-machine choice: <b>where</b> segments live, in what <b>format</b>, and how much of the store each machine <b>holds</b>.</p>
+  <p class="gist">Places expose few operations: list records, get one by id, find changes since a checkpoint, and get a blob by hash. The index is disposable. Everything else is a per-store, per-machine choice: <b>where</b> segments live, in what <b>format</b>, and how much of the store each machine <b>holds</b>.</p>
   <p><span class="pill p-ok">layer closed</span> Segment sync between places is a comparison of segment lists; see <a href="#sharing" data-tab="sharing">Sharing</a>.</p>
 
   <h3>A store on disk</h3>
@@ -16,7 +16,7 @@
 ~/.config/loops/places.json                 per machine, never shared
 ~/.config/loops/keys/                       the file signer; the OS keychain otherwise
 ~/.cache/loops/index.db                     derived, disposable</pre>
-  <p>Discovery walks up to the nearest <code>.loops/</code>, the way git finds <code>.git</code>. Zero-config is <code>.loops/</code> alone, JSONL, no <code>places.json</code>. The device in a segment path is a label per write place, created on first run; it keeps two writers out of one file, and each segment is signed by exactly one device key. In a git place a segment file closes once it is committed and the next write opens a new one, so a writer on two branches adds two files instead of forking one. A store whose places are all SQLite can be a single <code>store.db</code> holding the same things.</p>
+  <p>Discovery walks up to the nearest <code>.loops/</code>, the way git finds <code>.git</code>. Zero-config is <code>.loops/</code> alone, JSONL, no <code>places.json</code>. First run creates a device label per write place in the segment path. It keeps two writers out of one file. Exactly one device key signs each segment. In a git place a segment file closes once committed. The next write opens a new file. A writer on two branches adds two files instead of forking one. A store whose places are all SQLite can be a single <code>store.db</code> holding the same things.</p>
 
   <h3>Defining a store</h3>
   <p>The old <code>.vertex</code> file did four jobs at once. Each now has its own home:</p>
@@ -49,7 +49,7 @@
 }</pre>
   <p><code>shared</code>: shared places stay reviewable in PRs. <code>refuse</code>: prevention, before erasure is needed. <code>refs</code>: reference fields, once called edges. <code>facet</code>: emitted whole. <code>search</code>: worth indexing; each machine decides. <code>preview</code>: how lenses show it by default. <code>erasable</code>: payloads go to a blob place.</p>
   <ul>
-    <li><b>Updating a store is an emit.</b> <code>apply</code> compares the file with current declarations and emits one changeset record, so a half-synced replica never sees half a change. Breaking changes are refused (a new kind instead); removals emit <code>retire</code>.</li>
+    <li><b>Updating a store is an emit.</b> <code>apply</code> compares the file with current declarations and emits one changeset record. A half-synced replica never sees half a change. Breaking changes are refused (a new kind instead); removals emit <code>retire</code>.</li>
     <li><b>It's a performative.</b> A steward's changeset takes effect. Anyone else's is a visible proposal that takes effect if a steward affirms it.</li>
     <li><b>Concurrent edits are forks,</b> two heads on <code>prev</code>, resolved by a steward stance. No merge conflicts in a config file.</li>
     <li><b>A record is judged by the declarations in effect at its <code>emitted</code>.</b> Raising a store to strict doesn't reject its history. A record emitted before a declaration it would violate, but arriving after it, is flagged: the late-record pattern applied to definitions.</li>
@@ -57,7 +57,7 @@
   </ul>
 
   <h3>Places</h3>
-  <p>A place is a <b>location, a format and a scope</b>, holding segments. The store is the union of its segments across places. Remixing is safe because ids are computed over canonical bytes (JCS), not a file format; segments are immutable and single-writer, so sync is union; and ticks already say what they saw, so partial places stay honest.</p>
+  <p>A place is a <b>location, a format and a scope</b>, holding segments. The store is the union of its segments across places. Ids use canonical bytes (JCS), not a file format. Immutable, single-writer segments make sync a union. Ticks state what they saw, even with partial places.</p>
   <div class="tbl"><table>
     <thead><tr><th>Role</th><th>Meaning</th></tr></thead>
     <tbody>
@@ -66,7 +66,7 @@
       <tr><td><b>blobs</b></td><td>where large or erasable payloads live</td></tr>
     </tbody>
   </table></div>
-  <p>The index isn't a place: it's derived and per machine. What the remix enables: <b>git as interchange</b> (JSONL in git for sync and review, SQLite as a fast working copy), <b>tiering</b> (recent on the laptop, everything on the homelab, cold in object storage), <b>erasable payloads</b> in a blob place outside git, and <b>backups</b> that are just places.</p>
+  <p>The index isn't a place: it's derived and per machine. This enables <b>git as interchange</b>: JSONL in git for sync and review, SQLite as a fast working copy. <b>Tiering</b> keeps recent data on the laptop, everything on the homelab, and cold data in object storage. <b>Erasable payloads</b> live in a blob place outside git. <b>Backups</b> are just places.</p>
 
   <h3>The index, without doubling storage</h3>
   <div class="tbl"><table>
@@ -106,20 +106,20 @@
   <div class="tbl"><table>
     <thead><tr><th>Piece</th><th>Why</th></tr></thead>
     <tbody>
-      <tr><td><b>Hash the payload separately, salted, per payload</b></td><td>ids, ticks and what they cover survive erasure; the salt stops anyone confirming a guess</td></tr>
+      <tr><td><b>Hash the payload separately, salted, per payload</b></td><td>Ids, ticks and what they cover survive erasure. A secret salt makes offline guesses harder while the opening remains withheld.</td></tr>
       <tr><td><b>One envelope field, <code>erases</code></b>, on a record signed by a steward, per store</td><td>a visible gap, not a broken reference</td></tr>
       <tr><td><b>Tick results reference, don't copy</b></td><td>nothing inside ticks needs chasing</td></tr>
       <tr><td><b>The envelope is permanent</b></td><td>personal identifiers go behind opaque anchors, never natural keys in <code>about</code></td></tr>
     </tbody>
   </table></div>
-  <p><b>The whole game:</b> find every record holding the data (search, then trace references from the originals), emit a record whose <code>erases</code> names each, and each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
+  <p><b>The whole game:</b> find every record holding the data. Search, then trace references from the originals. Emit a record whose <code>erases</code> names each one. Each store replaces the opening with the commitment. In git that means a steward rewriting one segment file's history; because ids never change, nothing else is touched. <b>Rejection isn't erasure:</b> policy hides a record from folds, but in git it still exists.</p>
   <details class="unfold"><summary>Prevention, before cure</summary><div class="body"><ul>
     <li><b>Promotion</b> is a deliberate stance, so it's the review moment; agent-proposed promotions need yours.</li>
     <li><b>Store policy</b> can refuse whole sources ("never admit records from personal collectors").</li>
     <li><b>A hygiene vertex</b> flags likely-personal payloads (emails, phone numbers, health terms) for the stale review; secret scanning sits in the same place.</li>
   </ul></div></details>
   <details class="unfold"><summary>What true erasure would look like</summary><div class="body">
-    <p>A record shouldn't contain its data; it should <b>commit</b> to it. <code>hash(salt + payload)</code> is a hiding commitment; erasure is forgetting the opening.</p>
+    <p>A record shouldn't contain its data; it should <b>commit</b> to it. <code>hash(salt + payload)</code> commits to the payload. A secret salt makes offline guesses harder while the opening remains withheld. Erasure forgets the opening.</p>
     <div class="tbl"><table>
       <thead><tr><th>Level</th><th>Gone</th><th>Still leaks</th></tr></thead>
       <tbody>

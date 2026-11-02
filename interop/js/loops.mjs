@@ -189,9 +189,9 @@ export function verifyId(sig, id) {
   return verify(null, utf8(signingInput(id)), key, Buffer.from(base32Decode(sig.ed25519)));
 }
 
-// Every number within ±(2^53 - 1): past that, two numbers share one canonical form.
+// Writers bound magnitude, whole or not; numeric readers additionally require whole values.
 const inRange = (v) =>
-  typeof v === "number" ? Math.abs(v) <= Number.MAX_SAFE_INTEGER
+  typeof v === "number" ? Number.isFinite(v) && Math.abs(v) <= Number.MAX_SAFE_INTEGER
   : v !== null && typeof v === "object" ? Object.values(v).every(inRange)
   : true;
 
@@ -244,8 +244,7 @@ export function writeText(env, salt, text, seed) {
 }
 
 // Seal a record: the stored line, and the line after erasure. Refuses a bad
-// envelope, a salt that isn't 16 bytes, then a payload number outside
-// ±(2^53 - 1) as JSON reads it.
+// envelope, a salt that isn't 16 bytes, then a nonfinite or out-of-range payload number.
 export function seal(env, salt, payload, seed) {
   const why = problem(env) ?? saltProblem(salt) ?? (inRange(payload) ? null : "number-out-of-range");
   if (why) throw new Error(why);

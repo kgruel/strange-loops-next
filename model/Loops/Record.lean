@@ -1,4 +1,5 @@
-import Loops.Base32
+import Loops.Id
+import Loops.Number
 import Loops.Occurred
 
 /-!
@@ -25,45 +26,36 @@ inductive Shown where
 inductive Val where
   | str (s : String)
   | int (i : Int)
+  | number (n : Number)
   | bool (b : Bool)
   deriving Repr, DecidableEq, Inhabited
 
 structure Record where
-  id       : Nat
+  id       : RecordId
   kind     : String
   /-- Who says so. -/
   observer : String
   /-- The things this record is about: a set. -/
   about    : List String := []
   value    : String
-  prev     : List Nat
+  prev     : List RecordId
   /-- The grant this record acts on, if any. -/
-  under    : Option Nat := none
+  under    : Option RecordId := none
   /-- The claimed past, if the observer gave one. -/
   occurred : Option Claim := none
   /-- The observer's now. -/
   emitted  : Stamp
   /-- The ids whose payloads this record erases, whatever its kind. -/
-  erases   : List Nat := []
+  erases   : List RecordId := []
   /-- A numeric payload field the numeric folds read. Exact: an integer. -/
   n        : Int := 0
+  /-- A nonwhole numeric payload overrides the fixture integer. -/
+  nNumber  : Option Number := none
   /-- Further payload fields, by name. -/
   fields   : List (String × Val) := []
-  /-- Whether the payload (`value`, `n`, `fields`) is here for this reader. -/
+  /-- Whether the payload (`value`, `n`, `nNumber`, `fields`) is here for this reader. -/
   shown    : Shown := .here
   deriving Repr, DecidableEq, Inhabited
-
-/-- The last `k` base-256 digits of `n`, most significant first; the first
-holds whatever is above them. -/
-def digestDigits : Nat → Nat → List Nat
-  | 0, _ => []
-  | k + 1, n => n / 256 ^ k :: digestDigits k (n % 256 ^ k)
-
-/-- An id's digest: its 32 bytes, most significant first. -/
-def idDigest (n : Nat) : List Nat := digestDigits 32 n
-
-/-- An id as text: `r:` and its digest in base32. -/
-def idText (n : Nat) : String := "r:" ++ base32 ((idDigest n).map Nat.toUInt8)
 
 /-- The span content order reads: `occurred`'s, or without one, `emitted` as
 a span of no length. -/
@@ -108,22 +100,22 @@ structure View (f : Record → Record) : Prop where
   hides : ∀ r, f r = r ∨ (f r).shown ≠ .here
 
 def Record.withhold (r : Record) : Record :=
-  { r with value := "", n := 0, fields := [], shown := .withheld }
+  { r with value := "", n := 0, nNumber := none, fields := [], shown := .withheld }
 
 def Record.erase (r : Record) : Record :=
-  { r with value := "", n := 0, fields := [], shown := .erased }
+  { r with value := "", n := 0, nNumber := none, fields := [], shown := .erased }
 
 /-- A payload field by name: `value` and `n` always exist; others may not. -/
 def Record.get (r : Record) (name : String) : Option Val :=
   if name = "value" then some (.str r.value)
-  else if name = "n" then some (.int r.n)
+  else if name = "n" then some (match r.nNumber with | some n => .number n | none => .int r.n)
   else r.fields.lookup name
 
 /-- A payload field as an exact number, if the reader holds it and it is one. -/
 def Record.num (r : Record) (name : String) : Option Int :=
   if r.shown = .here then
     match r.get name with
-    | some (.int i) => some i
+    | some (.int i) => if -(2^53 - 1) ≤ i ∧ i ≤ 2^53 - 1 then some i else none
     | _ => none
   else none
 

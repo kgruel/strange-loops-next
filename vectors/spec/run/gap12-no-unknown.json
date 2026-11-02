@@ -1,0 +1,79 @@
+{
+  "vector": "gap12-no-unknown",
+  "layer": "spec/run",
+  "laws": ["where.set", "result.unread"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "."
+        }
+      ],
+      "fold": {
+        "payload-first": {
+          "count": true,
+          "where": {
+            "status": {
+              "is": "open"
+            },
+            "env.kind": {
+              "is": "note"
+            }
+          }
+        },
+        "envelope-first": {
+          "count": true,
+          "where": {
+            "env.kind": {
+              "is": "note"
+            },
+            "status": {
+              "is": "open"
+            }
+          }
+        },
+        "unknown": {
+          "count": true,
+          "where": {
+            "status": {
+              "is": "open"
+            },
+            "env.kind": {
+              "is": "task"
+            }
+          }
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabca",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:3"],
+          "prev": [],
+          "emitted": "2026-10-01T00:02:40Z",
+          "occurred": "2026-10-01T00:02:40Z",
+          "shown": "withheld"
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "payload-first": {
+      "value": 0,
+      "unread": 0
+    },
+    "envelope-first": {
+      "value": 0,
+      "unread": 0
+    },
+    "unknown": {
+      "value": 0,
+      "unread": 1
+    }
+  }
+}

@@ -14,12 +14,13 @@
         <dt>about?</dt><dd>the things it is about: a set, usually one</dd>
         <dt>prev?</dt><dd>the records this one replaces: a set, usually one</dd>
         <dt>under?</dt><dd>the grant it acts on</dd>
+        <dt>erases?</dt><dd>record ids whose payloads it erases</dd>
         <dt>payload</dt><dd>anything, including references</dd>
         <dt>sig?</dt><dd>signature over the id, kept beside the record (outside the id); see <a href="#sharing" data-tab="sharing">Sharing</a></dd>
       </dl>
     </div>
     <div class="card amb">
-      <h5>Record · resolution (tick)</h5>
+      <h5>Proposed tick value · stored inside an ordinary record</h5>
       <dl class="env">
         <dt>id</dt><dd>content hash</dd>
         <dt>vertex</dt><dd>the question it answers</dd>
@@ -28,11 +29,11 @@
         <dt>covers</dt><dd>ids of the records it folded</dd>
         <dt>occurred?</dt><dd>the concrete window it covers</dd>
         <dt>payload</dt><dd>the folded result</dd>
-        <dt>observer · emitted · sig</dt><dd>witness ticks only; a content tick derives its time from what it covers</dd>
+        <dt>witness metadata</dt><dd>proposed witness-value fields; stored records always use the ordinary envelope</dd>
       </dl>
     </div>
   </div>
-  <p>One envelope, two variants. Everything done to records (storing, signing, merging, sending, observing) works the same on both. Only the variant tells a conclusion from an observation.</p>
+  <p>A stored tick uses the ordinary record envelope with kind <code>tick</code>. Tick-specific fields belong in its payload. The card sketches a proposed tick value, not a second stored-record variant.</p>
 
   <h3>The envelope convention</h3>
   <p>A field belongs on the envelope only if the core reads it. Everything else is a payload convention. It's a test applied when a field is proposed, not a law.</p>
@@ -47,12 +48,13 @@
       <tr><td><code>about?</code></td><td>selection</td><td><span class="pill p-ok">keep</span></td></tr>
       <tr><td><code>prev?</code></td><td>Latest and LatestBy follow chains to their heads instead of trusting clocks; a set, so one record can merge a fork</td><td><span class="pill p-lean">keep</span></td></tr>
       <tr><td><code>under?</code></td><td>admission (the grant check)</td><td><span class="pill p-ok">keep</span></td></tr>
-      <tr><td><code>covers</code> (ticks)</td><td>verification</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>erases?</code></td><td>settling payload forms</td><td><span class="pill p-ok">keep</span></td></tr>
+      <tr><td><code>covers</code> (tick payload)</td><td>proposed verification</td><td><span class="pill p-next">payload</span></td></tr>
       <tr><td><code>as</code></td><td>nothing: names are never matched</td><td><span class="pill p-sk">drops</span></td></tr>
       <tr><td><code>derived-from</code></td><td>nothing: only hygiene vertices</td><td><span class="pill p-sk">payload</span></td></tr>
     </tbody>
   </table></div>
-  <p><code>as</code> existed to keep history honest ("written when it still called itself claude"). Name records are dated, so "what was this observer called at <code>emitted</code>" is a fold, and <code>as</code> drops out. On ticks, <code>observer</code>, <code>emitted</code> and the signature appear only on witness ticks; see <a href="#resolution" data-tab="resolution">Resolution</a>.</p>
+  <p>Historically, <code>as</code> preserved a writer's old name. Dated name records make that a fold, so the field is absent. Every stored tick has the ordinary observer, emitted and signature fields. Content ticks remain values until stored.</p>
   <details class="unfold"><summary>Time in the id, or a field?</summary><div class="body">
     <p>A time-ordered id (UUIDv7, or AT Protocol's TID) carries emit time inside the identifier. A UUIDv7 is out: it's random, and ticks, verbatim promotion, lineage ids and merge dedup all need the id to be a content hash. The real choice was a <b>time prefix plus a content hash</b> against a plain hash with <code>emitted</code> as a field. In both, the hash covers the time, so they hold the same information; the difference is where it shows.</p>
     <div class="tbl"><table>
@@ -93,7 +95,7 @@
   <h3>Things, and who observed them</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 250" role="img" aria-label="One thing, an essay, observed by four observers: kyle/rss saw it appear in a feed, kyle/safari saw a visit, kyle/likes saw a like, and kyle read it and judged it mattered.">
+      <svg class="dg" viewBox="0 0 400 250" role="img" aria-label="Four observers see one essay. RSS observes publication; Safari observes a visit; likes records a like. Kyle reads it and judges that it matters.">
         <rect class="box-amb" x="8" y="8" width="384" height="40" rx="8"/>
         <text x="200" y="33" text-anchor="middle" class="b">thing: essay at example.com/x</text>
         <line class="ln" x1="24" y1="48" x2="24" y2="224"/>
@@ -147,11 +149,11 @@
       <tr><td><code>201X</code> · <code>2004-XX</code></td><td>unspecified digits: sometime in the 2010s, in 2004</td></tr>
       <tr><td><code>2019/..</code></td><td>began in 2019, still going</td></tr>
     </tbody></table></div>
-    <p><span class="pill p-ok">settled</span> That is the whole grammar, in <code>protocol/record.md</code>, with the laws in <code>model/Laws/Time.lean</code> and the vectors in <code>vectors/occurred/</code>. The forms come from ISO 8601 and EDTF Level 1, kept to those that name exactly one span. Calendar dates are UTC days, so every store orders them alike. A span of no length comes before a longer one with the same start, and an open end comes last. Durations are refused because an end instant says the same thing; seasons, open or unknown starts, unknown ends and years past 9999 are refused because they don't name one span. Accepting more later is free; accepting less would invalidate stored records.</p>
+    <p><span class="pill p-ok">settled</span> That is the whole grammar, in <code>protocol/record.md</code>, with the laws in <code>model/Laws/Time.lean</code> and the vectors in <code>vectors/occurred/</code>. The forms come from ISO 8601 and EDTF Level 1, kept to those that name exactly one span. Calendar dates are UTC days, so every store orders them alike. A span of no length comes before a longer one with the same start, and an open end comes last. Durations are refused because an end instant expresses the same span. Seasons, unknown starts, unknown ends and years beyond 9999 do not identify one span. Accepting more later is free; accepting less would invalidate stored records.</p>
     <h4>Still to muse on</h4>
     <ul>
-      <li><b>Duration vs imprecision.</b> "Visited for 4 minutes" lasted the whole span. "Decided in 2009" happened at some point inside it. Both order the same, but folds may care (summing attention time vs placing a decision on a timeline). Lean: the core stays out of it and the kind decides at read. This is the most likely place a second field becomes necessary.</li>
-      <li><b>Claim at write vs derive at read.</b> Lean: <code>occurred</code> on the envelope is the observer's own claim. A declaration may derive or reinterpret time at read, as a lens, without overwriting the claim. For dumb collectors either works.</li>
+      <li><b>Duration vs imprecision.</b> "Visited for 4 minutes" lasted the whole span. "Decided in 2009" happened at some point inside it. Both order the same, but folds may care (summing attention time vs placing a decision on a timeline). Preferred design: the core stays out of it and the kind decides at read. This is the most likely place a second field becomes necessary.</li>
+      <li><b>Claim at write vs derive at read.</b> Preferred design: <code>occurred</code> on the envelope is the observer's own claim. A declaration may derive or reinterpret time at read, as a lens, without overwriting the claim. For dumb collectors either works.</li>
       <li><b>Revised claims.</b> "Actually it was 2011" is a new record about a record. A fold applies it at read.</li>
       <li><b>Intervals</b> (overlap, containment) are out of scope for layer 0.</li>
     </ul>
@@ -163,6 +165,6 @@
 
   <details class="unfold"><summary>The <code>about</code> field and thing identity</summary><div class="body">
     <p><code>about</code> is promoted from a payload <code>ref</code> to an envelope field because composition depends on it: salience groups by thing across three stores.</p>
-    <p>The hard part is thing identity across stores. The same essay shows up as a feed GUID in RSS, a URL with tracking parameters in Safari, and a post id in likes. The answer is both: a typed natural key normalized per prefix where the world supplies one, and <code>same-as</code> records folded at read where it takes judgment. Worked through in <a href="#things" data-tab="things">Things</a>.</p>
+    <p>The hard part is thing identity across stores. The same essay shows up as a feed GUID in RSS, a URL with tracking parameters in Safari, and a post id in likes. Use a typed natural key where the world supplies one. Normalize it per prefix. Use <code>same-as</code> records, folded at read, where identity needs judgment. Worked through in <a href="#things" data-tab="things">Things</a>.</p>
   </div></details>
 </section>

@@ -3,6 +3,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import * as F from "./fold.mjs";
 import { tally, jsonFiles, runAlone } from "./tally.mjs";
 
@@ -22,7 +23,7 @@ export function check(dir) {
   const t = tally();
   for (const family of readdirSync(join(dir, "fold")).sort()) {
     for (const file of jsonFiles(join(dir, "fold", family))) {
-      const v = JSON.parse(readFileSync(file, "utf8"));
+      const v = readVector(readFileSync(file, "utf8"));
       t.files++;
       const n = `${v.layer}/${v.vector}`;
       if (!RUN[v.layer]) {

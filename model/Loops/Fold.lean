@@ -1,4 +1,5 @@
 import Loops.Record
+import Loops.Json
 
 /-!
 # Fold
@@ -25,7 +26,7 @@ winner is the newest head, and any other heads are a fork, shown as a conflict.
 -/
 
 /-- Insert into a strictly ascending list, keeping it duplicate-free. -/
-def insertId (n : Nat) : List Nat → List Nat
+def insertId (n : RecordId) : List RecordId → List RecordId
   | [] => [n]
   | m :: ms => if n < m then n :: m :: ms else if n = m then m :: ms else m :: insertId n ms
 
@@ -35,7 +36,7 @@ def insertRec (r : Record) : List Record → List Record
   | h :: t => if Newer r h then r :: h :: t else if r = h then h :: t else h :: insertRec r t
 
 structure LatestBy where
-  named : List Nat
+  named : List RecordId
   heads : List Record
   deriving Repr, DecidableEq, Inhabited
 
@@ -56,13 +57,44 @@ def LatestBy.winner (s : LatestBy) : Option Record := s.heads.head?
 /-- The other heads: non-empty means the thing is forked. -/
 def LatestBy.others (s : LatestBy) : List Record := s.heads.drop 1
 
-/-! ## Latest
+/-! ## Whole-reader heads -/
 
-Latest is LatestBy over one thing: the newest head, and any other heads as
-a fork. It follows `prev` chains instead of trusting clocks.
--/
+/-- A record names its things or anchors its own id when about is empty. -/
+def Record.things (r : Record) : List String := if r.about.isEmpty then [idText r.id] else r.about
 
-def Latest.fold (xs : List Record) : LatestBy := LatestBy.fold LatestBy.empty xs
+def Record.isAbout (r : Record) (t : String) : Bool := r.things.contains t
+
+def shares (a b : Record) : Bool := a.things.any b.things.contains
+
+/-- Every thing the records are about, each once, in canonical order. -/
+def thingsOf (xs : List Record) : List String := canonSet (xs.flatMap Record.things)
+
+/-- A thing's state: LatestBy over the records about it. -/
+def stateIn (t : String) (xs : List Record) : LatestBy :=
+  LatestBy.fold .empty (xs.filter (·.isAbout t))
+
+def perThing (xs : List Record) : List (String × LatestBy) :=
+  (thingsOf xs).map fun t => (t, stateIn t xs)
+
+/-- The union of what several places hold, each id once. -/
+def dedup : List Record → List Record
+  | [] => []
+  | r :: rs => if rs.any (·.id == r.id) then dedup rs else r :: dedup rs
+
+/-- Sort records in content order and keep each id once. -/
+def orderHeads (xs : List Record) : List Record :=
+  (dedup xs).foldl (fun hs r => insertRec r hs) []
+
+/-- Combine the per-thing heads without global supersession. -/
+def wholeHeads (xs : List Record) : List Record :=
+  orderHeads ((perThing xs).flatMap fun ts => ts.2.heads)
+
+/-! ## Latest -/
+
+/-- Latest combines per-thing heads and their named ids. -/
+def Latest.fold (xs : List Record) : LatestBy :=
+  let states := (perThing xs).map (·.2)
+  ⟨(states.flatMap (·.named)).foldl (fun ns n => insertId n ns) [], wholeHeads xs⟩
 
 def Latest.winner (s : LatestBy) : Option Record := s.heads.head?
 

@@ -1,0 +1,30 @@
+{
+  "vector": "12-negative-exact-boundary",
+  "layer": "record",
+  "laws": ["record.canonical"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+        "emitted": "2026-10-21T05:30:00-04:00"
+      }
+    ],
+    "payloads": [-9007199254740991],
+    "salt": "rmz7vi5a53z2q5kcqaacsrrqfm",
+    "seed": "jpairczaap3nqstmrszbjgpwkrjvfwtbw6gplbcgwfqb4ubyub5a"
+  },
+  "expect": {
+    "env_canonical": "{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}",
+    "payload_canonical": "-9007199254740991",
+    "commit": "h:wpeix5ycp6rmeykecxv2qhvnytwbvx7tbutl6viiabl7svecpiza",
+    "id_preimage": "{\"commit\":\"h:wpeix5ycp6rmeykecxv2qhvnytwbvx7tbutl6viiabl7svecpiza\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}}",
+    "id": "r:weuehr6mitlpoo4saeirdim5plhi6o5dxz2m7vjezvsr5owffmvq",
+    "signing_input": "loops/record/v1:r:weuehr6mitlpoo4saeirdim5plhi6o5dxz2m7vjezvsr5owffmvq",
+    "key": "k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q",
+    "ed25519": "f4qkoqczi4h2truprxxmdwls36ap2ymxzdqbxyasmqk72jomfsoyrjc45cp6bfi5tjjoccgw5hqyqsou3ykohhhccvfqhduxmfenwcq",
+    "line": "{\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:weuehr6mitlpoo4saeirdim5plhi6o5dxz2m7vjezvsr5owffmvq\",\"payload\":-9007199254740991,\"salt\":\"rmz7vi5a53z2q5kcqaacsrrqfm\",\"sig\":{\"ed25519\":\"f4qkoqczi4h2truprxxmdwls36ap2ymxzdqbxyasmqk72jomfsoyrjc45cp6bfi5tjjoccgw5hqyqsou3ykohhhccvfqhduxmfenwcq\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}",
+    "erased_line": "{\"commit\":\"h:wpeix5ycp6rmeykecxv2qhvnytwbvx7tbutl6viiabl7svecpiza\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:weuehr6mitlpoo4saeirdim5plhi6o5dxz2m7vjezvsr5owffmvq\",\"sig\":{\"ed25519\":\"f4qkoqczi4h2truprxxmdwls36ap2ymxzdqbxyasmqk72jomfsoyrjc45cp6bfi5tjjoccgw5hqyqsou3ykohhhccvfqhduxmfenwcq\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}"
+  }
+}

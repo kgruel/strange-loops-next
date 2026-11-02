@@ -1,10 +1,11 @@
+import Loops.Number
+
 /-!
 # Json and canonical bytes
 
 The JSON the model needs, and its canonical text per RFC 8785 (JCS):
 members sorted by UTF-16 code units, minimal string escapes, no
-whitespace. The model's numbers are integers; IEEE-754 formatting of other
-numbers is tested against the RFC's own vectors in `vectors/standard/`.
+whitespace. Numbers use binary64 and shortest roundtripping decimal text.
 -/
 
 namespace Loops
@@ -13,6 +14,7 @@ inductive Json where
   | null
   | bool (b : Bool)
   | int (i : Int)
+  | number (n : Number)
   | str (s : String)
   | arr (xs : List Json)
   | obj (kvs : List (String × Json))
@@ -77,6 +79,7 @@ def Json.canon : Json → String
   | .null => "null"
   | .bool b => if b then "true" else "false"
   | .int i => toString i
+  | .number n => n.canon
   | .str s => quote s
   | .arr xs => "[" ++ ",".intercalate (Json.canonAll xs) ++ "]"
   | .obj kvs =>
@@ -109,18 +112,18 @@ def Json.membersDistinct : List (String × Json) → Bool
   | (_, v) :: kvs => v.keysDistinct && Json.membersDistinct kvs
 end
 
-/-! ## Numbers a record can carry exactly
+/-! ## Numbers a record can carry
 
-RFC 8785 reads every number as an IEEE-754 double, which holds an integer
-exactly only within ±(2^53 − 1). Past that, two different numbers share one
-canonical form, so writers would disagree on a record's id. -/
+RFC 8785 reads numbers as binary64. Writers require magnitude at most 2^53 − 1,
+whole or not. Raw integers obey the same bound. -/
 
 def maxExact : Int := 2 ^ 53 - 1
 
 mutual
-/-- Every number in the value lies within ±(2^53 − 1). -/
+/-- Every number is finite and lies within ±(2^53 − 1), whole or not. -/
 def Json.inRange : Json → Bool
   | .int i => decide (-maxExact ≤ i) && decide (i ≤ maxExact)
+  | .number n => n.inRange
   | .arr xs => Json.allInRange xs
   | .obj kvs => Json.membersInRange kvs
   | _ => true

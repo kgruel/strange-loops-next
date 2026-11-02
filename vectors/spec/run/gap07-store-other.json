@@ -1,0 +1,46 @@
+{
+  "vector": "gap07-store-other",
+  "layer": "spec/run",
+  "laws": ["spec.set"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "from": [
+        {
+          "store": "other"
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:1"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0,
+          "fields": {
+            "status": "open",
+            "est": 3
+          }
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "c": {
+      "value": 1,
+      "unread": 0
+    }
+  }
+}

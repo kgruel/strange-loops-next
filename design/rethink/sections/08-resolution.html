@@ -38,7 +38,7 @@
       <p style="margin:8px 0 0;font-size:14px;color:var(--muted)">Never reproducible, and never pretends to be. Its value is historical: what was known, shown or sent.</p>
     </div>
   </div>
-  <p>Every tick's result can be checked against its covered ids, and both are written down the same way: a stored content tick is a tick record too, signed by whoever cited or sent it. The kinds differ only in how the set was chosen; what a witness tick asks you to trust is that the set was complete. Once an input is erased, a numeric result can't be recomputed and rests on the signature; a result made of references still can be.</p>
+  <p>A reader with the covered records can check a tick's result. Both kinds use the same storage form. A stored content tick is also a tick record, signed by whoever cited or sent it. The kinds differ only in how the set was chosen; what a witness tick asks you to trust is that the set was complete. Once an input is erased, a numeric result can't be recomputed and rests on the signature; a result made of references still can be.</p>
 
   <h3>How the set is chosen</h3>
   <div class="tbl"><table>
@@ -137,23 +137,23 @@
   </ul>
 
   <details class="unfold"><summary>Where ticks live, and who writes them</summary><div class="body">
-    <p>A content tick is a value: recomputed on demand, and written down only when cited or sent, as a tick record signed by whoever writes it. <code>into</code> names where that record lands. Admission there works by recomputing (for a store that holds the records) or by the writer's grant. A vertex never signs anything; the observer who ran it signs.</p>
+    <p>A content tick is a value, recomputed on demand. When someone cites or sends it, they write and sign a tick record. <code>into</code> names where that record lands. Admission there works by recomputing (for a store that holds the records) or by the writer's grant. A vertex never signs anything; the observer who ran it signs.</p>
   </div></details>
 
   <details class="unfold"><summary>Determinism, across implementations</summary><div class="body"><ul>
-    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. Numeric folds are exact: integers, or decimals at a scale the spec declares; never floats, whose sums change with order (found in step 1).</li>
+    <li><b>The set decides, for every fold.</b> Accumulating folds are commutative and folds over heads work from the heads, so arrival order never enters. The reader reads JSON numbers as binary64 values. Numeric folds accept only safe whole values and count other values as unread. Sum uses an exact integer accumulator.</li>
     <li><b>The spec hash pins the fold-vocabulary version.</b> Otherwise a change to LatestBy's semantics would change results under an unchanged hash.</li>
-    <li><b>Conformance vectors bind implementations.</b> The vectors in <code>vectors/</code> are how any two implementations, such as the Rust core and a JavaScript record writer, stay bit-for-bit identical; they become a requirement.</li>
+    <li><b>Conformance vectors bind implementations.</b> The conformance vectors in <code>vectors/</code> are a requirement. They check agreement between implementations, such as the Rust core and a JavaScript record writer.</li>
     <li><b>Window membership:</b> a record belongs if the start of its <code>occurred</code> span falls in the window; records without <code>occurred</code> use <code>emitted</code>. A spec may override.</li>
     <li><b>Empty windows:</b> a witness tick may be empty ("monitoring saw nothing all night" is information); a content vertex never ticks over an empty set.</li>
   </ul></div></details>
 
-  <details class="unfold"><summary>Boundary modes in today's code</summary><div class="body">
-    <p><code>Boundary(mode="when"|"after"|"every", conditions)</code> in <code>libs/atoms/src/atoms/boundary.py</code> already holds the split: <code>when</code> a kind arrives, <code>after</code> N records, and conditions on folded state are content boundaries. <code>every</code> is the only operational mode, along with a manual "tick now".</p>
+  <details class="unfold"><summary>Boundary modes in the earlier prototype</summary><div class="body">
+    <p><b>Earlier prototype context, not an integrated runner.</b> Its <code>Boundary(mode="when"|"after"|"every", conditions)</code> in <code>libs/atoms/src/atoms/boundary.py</code> holds this split. That path is absent from this repository. Content boundaries include <code>when</code> a kind arrives, <code>after</code> N records, and conditions on folded state. In that prototype, <code>every</code> is the operational mode, alongside a manual "tick now". Boundaries are not implemented here.</p>
   </div></details>
 
   <details class="unfold"><summary>Prior art: the Dataflow model</summary><div class="body">
-    <p>Stream processing met late data head-on: event time vs processing time, watermarks, triggers, and refinements or retractions of earlier results. <code>occurred</code> is event time, a boundary is a trigger, and ticking again with <code>prev</code> is an accumulating refinement.</p>
+    <p>Stream processing handles late data with event time, processing time, watermarks and triggers. It refines or retracts earlier results. <code>occurred</code> is event time, a boundary is a trigger, and ticking again with <code>prev</code> is an accumulating refinement.</p>
     <details class="source"><summary>Akidau et al., VLDB 2015</summary><div class="body"><p>Akidau et al., "The Dataflow Model: A Practical Approach to Balancing Correctness, Latency, and Cost in Massive-Scale, Unbounded, Out-of-Order Data Processing", PVLDB 8(12), 2015. <a href="http://www.vldb.org/pvldb/vol8/p1792-Akidau.pdf" rel="noopener">vldb.org/pvldb/vol8/p1792-Akidau.pdf</a></p></div></details>
   </div></details>
 </section>

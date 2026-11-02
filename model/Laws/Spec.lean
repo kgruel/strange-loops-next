@@ -5,27 +5,28 @@ import Laws.Things
 /-!
 # Laws of the spec
 
-* **Operators.** `not` is the complement of `is` and `absent` of `present`;
-  on a number, or a time, exactly one of `at-least` and `below` holds.
+* **Operators.** `not` complements `is`; `absent` complements `present`.
+  With a held safe whole value and a numeric bound, exactly one of `at-least` and `below` holds.
+  Present times obey the corresponding time law.
   They compare like with like: numbers with numbers, times with times.
 * **Each field reads as what it holds.** `kind` and `observer` as their
   text, a set as its members, `emitted` as its own instant. `from` reads
   `about` by thing: a record about nothing is about its own id.
-* **Times read as what they say.** A test on a time reads its span, never
-  its spelling, the record's or the argument's; `at-least` and `below`
-  compare starts, and a record without `occurred` passes neither.
+* **Times read as what they say.** A time test reads the span, not the record's or argument's spelling.
+  `at-least` and `below` compare starts.
+  A record without `occurred` passes neither.
 * **Totality.** A test answers for every record whose payload is here; a
   test on the envelope answers for every record.
 * **A `where` map is a set of tests.** Their order never matters.
 * **Views only lose information.** Under a view each test, and each `where`
   map, keeps its answer or becomes unknown. Selection by `from` reads only
   envelopes, so a view selects the same records.
-* **The set decides, for every spec.** Every slot gives the same value for
-  the same set of records.
+* **The set decides, for every spec.** Supply each input id once.
+  Every slot then gives the same value for the same record set.
 * **Selection comes after supersession.** Slots over heads return only
-  heads, records no record about their thing has superseded, and only heads
-  that `from` takes and every test of `where` holds for. Under a view, each
-  thing's state is the full reader's with payloads hidden.
+  records that remain heads of at least one thing.
+  Each returned head passes `from` and every `where` test.
+  With distinct input ids and an envelope-only replacement rule, an envelope-preserving view keeps each thing's head ids.
 -/
 
 namespace Loops
@@ -274,9 +275,9 @@ theorem Source.takes_view {f : Record → Record} (hf : View f) (s : Source) (r 
   have ha : (f r).isAbout = r.isAbout := funext (isAbout_view hf r)
   simp [Source.takes, he.kind, ha]
 
-/-- `from` reads `about` by thing: an entry naming a thing takes exactly the
-records about it, and a record about nothing is about its own id and
-nothing else. -/
+/-- `from` reads `about` by thing.
+An entry naming a thing takes exactly its records.
+A record about nothing belongs only to the thing named by its own id. -/
 theorem Source.takes_about (store t : String) (r : Record) :
     (Source.mk store [] (some t)).takes r =
       if r.about.isEmpty then t == idText r.id else r.about.contains t := by
@@ -335,7 +336,7 @@ theorem collectOf_set_decides (sel : Record → Bool) (cs : List Cond) (follow :
   unfold collectOf
   simp only [hp]
 
-/-- Every slot gives the same value for the same set of records. -/
+/-- With each input id supplied once, every slot gives the same value for the same record set. -/
 theorem Slot.set_decides (s : Slot) (sel : Record → Bool) {xs ys : List Record}
     (hx : Distinct xs) (hy : Distinct ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
     s.run sel xs = s.run sel ys := by
@@ -349,7 +350,7 @@ theorem Slot.set_decides (s : Slot) (sel : Record → Bool) {xs ys : List Record
   · exact latestOf_set_decides _ _ hx.addressed hy.addressed h
   · exact collectOf_set_decides _ _ _ _ hx.addressed hy.addressed h
 
-/-- The set decides, for every spec, under any rule for who may replace whom. -/
+/-- With each input id supplied once, the same record set gives the same spec result under any fixed replacement rule. -/
 theorem Spec.set_decides (sp : Spec) (may : Record → Record → Bool) {xs ys : List Record}
     (hx : Distinct xs) (hy : Distinct ys) (h : ∀ r, r ∈ xs ↔ r ∈ ys) :
     sp.run xs may = sp.run ys may := by
@@ -359,10 +360,8 @@ theorem Spec.set_decides (sp : Spec) (may : Record → Record → Bool) {xs ys :
 
 /-! ## Selection after supersession -/
 
-/-- What a spec's heads read under a view: every thing's state is the full
-reader's, with payloads hidden. Withholding never brings back what was
-superseded, and neither does selecting by kind, `about` or `from`, since
-selection only ever looks at heads. -/
+/-- Distinct input ids, an envelope-preserving view and an envelope-only replacement rule preserve each thing's head ids.
+The resulting heads carry the view's payload forms. -/
 theorem Spec.view_state {f : Record → Record} (hf : View f) {may : Record → Record → Bool}
     (hm : EnvOnly may) {xs : List Record} (hx : Distinct xs) :
     perThing (admit may (xs.map f)) =
@@ -414,13 +413,12 @@ theorem chosen_payTest_yes {sel : Record → Bool} {cs : List Cond} {r : Record}
   · rintro ⟨hs, hall⟩
     exact ⟨⟨hs, fun c ⟨hc, _⟩ => hall c hc⟩, fun c ⟨hc, _⟩ => hall c hc⟩
 
-/-- Latest-by returns only heads, and only those it was asked for: every
-record it gives for a thing is one no record about that thing has
-superseded, that `from` takes, and that every test holds for. -/
+/-- Latest-by returns only records that remain heads of at least one thing.
+Each returned record passes `from` and every test. -/
 theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Record}
-    (hx : Addressed xs) {ts : List (String × List (Nat × Shown))} {u : Nat}
-    (h : latestOf sel cs xs = .things ts u) {t : String} {ps : List (Nat × Shown)}
-    (ht : (t, ps) ∈ ts) {p : Nat × Shown} (hp : p ∈ ps) :
+    (hx : Addressed xs) {ts : List (String × List (RecordId × Shown))} {u : Nat}
+    (h : latestOf sel cs xs = .things ts u) {t : String} {ps : List (RecordId × Shown)}
+    (ht : (t, ps) ∈ ts) {p : RecordId × Shown} (hp : p ∈ ps) :
     ∃ r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = .yes ∧ (r.id, r.shown) = p := by
   unfold latestOf at h
   simp only [SlotValue.things.injEq] at h
@@ -439,6 +437,16 @@ theorem latestOf_heads (sel : Record → Bool) (cs : List Cond) {xs : List Recor
     obtain ⟨hk0, hch⟩ := mem_filter.1 hk1
     obtain ⟨hsel, hcond⟩ := chosen_payTest_yes.1 ⟨hch, hpay⟩
     exact ⟨k, stateIn_heads hx (mem_perThing hs' ▸ hk0), hsel, hcond, rfl⟩
+
+/-- Latest-by counts each unknown chosen head once by id, even across things. -/
+theorem latestOf_unread (sel : Record → Bool) (cs : List Cond) (xs : List Record)
+    {ts : List (String × List (RecordId × Shown))} {u : Nat}
+    (h : latestOf sel cs xs = .things ts u) :
+    u = (idsOf (((perThing xs).flatMap (·.2.heads)).filter fun r =>
+      chosen sel cs r && payTest cs r == .unknown)).length := by
+  unfold latestOf at h
+  obtain ⟨_, rfl⟩ := SlotValue.things.inj h
+  simp only [flatMap_map, filter_flatMap, filter_filter, Bool.and_comm]
 
 theorem payTest_unlinked (cs : List Cond) (r : Record) :
     payTest cs r.unlinked = payTest cs r := by
@@ -475,12 +483,82 @@ theorem mem_newestFirst {xs : List Record} (hx : Addressed xs) {r : Record}
   obtain ⟨q, hq, e⟩ := mem_map.1 hm
   exact ⟨q, hq, e.symm⟩
 
-/-- Collect following `prev` returns only heads, and only those it was asked
-for: each record it gives is one no record about its thing has superseded,
-that `from` takes, and that every test holds for. -/
+/-- Dropping `prev` makes every input record a head of the ordering fold. -/
+theorem mem_newestFirst_iff {xs : List Record} (hx : Addressed xs) {r : Record} :
+    r ∈ newestFirst xs ↔ ∃ q ∈ xs, r = q.unlinked := by
+  refine ⟨mem_newestFirst hx, ?_⟩
+  rintro ⟨q, hq, rfl⟩
+  apply ((LatestBy.inv_of hx.unlinked).heads_mem q.unlinked).2
+  refine ⟨mem_map.2 ⟨q, hq, rfl⟩, ?_⟩
+  rintro ⟨r, hr, hp⟩
+  obtain ⟨a, _, rfl⟩ := mem_map.1 hr
+  simp [Record.unlinked] at hp
+
+/-- The ordering fold has no repeated ids on addressed input. -/
+theorem newestFirst_distinct {xs : List Record} (hx : Addressed xs) :
+    Distinct (newestFirst xs) := by
+  have inv := LatestBy.inv_of hx.unlinked
+  have ha : Addressed (newestFirst xs) :=
+    hx.unlinked.sub fun r hr => ((inv.heads_mem r).1 hr).1
+  apply pairwise_map.2
+  apply inv.heads_sorted.imp_of_mem
+  intro a b ha' hb' hn e
+  have hab := ha a ha' b hb' e
+  exact Newer.irrefl b (hab ▸ hn)
+
+/-- On a list with distinct ids, canonicalizing the ids preserves length. -/
+theorem idsOf_length {xs : List Record} (hx : Distinct xs) :
+    (idsOf xs).length = xs.length := by
+  have hp : idsOf xs ~ xs.map (·.id) :=
+    (perm_ext_iff_of_nodup ((idsOf_sorted xs).imp Fin.ne_of_lt) hx).2 fun i => by
+      simp only [mem_idsOf, mem_map]
+  simpa using hp.length_eq
+
+/-- Ordering and deduplication count exactly the unknown input ids. -/
+theorem newestFirst_unread (cs : List Cond) {xs : List Record} (hx : Addressed xs) :
+    ((newestFirst xs).filter (payTest cs · == .unknown)).length =
+      (idsOf (xs.filter (payTest cs · == .unknown))).length := by
+  have hd : Distinct ((newestFirst xs).filter (payTest cs · == .unknown)) :=
+    pairwise_map.2 ((pairwise_map.1 (newestFirst_distinct hx)).sublist filter_sublist)
+  rw [← idsOf_length hd]
+  congr 1
+  apply idsOf_ext
+  intro i
+  constructor
+  · rintro ⟨r, hr, hi⟩
+    obtain ⟨hr, hp⟩ := mem_filter.1 hr
+    obtain ⟨q, hq, rfl⟩ := (mem_newestFirst_iff hx).1 hr
+    exact ⟨q, mem_filter.2 ⟨hq, by simpa [payTest_unlinked] using hp⟩, hi⟩
+  · rintro ⟨r, hr, hi⟩
+    obtain ⟨hr, hp⟩ := mem_filter.1 hr
+    exact ⟨r.unlinked,
+      mem_filter.2 ⟨(mem_newestFirst_iff hx).2 ⟨r, hr, rfl⟩,
+        by simpa [payTest_unlinked] using hp⟩, hi⟩
+
+/-- Collect counts unknown chosen ids before ordering or limiting its readable output. -/
+theorem collectOf_unread (sel : Record → Bool) (cs : List Cond) (follow : Bool)
+    (limit : Option Nat) {xs : List Record} (hx : Addressed xs)
+    {hs : List (RecordId × Shown)} {u : Nat}
+    (h : collectOf sel cs follow limit xs = .heads hs u) :
+    u = (idsOf (((if follow then (perThing xs).flatMap (·.2.heads) else xs)).filter fun r =>
+      chosen sel cs r && payTest cs r == .unknown)).length := by
+  have hpool : Addressed (if follow then (perThing xs).flatMap (·.2.heads) else xs) := by
+    cases follow
+    · exact hx
+    · apply hx.sub
+      intro r hr
+      obtain ⟨⟨t, s⟩, hts, hr⟩ := mem_flatMap.1 hr
+      exact (stateIn_heads hx (mem_perThing hts ▸ hr)).1
+  unfold collectOf at h
+  obtain ⟨_, rfl⟩ := SlotValue.heads.inj h
+  rw [newestFirst_unread cs (hpool.filter _)]
+  simp only [filter_filter, Bool.and_comm]
+
+/-- Collect following `prev` returns only records that remain heads of at least one thing.
+Each returned record passes `from` and every test. -/
 theorem collectOf_heads (sel : Record → Bool) (cs : List Cond) (limit : Option Nat)
-    {xs : List Record} (hx : Addressed xs) {hs : List (Nat × Shown)} {u : Nat}
-    (h : collectOf sel cs true limit xs = .heads hs u) {p : Nat × Shown} (hp : p ∈ hs) :
+    {xs : List Record} (hx : Addressed xs) {hs : List (RecordId × Shown)} {u : Nat}
+    (h : collectOf sel cs true limit xs = .heads hs u) {p : RecordId × Shown} (hp : p ∈ hs) :
     ∃ t r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = .yes ∧ (r.id, r.shown) = p := by
   unfold collectOf at h
   simp only [↓reduceIte, SlotValue.heads.injEq] at h

@@ -1,0 +1,70 @@
+{
+  "vector": "gap18-reorder-unknown-absent",
+  "layer": "lens/section",
+  "laws": ["lens.nothing-dropped"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "a",
+        "body": ["A"]
+      },
+      {
+        "id": "b",
+        "body": ["B"]
+      },
+      {
+        "id": "c",
+        "body": ["C"]
+      }
+    ],
+    "text": ["::: b", "B2", ":::", "::: a", "A2", ":::", "::: unknown", "X", ":::"]
+  },
+  "expect": {
+    "parsed": [
+      {
+        "id": "b",
+        "body": ["B2"]
+      },
+      {
+        "id": "a",
+        "body": ["A2"]
+      },
+      {
+        "id": "unknown",
+        "body": ["X"]
+      }
+    ],
+    "normalized": ["::: b", "B2", ":::", "::: a", "A2", ":::", "::: unknown", "X", ":::"],
+    "outcomes": [
+      {
+        "accepted": "b",
+        "body": ["B2"]
+      },
+      {
+        "accepted": "a",
+        "body": ["A2"]
+      },
+      {
+        "unknown": "unknown"
+      },
+      {
+        "absent": "c"
+      }
+    ],
+    "applied": [
+      {
+        "id": "a",
+        "body": ["A2"]
+      },
+      {
+        "id": "b",
+        "body": ["B2"]
+      },
+      {
+        "id": "c",
+        "body": ["C"]
+      }
+    ]
+  }
+}

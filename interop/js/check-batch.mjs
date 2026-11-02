@@ -4,6 +4,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import { resolveBatch } from "./batch.mjs";
 import { tally, jsonFiles, runAlone } from "./tally.mjs";
 
@@ -24,7 +25,7 @@ const variants = { "as given": [], "prev reversed": ["prev"], "about reversed": 
 export function check(dir) {
   const t = tally();
   for (const file of jsonFiles(join(dir, "batch"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     const n = `batch/${v.vector}`;
     t.files++;
     for (const [how, keys] of Object.entries(variants)) {

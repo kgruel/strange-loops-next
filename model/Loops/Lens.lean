@@ -63,7 +63,18 @@ def parseGo : List Line → St → List Section → Option (List Section)
     else if l.take 3 = fence then none
     else parseGo ls (.inside id (unescape l :: b)) acc
 
-def parse (ls : List Line) : Option (List Section) := parseGo ls .top []
+def ids (d : List Section) : List Line := d.map (·.id)
+
+/-- Section ids are nonempty and distinct. -/
+def Valid (d : List Section) : Prop :=
+  (∀ s ∈ d, s.id ≠ []) ∧ (ids d).Nodup
+
+instance (d : List Section) : Decidable (Valid d) :=
+  inferInstanceAs (Decidable ((∀ s ∈ d, s.id ≠ []) ∧ (ids d).Nodup))
+
+def parse (ls : List Line) : Option (List Section) := do
+  let d ← parseGo ls .top []
+  if Valid d then some d else none
 
 /-- What an edited text means against its base. -/
 inductive Outcome where

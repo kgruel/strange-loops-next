@@ -93,7 +93,7 @@ export function checkPremises({ data, rows, resolved, graph, fail }) {
       for (const h of hypotheses(graph[full].states)) {
         const hit = Object.keys(vocab).find((v) => matcher(v).test(h));
         if (!hit) {
-          if (NAMED.test(h) || /\.Nodup$/.test(h)) fail(`${r.key}: ${name} takes the hypothesis \`${h}\`, which laws.json premises.vocabulary doesn't know; add it (page, law or subject)`);
+          if (NAMED.test(h) || /\.Nodup$/.test(h) || /^\w+ ≠ \[\]$/.test(h)) fail(`${r.key}: ${name} takes the hypothesis \`${h}\`, which laws.json premises.vocabulary doesn't know; add it (page, law or subject)`);
           continue;
         }
         if (!t.has(hit)) t.set(hit, []);

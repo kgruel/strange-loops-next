@@ -4,14 +4,15 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { canonical } from "./loops.mjs";
+import { inspect } from "node:util";
+import { equal } from "../answers.mjs";
 
-// A tally: { passed, failures, files }, with checks comparing canonical JSON.
+// A tally: { passed, failures, files }, comparing structural, exact answers.
 export function tally() {
   const t = { passed: 0, failures: [], files: 0 };
   t.expect = (name, got, want) => {
-    if (canonical(got) === canonical(want)) t.passed++;
-    else t.failures.push(`${name}: got ${canonical(got)}, want ${canonical(want)}`);
+    if (equal(got, want)) t.passed++;
+    else t.failures.push(`${name}: got ${inspect(got, { depth: null })}, want ${inspect(want, { depth: null })}`);
   };
   return t;
 }

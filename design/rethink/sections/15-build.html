@@ -1,24 +1,24 @@
 <section class="panel" id="build" role="tabpanel" aria-labelledby="t-build">
   <div class="panel-head"><h2>Building it</h2><button class="toggle-all" type="button">Unfold all</button></div>
-  <p class="gist"><b>Rust</b>, in a new <code>strange-loops</code> repo: a core crate with two allowed dependencies, a CLI crate around it, and a Lean model beside both. The product is <b>the protocol, its vectors and one implementation</b>; other languages meet it at the JSON format, the CLI or a local socket, and phones and browsers can carry the core itself. Steps 0 and 1 are built, and step 2 is modelled and reviewed. Next, the data model is formalized in Lean, before step 3 or any Rust.</p>
+  <p class="gist"><b>Rust now implements the modeled protocol</b> beside Lean and JS. JS and Rust check every fixture family, including external standards. Storage, CLI workflows and higher reference, boundary and tick transitions remain planned.</p>
 
-  <h3>Ready to build: the next session</h3>
-  <p><span class="pill p-next">next</span> Formalize the data model in Lean first: one record, from JSON text to what a reader holds, with every boundary returning a type that carries its invariants. No Rust until that's done. The work is in <code>kgruel/strange-loops-next</code>. PRs 1, 2, 4–7 and 9–11 are merged: PR 7 is the checked write path, PR 9 the envelope's <code>erases</code>, and PR 11 gives <code>occurred</code> its grammar and order. PR 3, the KDL parser, is closed and its branch kept for the standalone release. The list below is the build that follows.</p>
+  <h3>Historical version-35 roadmap</h3>
+  <p><b>Historical version-35 roadmap, not current status.</b> The old plan put data-model formalization before Rust. PR 7 checked writes, PR 9 added <code>erases</code>, and PR 11 formalized occurred spans. PR 3 closed the KDL parser work and kept its branch for standalone release. These API sketches, diagrams and CLI examples remain proposals unless explicitly identified as implemented. They are not conformance fixtures. <code>protocol/spec.md</code> is normative. No JSON Schema files or <code>schema.md</code> exist.</p>
   <ol>
-    <li><b>Port step 1 to Rust,</b> once the data model is formalized. Start the Cargo workspace: <code>crates/loops</code> with <code>record</code> and <code>json</code>, <code>xtask</code> for the budgets, and the CI jobs below. Use the model's names: <code>NewRecord</code>, <code>Stored</code>, <code>Written</code>, <code>covers</code>, <code>LatestBy</code>; refuse lone surrogates. <i>Done when</i> every record vector, the RFC 8785 and ES6 number vectors and the Ed25519 vectors pass through the public API, the JS writer agrees, the core builds for <code>wasm32-unknown-unknown</code>, and the budget check passes.</li>
-    <li><span class="pill p-ok">proved</span> <b>Model step 2 in Lean</b> (PR 4). Folds take records with distinct ids; a payload is here, withheld or erased, and heads depend only on envelopes; two fold families, one law each; results count what they couldn't read; the spec parses from JSON with closed refusals, <code>where</code> answers yes, no or unknown, and payload tests apply after supersession; a labelled batch has one meaning. The vectors are in <code>fold/</code>, <code>spec/</code> and <code>batch/</code>. Supersession runs per thing over everything held, the reader settles its places' forms with erase records, and a <code>prev</code> must name a held record about a shared thing; the <code>realm/</code> vectors cover it. Still to model when their steps come: <code>as</code>, <code>by</code>, <code>order</code>, <code>set</code>, <code>weight-by</code>, a LatestBy keyed by a payload field, and windows, which wait for ticks. Content order already reads real times (PR 12), and <code>where</code> tests any envelope field (PR 13).</li>
-    <li><b>Write the schemas</b> in <code>protocol/</code>: vertex, draft, store and places, checked against the model's types.</li>
-    <li><b>Build step 2 in Rust:</b> <code>spec</code>, <code>fold</code>, <code>vertex</code>, the <code>Place</code> trait with checkpoints, <code>loops-dir</code>; in the CLI <code>emit</code> (one record, <code>-</code> as one changeset with labels, <code>--stream</code>), <code>read</code> and <code>get</code>; the <code>.loops/</code> layout with its pre-commit hook; a file signer for the device key, signing by default. <i>Done when</i> it does the old CLI's workable job, signed, shown by trycmd scenarios: emit, read and get; a labelled batch; a refused batch that writes nothing; two heads shown as a fork.</li>
-    <li><b>First real data:</b> this page's decision ledger, emitted as one labelled batch into the repo's own <code>.loops/</code>.</li>
+    <li><b>Historical step 1:</b> port records and canonical JSON, check standards, target WebAssembly and add budgets. Rust now implements protocol and standards boundaries.</li>
+    <li><b>Historical step 2 model:</b> distinct ids, payload forms, per-thing heads, typed tests and ordered labels. Current laws retain their exact premises.</li>
+    <li><b>Future schemas:</b> declarations, stores and places still need product contracts. The implemented spec format uses normative prose, not JSON Schema.</li>
+    <li><b>Future product slice:</b> checkpoints, directory places, emit/read/get, atomic batches, device signing and fork display.</li>
+    <li><b>Future first data:</b> emit this ledger as one labeled batch after storage exists.</li>
   </ol>
-  <p><b>Decide in the session:</b> exact schema field names, the crate name, and what "decimal" means for exact sums (Open). <b>Out of scope:</b> standing, ticks, sync, lenses, <code>serve</code>, <code>mcp</code>, the WebAssembly and phone crates. <b>Read first:</b> this tab, the <a href="#glossary" data-tab="glossary">Glossary</a>, and the repo's <code>protocol/laws.md</code> and <code>vectors/README.md</code>.</p>
+  <p><b>Human choices remain open:</b> the published crate name, future declaration fields and product budgets. Numeric folds accept safe whole binary64 values. Writers cap every number's magnitude at 2^53−1, including fractions. JS and Rust sums use unbounded BigInt. A future bounded port must refuse overflow. See <code>protocol/laws.md</code> and <code>vectors/README.md</code> for current contracts.</p>
 
   <h3>Sequence: a minimal end-to-end slice first</h3>
   <div class="tbl"><table>
     <thead><tr><th>Step</th><th>Builds</th><th>Done when</th></tr></thead>
     <tbody>
       <tr><td>0 ✓</td><td>The Lean spike: Count and LatestBy, one lens combinator, 23 vectors</td><td>done: proved in a day</td></tr>
-      <tr><td>1 ✓</td><td>Protocol and vectors for layer 0: canonical bytes, salt and commitment, id, signature</td><td>done overnight: the model, a Go core and a small JS writer agreed on every vector (PR 1). The Go was removed in version 35 (PR 6); Rust passes the same vectors once the data model is formalized.</td></tr>
+      <tr><td>1 ✓</td><td>Protocol and vectors for layer 0: canonical bytes, salt and commitment, id, signature</td><td>done overnight: the model, a Go core and a small JS writer agreed on every vector (PR 1). Version 35 removed Go (PR 6). Rust now checks all fixture families and external standards.</td></tr>
       <tr><td>2</td><td>Emit, read, fold for one person: JSONL segment, JSON spec, the two fold families, <code>"follow": "prev"</code>, device key, signing by default. <code>about</code> takes ids and natural keys only.</td><td>it does the old CLI's workable job, signed</td></tr>
       <tr><td>3</td><td>Standing: declarations, admission, stances, grants, presence key, retire through; then name tables and <code>resolve-by</code></td><td>a strict store rejects visibly; a steward's changeset takes effect</td></tr>
       <tr><td>4</td><td>Ticks: content and witness, boundaries, markers</td><td>a content tick recomputes to the same hash on two machines</td></tr>
@@ -27,13 +27,13 @@
     </tbody>
   </table></div>
   <ul>
-    <li><b>Each step</b> extends the Lean model and its laws first, writes the step's vectors, then the Rust; differential fuzzing runs once both exist, and the step's walk becomes a scenario.</li>
+    <li><b>Planned sequence:</b> extend model laws, compute protocol vectors, then implement Rust. Differential checks compare both; product walks become scenarios.</li>
     <li><b>First real data:</b> this page's decision ledger, about 50 dated records with stances and <code>prev</code> chains, in the repo's own <code>.loops/</code>.</li>
     <li><b>Migration</b> is a collector added later: it reads old stores and emits records. Nothing in the core knows the old system existed.</li>
   </ul>
 
   <h3>Language: Rust</h3>
-  <p><span class="pill p-ok">settled: Rust</span> Reversed from Go in version 31. The page had said embedding stopped mattering, because any language can write a signed record in about 100 lines. That holds for writing. A phone app or a browser extension that <b>reads</b>, folding what friends annotated, checking standing and rendering a lens, needs the core itself inside the device, and there Rust is clearly ahead.</p>
+  <p><b>Rust was chosen in version 31.</b> Small writers can use JSON in any language. Phones and browser extensions need embedded readers too. Rust supports that deployment. This is design rationale, not a bindings implementation claim.</p>
   <div class="tbl"><table>
     <thead><tr><th></th><th>Rust <span class="pill p-ok">chosen</span></th><th>Go</th><th>TypeScript</th></tr></thead>
     <tbody>
@@ -52,11 +52,11 @@
     </tbody>
   </table></div>
   <ul>
-    <li><b>Why Rust:</b> the core can run where people read, in a phone or a browser extension, with no server; a strict compiler is a fast verifier for agents, since exhaustive enums make whole classes of mistakes fail to compile with a reason; the closed sets and the Lean model's inductive types become enums directly. AWS's Cedar is exactly this stack: a Lean model with proofs, a Rust implementation, differential testing between them.</li>
-    <li><b>Guards, since cleverness is what Go protected us from:</b> the core is synchronous; <code>#![forbid(unsafe_code)]</code>; no macros beyond <code>derive</code>; the only traits in the public API are the three contracts (<code>Place</code>, <code>Signer</code>, <code>Lens</code>); closed enums are matched without wildcard arms, so adding a fold type makes the compiler list every place that must handle it.</li>
-    <li><b>Costs, covered:</b> the core can't be dependency-free, since Rust's standard library has no cryptography and we never write our own, so the imports budget becomes an allowlist (<code>sha2</code>, <code>ed25519-dalek</code>); JSON, canonical form and base32 we write ourselves, as in Go; SQLite cross-compiles with <code>cargo-zigbuild</code>; first builds take minutes, kept short by few dependencies.</li>
-    <li><b>What switching cost:</b> about a day. Step 1's Go was about 3.5k tokens, and the vectors are language-neutral, so the Rust core passes the same vectors and the JS writer still cross-checks it.</li>
-    <li><b>Dropped:</b> Go (its KDL parser lives on as a standalone release), Zig (pre-1.0, thin libraries), OCaml and Haskell (small ecosystems, less agent fluency), Swift (weak off the Mac).</li>
+    <li><b>Why Rust:</b> readers can run on phones and browsers without a server. Exhaustive enums expose missing cases. Lean's closed types map directly to enums. Cedar also combines Lean, Rust and differential testing.</li>
+    <li><b>Proposed guards:</b> keep the core synchronous and forbid unsafe code. Restrict macros and public traits. Match closed enums exhaustively so new variants expose missing cases.</li>
+    <li><b>Current dependency boundary:</b> the pure Rust core uses BigInt. The evaluation crate owns JSON, SHA-256, Ed25519 and adapters. The old crypto-only allowlist below describes the proposed product layout, not this workspace.</li>
+    <li><b>Historical switching estimate:</b> about one day. Step 1's Go used roughly 3.5k tokens. Language-neutral vectors let Rust and JS share contracts.</li>
+    <li><b>Historical alternatives:</b> Go's KDL parser remains separate. Zig had pre-1.0 libraries. OCaml and Haskell had smaller ecosystems. Swift had weaker cross-platform support.</li>
   </ul>
   <details class="unfold"><summary>Three ways a reader reaches the core</summary><div class="body">
     <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">A · local server
@@ -79,8 +79,8 @@ C · native bindings (the core runs inside the app)
       <tr><td>canonical bytes</td><td>RFC 8785 (JCS): ECMAScript-exact numbers, no NaN</td></tr>
       <tr><td>hash</td><td>SHA-256: WebCrypto and hardware everywhere; speed doesn't matter at this scale</td></tr>
       <tr><td>id text</td><td>typed prefix plus lowercase base32 (<code>r:</code>, <code>st:</code>, <code>sl:</code>, …); algorithm changes go through the version label</td></tr>
-      <tr><td>signatures</td><td>RFC 8032 (Ed25519) over <code>loops/record/v1</code> + id</td></tr>
-      <tr><td>specs, declarations, config, drafts</td><td>JSON (RFC 8259), described by JSON Schemas in <code>protocol/</code>; hashed in RFC 8785 canonical form</td></tr>
+      <tr><td>signatures</td><td>RFC 8032 (Ed25519) over <code>loops/record/v1:</code> + id</td></tr>
+      <tr><td>specs, declarations, config, drafts</td><td>Implemented specs use JSON (RFC 8259), defined by <code>protocol/spec.md</code>. Future declarations and config shapes remain proposals.</td></tr>
       <tr><td>index, search</td><td>SQLite with FTS5 through <code>rusqlite</code>, bundled; the CLI only, never the core</td></tr>
       <tr><td>keys</td><td>the OS keychain (macOS through <code>security-framework</code>, no C glue) behind the <code>Signer</code> trait; a file fallback</td></tr>
       <tr><td>provenance export</td><td>W3C PROV or PREMIS mapping, maybe</td></tr>
@@ -88,15 +88,15 @@ C · native bindings (the core runs inside the app)
   </table></div>
 
   <h3>Repo structure</h3>
-  <p><span class="pill p-ok">settled</span> One repo, <code>strange-loops</code>: a Cargo workspace with the core crate, the one built-in place and the CLI, beside the Lean model, its vectors and the scenarios. The layout enforces the budgets so nobody has to remember them.</p>
+  <p><b>Proposed product layout:</b> one Cargo workspace with core, place and CLI crates beside Lean, vectors and scenarios. The current integration workspace lives under <code>rust/</code>.</p>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 404" role="img" aria-label="The strange-loops repo. Top row: protocol, prose per layer and JSON Schemas; model, Lean 4 with laws and the vector writer; vectors, the model's render plus standard vectors. The model writes the vectors and fuzzes the core; the core must pass the vectors. Middle: crates/loops, the core, depending only on sha2 and ed25519-dalek. Inside it, private modules depend one way: record and place, then spec, fold, standing, vertex, tick, lens, and finally lib.rs, the public API. The core does no I/O and reads no clock. Tests live in tests/ and see the public API only. Below: crates/loops-cli depends on the core, loops-dir (the one built-in place), SQLite and the keychain, and holds the loops binary, serve, mcp, the index and gitplace; scenarios, the walks as trycmd cases, run through the binary. Bottom row: interop/js, the step 1 writer; .loops/, the repo's own decision ledger; Cargo.toml and xtask, the workspace and its budget checker.">
+      <svg class="dg" viewBox="0 0 400 404" role="img" aria-label="Proposed product layout, not the current workspace. Protocol prose, Lean laws and generated protocol vectors sit beside external standards. Core modules depend inward. CLI and place adapters stay outside pure folds. Proposed scenarios test disk and git behavior. Interop JS checks fixtures. A future repo store records decisions; xtask would enforce budgets.">
         <rect class="box dash" x="2" y="2" width="396" height="400" rx="14"/>
         <text x="14" y="20" class="s b m">strange-loops/</text>
         <rect class="box" x="14" y="30" width="114" height="50" rx="8"/>
         <text x="24" y="49" class="s b">protocol/</text>
-        <text x="24" y="66" class="xs">prose · JSON Schemas</text>
+        <text x="24" y="66" class="xs">prose · future schemas</text>
         <rect class="box-amb" x="143" y="30" width="114" height="50" rx="8"/>
         <text x="153" y="49" class="s b tb">model/</text>
         <text x="153" y="66" class="xs">Lean 4 · laws · Gen</text>
@@ -158,18 +158,18 @@ C · native bindings (the core runs inside the app)
         <text x="282" y="381" class="xs m">workspace · budgets</text>
       </svg>
     </div>
-    <figcaption>Every arrow points inward. The core can't reach the CLI, the CLI reaches the core only through <code>lib.rs</code>, and nothing in Rust reaches the model except through vectors and the fuzzing harness. Later, <code>loops-wasm</code> and <code>loops-ffi</code> wrap the same core for browsers and phones.</figcaption>
+    <figcaption>The proposed dependencies point inward. The CLI calls the core through <code>lib.rs</code>. Model comparisons cross vector and differential-check boundaries. Browser and phone wrappers remain planned.</figcaption>
   </figure>
   <div class="tbl"><table>
     <thead><tr><th>The rule</th><th>How the layout enforces it</th></tr></thead>
     <tbody>
       <tr><td>The core's dependencies are an allowlist</td><td><code>cargo xtask budget</code> reads <code>cargo metadata</code>: <code>crates/loops</code> may depend on <code>sha2</code> and <code>ed25519-dalek</code>, nothing else; <code>loops-dir</code> on the core only</td></tr>
-      <tr><td>The core does no I/O and reads no clock</td><td>Clippy's disallowed types and methods keep <code>std::fs</code>, <code>std::net</code>, <code>SystemTime</code> and randomness out of <code>crates/loops</code>; storage sits behind the <code>Place</code> trait; a CI job builds the core for <code>wasm32-unknown-unknown</code>, which fails if anything reaches for the OS</td></tr>
+      <tr><td>The core does no I/O and reads no clock</td><td>Proposed lints restrict filesystem, network, clock and randomness access. Storage uses <code>Place</code>. A WebAssembly target checks that build configuration, not every possible OS dependency.</td></tr>
       <tr><td>The surface budget</td><td>modules are private and <code>lib.rs</code> re-exports the API; a <code>cargo public-api</code> snapshot is diffed in CI</td></tr>
       <tr><td>Tests touch only what users touch</td><td>tests live in <code>tests/</code>, which sees the public API only; the budget check rejects <code>#[cfg(test)]</code> under <code>src/</code></td></tr>
       <tr><td>Closed sets stay closed</td><td>enums are matched without wildcard arms (Clippy's <code>wildcard_enum_match_arm</code>), so a new variant breaks every match until each handles it</td></tr>
       <tr><td>One Lean twin per module</td><td><code>fold.rs</code> and <code>Fold.lean</code>, <code>vertex.rs</code> and <code>Vertex.lean</code>: each module has one model file to diff against</td></tr>
-      <tr><td>Vectors never drift from the model</td><td>vectors are a pure render of <code>model/</code>, like committed lens files: CI regenerates them and fails on any difference</td></tr>
+      <tr><td>Vectors never drift from the model</td><td>CI regenerates protocol vectors from <code>model/</code> and checks differences. Standards fixtures keep their external expected data.</td></tr>
     </tbody>
   </table></div>
   <details class="unfold"><summary>The core's modules, with budgets</summary><div class="body">
@@ -177,7 +177,7 @@ C · native bindings (the core runs inside the app)
       <thead><tr><th>Module</th><th>Holds</th><th>Tokens</th></tr></thead>
       <tbody>
         <tr><td><code>record</code></td><td>envelope, ids, salted commitments, Ed25519, the <code>Signer</code> trait</td><td>~6k</td></tr>
-        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers exact), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
+        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers read as binary64), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
         <tr><td><code>spec</code></td><td>JSON to typed specs and declarations; the closed folds and predicates as enums</td><td>~6k</td></tr>
         <tr><td><code>fold</code></td><td>six folds in two families, their modifiers, results that count what they couldn't read; no admission</td><td>~8k</td></tr>
         <tr><td><code>standing</code></td><td>declarations, stances, grants, presence, retire through, name tables, <code>resolve-by</code>, folded with <code>fold</code></td><td>~8k</td></tr>
@@ -190,7 +190,7 @@ C · native bindings (the core runs inside the app)
         <tr><td><code>loops-dir</code></td><td>the one built-in place, its own crate: the only file-system code beside the CLI</td><td>~4k</td></tr>
       </tbody>
     </table></div>
-    <p><b>Why <code>standing</code> and <code>vertex</code> are separate:</b> admission needs standing, and standing is itself a fold. <code>fold</code> stays pure, <code>standing</code> folds authority with it, and <code>vertex</code> brings selection, admission and folding together, so nothing depends in a circle; the budget check reads <code>use crate::</code> lines and fails on any edge pointing the wrong way. The numbers are first guesses; step 2 calibrates them.</p>
+    <p><b>Proposed module separation:</b> admission needs standing, which itself uses folds. Keep folds pure. Standing computes authority; vertex combines selection, admission and folding. This avoids cycles. A future layering check can inspect imports. The budgets remain initial guesses.</p>
   </div></details>
   <details class="unfold"><summary>The full tree</summary><div class="body">
     <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">strange-loops/
@@ -219,7 +219,7 @@ later: crates/loops-wasm (wasm-bindgen), crates/loops-ffi (UniFFI)</pre>
     <thead><tr><th>Step</th><th>Fills in</th></tr></thead>
     <tbody>
       <tr><td>0</td><td><code>model/</code> and <code>vectors/</code> only</td></tr>
-      <tr><td>1</td><td><code>record</code>, <code>json</code>, <code>interop/js</code>; built in Go first (removed in PR 6), in Rust once the data model is formalized</td></tr>
+      <tr><td>1</td><td><code>record</code>, <code>json</code>, <code>interop/js</code>. Go was removed in PR 6. Rust now implements the modeled protocol.</td></tr>
       <tr><td>2</td><td><code>spec</code>, <code>fold</code>, <code>vertex</code>, <code>place</code>, <code>loops-dir</code>; <code>emit</code>, <code>read</code> and <code>get</code> in the CLI; <code>.loops/</code> and the first scenarios</td></tr>
       <tr><td>3</td><td><code>standing</code></td></tr>
       <tr><td>4</td><td><code>tick</code></td></tr>
@@ -229,8 +229,8 @@ later: crates/loops-wasm (wasm-bindgen), crates/loops-ffi (UniFFI)</pre>
     </tbody>
   </table></div>
   <p><b>Not in this repo:</b> collectors (transcripts, Discord, the browser extension) speak JSONL over stdin from their own repos. The <b>legacy importer lives in the old repo</b>, the only place that knows the old format, so the new repo never learns it existed. The LSP, TUI, front ends and the orchestrator use the CLI, the socket or the crate. The pre-commit hook and the merge driver for committed renders are CLI subcommands: outside the core, inside the repo.</p>
-  <p><b><code>.loops/</code></b> holds the repo's own store from step 2: this page's ledger becomes its first records, and the project records its design in itself from then on.</p>
-  <p><b>CI jobs:</b> <code>model</code> (proofs check), <code>vectors</code> (regenerate and diff), <code>core</code> (<code>cargo test</code>; time-boxed fuzzing against the model), <code>wasm</code> (the core builds for <code>wasm32-unknown-unknown</code>), <code>interop</code> (the JS writer cross-checks), <code>cli</code> (trycmd scenarios), <code>budget</code> (<code>cargo xtask budget</code>: tokens per module, the public-API diff, the dependency allowlist, module layering, no tests under <code>src/</code>).</p>
+  <p><b>Planned self-hosting:</b> emit this ledger into a repo store after storage and CLI work. This page does not establish that such a store exists.</p>
+  <p><b>Proposed product CI:</b> model proofs, vector diffs, Rust tests, differential checks, WebAssembly builds and JS interop. CLI scenarios and budget checks follow their implementations. This list is a roadmap, not current job coverage.</p>
 
   <h3>The local API</h3>
   <p><span class="pill p-ok">settled</span> One API, the <code>loops</code> crate, under every surface: the CLI, <code>serve</code>, MCP and the LSP. Walked from the callers inward: each writes down the calls it makes, and the API is what they share.</p>
@@ -256,7 +256,7 @@ impl Realm {
     pub fn narrow(&amp;self, grant: &amp;Id) -&gt; Result&lt;Realm&gt;              // only ever narrows
     pub fn emit(&amp;self, store: &amp;StoreId, d: Draft, s: &amp;dyn Signer) -&gt; Result&lt;Record&gt;
     pub fn apply(&amp;self, store: &amp;StoreId, ds: Vec&lt;Draft&gt;, s: &amp;dyn Signer) -&gt; Result&lt;Vec&lt;Record&gt;&gt;
-    pub fn get(&amp;self, id: &amp;Id) -&gt; Option&lt;Record&gt;                    // erased form if withheld
+    pub fn get(&amp;self, id: &amp;Id) -&gt; Option&lt;Record&gt;                    // without payload if withheld
     pub fn fold(&amp;self, spec: &amp;Spec, at: AsOf) -&gt; Result&lt;State&gt;
     pub fn since(&amp;self, cp: &amp;Checkpoint) -&gt; Result&lt;(Vec&lt;Record&gt;, Checkpoint)&gt;
     pub fn due(&amp;self, spec: &amp;Spec, cp: &amp;Checkpoint) -&gt; Result&lt;bool&gt;
@@ -270,9 +270,9 @@ impl Realm {
     <li><b>Pure functions plus a thin handle.</b> The pure half is what Lean models and fuzzes; the handle is the only part with I/O.</li>
     <li><b>The core takes specs as data:</b> JSON, hashed in canonical form, so formatting never changes a key. See <i>Specs are JSON</i> below.</li>
     <li><b><code>serve</code> speaks JSON-RPC that mirrors the crate.</b> The LSP and MCP are JSON-RPC too, so each is a thin translator, and a JavaScript front end makes the same calls.</li>
-    <li><b>Refusals are values:</b> one type, a code from a closed enum, the field it concerns and, in a batch, the line. Every surface shows a refusal the same way. Step 1 has six codes (<code>kind-empty</code>, <code>observer-not-typed</code>, <code>emitted-not-rfc3339</code>, <code>about-not-typed</code>, <code>prev-not-record-id</code>, <code>under-not-record-id</code>); the MCP walk added <code>outside-grant</code>.</li>
-    <li><b>The envelope's version rides in the signed prefix</b> (<code>loops/record/v1</code>). A reader refuses only versions newer than it knows, and says so.</li>
-    <li><b>Watching stays outside the core.</b> The core gives a checkpoint; <code>serve</code> notifies on its own writes at once, hears other processes through file notifications, and polls only as a fallback. Boundaries run in whoever holds the handle when a record lands, using the pure <code>due</code> check: <code>serve</code> when it runs, otherwise the CLI or MCP process after its own emit. A content tick can run anywhere, since a second run makes the same id; a witness tick runs where its key lives. Remotely, <code>watch(checkpoint)</code> streams over a WebSocket, each connection a handle narrowed to a grant. The client holds its checkpoint, so a dropped connection resumes with nothing lost, and <code>serve</code> keeps no list of subscribers. Between places there is no push: sync pulls, a static place costs one conditional GET, and pings stay deferred until a public store has readers.</li>
+    <li><b>Refusals are values:</b> code, field and optional batch line. The historical six-code sketch is obsolete. The protocol and fixture contracts define current refusal vocabularies.</li>
+    <li><b>The envelope's version rides in the signed prefix</b> (<code>loops/record/v1:</code>). A reader refuses only versions newer than it knows, and says so.</li>
+    <li><b>Watching stays outside the core.</b> The core gives a checkpoint; <code>serve</code> notifies on its own writes at once, hears other processes through file notifications, and polls only as a fallback. The proposed handle runs the pure <code>due</code> check after a record lands. Either the server or the emitting CLI/MCP process runs it. A content tick can run anywhere, since a second run makes the same id; a witness tick runs where its key lives. Remotely, <code>watch(checkpoint)</code> streams over a WebSocket, each connection a handle narrowed to a grant. The client holds its checkpoint, so a dropped connection resumes with nothing lost, and <code>serve</code> keeps no list of subscribers. Between places there is no push: sync pulls, a static place costs one conditional GET, and pings stay deferred until a public store has readers.</li>
   </ul>
   <details class="unfold"><summary>Walk: dev2's hover, through the draft</summary><div class="body">
     <ol>
@@ -283,20 +283,20 @@ impl Realm {
       <li><b>Admission:</b> the <code>same-as</code> from <code>ci/merge</code> counts only if its grant holds, checked inside the fold. Holds.</li>
       <li><b>Render:</b> the note lens, for you as the audience: both notes, dev2's question unanswered, and what's withheld from you, such as one erased note. Holds.</li>
     </ol>
-    <p>Two changes came out of it: identity-aware reads go through <code>Fold</code>, with a raw listing kept only for tooling such as sync and export, and the handle is a realm.</p>
+    <p>The hover walk proposed identity-aware folds and a realm handle. Raw record listings remain for sync and export tooling.</p>
   </div></details>
   <details class="unfold"><summary>Walk: an agent session over MCP</summary><div class="body">
     <p>MCP is how an agent gets tools: a server lists them with JSON schemas, and the model calls them over JSON-RPC. Here, Claude Code works in the platform repo as the generic seat <code>sl:c0</code>. Kyle granted <code>g:s9</code> once, with one tap: read the team and platform stores; emit notes and findings about <code>git:</code> keys into the team store.</p>
     <ol>
       <li><b>Start.</b> The host launches <code>loops mcp</code>, which opens the realm and narrows it to <code>g:s9</code>, with a session key bound under the grant. The tool list is what the grant allows: <code>about</code>, <code>read</code>, <code>get</code>, <code>emit</code>. A read-only grant shows no <code>emit</code>. <span class="pill p-open">breaks</span> the draft had no way to narrow, so the handle gains <code>Narrow</code>.</li>
       <li><b>"What do we know about ValidateToken?"</b> <code>about("internal/security/jwt.go#ValidateToken")</code>. Key resolution is the LSP's tooling, shared in <code>loops-cli</code>; then a spec per call and a fold, as in the hover. It returns a gist: one line per record with its id, plus a count of what's withheld. Holds.</li>
-      <li><b>Unfolding.</b> The agent opens two ids with <code>get</code>. One is dev2's session record, withheld from this grant; it comes back in erased form, envelope without payload, so the agent can say what it couldn't see instead of guessing. Holds, with <code>Get</code> on a narrowed realm returning the erased form.</li>
+      <li><b>Unfolding.</b> The agent opens two ids with <code>get</code>. The grant withholds dev2's session payload. The proposed get returns its envelope without payload, so the agent can state what it cannot see. Holds, with <code>Get</code> on a narrowed realm returning the envelope without payload.</li>
       <li><b>A finding.</b> <code>emit(kind="finding", about=…#Verify, …)</code>. The narrowed realm signs with the session key, sets <code>under="g:s9"</code>, and refuses anything outside the grant with a new code, <code>outside-grant</code>. Holds.</li>
       <li><b>Done.</b> The agent emits a <code>task-complete</code> marker, and the session vertex's boundary fires. <span class="pill p-open">breaks</span> twice: something has to run that boundary, and the draft's <code>Tick</code> took a signer for both kinds of tick. A content tick has no signer; a witness tick covers an explicit set, what the runner had, which no fold produces. So <code>Tick</code> splits into <code>Tick</code> and <code>Witness</code>.</li>
       <li><b>Close.</b> The MCP server writes a witness tick covering every id it returned, which is what the session knew, and retires the session key through it. The review lens reads its blind spots from that tick. Holds.</li>
     </ol>
     <ul>
-      <li><b>The handle narrows, never widens.</b> Reads are filtered for the grant, withheld records come back erased rather than missing, and writes are signed under the grant. Locally this guards the agent's tools, not the files; in a cloud sandbox the grant also filters what is sent up, which is the real boundary.</li>
+      <li><b>The handle narrows, never widens.</b> Reads are filtered for the grant, withheld records come back without payload rather than missing, and writes are signed under the grant. Locally the grant guards tools, not files. The cloud sandbox also filters the records sent to the agent.</li>
       <li><b>No tick tool.</b> Agents emit markers and vertices tick, so the two write verbs stay with their owners.</li>
       <li><b>Tick and Witness</b> match the two kinds of tick exactly.</li>
       <li><b>Tool names come from the vocabulary:</b> <code>about</code> a thing, <code>read</code> a vertex, <code>get</code> a record, <code>emit</code> a record.</li>
@@ -304,7 +304,7 @@ impl Realm {
   </div></details>
 
   <h3>Specs are JSON</h3>
-  <p><span class="pill p-ok">settled</span> KDL was chosen when a vertex file was the whole runtime: where records lived, who produced them, what to select, parsing and shell commands. A spec is now a few clauses from a closed vocabulary, and most are written by programs: the LSP builds one per hover, MCP one per <code>about</code>, the orchestrator fills templates, stores ship standard vertices, agents create them. So a spec is JSON, defined by a JSON Schema in <code>protocol/</code>, checked against the Lean model's types. KDL leaves the project; its parser, written for step 1, becomes a standalone Go release.</p>
+  <p>The historical KDL file mixed storage, producers, selection, parsing and commands. Specs now use JSON with a closed vocabulary. Programs can construct them directly. <code>protocol/spec.md</code> defines the implemented grammar. The example below proposes unsupported product keys. Its <code>$schema</code> path is illustrative and does not name an existing file.</p>
   <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{
   "$schema": "…/protocol/vertex.schema.json",
   "vertex": "manuscript",
@@ -318,15 +318,15 @@ impl Realm {
 }</pre>
   <ul>
     <li><b>No mapping layer.</b> The file is the data, and its canonical JSON is what gets hashed. KDL's traps go with it: repeated properties keep only the last, so <code>kind="scene" kind="character"</code> meant only <code>character</code>.</li>
-    <li><b>One schema, three readers.</b> Editors complete and check fields from <code>$schema</code>; agents get the same schema as the MCP <code>emit</code> tool's; programs need nothing but the standard library.</li>
+    <li><b>Proposed schema tooling:</b> editors and MCP could share JSON Schemas. Those schemas do not exist. <code>protocol/spec.md</code> remains normative.</li>
     <li><b>Specs are records</b> of kind <code>vertex</code>, so a store carries its vertices. <code>vertices/&lt;name&gt;.json</code> is only the editing form: <code>loops apply</code> emits it, and writing it back is pretty-printing the payload.</li>
     <li><b>Comments become <code>note</code>:</b> data, shown by <code>read</code>, on hover and in review. It doesn't shape a result, so it stays out of the input key.</li>
     <li><b>Predicates</b> are <code>where</code> maps with six operators: <code>is</code>, <code>not</code>, <code>present</code>, <code>absent</code>, <code>at-least</code>, <code>below</code>. Expression strings such as <code>"approved == children"</code> become <code>{"state": "approved", "at-least": "$size"}</code>. A vertex with <code>param</code>s is a template; <code>$name</code> is a literal filled at run time, so predicates stay closed.</li>
-    <li><b><code>store.json</code> and <code>places.json</code></b> follow, as renders of the store's declarations and this machine's places: one format across files, records, <code>--json</code>, <code>serve</code>, MCP and a browser. Most people set places with <code>loops place add</code>.</li>
+    <li><b><code>store.json</code> and <code>places.json</code></b> are proposed renders of declarations and local places. The design shares JSON across files, records and interfaces. Most people set places with <code>loops place add</code>.</li>
   </ul>
 
   <h3>The CLI</h3>
-  <p><span class="pill p-ok">settled</span> Verb first, as before, and the verbs are the API's: the same name for an operation in the CLI, as a <code>serve</code> method and as an MCP tool.</p>
+  <p><b>Proposed CLI:</b> use the same operation names as the local API, socket methods and MCP tools. These commands are not implemented surfaces.</p>
   <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">loops emit &lt;kind&gt; [field=text | field:=json]... ["message"]   write a record
            --about &lt;thing&gt;  --prev &lt;id&gt;  --occurred &lt;when&gt;  --into &lt;store&gt;
 loops emit -            drafts as JSONL on stdin: one changeset
@@ -344,12 +344,12 @@ loops sync [place]  ·  loops serve  ·  loops mcp  ·  loops whoami
 
 everywhere: --json   -C &lt;dir&gt;</pre>
   <ul>
-    <li><b>Payload syntax from HTTPie:</b> <code>field=text</code> is always a string, <code>field:=json</code> a JSON value. A bare quoted string at the end is the message. <code>:=</code> numbers are integers; decimals stay strings, so sums stay exact.</li>
+    <li><b>Payload syntax from HTTPie:</b> <code>field=text</code> is always a string, <code>field:=json</code> a JSON value. A bare quoted string at the end is the message. <code>:=</code> numbers use the layer 0 binary64 rule. Numeric folds accept only safe whole values; other values count as unread.</li>
     <li><b><code>emit</code> writes to a store,</b> never a vertex: the nearest <code>.loops/</code>, found the way git finds <code>.git</code>, or <code>--into</code>.</li>
     <li><b>Output:</b> human by default, through the vertex's lens. <code>--json</code> prints exactly what <code>serve</code> returns. No <code>-q</code>/<code>-v</code>: a different lens is how you see more or less.</li>
     <li><b>Exit codes:</b> 0 ok; 1 refused, printed with its code and field; 2 a usage error.</li>
     <li><b>Batches are one changeset.</b> <code>emit -</code> checks every line first and writes nothing if any is refused, naming the line. It is <code>Apply</code> with drafts that didn't come from a lens. Collectors, which stream forever, use <code>--stream</code>.</li>
-    <li><b>Labels for references inside a batch,</b> as in <code>git fast-import</code>: a draft carries <code>"label":"@d"</code>, later drafts write <code>"@d"</code> in <code>about</code> or <code>prev</code>, and the output maps each label to its id. Labels resolve in order and are never stored. The MCP <code>emit</code> tool takes the same list.</li>
+    <li><b>Labels inside a batch:</b> a draft declares <code>"label":"@d"</code>. References use <code>"@d"</code>; output maps each label to its id. Labels resolve in order and are not stored. The proposed MCP tool takes the same list.</li>
   </ul>
   <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{"label":"@d", "kind":"decision", "about":["repo:strange-loops"], "payload":{"text":"Rust, in a new repo"}}
 {"kind":"note", "about":["@d"], "payload":{"text":"phones and extensions need the core itself"}}
@@ -374,7 +374,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
   <ul>
     <li><b>Vertex files are an editing form.</b> The store holds its vertices as records; <code>loops apply</code> emits a file's contents, and writing it back is pretty-printing the payload. A store is self-contained from step 2.</li>
     <li><b>Directory names drop the <code>sl:</code> and <code>k:</code> prefixes,</b> since <code>:</code> isn't allowed in Windows file names: <code>segments/7f3a…/k4q…/</code>.</li>
-    <li><b>A pre-commit hook closes segments:</b> <code>open.jsonl</code> is renamed to its hash as the commit is made, so one writer on two branches adds different files and merging only adds files. A committed segment changing outside an erase is the alarm.</li>
+    <li><b>Planned segment closure:</b> the hook renames <code>open.jsonl</code> to its hash at commit. Branches add different files, so merging adds files. A changed committed segment outside erasure is an alarm.</li>
     <li><b><code>segments.json</code></b> is generated only when publishing to a static place, never committed: one shared file changing on every write would conflict between branches.</li>
     <li><b>Discovery</b> walks up to the nearest <code>.loops/</code>, the way git finds <code>.git</code>. Zero setup: the first emit writes the anchor, the device key and the first segment.</li>
   </ul>
@@ -383,7 +383,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
   <p><span class="pill p-ok">settled: Lean 4</span> The core is a small, closed set of pure functions, which is what a proof assistant is for. An <b>executable model in Lean 4</b> states the laws the core must keep and proves them. The model then writes the vectors and is fuzzed against the Rust core. Lean never enters Rust's build; what we keep is the laws, the vectors and the scenarios.</p>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 314" role="img" aria-label="The stack, top to bottom. The Lean 4 model: an executable model with proofs of incremental equals batch, order, totality and the lens laws; never in Rust's build. It writes the vectors, checked in: bytes, fold traces, predicate tables, lens edits. The Rust core must pass them; it is about 60k tokens, its exported names are diffed, and its vocabulary is closed and priced by the key. Outer rings import inward only: collectors, lenses, the CLI, the LSP. On the left, differential fuzzing runs random cases through the model and the Rust core and compares them. On the right, the regenerability check: from the page and the vectors, a fresh agent rebuilds a package and must reach the same results.">
+      <svg class="dg" viewBox="0 0 400 314" role="img" aria-label="Lean proves listed model laws under explicit premises and computes protocol-vector answers. JS and Rust check those fixtures and external standards. Differential checks compare model and implementation cases. Outer surfaces call the core. Product budgets and regenerability checks remain proposals.">
         <rect class="box-amb" x="36" y="8" width="250" height="62" rx="10"/>
         <text x="50" y="26" class="s b tb">Lean 4 model</text>
         <text x="50" y="42" class="xs">batch · order · totality · lens laws</text>
@@ -418,46 +418,46 @@ everywhere: --json   -C &lt;dir&gt;</pre>
   <div class="tbl"><table>
     <thead><tr><th>Law</th><th>What rests on it</th><th>Plan</th></tr></thead>
     <tbody>
-      <tr><td><b>Incremental = batch:</b> <code>fold(fold(s, xs), ys) = fold(s, xs ++ ys)</code></td><td>ticks, caching, snapshots, early cutoff. If it fails for any fold type, the build walk is unsound.</td><td><span class="pill p-ok">proved</span> free by construction for any step fold; the teeth are in the next row</td></tr>
-      <tr><td><b>The set decides:</b> LatestBy's state depends only on which records were folded, not their order or repeats</td><td>late arrivals, re-sent segments and two-way syncs agree. Needs content addressing: an id names one record.</td><td><span class="pill p-ok">proved</span> step 0</td></tr>
-      <tr><td><b>Count counts repeats</b></td><td>the store must hand each id over once: an obligation on the read path, now written down</td><td><span class="pill p-ok">proved</span> step 0</td></tr>
-      <tr><td><b>Order:</b> content order decides which record wins; no fold depends on the order records are read</td><td>two places folding the same records agree. The proof forces the order (<code>prev</code> chain, then <code>occurred</code>, <code>emitted</code>, id) to be written down.</td><td><span class="pill p-ok">proved</span> for LatestBy, Latest, Sum, Min, Max (PR 2)</td></tr>
-      <tr><td><b>Two families:</b> any commutative step, and any answer worked out from the heads, inherit "the set decides"</td><td>every fold in the vocabulary, and caching without partial rewind. Each modifier is proved once, not per fold.</td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>No false resurrection:</b> heads depend only on envelopes, so withholding or erasing payloads never makes a replaced record current</td><td>withheld forms, erasure, narrowed handles: every reader who sees less still sees what was superseded</td><td><span class="pill p-ok">proved</span> step 2, for folds and spec slots</td></tr>
-      <tr><td><b>Honest results:</b> a result counts the covered records whose payload it couldn't read; with none missing it equals the full fold</td><td>the five reference states, ticks after erasure, three-valued <code>where</code></td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>Totality:</b> every predicate answers for every record whose payload is held; <code>not</code> and <code>absent</code> are complements; <code>at-least</code> and <code>below</code> hold only for numbers</td><td>the closed predicate set</td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>The set decides, for every spec:</b> every slot gives the same value for the same set; selection reads only envelopes</td><td>a spec is safe to cache and to run anywhere</td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>One meaning per batch:</b> an acyclic batch's labels resolve one way, whatever order its drafts are in</td><td><code>emit -</code> with labels</td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>A thing's state depends only on records about it,</b> and a record's <code>prev</code> names only records it shares a thing with</td><td>provenance per thing; a stray <code>prev</code> can't reach another thing</td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>Settling places:</b> what a reader keeps doesn't depend on read order; a held payload is kept; an erase record erases every form</td><td>replication with erasure; no place can blank a payload</td><td><span class="pill p-ok">proved</span> step 2</td></tr>
-      <tr><td><b>Round trip:</b> decoding an encoding gives back the same state</td><td>result hashes</td><td>prove; number formatting from RFC 8785's vectors</td></tr>
-      <tr><td><b>Lens no-op and put-get</b>, for each built-in combinator: keyed section, field, ordered list, opaque body</td><td>the lens contract; every lens built from the combinators inherits it</td><td><span class="pill p-ok">proved</span> keyed section; field, ordered list next</td></tr>
-      <tr><td><b>Normal form:</b> normalizing twice changes nothing; every render is already normal</td><td>put-get "up to the lens's normal form"</td><td><span class="pill p-ok">proved</span> keyed section</td></tr>
-      <tr><td><b>Nothing dropped:</b> every difference from the base is accepted or reported</td><td>the contract's "reported, never dropped", as a theorem instead of a sentence</td><td><span class="pill p-ok">proved</span> keyed section, with "absence is never an edit"</td></tr>
-      <tr><td><b>Escaping:</b> printing a section and parsing it back returns it, whatever the body holds</td><td>code fences, marker-like lines, conflict blocks: where the lens walk kept breaking</td><td><span class="pill p-ok">proved</span> keyed section</td></tr>
+      <tr><td><b>Incremental = batch:</b> <code>fold(fold(s, xs), ys) = fold(s, xs ++ ys)</code></td><td>Splitting one step fold preserves its state. This alone does not establish set invariance.</td><td>proved for Count and LatestBy; other step folds inherit the construction</td></tr>
+      <tr><td><b>LatestBy set invariance:</b> an id names one record.</td><td>Arrival order and repeated records preserve LatestBy state. Accumulating folds additionally need each id once.</td><td>proved under Addressed</td></tr>
+      <tr><td><b>Count counts repeats.</b></td><td>Sync must deduplicate before accumulating. A delivered id counts again if the caller repeats it.</td><td>proved</td></tr>
+      <tr><td><b>Content order:</b> span, then emitted instant, then id digest bytes.</td><td>Head membership follows <code>prev</code>. Content order compares heads; it does not replace chain traversal.</td><td>proved for the listed order and fold theorems</td></tr>
+      <tr><td><b>Two families:</b> commuting accumulators and answers computed from LatestBy state.</td><td>With distinct input ids, each family is set-invariant. Cache the accumulator or complete LatestBy state, not an arbitrary answer.</td><td>proved. Max's scalar state cannot maintain the maximum over changing heads.</td></tr>
+      <tr><td><b>No false resurrection within a thing.</b></td><td>An envelope-only view keeps that thing's head ids. A whole view retains a record if any thing retains it.</td><td>proved under the view and admission premises</td></tr>
+      <tr><td><b>Honest results:</b> count unknown tests and selected records unreadable to the fold.</td><td>Full-result equality needs every test to answer and every covered record to be fold-readable. Max counts every unreadable head value.</td><td>proved; held text or fractions remain unreadable to numeric folds</td></tr>
+      <tr><td><b>Typed tests:</b> held payloads answer; envelope tests always answer.</td><td>Numeric complements require a held safe whole value and numeric bound. Present times use the separate time law.</td><td>proved; an unread numeric value passes neither numeric bound</td></tr>
+      <tr><td><b>Spec invariance:</b> distinct input ids give the same slot values for the same set.</td><td>Sources read envelopes. Payload tests follow supersession and can answer unknown.</td><td>proved under the stated premises</td></tr>
+      <tr><td><b>At most one meaning:</b> an acyclic batch has at most one satisfying id assignment.</td><td>This does not establish resolver correctness or draft-order independence.</td><td>proved by Meaning.unique</td></tr>
+      <tr><td><b>Thing locality:</b> fix the admitted record set.</td><td>Only records about a thing determine its state. Admission and erasure can read other records. Writers require held, related prev targets; readers tolerate unknown targets.</td><td>proved at the admitted-set boundary</td></tr>
+      <tr><td><b>Settling:</b> read order does not change the result when forms agree.</td><td>Keep a held payload unless a held eraser names its id. Bare erased forms do not erase held payloads.</td><td>proved under Forms consistency</td></tr>
+      <tr><td><b>Result encoding roundtrip.</b></td><td>A canonical result format still needs its own contract and proof.</td><td>planned; standards fixtures check number formatting, not this result contract</td></tr>
+      <tr><td><b>Keyed lens:</b> render requires nonempty, distinct ids.</td><td>Put-get requires distinct base ids and exactly the same ordered id list in the edit.</td><td>proved for keyed sections; other combinators remain planned</td></tr>
+      <tr><td><b>Normal form:</b> normalize twice equals normalize once.</td><td>A rendered valid document is already normal.</td><td>proved for keyed sections</td></tr>
+      <tr><td><b>Nothing dropped:</b> edited sections produce unchanged, accepted or reported outcomes.</td><td>Missing base sections are reported; applying them keeps the old body.</td><td>proved for keyed sections</td></tr>
+      <tr><td><b>Escaping:</b> a section with a nonempty id preserves its body through render and parse.</td><td>Body lines can contain fences, markers and backslashes.</td><td>proved for keyed sections</td></tr>
     </tbody>
   </table></div>
-  <p><b>Why Lean 4.</b> The pattern has been run at scale: AWS builds the Cedar authorization language as an executable Lean model with proofs, a Rust implementation, and differential random testing between them. The proofs found 4 bugs and the differential and property tests 21 more, and no release ships unless the model, proofs and tests are current. That is exactly this stack. Lean is mature, has automation (<code>simp</code>, <code>omega</code>, <code>grind</code>) that does much of the routine proving, has bytes, strings and unbounded integers, and is the proof language models are strongest at.</p>
+  <p><b>Why Lean 4.</b> AWS Cedar combines executable Lean, proofs, Rust and differential testing. Its published review reported 4 proof-discovered bugs and 21 additional testing findings. Lean supplies tactics, bytes, strings and unbounded integers. The protocol model stays outside Rust's build.</p>
   <p><b>What lens proofs cover.</b> Only the syntax we own: the combinators, the escaping, the conflict block. Lenses built from proved combinators inherit the laws, as in BiGUL, verified in Agda; "up to normal form" is a quotient lens. CommonMark at large, editors, how viewers display a file and adapters for other formats stay with tests. That's a reason to keep the owned syntax small: inside it everything is provable.</p>
-  <div class="callout"><p><b>The spike: adopted.</b> It took a day, not weeks. About 220 lines of model, 540 of proofs, core Lean only (no Mathlib), and every theorem rests on Lean's three standard axioms alone. Two findings: incremental = batch is free for any step fold, so the law worth proving is that <b>the set decides</b>; and Count counts repeats, which puts dedup by id on the read path. A dangling <code>prev</code> replaces nothing, so it shows as a fork. (Since version 34 writing one is refused, and a reader that hasn't synced the target sees it replace nothing until it arrives.)</p></div>
-  <p><b>The model leads by one step,</b> not the whole protocol up front. Each step in the sequence extends the model and its laws, writes that step's vectors, then builds the Rust. Modelling further ahead than that would be specifying what nobody has walked yet. The model sits under the context budget too: it is the protocol in exact form, so it should come out smaller than the Rust it checks.</p>
-  <p><b>Which proofs are required.</b> The executable model and its vectors are required at every step. The laws that define what the system means, "the set decides" and "no false resurrection", must be proved. Others may wait: an unproved law is listed in <code>laws.md</code> as a conjecture, checked by vectors and fuzzing until it is proved, and <code>--wfail</code> keeps <code>sorry</code> out of the build.</p>
+  <div class="callout"><p><b>Historical spike:</b> roughly 220 model lines and 540 proof lines, using core Lean without Mathlib. Its theorems used the standard axioms. Incremental equals batch follows from the step fold; set invariance supplies the stronger law. Count repeats require each id once on the accumulating path. Readers tolerate unknown <code>prev</code> targets. Writers require held targets in the store or batch that share a thing.</p></div>
+  <p><b>Planned cadence:</b> model one step ahead, prove its laws, compute its vectors, then implement it. Do not specify unexplored product behavior. Keep modules reviewable as units.</p>
+  <p><b>Required proofs:</b> core meaning laws need proofs under explicit premises. Unproved laws remain labeled conjectures, with vector and differential checks. The build rejects <code>sorry</code>. Passing fixtures does not prove a conjecture.</p>
   <details class="unfold"><summary>Hashes, signatures and numbers: standard vectors, not proofs</summary><div class="body">
-    <p>The model treats hashing and signing as abstract functions (a hash assumed collision-free), since proving SHA-256 or Ed25519 is not our problem. Their vectors come from the standards: RFC 8032 for Ed25519, RFC 8785 and its number samples for canonical bytes. ECMAScript number formatting is notoriously hard to prove; the round-trip law holds up to it.</p>
+    <p>Runtime checks use external standards vectors, including RFC 8032 for Ed25519 and RFC 8785 number samples for canonical bytes. An explicit proof of shortest formatting and roundtrip remains open. Hashes and signatures themselves lie outside the hash-parametric proofs.</p>
   </div></details>
   <details class="unfold"><summary>State machines: the fold already is one</summary><div class="body">
     <p>A full state-machine framework would coordinate shared mutable state, and the model has none: no consensus, no transactions across writers, records append-only, state always derived. Each vertex is already a state machine (records in, fold as transition, tick out), and the closed fold vocabulary is its definition, written as data. Building a generic engine on top is the accretion the limits exist to stop.</p>
-    <p>Where state-machine thinking does pay is the small finite tables: the five reference states, the boundary modes, a tick's lifecycle. They live in the Lean model, where every transition is enumerated and proved, and the vectors carry them to Rust. If places ever share state concurrently, model-check that one protocol in Quint or TLA+; it sits in "not yet" with that trigger.</p>
+    <p>Reference states, boundary modes and tick lifecycles need future transition models and proofs. They are not fully enumerated or proved today. If places later coordinate mutable state, model-check that separate protocol in Quint or TLA+.</p>
   </div></details>
   <details class="unfold"><summary>Bend 2, considered</summary><div class="body">
-    <p>Bend 2 is pure, dependently typed and affine, built around laws an AI writes proofs for. Against Lean it loses on what we need: no tactics, numbers limited to Nat, U32 and F32, a compiler its README calls young and mostly AI-written, and a proven kernel that is itself formalized in Lean. A compiler lane into our implementation language would be about 2k lines, but the catch is trust, not effort: proofs cover the source, so a miscompiled fold would carry its proof and still need checking, and it would be a fork of a fast-moving, unaudited compiler. Its <code>WONTFIX.txt</code> is a list of limits in the same shape as ours.</p>
+    <p><b>Historical Bend 2 comparison:</b> it offered pure, dependent and affine types. The review found no tactics and only Nat, U32 and F32 numbers. Its young compiler and Lean-formalized kernel did not replace Lean tooling. A proposed Rust compiler lane cost roughly 2k lines, but added a trust boundary. Source proofs would not establish compiler correctness. <code>WONTFIX.txt</code> documented its limits.</p>
   </div></details>
 
   <h3>Testing: from the outside only</h3>
-  <p><span class="pill p-ok">settled</span> <b>No unit tests.</b> The Lean model takes their place for the core's logic, and everything else is tested end to end. Four checks, each getting its expected answer from somewhere other than the Rust code it checks.</p>
+  <p><b>Current testing:</b> proofs cover model claims under their premises. JS and Rust check protocol fixtures and external standards. Rust also contains characterization tests. CLI, place, sync and crash scenarios below remain proposed product work.</p>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 196" role="img" aria-label="What each check covers, across four parts of the system: the Lean model, the Rust core's API, the store and places, and the CLI with git and two clones. Proofs cover the model, for all inputs. Vectors cover the model and the Rust core, as fixed cases checked in. Differential fuzzing covers the model and the Rust core, with random cases compared live. Scenarios cover the Rust core, the store and the CLI: the walks, scripted. The Rust core is the one part checked by all three runtime checks.">
+      <svg class="dg" viewBox="0 0 400 196" role="img" aria-label="The proposed testing matrix separates Lean, Rust API, storage and CLI. Proofs cover model claims under their premises. Fixtures and differential checks compare runtime answers. Product scenarios for disks, git and clone sync remain planned.">
         <rect class="panel" x="148" y="4" width="84" height="188" rx="8"/>
         <text x="106" y="18" class="xs b m" text-anchor="middle">Lean model</text>
         <text x="190" y="18" class="xs b ta" text-anchor="middle">Rust core API</text>
@@ -491,13 +491,13 @@ everywhere: --json   -C &lt;dir&gt;</pre>
     </tbody>
   </table></div>
   <ul>
-    <li><b>Tests touch only what users touch:</b> the public API (Rust's <code>tests/</code> can reach nothing else), the CLI, files on disk. Nothing tests unexported code, so internals refactor freely and the surface budget stays honest.</li>
+    <li><b>Fixture tests target the public API.</b> Rust unit and characterization tests may also exercise internal helpers. CLI and file scenarios test user-facing behavior.</li>
     <li><b>Every failure becomes a case.</b> A disagreement found by fuzzing, or a bug found in use, lands as a vector or a scenario. The suite grows with the code and never loses a case: a ratchet.</li>
     <li><b>Expected answers never come from the Rust code.</b> Even a scenario's golden tick hashes are checked by exporting its records and refolding them in the model.</li>
-    <li><b>What the model can't reach</b> goes to scenarios: segment files and atomic appends, crash safety (a fault-injecting place truncates a segment mid-write or kills an apply), the keychain, sync between clones, the pre-commit hook, CLI ergonomics.</li>
+    <li><b>Planned scenarios:</b> atomic appends, truncated writes, killed applies, keychains, clone sync, hooks and CLI behavior. These operational cases lie outside the current pure model.</li>
   </ul>
   <details class="unfold"><summary>The walks become scenarios</summary><div class="body">
-    <p>Each walk on this page is already a scenario: a sequence of acts with an expected end state. Written as scripts of CLI commands with expected output (<code>trycmd</code> cases, Rust's counterpart to the txtar scripts the Go team tests the <code>go</code> command with), they become the end-to-end suite.</p>
+    <p>Each design walk suggests a scenario with actions and an expected result. Future <code>trycmd</code> scripts can exercise the CLI end to end. These walks are not executable tests yet.</p>
     <div class="tbl"><table>
       <thead><tr><th>Walk</th><th>Scenarios</th></tr></thead>
       <tbody>
@@ -508,7 +508,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
         <tr><td>Context and disclosure</td><td>a reader outside the grant sees withheld forms, never content</td></tr>
       </tbody>
     </table></div>
-    <p>Fuzzing and the scenarios meet when a fuzzed disagreement is minimized: it is checked in as a vector if it lives in the core, and as a scenario if it needed disks or git.</p>
+    <p>Minimize each discovered disagreement. Record pure-core cases as vectors and disk or git cases as scenarios.</p>
   </div></details>
 
   <h3>Budgets: guard the failure, not the size</h3>
@@ -522,9 +522,9 @@ everywhere: --json   -C &lt;dir&gt;</pre>
       <tr><td><b>Imports</b></td><td>outer rings leaking inward</td><td>a dependency allowlist over <code>cargo metadata</code>, and module layering over <code>use crate::</code></td><td>the core depends on <code>sha2</code> and <code>ed25519-dalek</code> only; rings depend inward, never out</td></tr>
     </tbody>
   </table></div>
-  <p><b>Per module, not per file:</b> a module is the unit of meaning (one file, or a directory with <code>mod.rs</code>), and a per-file budget only rewards splitting files. <b>Surface is the one to watch:</b> re-accretion arrives as small widenings that never come back out. <b>Vocabulary is already priced:</b> version 17 put the fold vocabulary in every key, so adding a fold type invalidates every cached result. That's a construction ratchet: the design itself charges for growth.</p>
-  <div class="callout"><p><b>Budgets grow only through the ledger.</b> A limit rises only with a ledger entry that cites the rule for the core: two separate cases need it, and it can't be built outside. The number is a tripwire for the rule, not a target.</p></div>
-  <p><b>The regenerability test.</b> The core is specified well enough when a fresh agent, given only this page and the vectors, can rebuild one module inside its context budget and pass the vectors. If it can't, the module is too big or the protocol is too thin, and both are worth knowing. Run it now and then, one module at a time; it makes "the protocol is the product" something you can check.</p>
+  <p><b>Per module, not per file:</b> meaning defines the unit, whether one file or a directory. File limits reward splitting without reducing complexity. Watch surface growth because small additions rarely leave. Price vocabulary changes through their cache-key version.</p>
+  <div class="callout"><p><b>Budgets grow through the ledger.</b> An increase needs two independent use cases and a reason outside composition cannot serve them. The number is a tripwire, not a target.</p></div>
+  <p><b>Proposed regenerability test:</b> give a fresh agent the protocol and vectors. Ask it to rebuild one module within its budget. Passing vectors checks agreement on those cases, not complete correctness. Failure can expose missing protocol detail or excessive module scope.</p>
   <details class="unfold"><summary>The old repo, measured</summary><div class="body">
     <div class="tbl"><table>
       <thead><tr><th>Package</th><th>Lines</th><th>About tokens</th></tr></thead>
@@ -540,7 +540,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
         <tr><td><b>All</b></td><td><b>76.7k</b></td><td><b>765k</b></td></tr>
       </tbody>
     </table></div>
-    <p>Non-test Python source; tokens as bytes ÷ 4. <code>libs/engine</code> alone is five times the new core's whole context budget. The earlier line budget (core under about 8k, store under 5k, CLI under 5k) lands near the same place for the core; tokens just measure what it was for.</p>
+    <p>These historical measurements cover non-test Python, estimating tokens as bytes divided by four. <code>libs/engine</code> alone exceeded the proposed core budget fivefold. Earlier line limits were 8k core, 5k store and 5k CLI. Token budgets target reviewable context instead.</p>
     <details class="source"><summary>docs/RATCHETS.md</summary><div class="body"><p>Construction ratchets make a defect inexpressible and add zero ongoing surface. Detection ratchets build a parallel model of the code and inherit static analysis's defect classes; in the 0.9.0 review they "fell seven times between them before converging."</p></div></details>
   </div></details>
 
@@ -548,7 +548,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
   <p><span class="pill p-ok">settled</span> Four tiers: what the model refuses to be, what the core won't contain, what waits for a trigger, and what lives outside by design. Each line names what earned it, so a future "can we just add…" argues with the reason, not the rule.</p>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 300" role="img" aria-label="Four nested rings. Outermost, not the model: a state database, consensus, hidden computation, a message bus, a trusted clock, an identity registry, big data. Next, outside by design: collectors, lens adapters, the LSP, TUI and front ends, the orchestrator, place adapters, the git hook and merge driver. Next, not yet, each with a trigger: a cache place, SQLite places, compaction, aggregators, selectors, snapshots, zero-knowledge proofs. At the centre, the core: records, canonical bytes, commitments and Ed25519; specs with closed folds and closed predicates; content-ordered folding with as-of and admission; ticks with two names and the storage interface; the lens contract.">
+      <svg class="dg" viewBox="0 0 400 300" role="img" aria-label="The proposed boundaries form four rings. Exclude consensus, mutable-state databases and trusted clocks from the model. Keep adapters and user interfaces outside the core. Defer caches, compaction, aggregators and advanced selectors until needed. Core protocols cover records, folds and typed specs. Higher ticks and storage transitions remain future work.">
         <rect class="box dash" x="2" y="2" width="396" height="296" rx="14"/>
         <text x="16" y="19" class="s b m">Not the model</text>
         <text x="16" y="32" class="xs m">state database · consensus · hidden computation · message bus</text>
@@ -596,7 +596,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
       <li><b>No clock or randomness</b> in folds or lenses: fold functions get no context that holds one; "as of" is an input.</li>
       <li><b>The core computes; it doesn't connect.</b> Places are interfaces; HTTP, git and Syncthing are adapters. Comparing segment lists stays in; moving bytes is outside.</li>
       <li><b>The core never reads the world:</b> no git, no URLs. Birth keys and URL normalization are tooling.</li>
-      <li><b>One crypto suite:</b> hashing, Ed25519, salted commitments. A version byte, no runtime choice. No BBS, no zero-knowledge, <b>no encryption at rest</b>: that belongs to whatever holds the place (an encrypted disk or volume, or later a place adapter).</li>
+      <li><b>One crypto suite:</b> hashing, Ed25519, salted commitments. A version byte, no runtime choice. BBS and zero-knowledge proofs stay outside. <b>Encryption at rest</b> belongs to the storage medium or a future place adapter.</li>
       <li><b>No plugin system:</b> collectors and lens adapters are processes over stdin and stdout.</li>
       <li><b>No query language.</b> Vertices are the questions; search is full-text. For ad-hoc questions, open a SQLite place read-only with plain SQL; writes still go through emit.</li>
       <li><b>No migrations:</b> records are never rewritten; Arrival's stores arrive through a collector.</li>
@@ -604,7 +604,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
       <li><b>No effects:</b> boundaries lose <code>run</code>. At a boundary the vertex ticks; an observer watching ticks runs the script.</li>
       <li><b>No state-machine framework:</b> each vertex already is one. Records are its input, the fold its transition function, a tick its output.</li>
       <li><b>No UI, orchestration, model calls, or authorization beyond admission and grants.</b></li>
-      <li><b>No cleverness the compiler can't check:</b> no <code>unsafe</code>, no <code>async</code>, no macros beyond <code>derive</code>, no wildcard arms on closed enums, no traits in the public API beyond <code>Place</code>, <code>Signer</code> and <code>Lens</code>.</li>
+      <li><b>Proposed implementation guardrails:</b> forbid unsafe and async core code. Limit macros to derive, match closed enums exhaustively and restrict public traits to storage, signing and lenses.</li>
     </ul>
   </div></details>
   <details class="unfold"><summary>3 · Not yet, each with a trigger</summary><div class="body">
@@ -627,20 +627,20 @@ everywhere: --json   -C &lt;dir&gt;</pre>
     </table></div>
   </div></details>
   <details class="unfold"><summary>4 · Outside by design</summary><div class="body">
-    <p>Each needs only records, ticks and lenses, in this repo or another: collectors (transcripts, Discord, the browser extension, the legacy importer), lens adapters beyond the built-ins, the LSP server, TUI and the novel's front end, the orchestrator, the git hook and merge driver, place adapters (git, S3, Syncthing, encryption if anyone wants it), and the Lean model, which writes the vectors and fuzzes the core.</p>
+    <p>Keep collectors, lens adapters, LSP, TUI, front ends and orchestration outside the core. Git hooks, merge drivers and place adapters also sit outside it. Lean computes protocol-vector answers and supplies the differential oracle. External standards retain independent expected answers.</p>
   </div></details>
 
   <h3>Spec predicates: a closed set</h3>
-  <p><span class="pill p-ok">settled</span> A predicate is wherever a spec says <b>which records</b> or <b>when to tick</b>. Today they live in three places and were drifting toward a language: parse pipelines reached regex and lambdas, and boundaries reached shell commands. The only real vertex in the repo, <code>apps/loops/session.vertex</code>, selects by kind alone.</p>
+  <p><b>Historical predicate review:</b> parse pipelines drifted toward regex and lambdas; boundaries reached shell commands. The legacy session vertex selected kind alone. <code>protocol/spec.md</code> defines current typed tests. Future tick and identity examples below remain proposals.</p>
   <div class="tbl"><table>
     <thead><tr><th>Where</th><th>Allowed</th></tr></thead>
     <tbody>
-      <tr><td><b>Selecting records</b> (one record at a time, clauses ANDed)</td><td><code>kind</code> from a set; <code>about</code>, through <code>resolve-by</code>; a field equals, is in a set, is present or absent, or the negation; <code>&gt;=</code>, <code>&lt;</code> only on fields the kind types (int, decimal, EDTF date); time cuts as inputs. OR is a set or a second <code>from</code>.</td></tr>
+      <tr><td><b>Selecting records</b> (one record at a time, clauses ANDed)</td><td>Implemented tests compare typed text, sets, safe whole numbers and envelope times. <code>resolve-by</code>, decimal-kind declarations and tick time cuts remain proposed. Sources provide alternatives; tests within a source combine with AND.</td></tr>
       <tr><td><b>Ticking</b></td><td>a record of a kind arrives, with the same matches; the vertex's own state crosses a value (<code>high &gt;= 80</code>); count and window modes</td></tr>
       <tr><td><b>Never</b></td><td>regex, substrings, string functions, arithmetic, conditions across records, user functions, effects</td></tr>
     </tbody>
   </table></div>
-  <p><b>Why closed:</b> each operator joins the fold vocabulary, so it enters the cache key, needs vectors and must behave the same everywhere. Regex is the sharpest case: Rust's <code>regex</code> and JavaScript's engine disagree at the edges, so the core and a JS reader would fold the same records differently.</p>
+  <p><b>Why closed:</b> each operator joins the fold vocabulary, so it enters the cache key, needs vectors and must behave the same everywhere. Regex exposes the risk: Rust and JavaScript engines disagree at their edges. The same records could then produce different folds.</p>
   <p><b>Classify by recording, not by predicate.</b> When a selection needs text matching, judgment or arithmetic, an observer computes it once and records the answer; the vertex selects on the record. The answer is signed, cached and visible in provenance instead of hidden in a filter.</p>
   <div class="tbl"><table>
     <thead><tr><th>The need</th><th>Where it goes</th></tr></thead>
@@ -651,7 +651,7 @@ everywhere: --json   -C &lt;dir&gt;</pre>
       <tr><td>"the important ones"</td><td>a triage observer's record</td></tr>
     </tbody>
   </table></div>
-  <p><b>Lens templates follow the same rule:</b> built-in lenses are Rust code in the core; user templates are logic-less (Mustache-style sections and lists, no expressions), hashed into the key.</p>
+  <p><b>Proposed lens templates:</b> built-ins use Rust. User templates use logic-less sections and lists, without expressions. Their hashes enter the key.</p>
 
   <h3>The old vectors</h3>
   <div class="tbl"><table>

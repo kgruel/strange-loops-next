@@ -87,6 +87,7 @@ export function vectorCodes(files) {
   return codes;
 }
 
+// A complete vector path names that vector. Other references use these forms.
 // A law row's Vectors cell, resolved to files. `dir/NN` names a file; a bare `NN` after it is in
 // the same directory; `NN`–`MM` is the range, every member of which must exist; `dir/*`, or a
 // directory named on its own ("every `spec/run` vector"), is all of a directory. A backticked
@@ -107,6 +108,11 @@ export function resolveVectors(cell, files) {
   for (const t of tokens) {
     if (t[0] === "–") { range = true; continue; }
     let tok = t[1];
+    if (files.has(tok)) {
+      found.add(tok);
+      dir = null; last = null; range = false;
+      continue;
+    }
     const slash = tok.lastIndexOf("/");
     if (slash >= 0 && !/^(\d+|\*)$/.test(tok.slice(slash + 1))) {
       if (!names.some((n) => n.startsWith(`${tok}/`))) throw new Error(`laws.md: ${tok} is no vector or directory of vectors (in "${cell}")`);

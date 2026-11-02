@@ -3,19 +3,24 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import * as Lens from "./lens.mjs";
 import { tally, jsonFiles, runAlone } from "./tally.mjs";
 
 export function check(dir) {
   const t = tally();
   for (const file of jsonFiles(join(dir, "lens", "section"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     const n = `lens/section/${v.vector}`;
     const { base, text } = v.input;
     t.files++;
     const parsed = Lens.parse(text);
     if (v.expect.refused) {
       t.expect(`${n} refused`, parsed, null);
+      continue;
+    }
+    if (parsed === null) {
+      t.failures.push(`${n} parsed: unexpected null`);
       continue;
     }
     t.expect(`${n} parsed`, parsed, v.expect.parsed);

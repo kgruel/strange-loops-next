@@ -1,0 +1,25 @@
+{
+  "vector": "gap03-repeat-key-before-value",
+  "layer": "spec/parse",
+  "laws": ["spec.parse"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "x",
+      "vertex": {
+        "x": "a",
+        "x": "b"
+      },
+      "from": [
+        {
+          "store": "."
+        }
+      ]
+    },
+    "spec_text": "{\"vertex\":\"x\",\"vertex\":{\"x\":\"a\",\"x\":\"b\"},\"from\":[{\"store\":\".\"}]}"
+  },
+  "expect": {
+    "refused": "member-duplicate",
+    "path": "vertex"
+  }
+}

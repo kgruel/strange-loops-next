@@ -1,3 +1,5 @@
+import Loops.Number
+
 /-!
 # A small JSON writer
 
@@ -12,6 +14,7 @@ inductive J where
   | bool (b : Bool)
   | num (n : Nat)
   | int (i : Int)
+  | number (n : Loops.Number)
   | str (s : String)
   | arr (xs : List J)
   | obj (kvs : List (String × J))
@@ -39,6 +42,7 @@ partial def J.render (ind : Nat) : J → String
   | .bool b => toString b
   | .num n => toString n
   | .int i => toString i
+  | .number n => n.canon
   | .str s => escape s
   | .arr [] => "[]"
   | .arr xs =>

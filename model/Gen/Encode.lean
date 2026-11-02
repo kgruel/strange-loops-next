@@ -7,6 +7,9 @@ import Gen.Json
 
 open Loops Gen
 
+/-- A fixture id, with its actual bound checked where it is written. -/
+def fixtureId (n : Nat) (h : n < 256 ^ 32 := by decide) : RecordId := ⟨n, h⟩
+
 /-! ## Fixture times
 
 A fixture's time `t` is `t` seconds into 2026-10-01, UTC: a stamp for
@@ -35,6 +38,7 @@ def claim (s : String) (ok : (Claim.of? s).isSome = true := by decide) : Claim :
 def jVal : Val → J
   | .str s => .str s
   | .int i => .int i
+  | .number n => .number n
   | .bool b => .bool b
 
 def jShown : Shown → J
@@ -58,7 +62,7 @@ def jRecord (r : Record) : J :=
     (if r.erases.isEmpty then [] else [("erases", .arr (r.erases.map (.str ∘ idText)))])
   let fields := if r.fields.isEmpty then [] else [("fields", .obj (r.fields.map fun (k, v) => (k, jVal v)))]
   match r.shown with
-  | .here => .obj (env ++ [("value", .str r.value)] ++ rest ++ [("n", .int r.n)] ++ fields)
+  | .here => .obj (env ++ [("value", .str r.value)] ++ rest ++ [("n", match r.nNumber with | some n => .number n | none => .int r.n)] ++ fields)
   | s => .obj (env ++ rest ++ [("shown", jShown s)])
 
 /-- Each thing and its state: its heads newest first, its winner and its fork. -/

@@ -7,6 +7,7 @@ import Gen.Batch
 import Gen.Realm
 import Gen.Occurred
 import Gen.Scenario
+import Gen.Rulings
 
 /-!
 # Gen: write the vectors
@@ -33,50 +34,56 @@ def jOutcome : Outcome → J
 
 /-! ## Records used by the fold cases -/
 
-def rec (id : Nat) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
-    (prev : List Nat := []) (value : String := s!"v{id}")
+def rec (id : RecordId) (thing : String) (occurred : Nat) (emitted : Nat := occurred)
+    (prev : List RecordId := []) (value : String := s!"v{id}")
     (okO : Reads occurred := by decide) (okE : Reads emitted := by decide) : Record :=
   { id, kind := "decision", observer := "sl:kyle", about := [thing], value, prev, occurred := some (claimAt occurred okO),
     emitted := stampAt emitted okE }
 
-def r1 := rec 0x11 "topic:auth" 100
-def r2 := rec 0x12 "topic:auth" 200 (prev := [0x11])
-def r3 := rec 0x13 "topic:auth" 150
-def r4 := rec 0x14 "topic:auth" 300 (prev := [0x12, 0x13])
-def r5 := rec 0x15 "topic:cache" 120
-def r6 := rec 0x16 "topic:auth" 200 (emitted := 210)
+def r1 := rec (fixtureId 0x11) "topic:auth" 100
+def r2 := rec (fixtureId 0x12) "topic:auth" 200 (prev := [fixtureId 0x11])
+def r3 := rec (fixtureId 0x13) "topic:auth" 150
+def r4 := rec (fixtureId 0x14) "topic:auth" 300 (prev := [fixtureId 0x12, fixtureId 0x13])
+def r5 := rec (fixtureId 0x15) "topic:cache" 120
+def r6 := rec (fixtureId 0x16) "topic:auth" 200 (emitted := 210)
 -- r6's times, each spelled another way, and a greater digest whose text sorts
 -- first: only the id, read as digest bytes, puts r7 first
-def r7 := { rec 0x37 "topic:auth" 200 (emitted := 210) with
+def r7 := { rec (fixtureId 0x37) "topic:auth" 200 (emitted := 210) with
   occurred := some (claim "2026-10-01T01:03:20+01:00"), emitted := stamp "2026-10-01T00:03:30.000Z" }
-def r8 := rec 0x18 "topic:cache" 400 (prev := [0x99])
+def r8 := rec (fixtureId 0x18) "topic:cache" 400 (prev := [fixtureId 0x99])
 -- r6's span spelled another way, an earlier `emitted` and a later id: only
 -- `emitted` puts r6 first
-def r9 := { rec 0x19 "topic:auth" 200 (emitted := 205) with
+def r9 := { rec (fixtureId 0x19) "topic:auth" 200 (emitted := 205) with
   occurred := some (claim "2026-10-01T01:03:20+01:00") }
 
 -- content order on real times: without `occurred`, a record sits at its
 -- `emitted`, between records with one, whatever its id
-def t1 := rec 0x31 "topic:auth" 500 (emitted := 520)
-def t2 := { rec 0x34 "topic:auth" 0 (emitted := 420) with occurred := none }
-def t3 := rec 0x32 "topic:auth" 300 (emitted := 900)
-def t4 := { rec 0x33 "topic:auth" 0 (emitted := 100) with occurred := none }
+def t1 := rec (fixtureId 0x31) "topic:auth" 500 (emitted := 520)
+def t2 := { rec (fixtureId 0x34) "topic:auth" 0 (emitted := 420) with occurred := none }
+def t3 := rec (fixtureId 0x32) "topic:auth" 300 (emitted := 900)
+def t4 := { rec (fixtureId 0x33) "topic:auth" 0 (emitted := 100) with occurred := none }
 -- at one start, an instant, then a month, then an open span; a year that
 -- starts earlier is oldest, though it ends last
-def u1 := { rec 0x41 "topic:auth" 0 (emitted := 60) with occurred := some (claim "2026-10-01T00:00:00Z") }
-def u2 := { rec 0x42 "topic:auth" 0 (emitted := 30) with occurred := some (claim "2026-10") }
-def u3 := { rec 0x43 "topic:auth" 0 (emitted := 10) with occurred := some (claim "2026-10-01/..") }
-def u4 := { rec 0x44 "topic:auth" 0 (emitted := 20) with occurred := some (claim "2026") }
+def u1 := { rec (fixtureId 0x41) "topic:auth" 0 (emitted := 60) with occurred := some (claim "2026-10-01T00:00:00Z") }
+def u2 := { rec (fixtureId 0x42) "topic:auth" 0 (emitted := 30) with occurred := some (claim "2026-10") }
+def u3 := { rec (fixtureId 0x43) "topic:auth" 0 (emitted := 10) with occurred := some (claim "2026-10-01/..") }
+def u4 := { rec (fixtureId 0x44) "topic:auth" 0 (emitted := 20) with occurred := some (claim "2026") }
 
-def n1 := { rec 0x21 "load" 100 with n := 5 }
-def n2 := { rec 0x22 "load" 110 with n := -3 }
-def n3 := { rec 0x23 "load" 120 with n := 40 }
-def n4 := { rec 0x24 "load" 130 with n := 40 }
+def n1 := { rec (fixtureId 0x21) "metric:load" 100 with n := 5 }
+def n2 := { rec (fixtureId 0x22) "metric:load" 110 with n := -3 }
+def n3 := { rec (fixtureId 0x23) "metric:load" 120 with n := 40 }
+def n4 := { rec (fixtureId 0x24) "metric:load" 130 with n := 40 }
+
+-- Both inputs are readable safe integers; only the exact sum exceeds binary64's
+-- safe-whole range, and must not be rounded at the output/checker boundary.
+def exactSumRecords : List Record := [
+  { rec (fixtureId 0x25) "metric:load" 100 with n := 9007199254740991 },
+  { rec (fixtureId 0x26) "metric:load" 110 with n := 2 }]
 
 -- the current load per host: `h3` supersedes `h2`
-def h1 := { rec 0x31 "host:a" 100 with n := 5 }
-def h2 := { rec 0x32 "host:b" 110 with n := 9 }
-def h3 := { rec 0x33 "host:b" 120 (prev := [0x32]) with n := 1 }
+def h1 := { rec (fixtureId 0x31) "host:a" 100 with n := 5 }
+def h2 := { rec (fixtureId 0x32) "host:b" 110 with n := 9 }
+def h3 := { rec (fixtureId 0x33) "host:b" 120 (prev := [fixtureId 0x32]) with n := 1 }
 
 /-! ## Fold cases -/
 
@@ -91,20 +98,32 @@ def rotations (xs : List Record) : List (List Record) :=
 def countCases : List FoldCase := [
   ⟨"01-empty", ["count.perm"], [[]]⟩,
   ⟨"02-three", ["count.perm"], rotations [r1, r3, r5]⟩,
-  ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩
+  ⟨"03-repeats-counted", ["count.repeats"], [[r1, r3, r5, r1, r3, r5]]⟩,
+  ⟨"gap15-multi-thing-once", ["count.perm"], rotations [
+    { rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 }]⟩,
+  ⟨"04-positive-offset-emitted", ["count.perm"],
+    [[{ rec (fixtureId 0x78) "topic:offset" 0 with emitted := stamp "2026-10-01T01:00:00+01:00" }]]⟩
 ]
 
 def latestCases : List FoldCase := [
-  ⟨"01-chain", ["latest.set"], rotations [r1, r2]⟩,
+  ⟨"01-chain", ["latest.set", "latest.newest", "latest.one-thing"], rotations [r1, r2]⟩,
   ⟨"02-fork", ["latest.set"], rotations [r1, r3]⟩,
   ⟨"03-merge", ["latest.set"], rotations [r1, r2, r3, r4]⟩,
-  ⟨"04-repeats", ["latest.repeats"], [[r1, r3], [r3, r1, r3, r1]]⟩
+  ⟨"04-repeats", ["latest.repeats"], [[r1, r3], [r3, r1, r3, r1]]⟩,
+  ⟨"gap16-newest-union-head", ["latest.set", "heads.whole-view", "latest.newest"], rotations [
+    { rec (fixtureId 0xc1) "task:a" 300 with about := ["task:a", "task:b"] },
+    rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]), rec (fixtureId 0xc3) "task:c" 100]⟩
 ]
 
 def sumCases : List FoldCase := [
+  ⟨"phase2-exact-output", ["sum.perm"], rotations exactSumRecords⟩,
   ⟨"01-empty", ["sum.perm"], [[]]⟩,
   ⟨"02-mixed-signs", ["sum.perm"], rotations [n1, n2, n3]⟩,
-  ⟨"03-repeats-counted", ["sum.repeats"], [[n1, n2, n3, n1, n2, n3]]⟩
+  ⟨"03-repeats-counted", ["sum.repeats"], [[n1, n2, n3, n1, n2, n3]]⟩,
+  ⟨"gap15-multi-thing-once", ["sum.perm"], rotations [
+    { rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 }]⟩
 ]
 
 def extremaCases : List FoldCase := [
@@ -119,6 +138,11 @@ def jOptInt : Option Int → J
   | none => .null
 
 def latestByCases : List FoldCase := [
+  -- Runner-domain fixtures, not a claim that self-prev is hash-addressable.
+  ⟨"phase2-self-prev", ["latest-by.set", "thing.local"],
+    [[rec (fixtureId 0x27) "topic:auth" 100 (prev := [fixtureId 0x27])]]⟩,
+  ⟨"phase2-self-prev-anchor", ["latest-by.set", "thing.local"],
+    [[{ rec (fixtureId 0x28) "unused:x" 100 (prev := [fixtureId 0x28]) with about := [] }]]⟩,
   ⟨"01-one", ["latest-by.set"], [[r1]]⟩,
   ⟨"02-fork", ["latest-by.set", "latest-by.order"], rotations [r1, r3]⟩,
   ⟨"03-chain", ["latest-by.set"], [[r1, r2]]⟩,
@@ -131,13 +155,24 @@ def latestByCases : List FoldCase := [
   ⟨"10-two-things", ["latest-by.set"], rotations [r1, r5, r3]⟩,
   ⟨"11-dangling-prev", ["latest-by.set"], rotations [r5, r8]⟩,
   ⟨"12-emitted-without-occurred", ["latest-by.order"], rotations [t1, t2, t3, t4]⟩,
-  ⟨"13-span-order", ["latest-by.order"], rotations [u1, u2, u3, u4]⟩
+  ⟨"13-span-order", ["latest-by.order"], rotations [u1, u2, u3, u4]⟩,
+  ⟨"gap15-memberships-and-anchor", ["latest-by.set"], rotations [
+    { rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 },
+    { rec (fixtureId 0xc3) "unused:x" 250 with about := [], n := 2 },
+    { rec (fixtureId 0xc4) "task:c" 300 with n := 3 },
+    { rec (fixtureId 0xc5) (idText (fixtureId 0xc3)) 350 (prev := [fixtureId 0xc3]) with n := 4 }]⟩
 ]
 
 def headsCases : List FoldCase := [
   ⟨"01-max-follows-prev", ["heads.set"], rotations [h1, h2, h3]⟩,
   ⟨"02-superseded-max-leaves", ["heads.set"], rotations [h2, h3]⟩,
-  ⟨"03-limit-newest-first", ["heads.set"], rotations [r1, r2, r3, r5, r8]⟩
+  ⟨"03-limit-newest-first", ["heads.set"], rotations [r1, r2, r3, r5, r8]⟩,
+  ⟨"gap15-partial-and-anchor", ["heads.set", "heads.whole-view"], rotations [
+    { rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+    { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 },
+    { rec (fixtureId 0xc3) "unused:x" 250 with about := [], n := 2 },
+    { rec (fixtureId 0xc4) (idText (fixtureId 0xc3)) 300 (prev := [fixtureId 0xc3]) with n := 3 }]⟩
 ]
 
 def jResult (r : Result (Option Int)) : J :=
@@ -156,14 +191,19 @@ structure ViewCase where
   /-- How the reader sees each record. -/
   view : Record → Record
 
-def hideIds (ids : List Nat) : Record → Record := withholding (ids.contains ·.id)
-def eraseIds (ids : List Nat) (r : Record) : Record := if ids.contains r.id then r.erase else r
+def hideIds (ids : List RecordId) : Record → Record := withholding (ids.contains ·.id)
+def eraseIds (ids : List RecordId) (r : Record) : Record := if ids.contains r.id then r.erase else r
 
 def viewCases : List ViewCase := [
-  ⟨"01-withheld-head-still-supersedes", ["view.no-resurrection"], [r1, r2], hideIds [0x12]⟩,
-  ⟨"02-erased-head-still-supersedes", ["view.no-resurrection"], [r1, r2, r3, r4], eraseIds [0x14]⟩,
-  ⟨"03-withheld-ancestor", ["view.no-resurrection"], [r1, r2, r3, r4], hideIds [0x11, 0x12]⟩,
-  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [0x33]⟩
+  ⟨"01-withheld-head-still-supersedes", ["view.no-resurrection"], [r1, r2], hideIds [fixtureId 0x12]⟩,
+  ⟨"02-erased-head-still-supersedes", ["view.no-resurrection"], [r1, r2, r3, r4], eraseIds [fixtureId 0x14]⟩,
+  ⟨"03-withheld-ancestor", ["view.no-resurrection"], [r1, r2, r3, r4], hideIds [fixtureId 0x11, fixtureId 0x12]⟩,
+  ⟨"04-max-counts-unread-heads", ["view.no-resurrection", "result.unread"], [h1, h2, h3], hideIds [fixtureId 0x33]⟩,
+  ⟨"gap15-partial-and-anchor", ["view.no-resurrection", "heads.whole-view"],
+    [{ rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
+      { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 },
+      { rec (fixtureId 0xc3) "unused:x" 250 with about := [], n := 2 },
+      { rec (fixtureId 0xc4) (idText (fixtureId 0xc3)) 300 (prev := [fixtureId 0xc3]) with n := 3 }], hideIds [fixtureId 0xc1]⟩
 ]
 
 def jViewState (s : LatestBy) : J :=
@@ -172,13 +212,13 @@ def jViewState (s : LatestBy) : J :=
 
 def viewVector (c : ViewCase) : Except String J := do
   let orders := rotations (c.records.map c.view)
-  let results := orders.map fun o => jViewState (LatestBy.fold .empty o)
+  let results := orders.map fun o => jViewState (Latest.fold o)
   let first := results.headD .null
   if !(results.all (·.render 0 == first.render 0)) then
     throw s!"fold/view/{c.name}: arrival orders disagree"
   -- a view sees the same heads as a reader holding everything
-  let full := (LatestBy.fold .empty c.records).heads.map (·.id)
-  if (LatestBy.fold .empty (c.records.map c.view)).heads.map (·.id) != full then
+  let full := (Latest.fold c.records).heads.map (·.id)
+  if (Latest.fold (c.records.map c.view)).heads.map (·.id) != full then
     throw s!"fold/view/{c.name}: a view changed the heads"
   return vector c.name "fold/view" c.laws
     (.obj [("orders", .arr (orders.map fun o => .arr (o.map jRecord)))]) first
@@ -195,6 +235,8 @@ structure SelectCase where
   w : Where
 
 def selectCases : List SelectCase := [
+  ⟨"phase2-exact-output", ["sum.perm", "select.set", "result.full"], exactSumRecords,
+    .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩,
   ⟨"01-payload-test-on-withheld", ["result.unread", "select.set"],
     [n1, n2, n3.withhold],
     .obj [("n", .obj [("at-least", .int 0)])], .payload (·.n ≥ 0)⟩,
@@ -268,7 +310,18 @@ def lensCases : List LensCase := [
   ⟨"09-text-outside", ["lens.refuse"], base, [L "stray line"] ++ render base⟩,
   -- a backslash the text itself starts with, before nothing that needs escaping, is kept
   ⟨"10-backslash-kept", ["lens.escaping", "lens.put-get"], base,
-    render [base[0]!] ++ [L "::: decision:cache", L "\\No cache until reads are slow.", L ":::"]⟩
+    render [base[0]!] ++ [L "::: decision:cache", L "\\No cache until reads are slow.", L ":::"]⟩,
+  ⟨"gap11-embedded-newline", ["lens.round-trip"], [], render [S "notes" ["one\ntwo", "", "\r"]]⟩,
+  ⟨"gap17-escaping", ["lens.escaping"],
+    [S "notes" [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]],
+    render [S "notes" [":::", "::: task:a", ":::x", "\\", "\\:::", "\\plain", "  ::: x", "::", ""]]⟩,
+  ⟨"gap17-raw-backslash", ["lens.escaping"], [S "notes" ["old"]],
+    [L "::: notes", L "\\plain", L "\\\\", L "\\:::x", L ":::"]⟩,
+  ⟨"gap17-empty-id", ["lens.refuse"], [], [L "::: ", L "body", L ":::"]⟩,
+  ⟨"gap17-duplicate-id", ["lens.refuse"], [], render [S "a" ["one"], S "a" ["two"]]⟩,
+  ⟨"gap18-reorder-unknown-absent", ["lens.nothing-dropped"],
+    [S "a" ["A"], S "b" ["B"], S "c" ["C"]],
+    render [S "b" ["B2"], S "a" ["A2"], S "unknown" ["X"]]⟩
 ]
 
 def lensVector (c : LensCase) : Except String J := do
@@ -318,7 +371,7 @@ def main (args : List String) : IO UInt32 := do
   let latestBy ← latestByCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/latest-by" c fun o => jPerThing (perThing o)))
   let heads ← headsCases.mapM fun c => do
-    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (LatestBy.fold .empty o)))
+    pure (c.name, ← orFail (foldVector "fold/heads" c fun o => jHeads (Latest.fold o)))
   let views ← viewCases.mapM fun c => do pure (c.name, ← orFail (viewVector c))
   let selects ← selectCases.mapM fun c => do pure (c.name, ← orFail (selectVector c))
   let lens ← lensCases.mapM fun c => do pure (c.name, ← orFail (lensVector c))
@@ -354,6 +407,9 @@ def main (args : List String) : IO UInt32 := do
   let scenarios ← match Gen.ScenarioVectors.vectors with
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
-  writeAll dir "scenario" scenarios
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length} vectors to {dir}"
+  let rulingScenarios ← match Gen.RulingVectors.vectors with
+    | .ok vs => pure vs
+    | .error e => throw (IO.userError e)
+  writeAll dir "scenario" (scenarios ++ rulingScenarios)
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length + rulingScenarios.length} vectors to {dir}"
   return 0

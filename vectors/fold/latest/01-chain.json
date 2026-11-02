@@ -1,7 +1,7 @@
 {
   "vector": "01-chain",
   "layer": "fold/latest",
-  "laws": ["latest.set"],
+  "laws": ["latest.set", "latest.newest", "latest.one-thing"],
   "source": "model",
   "input": {
     "orders": [

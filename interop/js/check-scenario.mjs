@@ -4,6 +4,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import { canonical } from "./loops.mjs";
 import * as S from "./spec.mjs";
 import { formOf, step, lensEdit, sectionOf } from "./scenario.mjs";
@@ -12,7 +13,7 @@ import { tally, jsonFiles, runAlone } from "./tally.mjs";
 export function check(dir) {
   const t = tally();
   for (const file of jsonFiles(join(dir, "scenario"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     const n = `${v.layer ?? "scenario"}/${v.vector}`;
     t.files++;
     const spec = S.parseSpec(v.input.spec);

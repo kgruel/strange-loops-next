@@ -6,6 +6,7 @@
 import { occurredSpan, problem } from "./loops.mjs";
 import { answer, held, YES, UNKNOWN } from "./where.mjs";
 import * as F from "./fold.mjs";
+import { admit } from "./realm.mjs";
 
 // JSON as written: an object keeps its members in order, repeats included,
 // as { members: [[key, node], ...] }; an array is { items: [node, ...] };
@@ -155,7 +156,7 @@ function slotOf(name, n) {
   const [follow, limit, where] = ["follow", "limit", "where"].map((k) => get(n, k));
   if (type === "latest-by" && follow === undefined) refuse("follow-missing", [...at, "follow"]);
   if (follow !== undefined && (follow !== "prev" || (type !== "collect" && type !== "latest-by"))) refuse("follow-invalid", [...at, "follow"]);
-  if (limit !== undefined && (!(Number.isInteger(limit) && limit >= 1) || type !== "collect")) refuse("limit-invalid", [...at, "limit"]);
+  if (limit !== undefined && (!(Number.isSafeInteger(limit) && limit >= 1) || type !== "collect")) refuse("limit-invalid", [...at, "limit"]);
   if (!ARGUMENT[type](get(n, type))) refuse("fold-argument", [...at, type]);
   const slot = { [type]: get(n, type) };
   if (follow !== undefined) slot.follow = follow;
@@ -193,7 +194,8 @@ function specOf(n) {
   if (!isArray(from)) refuse("from-invalid", ["from"]);
   const sources = from.items.map(sourceOf);
 
-  const fold = get(n, "fold") ?? { members: [] };
+  const suppliedFold = get(n, "fold");
+  const fold = suppliedFold === undefined ? { members: [] } : suppliedFold;
   if (!isObject(fold)) refuse("fold-invalid", ["fold"]);
   const slots = fold.members.map(([name, slot]) => [name, slotOf(name, slot)]);
   return { vertex, from: sources, fold: Object.fromEntries(slots) };
@@ -272,6 +274,7 @@ function runSlot(slot, spec, { records, taken, states }) {
 
 // Every slot's value, by name.
 export function runSpec(spec, records) {
+  records = admit(records).admitted;
   const ctx = { records, taken: records.filter((r) => takes(spec, r)), states: F.states(records) };
   const out = Object.create(null);
   for (const [name, slot] of Object.entries(spec.fold)) out[name] = runSlot(slot, spec, ctx);

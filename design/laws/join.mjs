@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { lawEdges, lawTable, proofs, resolveTheorem, resolveVectors, slug, vectorFiles } from "../protocol.mjs";
 import { checkPremises } from "./premises.mjs";
 
+// Evidence links point to current main; it may differ from the page's build.
 export const REPO = "https://github.com/kgruel/strange-loops-next/blob/main";
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 

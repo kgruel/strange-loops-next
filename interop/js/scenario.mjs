@@ -6,7 +6,7 @@
 
 import * as F from "./fold.mjs";
 import * as Lens from "./lens.mjs";
-import { realm } from "./realm.mjs";
+import { realm, settle } from "./realm.mjs";
 import { runSpec } from "./spec.mjs";
 
 const PAYLOAD = ["value", "n", "fields"];
@@ -29,7 +29,7 @@ export function step(spec, thing, forms) {
     admitted: r.admitted.map((x) => x.id),
     heads: hs.map((x) => x.id),
     winner: hs.length ? hs[0].id : null,
-    slots: runSpec(spec, r.admitted),
+    slots: runSpec(spec, settle(forms)),
   };
 }
 

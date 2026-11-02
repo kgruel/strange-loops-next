@@ -1,0 +1,180 @@
+{
+  "vector": "phase2-thing-state",
+  "layer": "scenario",
+  "laws": ["thing.local", "latest-by.order", "spec.set", "lens.put-get"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "decisions",
+      "from": [
+        {
+          "store": "team",
+          "kind": ["decision"]
+        }
+      ],
+      "fold": {
+        "current": {
+          "latest-by": "about",
+          "follow": "prev"
+        },
+        "decisions": {
+          "count": true
+        }
+      }
+    },
+    "thing": "decision:auth",
+    "records": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+        "kind": "decision",
+        "observer": "sl:ada",
+        "about": ["decision:auth", "decision:other"],
+        "value": "Other thing still current.",
+        "prev": [],
+        "emitted": "2026-10-01T00:03:20Z",
+        "n": 0
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+        "kind": "decision",
+        "observer": "sl:bo",
+        "about": ["decision:auth"],
+        "value": "Auth revised.",
+        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"],
+        "emitted": "2026-10-01T00:01:40Z",
+        "n": 0
+      }
+    ],
+    "steps": [
+      {
+        "name": "emit",
+        "forms": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "shown": "here"
+          }
+        ],
+        "orders": [
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"]
+        ]
+      },
+      {
+        "name": "partial-supersession",
+        "forms": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+            "shown": "here"
+          }
+        ],
+        "orders": [
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a"],
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"]
+        ]
+      }
+    ],
+    "lens": {
+      "base": [
+        {
+          "id": "decision:auth",
+          "body": ["Other thing still current."]
+        }
+      ],
+      "text": ["::: decision:auth", "Auth revised.", ":::"]
+    }
+  },
+  "expect": {
+    "steps": [
+      {
+        "settled": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "shown": "here"
+          }
+        ],
+        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"],
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+        "slots": {
+          "current": {
+            "things": {
+              "decision:auth": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+                  "shown": "here"
+                }
+              ],
+              "decision:other": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "decisions": {
+            "value": 1,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "settled": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+            "shown": "here"
+          }
+        ],
+        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a"],
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+        "slots": {
+          "current": {
+            "things": {
+              "decision:auth": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+                  "shown": "here"
+                }
+              ],
+              "decision:other": [
+                {
+                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+                  "shown": "here"
+                }
+              ]
+            },
+            "unread": 0
+          },
+          "decisions": {
+            "value": 2,
+            "unread": 0
+          }
+        }
+      }
+    ],
+    "lens": {
+      "rendered": ["::: decision:auth", "Other thing still current.", ":::"],
+      "outcomes": [
+        {
+          "accepted": "decision:auth",
+          "body": ["Auth revised."]
+        }
+      ],
+      "applied": [
+        {
+          "id": "decision:auth",
+          "body": ["Auth revised."]
+        }
+      ]
+    }
+  }
+}

@@ -35,13 +35,15 @@ def Arg.Fits : FieldType → Arg → Prop
   | .refs, .val (.str s) => typedRef s = true
   | .ids, .val (.str s) => recordId s = true
   | .time, .time c => Claim.of? c.text = some c
+  | .payload, .val (.int i) => -maxExact ≤ i ∧ i ≤ maxExact
+  | .payload, .val (.number _) => False
   | .payload, .val _ => True
   | _, _ => False
 
 /-- A bound: a time on a time, a number on a payload field. -/
 def Arg.Bounds : FieldType → Arg → Prop
   | .time, .time c => Claim.of? c.text = some c
-  | .payload, .val (.int _) => True
+  | .payload, .val (.int i) => -maxExact ≤ i ∧ i ≤ maxExact
   | _, _ => False
 
 def Op.Fits (ty : FieldType) : Op → Prop
@@ -78,7 +80,7 @@ theorem parseArg_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) :
     | int i =>
       simp only [parseArg, refuse, pure, Except.pure] at h
       split at h
-      · rename_i hty; cases h; subst hty; exact ⟨trivial, rfl⟩
+      · rename_i hty; cases h; obtain ⟨rfl, hi⟩ := hty; exact ⟨hi, rfl⟩
       · cases h
     | bool b =>
       simp only [parseArg, refuse, pure, Except.pure] at h
@@ -87,7 +89,7 @@ theorem parseArg_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) :
       · cases h
     | _ => cases h
   · rintro ⟨hf, rfl⟩
-    rcases a with (_ | _ | _) | c <;> cases ty <;>
+    rcases a with (_ | _ | _ | _) | c <;> cases ty <;>
       simp_all [Arg.Fits, Arg.toJson, Val.toJson, parseArg, pure, Except.pure]
 
 theorem parseBound_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) :
@@ -98,7 +100,7 @@ theorem parseBound_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) 
     | int i =>
       simp only [parseBound, refuse, pure, Except.pure] at h
       split at h
-      · rename_i hty; cases h; subst hty; exact ⟨trivial, rfl⟩
+      · rename_i hty; cases h; obtain ⟨rfl, hi⟩ := hty; exact ⟨hi, rfl⟩
       · cases h
     | str s =>
       simp only [parseBound, refuse] at h
@@ -111,9 +113,11 @@ theorem parseBound_ok_iff (ty : FieldType) (path : String) (j : Json) (a : Arg) 
       · cases h
     | _ => cases h
   · rintro ⟨hf, rfl⟩
-    rcases a with (_ | _ | _) | c <;> cases ty <;>
-      simp only [Arg.Bounds, Arg.toJson, Val.toJson, parseBound, pure, Except.pure, ↓reduceIte] at hf ⊢
-    exact (parseArg_ok_iff .time path (.str c.text) (.time c)).2 ⟨hf, rfl⟩
+    rcases a with v | c
+    · cases v <;> cases ty <;>
+        simp_all [Arg.Bounds, Arg.toJson, Val.toJson, parseBound, pure, Except.pure]
+    · cases ty <;> simp_all [Arg.Bounds, Arg.toJson, parseBound]
+      exact (parseArg_ok_iff .time path (.str c.text) (.time c)).2 ⟨hf, rfl⟩
 
 /-- A test is accepted exactly when its argument fits its field, and it
 renders back to what was written. -/
@@ -154,7 +158,7 @@ theorem Json.repeatAt_none (path : Option String) : (j : Json) → (j.repeatAt p
     simp only [Json.repeatAt, Json.keysDistinct, Bool.and_eq_true, decide_eq_true_eq]
     rw [Json.repeatMember_none path [] kvs]
     simp
-  | .null | .bool _ | .int _ | .str _ => by simp [Json.repeatAt, Json.keysDistinct]
+  | .null | .bool _ | .int _ | .number _ | .str _ => by simp [Json.repeatAt, Json.keysDistinct]
 
 theorem Json.repeatIn_none (path : Option String) : (xs : List Json) →
     (Json.repeatIn path xs = none ↔ Json.allDistinct xs = true)

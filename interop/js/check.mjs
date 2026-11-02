@@ -9,6 +9,7 @@
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { readVector } from "../answers.mjs";
 import { gunzipSync } from "node:zlib";
 import * as L from "./loops.mjs";
 import { tally, jsonFiles } from "./tally.mjs";
@@ -33,7 +34,7 @@ function exact() {
 function checkRecord(dir) {
   const t = exact();
   for (const file of jsonFiles(join(dir, "record"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     t.files++;
     const n = `record/${v.vector}`;
     const envs = v.input.envs;
@@ -76,7 +77,7 @@ const utc = ([secs, frac]) => {
 function checkOccurred(dir) {
   const t = exact();
   for (const file of jsonFiles(join(dir, "occurred"))) {
-    const v = JSON.parse(readFileSync(file, "utf8"));
+    const v = readVector(readFileSync(file, "utf8"));
     t.files++;
     const n = `occurred/${v.vector}`;
     const texts = v.input.occurred;

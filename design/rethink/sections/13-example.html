@@ -1,10 +1,12 @@
 <section class="panel" id="example" role="tabpanel" aria-labelledby="t-example">
   <div class="panel-head"><h2>A worked example</h2><button class="toggle-all" type="button">Unfold all</button></div>
-  <p class="gist">Every case so far, in one mature setup: six stores across two realms and three machines, plus a bridge to an HOA board. Commands are the CLI's, store files and vertices are their JSON, and ids are shortened (<code>r:a1…</code>). Records a person doesn't type, such as ticks, are described in comments. On disk every record is a JSONL line or a SQLite row.</p>
+  <p class="gist">Every case so far, in one mature setup: six stores across two realms and three machines, plus a bridge to an HOA board. Commands and JSON illustrate the proposed CLI and store design. Ids are shortened (<code>r:a1…</code>). Records a person doesn't type, such as ticks, are described in comments. On disk every record is a JSONL line or a SQLite row.</p>
+
+  <p><b>PROPOSED FUTURE syntax.</b> Examples below use <code>latest-by:kind</code>, <code>latest</code> and <code>collect</code> with <code>by</code>. These forms are not executable in the current crate. The <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/spec.md">normative protocol</a> defines the current contract.</p>
 
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 372" role="img" aria-label="The home realm holds five stores: root (names, identity, digests, on the laptop), novel (laptop and NAS), feed (homelab, plus 90 days on the laptop), homelab (incidents and health) and per-run stores. Root composes over feed for the HOA recap and salience. A run bundles its result into the homelab store. Root bridges a signed recap to the HOA board realm. The work realm holds kyle's work store, which promotes into the team-platform store in git. Nothing replicates across realms.">
+      <svg class="dg" viewBox="0 0 400 372" role="img" aria-label="The home realm holds five store roles. Root holds names, identity and digests on the laptop. Novel lives on the laptop and NAS. Feed lives on the homelab, with 90 days on the laptop. Homelab holds incidents and health. Each run has a per-run store. Root composes over feed for the HOA recap and salience. A run bundles its result into the homelab store. Root bridges a signed recap to the HOA board realm. The work realm holds kyle's work store, which promotes into the team-platform store in git. Nothing replicates across realms.">
         <rect class="panel" x="0" y="0" width="400" height="214" rx="10"/>
         <text x="12" y="18" class="b">@home realm</text>
         <rect class="box-acc" x="12" y="28" width="116" height="56" rx="8"/><text x="70" y="45" text-anchor="middle" class="s b">root</text><text x="70" y="60" text-anchor="middle" class="xs">names · identity</text><text x="70" y="74" text-anchor="middle" class="xs m">laptop · nas</text>
@@ -28,7 +30,7 @@
         <text x="338" y="334" text-anchor="middle" class="xs m">no replication</text><text x="338" y="348" text-anchor="middle" class="xs m">across realms</text>
       </svg>
     </div>
-    <figcaption>Each store is a lineage with its own definition. The realm's own store, <code>root</code>, holds the name table and the vertices that read across stores. Arrows are the only ways content moves: compose (read), bundle (a tick with its closure), promote (a stance) and bridge (a signed tick into another realm).</figcaption>
+    <figcaption>Each store is a lineage with its own definition. The realm's own store, <code>root</code>, holds the name table and the vertices that read across stores. Arrows show how content moves. Compose reads; a bundle carries a tick with its closure. Promote is a stance. Bridge signs a tick into another realm.</figcaption>
   </figure>
 
   <h3>How the realm composes</h3>
@@ -296,7 +298,7 @@ loops emit redaction --erases r:n9                                     # sl:dire
 
 {"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T10:12:44-05:00","about":["r:x1"]},
  "commit":"h:7ab1…"}</pre>
-    <p><code>id = hash(canonical(env) + commit)</code> and <code>commit = hash(salt + canonical(payload))</code>, so the second line still verifies, every reference to <code>r:9f3c</code> still resolves, and nothing else in the repository changes.</p>
+    <p><code>id = hash(canonical(env) + commit)</code> and <code>commit = hash(salt + canonical(payload))</code>. The second line still verifies. Every reference to <code>r:9f3c</code> still resolves. Nothing else in the repository changes.</p>
   </div></details>
 
   <h3>What the example surfaced</h3>

@@ -1,0 +1,30 @@
+{
+  "vector": "phase2-self-prev-anchor",
+  "layer": "fold/latest-by",
+  "laws": ["latest-by.set", "thing.local"],
+  "source": "model",
+  "input": {
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaua",
+          "kind": "decision",
+          "observer": "sl:kyle",
+          "about": [],
+          "value": "v40",
+          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaua"],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaua": {
+      "heads": [],
+      "winner": null,
+      "others": []
+    }
+  }
+}

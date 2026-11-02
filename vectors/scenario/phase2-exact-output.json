@@ -1,0 +1,158 @@
+{
+  "vector": "phase2-exact-output",
+  "layer": "scenario",
+  "laws": ["spec.set", "sum.perm", "numeric.safe-whole"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "exact-output",
+      "from": [
+        {
+          "store": "team"
+        }
+      ],
+      "fold": {
+        "n": {
+          "sum": "n"
+        },
+        "field": {
+          "sum": "est"
+        }
+      }
+    },
+    "thing": "decision:auth",
+    "records": [
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "kind": "decision",
+        "observer": "sl:ada",
+        "about": ["decision:auth"],
+        "value": "First.",
+        "prev": [],
+        "emitted": "2026-10-01T00:01:40Z",
+        "n": 9007199254740991,
+        "fields": {
+          "est": 9007199254740991
+        }
+      },
+      {
+        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "kind": "decision",
+        "observer": "sl:bo",
+        "about": ["decision:auth"],
+        "value": "Second.",
+        "prev": [],
+        "emitted": "2026-10-01T00:01:50Z",
+        "n": 2,
+        "fields": {
+          "est": 2
+        }
+      }
+    ],
+    "steps": [
+      {
+        "name": "safe-input",
+        "forms": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "shown": "here"
+          }
+        ],
+        "orders": [
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"]
+        ]
+      },
+      {
+        "name": "exact-output",
+        "forms": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+            "shown": "here"
+          }
+        ],
+        "orders": [
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza"],
+          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"]
+        ]
+      }
+    ],
+    "lens": {
+      "base": [
+        {
+          "id": "decision:auth",
+          "body": ["First."]
+        }
+      ],
+      "text": ["::: decision:auth", "Second.", ":::"]
+    }
+  },
+  "expect": {
+    "steps": [
+      {
+        "settled": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "shown": "here"
+          }
+        ],
+        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "slots": {
+          "n": {
+            "value": 9007199254740991,
+            "unread": 0
+          },
+          "field": {
+            "value": 9007199254740991,
+            "unread": 0
+          }
+        }
+      },
+      {
+        "settled": [
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "shown": "here"
+          },
+          {
+            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+            "shown": "here"
+          }
+        ],
+        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza"],
+        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
+        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "slots": {
+          "n": {
+            "value": 9007199254740993,
+            "unread": 0
+          },
+          "field": {
+            "value": 9007199254740993,
+            "unread": 0
+          }
+        }
+      }
+    ],
+    "lens": {
+      "rendered": ["::: decision:auth", "First.", ":::"],
+      "outcomes": [
+        {
+          "accepted": "decision:auth",
+          "body": ["Second."]
+        }
+      ],
+      "applied": [
+        {
+          "id": "decision:auth",
+          "body": ["Second."]
+        }
+      ]
+    }
+  }
+}

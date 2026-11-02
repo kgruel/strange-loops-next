@@ -1,0 +1,47 @@
+{
+  "vector": "13-source-union",
+  "layer": "spec/run",
+  "laws": ["spec.set", "spec.select"],
+  "source": "model",
+  "input": {
+    "spec": {
+      "vertex": "union",
+      "from": [
+        {
+          "store": ".",
+          "kind": ["task"]
+        },
+        {
+          "store": ".",
+          "kind": ["note"]
+        }
+      ],
+      "fold": {
+        "c": {
+          "count": true
+        }
+      }
+    },
+    "orders": [
+      [
+        {
+          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab4a",
+          "kind": "task",
+          "observer": "sl:kyle",
+          "about": ["task:8"],
+          "value": "",
+          "prev": [],
+          "emitted": "2026-10-01T00:01:40Z",
+          "occurred": "2026-10-01T00:01:40Z",
+          "n": 0
+        }
+      ]
+    ]
+  },
+  "expect": {
+    "c": {
+      "value": 1,
+      "unread": 0
+    }
+  }
+}

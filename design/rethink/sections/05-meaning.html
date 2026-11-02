@@ -1,7 +1,8 @@
 <section class="panel" id="meaning" role="tabpanel" aria-labelledby="t-meaning">
   <div class="panel-head"><h2>Layer 1: vertex and store</h2><button class="toggle-all" type="button">Unfold all</button></div>
+  <p class="callout"><b>Design proposals:</b> these examples include unsupported grammar and future product surfaces. <code>protocol/spec.md</code> defines accepted specs. Examples are not conformance fixtures.</p>
   <p class="gist"><b>A store is a thing you write into; a vertex is a question you ask.</b> A store is a lineage defined by records about itself; a vertex is named by the hash of its spec. Neither owns the other.</p>
-  <p>Today's <code>.vertex</code> file mixes four jobs: where records live, who produces them, which records to select, and what they mean. Split apart, a vertex keeps only meaning (inputs, a time axis, folds, a boundary) and writes ticks that cover exact records. A store becomes its own thing: an anchor id, declarations as records inside it, and places kept per machine. Names resolve through the same tables as observers. Declarations are dated and nothing is rewritten, so a store gets a schema without migrations and can mature from open to strict.</p>
+  <p>The legacy <code>.vertex</code> file mixed storage, producers, selection and meaning. The proposed design separates those jobs. A vertex keeps meaning and covers exact records. A store has an anchor, dated declarations and local places. Names resolve through observer-style tables. Declaration policy remains future work.</p>
   <div class="callout"><p><b>The contract:</b> <code>state = fold(spec, select(records))</code>. Same set, same spec, same state, wherever it runs and in whatever order the records are read. Every choice on this tab exists to keep that true.</p></div>
   <p><span class="pill p-ok">layer closed</span> Tick questions move to layer 2 and thing identity to composition. See <a href="#cases" data-tab="cases">Cases</a> for the novel, orchestration and team stores.</p>
 
@@ -64,22 +65,22 @@
       <thead><tr><th>Accumulating</th><th>Over heads</th></tr></thead>
       <tbody>
         <tr><td>Count, Sum, Min, Max, and Collect without <code>follow</code></td><td>LatestBy, and any fold with <code>"follow": "prev"</code></td></tr>
-        <tr><td>Compact state; the step is commutative</td><td>The state is the heads (records nothing names in <code>prev</code>) and every id named; the answer is worked out from them</td></tr>
+        <tr><td>Compact state; the step is commutative</td><td>The state retains per-thing heads and referenced ids. The answer comes from that state.</td></tr>
       </tbody>
     </table></div>
-    <p>Both are proved to depend only on the set of records, so a record landing late folds onto the cached state. Content order still decides which record wins, newest head first; it is never a rule about arrival. Supersession is why the second family exists: a new record can push an old one out of a top five, or retire the current maximum, and only the heads know what comes back. <code>limit</code> and <code>order</code> apply when the answer is read. A coarse <code>occurred</code> like <code>2009~</code> normalizes to a range and sorts by its start.</p>
+    <p>Both families have set-invariance laws under their stated premises. Accumulating folds consume each id once. LatestBy retains heads and all referenced ids, not just the current answer. Its cached state accepts late records. Heads apply per thing; a record remains if any thing retains it. Modifiers shape the final answer. Content order chooses among heads, not arrival order.</p>
   </div></details>
   <details class="unfold"><summary>Boundaries: content vs operational</summary><div class="body">
-    <p>Today a boundary fires "when a record of kind X <i>arrives</i>": receipt order in disguise.</p>
+    <p>In the earlier prototype, a boundary fired "when a record of kind X <i>arrives</i>": receipt order in disguise.</p>
     <ul>
       <li><b>Content boundaries</b> are defined by what records say: "at the record of kind <code>release</code>", "each calendar day of <code>occurred</code>". Deterministic: anyone folding the same set gets the same cycles.</li>
       <li><b>Operational boundaries</b>, like "every N prompts", "on demand" or "after 20 records", are honestly events in time.</li>
     </ul>
     <p>Either way the tick lists exactly what it covered. A late record simply wasn't in that tick. A tick is the vertex's own observation: "when I ticked, I had these, and they folded to this."</p>
-    <details class="source"><summary>Today's boundary</summary><div class="body"><p><code>libs/atoms/src/atoms/boundary.py</code>: modes <code>when</code> (on kind arrival), <code>after</code> and <code>every</code> (counts), with <code>reset</code>, payload <code>match</code>, fold-state <code>conditions</code> and a <code>run</code> hook.</p></div></details>
+    <details class="source"><summary>Earlier prototype boundary</summary><div class="body"><p><code>libs/atoms/src/atoms/boundary.py</code>: modes <code>when</code> (on kind arrival), <code>after</code> and <code>every</code> (counts), with <code>reset</code>, payload <code>match</code>, fold-state <code>conditions</code> and a <code>run</code> hook.</p></div></details>
   </div></details>
   <details class="unfold"><summary>Verifiable ticks</summary><div class="body">
-    <p>If a tick carries the spec's hash, the ids it covers and the folded result, anyone holding those records can fold them again and check the result, much like a reproducible build. Its payload then splits in two: the <b>fold result</b>, which can be checked, and <b>attachments</b> (like the orchestrator's message to you), which are signed claims.</p>
+    <p>A proposed tick carries the spec hash, covered ids and fold result. A reader holding those records can recompute the result. Attachments remain signed claims, not checked fold results.</p>
     <p>This only works with a closed, deterministic fold vocabulary, which is a strong reason to keep it closed and versioned. Who signs: nobody, for a content tick, which is a value anyone can recompute. When it's stored, whoever stores it signs the tick record, and the target store's writer policy admits that observer. The vertex holds no key (settled in version 32).</p>
   </div></details>
   <details class="unfold"><summary>Fold or lens?</summary><div class="body">
@@ -157,7 +158,7 @@
   <h3>Composing: the salience feed</h3>
   <figure>
     <div class="fig">
-      <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Three stores, safari, likes and feeds, each with its own kinds. The salience vertex maps visit to attention, like to marked and item to available, collates by thing, folds, and on a daily boundary writes a tick into a digest store. The tick covers by hash, so browsing history stays private.">
+      <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Three stores keep separate kinds: Safari visits, likes and feed items. The proposed salience vertex maps and groups them by thing. A daily boundary would emit a digest tick covering exact hashes.">
         <rect class="box" x="8" y="8" width="120" height="32" rx="8"/><text x="68" y="29" text-anchor="middle" class="s b">safari</text>
         <rect class="box" x="140" y="8" width="120" height="32" rx="8"/><text x="200" y="29" text-anchor="middle" class="s b">likes</text>
         <rect class="box" x="272" y="8" width="120" height="32" rx="8"/><text x="332" y="29" text-anchor="middle" class="s b">feeds</text>
@@ -196,7 +197,7 @@
 }</pre>
     <ul>
       <li><b>Kinds are scoped to their store.</b> Two stores may both declare <code>visit</code> with different shapes. <code>as</code> maps each input into the vertex's own vocabulary.</li>
-      <li><b>Collating needs thing identity.</b> The same essay must be recognized across Safari, likes and RSS. This open question just became central. Lean: a normalization rule (such as URL canonicalization) declared per kind in the store, plus <code>same-as</code> observations for the hard cases.</li>
+      <li><b>Collating needs thing identity.</b> The same essay must be recognized across Safari, likes and RSS. This open question just became central. Preferred design: a normalization rule (such as URL canonicalization) declared per kind in the store, plus <code>same-as</code> observations for the hard cases.</li>
       <li><b>Writing <code>into</code> another store makes whoever runs the vertex a writer there.</b> The tick record is theirs, signed with their key and admitted by that store's policy; the vertex itself holds no key.</li>
       <li><b>Across realms, <code>into</code> is a bridge</b> and must say so explicitly. Within a realm it's ordinary.</li>
     </ul>
@@ -213,9 +214,9 @@
       <tr><td><b>render</b></td><td>a lens</td><td>a view for someone</td></tr>
     </tbody>
   </table></div>
-  <p>"Observation" is a noun: the most common kind of record, not the only one. A <code>visit</code> claims something about the world and can be true or false. A <code>declare</code>, <code>grant</code>, <code>name</code> or <code>adopt</code> describes nothing: saying it, in a store that recognizes it, makes it so, but only if the author has standing.</p>
+  <p>"Observation" is a noun: the most common kind of record, not the only one. A <code>visit</code> claims something about the world and can be true or false. A proposed declaration, grant, name or adoption takes effect only when the store recognizes it and its author has standing.</p>
   <details class="unfold"><summary>Reserved kinds, and speech acts</summary><div class="body">
-    <p>The core reads a short, closed list of reserved kinds: <code>*-anchor</code>, <code>name</code>, <code>declare</code>, <code>policy</code>, <code>grant</code>, <code>vouch</code>, the stances (<code>affirm</code>, <code>adopt</code>, <code>dispute</code>, <code>retire</code>, <code>promote</code>) and <code>spec</code>. This list is to the core what the fold list is to vertices. Every other kind is yours, and the core never interprets it.</p>
+    <p>The future standing design proposes reserved anchors, names, declarations, policies, grants and vouches. It also proposes stances and spec records. These are not implemented admission rules. Other kinds remain user vocabulary.</p>
     <p>Speech act theory names the split: <i>constatives</i> state something; <i>performatives</i> do something by being said. A performative only works if its "felicity conditions" hold, such as the speaker having standing. A policy record from a non-steward is emitted, kept and visible, but has no effect: admission is the felicity check.</p>
     <details class="source"><summary>Prior art</summary><div class="body"><ul>
       <li>J. L. Austin, <i>How to Do Things with Words</i> (1962)</li>
@@ -229,9 +230,9 @@
     <thead><tr><th>Need</th><th>Handled by</th></tr></thead>
     <tbody>
       <tr><td>order by chapter or story time</td><td><code>order field=…</code>, a parameter</td></tr>
-      <tr><td>"all children ticked"</td><td>a boundary condition on folded state (exists today)</td></tr>
+      <tr><td>"all children ticked"</td><td>a boundary condition on folded state (existed in the earlier prototype)</td></tr>
       <tr><td>a set, not a list</td><td>an explicit set mode on <code>Collect</code></td></tr>
-      <tr><td>weighting by observer</td><td><b>new:</b> <code>weight-by=&lt;vertex&gt;</code> on Collect's ranking (and so TopN), reading another vertex's state like <code>admitted-by</code>. Never on Sum, where it would change the number rather than the order, and never on Latest: Latest is succession, and weighting it would bury new observations under old seniority.</td></tr>
+      <tr><td>weighting by observer</td><td><b>new:</b> <code>weight-by=&lt;vertex&gt;</code> on Collect's ranking (and so TopN), reading another vertex's state like <code>admitted-by</code>. The proposal excludes Sum because weighting changes its value. It excludes Latest because weighting can bury newer observations.</td></tr>
     </tbody>
   </table></div>
   <p>Without <code>weight-by</code>, weighted questions would need joins, and joins would open the vocabulary.</p>
