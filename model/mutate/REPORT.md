@@ -1,6 +1,65 @@
 # Lean model mutation report
 
-## CURRENT snapshot: `08fa7029485648fdc9de642d8c0f19c1dccc3651`
+## CURRENT Step-1 snapshot: `6fa98571b0f7d15d5ddbdae3ef12401efc0c92f7`
+
+The Node 22 run completes all 189 entries with a 240-second command timeout.
+The model sources and generated vectors match this snapshot.
+The working catalogue contains four reviewed re-anchors, described below.
+
+| Outcome | Count |
+|---|---:|
+| Rejected by build | 143 |
+| Vector differences | 27 |
+| Generator assertion exceptions | 12 |
+| Survivors | 7 |
+
+The runner exits 1 for generator assertions, not for infrastructure failure.
+All 12 error logs end with generator assertion exceptions.
+No command times out, receives a signal, or reports a spawn or cleanup error.
+A build rejection is not a semantic proof kill.
+A generator assertion is an error outcome, not a vector-difference kill.
+Survival alone proves neither equivalence nor reachability.
+
+All six previous survivors remain.
+The four D6 helper candidates remain unapproved: `wide-families-013`, `wide-spec-064`, `extra-families-max-acc`, and `extra-families-min-acc`.
+The prior scoped interpretations for `finish-json-hexdigit` and `last-spec-tests-conds` remain unchanged.
+This run adds no helper law and does not settle D6.
+
+### New survivor: `finish-occurred-stamp-of`
+
+This mutation adds `if s.toList.contains '+' then none else` before the existing parser call in `Stamp.of?`.
+Its build and generator pass, with no changed vector.
+The parent checks `instantParts?`, `digitsVal`, `tail`, and `offsetSecs` in `model/Loops/Time.lean`.
+Accepted text contains only decimal digits and the fixed separators `-`, `T`, `:`, `.`, and `Z`.
+It cannot contain `+`; R4 already refuses every numeric offset.
+Thus the added guard is redundant for accepted instants.
+Rejected instants still return `none` on both paths.
+This is a source-based equivalence interpretation, not a new Lean equivalence theorem or a conclusion from survival alone.
+The entry stays in the catalogue, so the run reports seven survivors without hiding it.
+
+### Re-anchors and limits
+
+- `wide-envelope-010` changes decoded width from 32 to 31 bytes.
+- `wide-time-095` refuses the sole accepted UTC marker.
+- `wide-time-096` negates fraction nonemptiness in the new canonical check.
+- `coverage-time-instant-` excludes second 59 in `instantParts?`.
+
+The catalogue retains every entry.
+It does not claim exhaustive mutation coverage for the new decoder and instant helpers.
+Both baseline builds pass; initial vector generation matches the committed corpus.
+After restoration, tracked model sources and vectors match HEAD and the mutation lock is absent.
+The parent starts no Lean build or explicit diagnostic probe during mutation.
+Automatic tooling isolation is not independently established.
+The later full integration gate checks the restored tree.
+
+Local evidence is in `.pi/evidence/mutations/full.json`, its `.logs/` directory, and `summary.json`.
+Reproduce with:
+
+```sh
+fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/step1-mutants.json
+```
+
+## HISTORICAL integrated snapshot: `08fa7029485648fdc9de642d8c0f19c1dccc3651`
 
 The full catalogue run completes all 189 entries on Node `v22.23.4`, with a 240-second command timeout.
 

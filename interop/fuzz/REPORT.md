@@ -2,11 +2,55 @@
 
 ## Scope
 
-This report covers the integrated JS, Lean, and Rust campaign and its fixes.
+This report covers the Step-1 JS, Lean, and Rust campaign.
 It also preserves evidence from earlier two-way campaigns as historical findings.
 The harness covers record, fold, spec, realm, scenario, batch, and lens inputs.
 
-## Current integrated three-way campaign
+## Step-1 three-way campaign
+
+Node 22 checks 5,600 cases with seed `step1-1`: 800 cases per family.
+The run uses 88 chunks and takes 155.43 seconds.
+Exit 1 records the existing D1 disagreement, not an infrastructure failure.
+
+| Family | Cases | Match | Protocol refusal | Shared decoder refusal | Mismatch |
+|---|---:|---:|---:|---:|---:|
+| record | 800 | 367 | 406 | 27 | 0 |
+| fold | 800 | 698 | 0 | 102 | 0 |
+| spec | 800 | 716 | 42 | 42 | 0 |
+| realm | 800 | 698 | 0 | 102 | 0 |
+| scenario | 800 | 696 | 0 | 104 | 0 |
+| batch | 800 | 615 | 185 | 0 | 0 |
+| lens | 800 | 578 | 180 | 0 | 42 |
+| Total | 5,600 | 3,768 | 813 | 377 | 42 |
+
+All 377 decoder refusals occur in both Lean and Rust.
+They are not protocol agreement.
+The generator now uses canonical base32hex and UTC instants, including fractions.
+Scheduled refusal probes cover byte spellings, every instant position, and unknown-key precedence.
+Random near-miss choices cannot replace those probes.
+
+The parent checks all 42 raw and 42 reduced mismatch artifacts.
+Each repeats base ID `t:repeat`; Lean and Rust agree, and JavaScript differs.
+These artifacts contain one distinct raw input and one distinct reduced input.
+No new mismatch class appears.
+The existing fixture `found/03-duplicate-base-id.json` retains this D1 boundary.
+The campaign does not settle duplicate-base semantics.
+
+Each reduction uses 76 trials and three accepted rounds, below the 80-trial limit.
+The total is 3,192 trials; no reduction reaches its limit.
+These results do not prove absolute minimality.
+Local evidence is in `.pi/evidence/step1-1/`, including inputs, summaries, refusals, and raw and reduced mismatches.
+
+Reproduce in a new directory:
+
+```sh
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-1
+```
+
+## Historical integrated three-way campaign
+
+This campaign predates the Step-1 spelling changes.
+It does not establish results for the updated generator.
 
 A fresh Node 22 run compared JS, Lean, and Rust on 5,600 cases: 800 per family.
 It used seed `integrate-1`, shrink limit 80, 88 chunks, and completed in 160.70 seconds.

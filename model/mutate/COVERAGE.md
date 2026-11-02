@@ -5,7 +5,9 @@ Its file headings and exclusions are historical, not a coverage claim for the me
 The catalogue now follows moved definitions into `model/Loops/Id.lean` and `model/Loops/Fold.lean`.
 Use `node model/mutate/run.mjs --list` for current source paths.
 The runner tests check every current replacement site.
-No new definitions or coverage claims form part of this merge.
+Step 1 keeps all 189 entries and re-anchors four replacements.
+Its new decoder and instant helpers do not receive a complete mutation-coverage inventory here.
+The Step-1 run is a catalogue rerun, not exhaustive coverage of the changed model.
 
 A covered definition has at least one catalogue entry.
 Exclusions state why the definition has no direct eligible operation.
@@ -275,5 +277,5 @@ The catalogue includes existing entries without definition metadata.
 - `Loops.stripZeros`: covered by `wide-time-094`
 - `Loops.offsetSecs`: covered by `wide-time-095`
 - `Loops.tail`: covered by `wide-time-096`
-- `Loops.instant?`: covered by `coverage-time-instant-`
+- `Loops.instantParts?`: covered by `coverage-time-instant-`
 - `Loops.validEmitted`: covered by `wide-time-097`

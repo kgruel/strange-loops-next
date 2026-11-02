@@ -1,0 +1,47 @@
+// Unit checks only. No engine processes or campaigns run here.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+import { generate } from './generate.mjs';
+import { evaluateJS } from './evaluate.mjs';
+import { occurredSpan } from '../js/loops.mjs';
+
+const dir = new URL('../../vectors/byte-text/', import.meta.url);
+test('byte-text adapter uses the public strict decoder', () => {
+  for (const file of readdirSync(dir)) {
+    const vector = JSON.parse(readFileSync(new URL(file, dir), 'utf8'));
+    assert.deepEqual(evaluateJS(vector), [vector.expect], file);
+  }
+});
+
+test('named record boundaries remain scheduled across seeds', () => {
+  const names = ['id-uppercase', 'id-w', 'id-x', 'id-y', 'id-z', 'id-pad-bits', 'salt-pad-bits'];
+  const parts = ['emitted', 'occurred-single', 'occurred-start', 'occurred-stop', 'occurred-open'];
+  const kinds = ['offset', 'second-60', 'trailing-zero', 'ten-digits'];
+  names.push(...parts.flatMap(part => kinds.map(kind => `${part}-${kind}`)), 'unknown-envelope-key-empty-kind');
+  for (const seed of ['a', 'b', 'c', 'd']) {
+    for (const [i, name] of names.entries()) {
+      const v = generate(seed, i, 'record');
+      assert.equal(v.fuzz.nearMiss, name);
+      assert.equal(v.input.envs.length, 1);
+      const env = v.input.envs[0];
+      if (i === 6) { assert.throws(() => evaluateJS(v)); continue; }
+      const expected = i < 6 ? 'prev-not-record-id' : i < 11 ? 'emitted-not-rfc3339'
+        : i < 27 ? 'occurred-not-span' : 'envelope-field-unknown';
+      assert.deepEqual(evaluateJS(v), [{ refused: expected }, { refused: expected }], name);
+      if (i === 27) { assert.equal(env.kind, ''); assert.equal(env.extra, true); }
+    }
+  }
+});
+
+test('valid generated records include fractional instants and occurred forms', () => {
+  const envs = Array.from({ length: 128 }, (_, i) => generate('valid-times', i * 64 + 40, 'record'))
+    .filter(v => v.fuzz.nearMiss === null).flatMap(v => v.input.envs);
+  assert.ok(envs.some(env => /\.\d+Z$/.test(env.emitted)));
+  assert.ok(envs.some(env => /T.*\//.test(env.occurred)));
+  assert.ok(envs.some(env => /T.*Z$/.test(env.occurred)));
+  const intervals = envs.filter(env => env.occurred.includes('/'));
+  assert.ok(intervals.some(env => env.occurred.includes('T') && !env.occurred.endsWith('/..')));
+  assert.ok(intervals.some(env => env.occurred.includes('T') && env.occurred.endsWith('/..')));
+  for (const env of intervals) assert.ok(occurredSpan(env.occurred), env.occurred);
+});

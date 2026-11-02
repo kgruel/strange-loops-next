@@ -10,7 +10,7 @@ import { resolveBatch } from '../js/batch.mjs';
 import { formOf, step, lensEdit } from '../js/scenario.mjs';
 
 const WRITE_CODES = new Set([
-  'kind-empty', 'observer-not-typed', 'emitted-not-rfc3339', 'occurred-not-span',
+  'envelope-field-unknown', 'kind-empty', 'observer-not-typed', 'emitted-not-rfc3339', 'occurred-not-span',
   'about-not-typed', 'prev-not-record-id', 'under-not-record-id', 'erases-not-record-id',
   'salt-not-16-bytes', 'member-duplicate', 'number-out-of-range',
 ]);
@@ -64,6 +64,10 @@ export function evaluateJS(vector, rawText) {
   const { layer, input } = vector;
   if (folds[layer]) return input.orders.map(rs => folds[layer](rs, input));
   switch (layer) {
+    case 'byte-text': return [{ accepted: input.texts.map(text => {
+      try { L.fixedBytes(text, input.prefix, input.bytes); return true; }
+      catch { return false; }
+    }) }];
     case 'record': return input.envs.flatMap(env =>
       (input.payloads ?? [null]).map((payload, i) => {
         const variant = { ...input, envs: [env] };

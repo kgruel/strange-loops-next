@@ -275,9 +275,9 @@
   {
     "id": "wide-envelope-010",
     "file": "Envelope.lean",
-    "before": "rest.length == 52",
-    "after": "rest.length != 52",
-    "reason": "Change this selection or check.",
+    "before": "byteText 32 (String.ofList rest)",
+    "after": "byteText 31 (String.ofList rest)",
+    "reason": "Require the wrong record digest width.",
     "definition": "Loops.recordId"
   },
   {
@@ -755,17 +755,17 @@
   {
     "id": "wide-time-095",
     "file": "Time.lean",
-    "before": "h ≤ 23 && m ≤ 59",
-    "after": "h < 23 && m ≤ 59",
-    "reason": "Change this selection or check.",
+    "before": "| ['Z'] => some 0",
+    "after": "| ['Z'] => none",
+    "reason": "Reject the only canonical UTC marker.",
     "definition": "Loops.offsetSecs"
   },
   {
     "id": "wide-time-096",
     "file": "Time.lean",
-    "before": "if frac.isEmpty then none",
-    "after": "if !frac.isEmpty then none",
-    "reason": "Change this selection or check.",
+    "before": "if frac.isEmpty || frac.length > 9 || frac.getLast? == some '0' then none",
+    "after": "if !frac.isEmpty || frac.length > 9 || frac.getLast? == some '0' then none",
+    "reason": "Reject nonempty fractions.",
     "definition": "Loops.tail"
   },
   {
@@ -891,10 +891,10 @@
   {
     "id": "coverage-time-instant-",
     "file": "Time.lean",
-    "before": "&& s ≤ 60",
-    "after": "&& s < 60",
-    "reason": "Reject leap seconds.",
-    "definition": "Loops.instant?"
+    "before": "&& s ≤ 59",
+    "after": "&& s < 59",
+    "reason": "Reject the last second of each minute.",
+    "definition": "Loops.instantParts?"
   },
   {
     "id": "coverage-spec-slottests",
