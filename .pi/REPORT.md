@@ -1,5 +1,70 @@
 # Step-1 rulings
 
+## Review fixes
+
+F1–F4 are complete.
+R1–R6, D1–D7, and the six older mutation survivors remain unchanged.
+Public `base32` API and theorem names remain unchanged.
+No push occurs.
+
+| Fix | Change | Commits |
+|---|---|---|
+| F1 | Raw shape preflight precedes all envelope values and labels; typed writer codes exclude shape errors. | `fd341e6`, `3fda645`, `e7c42cc`, `f1b32fb`, `4689a7a` |
+| F2 | Scripts derive campaign totals and correct the historical match count. | `4689a7a`, `8130da0`; this report |
+| F3 | Eight guard mutations cover canonical text and raw shape order; only the redundant plus guard retires. | `fd341e6`, `e7c42cc`, `f1b32fb`, `4689a7a` |
+| F4 | UTC tail loses offset residue; equal-span tests and the offset fixture name recover their intent. | `fd341e6`, `3fda645`, `f1b32fb`, `8130da0` |
+
+The Rust core exposes `envelope::check_keys` and a distinct `ShapeError`.
+The JavaScript port exposes `checkEnvelopeKeys`; its harness no longer owns the key policy.
+Every batch envelope receives shape checks before any draft value or label.
+Any unknown envelope key gives record variants one top-level shape refusal.
+Signing seed decoding occurs only after writing succeeds.
+The independent review finds one overwritten repeated `env` member in the JS fuzz adapter.
+The parent preserves every raw occurrence and adds both-order regression tests.
+The reviewer accepts the correction; a separate three-way replay confirms it.
+This fix does not add a duplicate-member refusal or settle D5.
+
+The tree contains 76 laws, 629 exported theorems, and 6 boundary witnesses.
+It contains 328 JSON fixtures: 316 generated fixtures and 12 standard fixtures.
+Lean replays 307 inputs; 9 occurred fixtures use separate checks.
+The ledger and regenerated pages show the current counts.
+The ASCII scope states where JS, Rust, and Lean string orders agree.
+The generic `stripZeros` helper remains for moment algebra, but the instant parser no longer calls it.
+
+Full sequential gates precede each behavior commit.
+The first four logs are `.pi/gates/fixes-{model,vectors,js,rust}/`.
+The remaining logs are `.pi/gates/fixes-{adapters,evidence,pages}/`.
+These runs cover the adapter correction, restored mutation sources, evidence, and final pages.
+JavaScript passes 5,322 vector checks and 17 regression tests.
+The fuzz suite passes 43 tests; Rust passes 125 tests.
+All thirteen cheap mutations compile and fail runtime checks.
+All nine catalogue-runner tests pass.
+The CI seed checks 28 three-way cases without mismatches.
+Design mutations retain the existing single allowlisted survivor.
+
+The `step1-2` campaign checks 5,600 cases, with 800 per family.
+It reports 4,212 matches, 947 protocol refusals, 397 shared decoder refusals, and 44 D1 mismatches.
+The parent checks every raw and reduced mismatch against the previous D1 input and all three runtime answers.
+No new mismatch class appears.
+The 196-entry catalogue reports 147 build rejections, 27 vector differences, 16 generator assertion exceptions, and 6 survivors.
+These outcomes remain separate; build rejections are not semantic proof kills.
+All eight new mutations receive detection in both runners.
+No command has a timeout, signal, spawn error, or cleanup error.
+Sources and vectors restore, and the lock is absent.
+
+`.pi/summarize-fixes.py` derives counts from retained artifacts and checks every D1 mismatch.
+`.pi/update-fixes-reports.py` renders the current evidence sections from those checked totals.
+The reports preserve earlier snapshots as historical evidence.
+The original `step1-1` match count is 4,368, not 3,768.
+See `interop/fuzz/REPORT.md` and `model/mutate/REPORT.md` for commands and evidence limits.
+
+No requested fix is blocked.
+
+## Original run
+
+This section records the earlier run and its historical counts and decisions.
+The review-fix section above supersedes the affected details.
+
 ## Changes
 
 R1 makes every byte string lowercase, unpadded base32hex.
@@ -81,7 +146,7 @@ The complete rerun passes after these corrections.
 ## Three-way campaign
 
 The `step1-1` campaign checks 5,600 cases, with 800 per family, in 155.43 seconds.
-It reports 3,768 matches, 813 protocol refusals, 377 shared decoder refusals, and 42 mismatches.
+It reports 4,368 matches, 813 protocol refusals, 377 shared decoder refusals, and 42 mismatches.
 Shared decoder refusals do not count as agreement.
 The parent checks all 42 raw and 42 reduced mismatch artifacts.
 All show D1 duplicate-base lens behavior, with Lean and Rust agreeing against JavaScript.

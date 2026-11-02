@@ -41,3 +41,21 @@
 12:26 pages — All 21 gates pass after final page regeneration. Review the six settled ledger entries, grammar refusal, and canonical examples.
 12:27 complete — Review the report and roadmap against gate logs and both campaigns. D1–D7 stay unchanged. No helper remains active.
 12:27 complete — All generated files match HEAD after regeneration. Commit the final report, progress log, and roadmap. Do not push.
+14:22 model-fixes — Move raw envelope keys to an all-draft and all-variant shape preflight before value decoding. Keep typed writer codes separate. Simplify the UTC tail and prove canonical fractions without parser normalization. Add refusal rotations, keys-set proof, and eight shared guard mutations; retire only the R4-equivalent plus guard. Focused Lean gates are running sequentially; the parent retains port integration and evidence ownership.
+14:30 model-gates — Node 22.23.4 sequential gates pass: --wfail build, 316 generated vectors, 307 input replays, runtime checks, and 4,000 binary64 pins. All 13 cheap mutations compile and fail runtime checks. The 196-entry catalogue validates; all nine runner tests pass. The exports contain 629 theorems and six boundaries. Public law statements remain unchanged except the tail_digits return-shape adjustment. The six old survivor entries remain byte-for-byte unchanged. Parent gates still cover ports, the full catalogue, the campaign, and pages. No commits or port and evidence-report edits occur.
+14:33 review-fixes — The parent accepts the model diff and generated refusal rotations. Terra owns ports and fuzz inputs; the parent owns disjoint prose and evidence scripts.
+14:34 ports — Add reader-level envelope key preflight in Rust and JS. Add scheduled shape cases and direct boundary tests.
+14:36 port-gates — Node 22 passes 58 unit tests and 5,322 vector checks. Rust format, strict Clippy, and workspace tests pass.
+14:39 gates — The parent reviews all port changes and adds direct key-before-value tests. Start the full sequential gates before behavior commits.
+14:41 fixes-model — All 21 sequential gates pass. Commit the reviewed unit.
+14:42 fixes-vectors — All 21 sequential gates pass. Commit the reviewed unit.
+14:44 fixes-js — All 21 sequential gates pass. Commit the reviewed unit.
+14:46 fixes-rust — All 21 sequential gates pass. Commit the reviewed unit.
+14:46 fixes-evidence — Start the step1-2 campaign and full catalogue in sequence. No concurrent Lean build runs.
+14:47 review-fixes — The independent review finds an overwritten raw env member in the JS adapter. Preserve every raw occurrence before shape checks. Stop the partial campaign and retain its artifacts separately.
+15:53 recovery — The first catalogue stops when the parent ends its turn. Restore the unfinished mutation and archive the partial run.
+15:53 evidence — Wait for the full catalogue rerun to finish. Check all 196 outcomes and all 44 raw and reduced D1 cases. Sources restore and the lock is absent.
+15:55 evidence-gates — All 21 restored-tree gates pass. Commit the reviewed adapter, generator, tests, and evidence reports as 4689a7a.
+15:58 final-gates — All 21 final gates pass. Verify 125 Rust tests from all workspace results, not only the evaluator.
+15:58 complete — Commit the reviewed counts, ledger, and generated pages as 8130da0. The reports list each fix and its commits.
+15:58 complete — All helpers and commands finish. The model and vectors match HEAD, and no mutation lock remains. Commit the report and progress log. Do not push.
