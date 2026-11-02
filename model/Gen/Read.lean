@@ -1,4 +1,6 @@
 import Loops
+import Loops.Base32
+import Loops.Envelope
 
 /-!
 # Read: inputs as text, back into the model's values
@@ -247,22 +249,16 @@ def opt {α : Type} (kvs : List (String × Json)) (k : String) (f : Json → Dec
   | some v => some <$> f v
   | none => pure none
 
-/-! ## Ids and base32 -/
+/-! ## Ids and base32hex -/
 
-def base32Val (c : Char) : Option Nat := base32Alphabet.findIdx? (· == c)
-
-/-- Bytes from lowercase, unpadded base32. Only the spelling `base32` writes
+/-- Bytes from lowercase, unpadded base32hex. Only the spelling `base32` writes
 is taken, so trailing bits must be zero and one text names one byte string. -/
 def unbase32 (s : String) : Except String (List UInt8) := do
-  let some vs := s.toList.mapM base32Val | throw "has a character outside lowercase base32 (a-z, 2-7)"
-  let bits : List Bool := vs.flatMap fun v => (List.range 5).reverse.map fun i => (v >>> i) % 2 == 1
-  let bytes := (List.range (bits.length / 8)).map fun k =>
-    ((bits.drop (8 * k)).take 8).foldl (fun n b => 2 * n + if b then 1 else 0) 0
-  let out := bytes.map Nat.toUInt8
-  if base32 out == s then pure out
-  else throw "is not base32 as written: its length or trailing bits name no byte string"
+  match Loops.unbase32 s with
+  | some bs => pure bs
+  | none => throw "is not canonical lowercase base32hex (0-9, a-v): bad alphabet, length or unused bits"
 
-/-- A record id: `r:` and the base32 of a 32-byte digest, read as a number
+/-- A record id: `r:` and the base32hex of a 32-byte digest, read as a number
 the way `idText` writes one. -/
 def recordId (path : String) (j : Json) : Dec RecordId := do
   let s ← text path j
@@ -275,14 +271,21 @@ def recordId (path : String) (j : Json) : Dec RecordId := do
         if idText n == s then pure n else bad path s!"\"{s}\" does not read back as itself"
       else bad path s!"\"{s}\" is not a 32-byte digest"
     | .error why => bad path s!"\"{s}\" {why}"
-  | _ => bad path s!"\"{s}\" is not a record id (r:<base32 digest>)"
+  | _ => bad path s!"\"{s}\" is not a record id (r:<base32hex digest>)"
 
-/-- Bytes written in base32: a salt, a seed. -/
+/-- Bytes written in base32hex: a salt, a seed. -/
 def bytes (path : String) (j : Json) : Dec (List UInt8) := do
   let s ← text path j
   match unbase32 s with
   | .ok bs => pure bs
   | .error why => bad path s!"\"{s}\" {why}"
+
+/-- The shared fixed-width textual boundary for salts, digests, keys and signatures. -/
+def fixedBytes (path : String) (n : Nat) (pre : String) (j : Json) : Dec (List UInt8) := do
+  let s ← text path j
+  if s.toList.take pre.length != pre.toList then bad path s!"expected prefix {pre}"
+  let bs ← bytes path (.str (String.ofList (s.toList.drop pre.length)))
+  if bs.length == n then pure bs else bad path s!"expected {n} bytes"
 
 /-! ## Records, as `jRecord` writes them -/
 
@@ -290,7 +293,7 @@ def stampOf (path : String) (j : Json) : Dec Stamp := do
   let s ← text path j
   match Stamp.of? s with
   | some st => pure st
-  | none => bad path s!"\"{s}\" is not an RFC 3339 instant with an offset"
+  | none => bad path s!"\"{s}\" is not a canonical UTC instant"
 
 def claimOf (path : String) (j : Json) : Dec Claim := do
   let s ← text path j
@@ -375,7 +378,8 @@ def sections (path : String) : Json → Dec (List Lens.Section) := each path sec
 /-- An envelope as a writer hands it over. Its contents are `write`'s to
 check, so here only its shape is. -/
 def env (path : String) (j : Json) : Dec Env := do
-  let kvs ← members? path ["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"] j
+  let kvs ← object path j
+  if let some why := envelopeKeysProblem kvs then throw why
   let setOf (k : String) : Dec (List String) := (opt kvs k (texts (dot path k))).map (·.getD [])
   let kind ← text (dot path "kind") (← req path kvs "kind")
   let observer ← text (dot path "observer") (← req path kvs "observer")

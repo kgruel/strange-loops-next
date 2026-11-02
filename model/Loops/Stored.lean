@@ -7,8 +7,8 @@ import Loops.Base32
 A record commits to its payload and is named by its envelope and that
 commitment:
 
-* `commit = "h:" + base32(H(salt ++ canonical(payload)))`
-* `id = "r:" + base32(H(canonical({"commit": commit, "env": env})))`
+* `commit = "h:" + base32hex(H(salt ++ canonical(payload)))`
+* `id = "r:" + base32hex(H(canonical({"commit": commit, "env": env})))`
 * a signature is Ed25519 over `"loops/record/v1:" + id`, kept beside the record
 
 Erasing a record forgets the opening (salt and payload) and keeps the
@@ -106,9 +106,9 @@ structure Written where
 
 def Written.stored (w : Written) : Stored := make w.env w.salt w.payload
 
-/-- Every code `writeProblem` can give, in the order it checks them. -/
+/-- Writer refusal order. The raw decoder checks envelope keys before typed writing. -/
 def writeCodes : List String :=
-  ["kind-empty", "observer-not-typed", "emitted-not-rfc3339", "occurred-not-span",
+  ["envelope-field-unknown", "kind-empty", "observer-not-typed", "emitted-not-rfc3339", "occurred-not-span",
     "about-not-typed", "prev-not-record-id", "under-not-record-id", "erases-not-record-id",
     "salt-not-16-bytes", "member-duplicate", "number-out-of-range"]
 

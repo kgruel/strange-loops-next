@@ -56,6 +56,15 @@
    "states":
    "∀ {c d : Char} {r s : List Nat}, Loops.utf16Char c ++ r = Loops.utf16Char d ++ s → c = d ∧ r = s",
    "module": "Laws.Record"},
+  "Loops.unbase32_eq_some_iff":
+  {"uses": ["Loops.unbase32_base32"],
+   "states":
+   "∀ (s : String) (bs : List UInt8), Loops.unbase32 s = some bs ↔ Loops.base32 bs = s",
+   "module": "Laws.Base32"},
+  "Loops.unbase32_base32":
+  {"uses": [],
+   "states": "∀ (bs : List UInt8), Loops.unbase32 (Loops.base32 bs) = some bs",
+   "module": "Laws.Base32"},
   "Loops.things_view":
   {"uses":
    ["Loops.SameEnvelope.about", "Loops.SameEnvelope.id", "Loops.View.envelope"],
@@ -261,6 +270,31 @@
    "states":
    "∀ (may : Loops.Record → Loops.Record → Bool) (xs : List Loops.Record) (r : Loops.Record), Loops.refusalOf may xs r = none ↔ Loops.entitled may xs r = true",
    "module": "Laws.Things"},
+  "Loops.radixValue_lt_iff":
+  {"uses": ["Loops.radixValue_bound"],
+   "states":
+   "∀ {r : Nat}, 0 < r → ∀ {xs ys : List Nat}, xs.length = ys.length → (∀ (x : Nat), x ∈ xs → x < r) → (∀ (y : Nat), y ∈ ys → y < r) → (Loops.radixValue r xs < Loops.radixValue r ys ↔ xs < ys)",
+   "module": "Laws.TextRadix"},
+  "Loops.radixValue_injective":
+  {"uses": ["Loops.radixValue_lt_iff"],
+   "states":
+   "∀ {r : Nat}, 0 < r → ∀ {xs ys : List Nat}, xs.length = ys.length → (∀ (x : Nat), x ∈ xs → x < r) → (∀ (y : Nat), y ∈ ys → y < r) → Loops.radixValue r xs = Loops.radixValue r ys → xs = ys",
+   "module": "Laws.TextRadix"},
+  "Loops.radixValue_fold":
+  {"uses": [],
+   "states":
+   "∀ (r : Nat) (xs : List Nat) (a : Nat), List.foldl (fun n d => r * n + d) a xs = a * r ^ xs.length + Loops.radixValue r xs",
+   "module": "Laws.TextRadix"},
+  "Loops.radixValue_bound":
+  {"uses": [],
+   "states":
+   "∀ {r : Nat}, 0 < r → ∀ {xs : List Nat}, (∀ (x : Nat), x ∈ xs → x < r) → Loops.radixValue r xs < r ^ xs.length",
+   "module": "Laws.TextRadix"},
+  "Loops.radixValue.eq_def":
+  {"uses": [],
+   "states":
+   "∀ (r : Nat) (x : List Nat), Loops.radixValue r x = match x with | [] => 0 | x :: xs => x * r ^ xs.length + Loops.radixValue r xs",
+   "module": "Laws.TextRadix"},
   "Loops.qualifier_not_slash":
   {"uses": [],
    "states": "∀ {q : Char}, Loops.isQualifier q = true → q ≠ '/'",
@@ -669,6 +703,16 @@
    "states":
    "∀ {kvs : List (String × Loops.Json)} {k : String} {v : Loops.Json}, (Loops.Json.obj kvs).keysDistinct = true → List.lookup k kvs = some v → v.keysDistinct = true",
    "module": "Laws.Parse"},
+  "Loops.lex_flatMap_fixed":
+  {"uses": ["Loops.lex_append_equal_width"],
+   "states":
+   "∀ {α β : Type} [inst : LT α] [inst_1 : LT β] [Std.Irrefl fun x1 x2 => x1 < x2] (f : α → List β) (w : Nat), 0 < w → (∀ (a : α), (f a).length = w) → (∀ (a b : α), f a = f b ↔ a = b) → (∀ (a b : α), f a < f b ↔ a < b) → ∀ (xs ys : List α), List.flatMap f xs < List.flatMap f ys ↔ xs < ys",
+   "module": "Laws.TextRadix"},
+  "Loops.lex_append_equal_width":
+  {"uses": [],
+   "states":
+   "∀ {α : Type} [inst : LT α] [Std.Irrefl fun x1 x2 => x1 < x2] {a b c d : List α}, a.length = b.length → (a ++ c < b ++ d ↔ a < b ∨ a = b ∧ c < d)",
+   "module": "Laws.TextRadix"},
   "Loops.lexLt_trans":
   {"uses": [],
    "states":
@@ -722,11 +766,35 @@
    "states":
    "∀ {f : Loops.Record → Loops.Record}, Loops.View f → ∀ (r : Loops.Record) (t : String), (f r).isAbout t = r.isAbout t",
    "module": "Laws.Things"},
+  "Loops.instant_parse_render":
+  {"uses": ["Loops.instantParts_render"],
+   "states":
+   "∀ {s : String} {t : Loops.Instant}, Loops.instantParts? s.toList = some t → t.text = s",
+   "module": "Laws.Instant"},
+  "Loops.instant_moment_unique":
+  {"uses": ["Loops.instant_calendar_injective", "Loops.instant_parse_render"],
+   "states":
+   "∀ {a b : String} {m : Loops.Moment}, Loops.instant? a.toList = some m → Loops.instant? b.toList = some m → a = b",
+   "module": "Laws.Instant"},
   "Loops.instant_canonical":
   {"uses": ["Loops.stripped_of_digits", "Loops.tail_digits"],
    "states":
    "∀ {cs : List Char} {m : Loops.Moment}, Loops.instant? cs = some m → m.Canonical",
    "module": "Laws.Time"},
+  "Loops.instant_calendar_injective":
+  {"uses": ["Loops.dayNumber_year_lt"],
+   "states":
+   "∀ {y m d y' m' d' : Nat}, 1 ≤ m ∧ m ≤ 12 → 1 ≤ d ∧ d ≤ Loops.daysIn y m → 1 ≤ m' ∧ m' ≤ 12 → 1 ≤ d' ∧ d' ≤ Loops.daysIn y' m' → Loops.dayNumber y m d = Loops.dayNumber y' m' d' → y = y' ∧ m = m' ∧ d = d'",
+   "module": "Laws.InstantCalendar"},
+  "Loops.instantParts_render":
+  {"uses":
+   ["Loops.digit_lt",
+    "Loops.radixValue_bound",
+    "Loops.radixValue_fold",
+    "Loops.takeWhile_digit"],
+   "states":
+   "∀ {cs : List Char} {t : Loops.Instant}, Loops.instantParts? cs = some t → t.text.toList = cs",
+   "module": "Laws.Instant"},
   "Loops.insertRec.eq_def":
   {"uses": [],
    "states":
@@ -772,6 +840,18 @@
    "states":
    "∀ (a b : Loops.RecordId), Loops.idDigest a < Loops.idDigest b ↔ a < b",
    "module": "Laws.Order"},
+  "Loops.idText_order":
+  {"uses":
+   ["Loops.base32_lt_iff",
+    "Loops.idDigest_byte",
+    "Loops.idDigest_length",
+    "Loops.idDigest_roundtrip",
+    "Loops.lex_append_equal_width",
+    "Loops.radixValue_fold",
+    "Loops.radixValue_lt_iff"],
+   "states":
+   "∀ (a b : Loops.RecordId), Loops.idText a < Loops.idText b ↔ a < b",
+   "module": "Laws.IdText"},
   "Loops.idText_injective":
   {"uses": ["Loops.base32_injective", "Loops.idDigest_bytes_roundtrip"],
    "states":
@@ -933,6 +1013,11 @@
    "states":
    "∀ (x : List Loops.Record), Loops.dedup x = match x with | [] => [] | r :: rs => if (rs.any fun x => x.id == r.id) = true then Loops.dedup rs else r :: Loops.dedup rs",
    "module": "Laws.Families"},
+  "Loops.decimalChars.eq_def":
+  {"uses": [],
+   "states":
+   "∀ (x x_1 : Nat), Loops.decimalChars x x_1 = match x, x_1 with | 0, x => [] | k.succ, n => Char.ofNat (48 + n / 10 ^ k) :: Loops.decimalChars k (n % 10 ^ k)",
+   "module": "Laws.Instant"},
   "Loops.daysIn_pos":
   {"uses": [],
    "states": "∀ (y m : Nat), 0 < Loops.daysIn y m",
@@ -1030,6 +1115,16 @@
    "states":
    "∀ (bs : List UInt8), bs.length = 32 → List.foldl (fun a b => 256 * a + b.toNat) 0 bs < 256 ^ 32",
    "module": "Loops.Id"},
+  "Loops.byteText_eq_true_iff":
+  {"uses": ["Loops.unbase32_eq_some_iff"],
+   "states":
+   "∀ (n : Nat) (s : String), Loops.byteText n s = true ↔ ∃ bs, bs.length = n ∧ Loops.base32 bs = s",
+   "module": "Laws.Base32"},
+  "Loops.bitsBytes.eq_def":
+  {"uses": [],
+   "states":
+   "∀ (x : Nat) (x_1 : List Bool), Loops.bitsBytes x x_1 = match x, x_1 with | 0, x => [] | n.succ, bs => (List.foldl (fun n b => 2 * n + if b = true then 1 else 0) 0 (List.take 8 bs)).toUInt8 :: Loops.bitsBytes n (List.drop 8 bs)",
+   "module": "Laws.Base32"},
   "Loops.baseForm_mem":
   {"uses": ["Loops.SameEnvelope.refl", "Loops.withhold_envelope"],
    "states":
@@ -1040,6 +1135,16 @@
    "states":
    "∀ {F G : List Loops.Record} {i : Loops.RecordId}, Loops.Forms F → (∀ (a : Loops.Record), a ∈ F → a.id = i) → (∀ (r : Loops.Record), r ∈ F ↔ r ∈ G) → Loops.baseForm F = Loops.baseForm G",
    "module": "Laws.Things"},
+  "Loops.base32_lt_iff":
+  {"uses":
+   ["Loops.lex_append_equal_width",
+    "Loops.lex_flatMap_fixed",
+    "Loops.radixValue_bound",
+    "Loops.radixValue_fold",
+    "Loops.radixValue_lt_iff"],
+   "states":
+   "∀ {as bs : List UInt8}, as.length = bs.length → (Loops.base32 as < Loops.base32 bs ↔ as < bs)",
+   "module": "Laws.Base32"},
   "Loops.base32_injective":
   {"uses": [],
    "states": "∀ (a b : List UInt8), Loops.base32 a = Loops.base32 b → a = b",
@@ -2599,6 +2704,21 @@
    "states":
    "∀ {s s_1 : Loops.Span}, Loops.Item.time s = Loops.Item.time s_1 → s = s_1",
    "module": "Loops.Spec"},
+  "Loops.Instant.mk.sizeOf_spec":
+  {"uses": [],
+   "states":
+   "∀ (year month day hour minute second : Nat) (fraction : List Int), sizeOf { year := year, month := month, day := day, hour := hour, minute := minute, second := second, fraction := fraction } = 1 + sizeOf year + sizeOf month + sizeOf day + sizeOf hour + sizeOf minute + sizeOf second + sizeOf fraction",
+   "module": "Loops.Time"},
+  "Loops.Instant.mk.injEq":
+  {"uses": ["Loops.Instant.mk.inj"],
+   "states":
+   "∀ (year month day hour minute second : Nat) (fraction : List Int) (year_1 month_1 day_1 hour_1 minute_1 second_1 : Nat) (fraction_1 : List Int), ({ year := year, month := month, day := day, hour := hour, minute := minute, second := second, fraction := fraction } = { year := year_1, month := month_1, day := day_1, hour := hour_1, minute := minute_1, second := second_1, fraction := fraction_1 }) = (year = year_1 ∧ month = month_1 ∧ day = day_1 ∧ hour = hour_1 ∧ minute = minute_1 ∧ second = second_1 ∧ fraction = fraction_1)",
+   "module": "Loops.Time"},
+  "Loops.Instant.mk.inj":
+  {"uses": [],
+   "states":
+   "∀ {year month day hour minute second : Nat} {fraction : List Int} {year_1 month_1 day_1 hour_1 minute_1 second_1 : Nat} {fraction_1 : List Int}, { year := year, month := month, day := day, hour := hour, minute := minute, second := second, fraction := fraction } = { year := year_1, month := month_1, day := day_1, hour := hour_1, minute := minute_1, second := second_1, fraction := fraction_1 } → year = year_1 ∧ month = month_1 ∧ day = day_1 ∧ hour = hour_1 ∧ minute = minute_1 ∧ second = second_1 ∧ fraction = fraction_1",
+   "module": "Loops.Time"},
   "Loops.FoldType.sum.sizeOf_spec":
   {"uses": [],
    "states":

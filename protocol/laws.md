@@ -11,6 +11,15 @@ JS and Rust check all fixture families, including those standards.
 |---|---|---|---|
 | `id.digest` | `idDigest_length`, `idDigest_byte`, `idDigest_roundtrip`, `idDigest_bytes_roundtrip`, `idText_injective`, `bytes_bounded`, `bytes_idDigest`, `idOf_eq_idText`, `Gen.sha256_length`, `Gen.sha256_bounded`, `Gen.sha256_idOf_eq_idText`, `Gen.Read.recordId_bounded` | An id's digest has exactly 32 bytes. Reading these bytes gives the same id. Two ids have the same text only when they are equal. Reading any 32 bytes gives an id below 2^256. Writing that id back gives the same 32 bytes. | (proved) |
 
+## Canonical byte and instant text (`model/Laws/Base32.lean`, `model/Laws/IdText.lean`, `model/Laws/Instant.lean`)
+
+| Law | Theorem | Says | Vectors |
+|---|---|---|---|
+| `base32.canonical` | `base32_injective`, `unbase32_base32`, `unbase32_eq_some_iff`, `byteText_eq_true_iff` | The decoder accepts exactly the encoder image and recovers its bytes. The fixed-width reader also requires the stated byte count. No hash premise is needed. | `byte-text/*` |
+| `id.text-order` | `idText_order` | Actual String lexical order on id text equals numeric order. Both inputs have type RecordId, which bounds them below 2^256. | `byte-text/id-32`, runtime id-order pins |
+| `instant.unique` | `instant_moment_unique` | If the actual instant reader accepts both Strings with the same moment, those Strings are equal. | `occurred/04`, `record/r4-emitted-0`, `record/r4-emitted-2`, `record/r4-emitted-5`, `record/r4-offset-0` |
+| `instant.round-trip` | `instantParts_render`, `instant_parse_render` | If the actual instant parser returns numeric fields, rendering those fields recovers the original text. | `occurred/04`, runtime parse/render pins |
+
 The model keeps every record id and reference below 2^256.
 The id reader returns only ids below 2^256.
 
@@ -215,7 +224,7 @@ Refused variants must give the same code. What isn't proved yet is that `resolve
 | `record.sets` | `id_sets`, `canonSet_eq` | reordering or repeating `about`, `prev` or `erases` never changes the id | `record/02`, `03`, `11` |
 | `record.member-order` | `canon_member_order` | reordering an object's members never changes its canonical bytes | `record/04` |
 | UTF-16 order | `lexLt_trans`, `lexLt_total`, `utf16_inj` | member and set order is a strict total order on distinct strings | every record vector |
-| `record.refuse` | (by construction) | A bad envelope, wrong salt length, repeated member, nonfinite number or any number outside ±(2^53 − 1) is refused with a stated reason. | `record/20`–`34` |
+| `record.refuse` | (by construction) | Bad envelopes, salt lengths, repeated members, nonfinite and out-of-range numbers receive named refusals. Raw unknown envelope keys refuse before `kind-empty`. | `record/20`–`34`, `record/r6-unknown-field`, `record/r6-unknown-before-kind` |
 | `write.checked` | `writeProblem_none`, `Written` | `write` succeeds exactly when every check passes, and what it returns carries the proof; a batch writes through it | `record/*`, `batch/15`, `17` |
 | `write.member-order` | `Written.commit_member_order` | a written payload's commitment doesn't depend on the order of its members: `write` established the distinct names `record.member-order` needs | `record/04` |
 
@@ -225,7 +234,7 @@ Refused variants must give the same code. What isn't proved yet is that `resolve
 |---|---|---|---|
 | `occurred.span` | `occurred_point`, `occurred_open`, `occurred_interval`, `point_le` | Each accepted point gives its grammar-defined span, alone, with `..`, or paired with a point starting no earlier. A span never ends before its start. | `occurred/01`–`06` |
 | `occurred.qualifier` | `occurred_qualified`, `occurred_qualified_start`, `occurred_qualified_end` | a qualifier never changes a span, on a date alone or on either end of an interval | `occurred/03`, `05` |
-| `occurred.moment` | `instant_canonical`, `point_canonical`, `moment_lt_iff_scaled`, `stripZeros_replicate_zero` | A parsed moment has whole seconds and digits without trailing zeros. List comparison equals exact decimal comparison. Trailing zeros never change a moment. | `occurred/04` |
+| `occurred.moment` | `instant_canonical`, `point_canonical`, `moment_lt_iff_scaled` | A parsed moment has whole seconds and digits without trailing zeros. For stripped fractions and a scale covering both, list comparison equals exact decimal comparison. | `occurred/04` |
 | `occurred.order` | `Span.before_irrefl`, `Span.before_trans`, `Span.before_total` | Spans have strict total order by start, then end, with an open end last. Stores using that order agree. | `occurred/08` |
 | `occurred.refuse` | (by construction) | a text the reader doesn't accept is refused with `occurred-not-span`, never guessed at | `occurred/07`, `record/34` |
 

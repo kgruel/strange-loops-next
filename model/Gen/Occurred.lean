@@ -33,8 +33,7 @@ def pad (w n : Nat) : String :=
 /-- A year as ISO 8601 writes one, with a sign before year 0 and five digits past 9999. -/
 def year (y : Int) : String := if y < 0 then "-" ++ pad 4 (-y).toNat else pad 4 y.toNat
 
-/-- A moment in UTC, as RFC 3339 writes it. An offset can carry an instant in
-year 0000 or 9999 just past the calendar's ends, so years are signed. -/
+/-- A moment in UTC. Date-span ends may use year 10000. -/
 def utc : Moment → Except String String
   | [] => throw "empty moment"
   | s :: frac => do
@@ -69,13 +68,11 @@ def cases : List Case := [
     texts := ["201X", "20XX", "2004-XX", "1985-04-XX", "1985-XX-XX", "99XX"] },
   { name := "03-qualifiers", laws := ["occurred.span", "occurred.qualifier"],
     texts := ["2009", "2009?", "2009~", "2009%", "2004-06-11?", "201X~"] },
-  { name := "04-instants", laws := ["occurred.span", "occurred.moment"],
-    texts := ["2026-10-17T09:14:03Z", "2026-10-17T04:14:03-05:00", "2026-10-17T23:30:00-01:00",
-      "2026-10-17T09:14:03.250Z", "2026-10-17T09:14:03.25Z", "2026-10-17T09:14:03.000Z",
-      "2016-12-31T23:59:60Z", "2026-10-17T12:34:60.5Z", "1969-12-31T23:59:59.5Z",
-      "2026-10-17T09:14:03.0000000001Z",
-      -- written in year 0000 or 9999, but in UTC just outside it
-      "0000-01-01T00:00:00+01:00", "9999-12-31T23:30:00-01:00"] },
+  { name := "04-instants", laws := ["occurred.span", "occurred.moment", "instant.unique", "instant.round-trip"],
+    texts := ["2026-10-17T09:14:03Z", "2026-10-17T23:30:00Z",
+      "2026-10-17T09:14:03.25Z", "2026-10-17T09:14:03.000000001Z",
+      "2016-12-31T23:59:59Z", "2026-10-17T12:34:59.5Z", "1969-12-31T23:59:59.5Z",
+      "0000-01-01T00:00:00Z", "9999-12-31T23:59:59Z"] },
   { name := "05-intervals", laws := ["occurred.span", "occurred.qualifier"],
     texts := ["2009-07/2011-03", "2026-10-17T09:14:03Z/2026-10-17T09:18:13Z",
       "2026-10-17/2026-10-17T12:00:00Z", "2004-06~/2004-09?", "2009/2009",
@@ -84,7 +81,7 @@ def cases : List Case := [
     texts := ["2019/..", "2026-10-17T09:14:03Z/..", "201X/.."] },
   { name := "07-refused", laws := ["occurred.refuse"], accepted := false,
     texts := [
-      -- durations, and times without seconds or an offset
+      -- Durations, missing seconds, and a missing UTC marker.
       "2026-10-17T09:14/PT4M", "2026-10-17T09:14:03Z/PT4M10S", "2026-10-17T09:14Z",
       "2026-10-17T09:14:03", "2026-10-17t09:14:03z",
       -- seasons, open and unknown starts, unknown ends
@@ -97,7 +94,12 @@ def cases : List Case := [
       "2009-13", "2009-00", "2009-02-29", "2009-7",
       -- ends in the wrong order, a qualified instant, two qualifiers
       "2010/2009", "2026-10-17T09:14:04Z/2026-10-17T09:14:03Z", "2026-10-17T09:14:03Z~", "2009~?",
-      ""] }
+      ""] },
+  { name := "r4-canonical-refusals", laws := ["occurred.refuse"], accepted := false,
+    texts := ["2026-10-17T09:14:03+00:00", "2026-10-17T09:14:03-00:00",
+      "2026-10-17T09:14:60Z", "2016-12-31T23:59:60Z", "2026-10-17T09:14:03.50Z",
+      "2026-10-17T09:14:03.0Z", "2026-10-17T09:14:03.500Z", "2026-10-17T09:14:03.1234567891Z"].flatMap fun s =>
+        [s, s ++ "/2027", "2026/" ++ s, s ++ "/.."] }
 ]
 
 def caseVector (c : Case) : Except String J := do
@@ -112,7 +114,7 @@ def caseVector (c : Case) : Except String J := do
 def orderTexts : List String := [
   "2026-10-17T09:14:03Z/..", "2009", "2026-10-17", "2026-10-17T09:14:03Z", "2009-01",
   "2026-10-17T09:14:03Z/2026-10-17T09:18:13Z", "2009/..", "1985-04-XX", "2026-10-17T09:14:03.5Z",
-  "2026-10-16T23:00:00-05:00", "201X"]
+  "2026-10-17T04:00:00Z", "201X"]
 
 def insert (x : String × Span) : List (String × Span) → List (String × Span)
   | [] => [x]
@@ -136,8 +138,8 @@ def selfCheck : Except String Unit := do
     match instant? s.toList with
     | some m => if (← utc m) != s then throw s!"self-check failed: {s} renders as {← utc m}"
     | none => throw s!"self-check failed: {s} refused"
-  for (m, want) in [([dayNumber 0 1 1 * 86400 - 3600], "-0001-12-31T23:00:00Z"),
-      ([dayNumber 10000 1 1 * 86400 + 1800], "10000-01-01T00:30:00Z")] do
+  -- The year-9999 date span ends at year 10000, outside the instant grammar.
+  for (m, want) in [([dayNumber 10000 1 1 * 86400], "10000-01-01T00:00:00Z")] do
     if (← utc m) != want then throw s!"self-check failed: {m} renders as {← utc m}, not {want}"
   for (y, m, d, n) in [(1970, 1, 1, 0), (2000, 3, 1, 11017), (1900, 1, 1, -25567), (0, 1, 1, -719528)] do
     if dayNumber y m d != n then throw s!"self-check failed: day {y}-{m}-{d} is {dayNumber y m d}, not {n}"

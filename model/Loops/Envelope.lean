@@ -1,4 +1,5 @@
 import Loops.Json
+import Loops.Base32
 import Loops.Occurred
 
 /-!
@@ -45,13 +46,18 @@ def typedRef (s : String) : Bool :=
   | (p :: ps, ':' :: _ :: _) => p.isLower && ps.all (fun c => isLowerAlnum c || c == '-')
   | _ => false
 
-/-- A record id: `r:` and 52 base32 characters (a SHA-256 digest). -/
+/-- A record id: `r:` and canonical base32hex for exactly 32 bytes. -/
 def recordId (s : String) : Bool :=
   match s.toList with
-  | 'r' :: ':' :: rest => rest.length == 52 && rest.all fun c => c.isLower || ('2' ≤ c && c ≤ '7')
+  | 'r' :: ':' :: rest => byteText 32 (String.ofList rest)
   | _ => false
 
-/-- Why an envelope is refused, if it is. -/
+/-- Check raw envelope keys before decoding values. Typed `Env` has no unknown fields. -/
+def envelopeKeysProblem (kvs : List (String × Json)) : Option String :=
+  if kvs.all (fun (k, _) => ["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"].contains k)
+  then none else some "envelope-field-unknown"
+
+/-- Why a typed envelope is refused, if it is. -/
 def Env.problem (e : Env) : Option String :=
   if e.kind.isEmpty then some "kind-empty"
   else if !typedRef e.observer then some "observer-not-typed"

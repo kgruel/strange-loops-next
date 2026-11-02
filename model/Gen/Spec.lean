@@ -65,7 +65,7 @@ def parseCases : List (String × Json) := [
       ("env.under", o [("absent", .bool true)]),
       ("env.erases", o [("absent", .bool true)]),
       ("env.emitted", o [("at-least", s "2026-10-01T00:00:00Z")]),
-      ("env.occurred", o [("at-least", s "2026-10"), ("below", s "2026-11-01T01:00:00+01:00"),
+      ("env.occurred", o [("at-least", s "2026-10"), ("below", s "2026-11-01T00:00:00Z"),
         ("not", s "2026-10-01/2026-10-31")])])])])]),
   ("05-no-fold", o [("vertex", s "x"), ("from", a [o [("store", s ".")]])]),
   ("06-from-about-anchor", fromOf (o [("about", s (idText (fixtureId 0x71))), ("store", s "."), ("kind", a [s "note"])])),
@@ -219,7 +219,7 @@ def timeSpec : Json := o [("vertex", s "events"),
       ("where", o [("env.occurred", o [("below", s "2026-10-01T00:05:00Z")])])]),
     ("undated", o [("collect", .bool true), ("where", o [("env.occurred", o [("absent", .bool true)])])]),
     ("emitted-late", o [("collect", .bool true),
-      ("where", o [("env.emitted", o [("at-least", s "2026-10-01T01:03:00+01:00")])])])])]
+      ("where", o [("env.emitted", o [("at-least", s "2026-10-01T00:03:00Z")])])])])]
 
 -- numeric bounds and complements on a payload field
 def boundSpec : Json := o [("vertex", s "estimates"),
@@ -264,7 +264,7 @@ def envSpec : Json := o [("vertex", s "envelopes"),
     ("emitted-since", o [("collect", .bool true),
       ("where", o [("env.emitted", o [("at-least", s "2026-10-01T00:04:00Z")])])]),
     ("emitted-is", o [("count", .bool true),
-      ("where", o [("env.emitted", o [("is", s "2026-10-01T01:01:40+01:00")])])]),
+      ("where", o [("env.emitted", o [("is", s "2026-10-01T00:01:40Z")])])]),
     ("alice-current", o [("latest-by", s "about"), ("follow", s "prev"),
       ("where", o [("env.observer", o [("is", s "sl:alice")])])]),
     ("alice-heads", o [("collect", .bool true), ("follow", s "prev"),

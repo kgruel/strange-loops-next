@@ -1,4 +1,5 @@
 import Loops.Occurred
+import Loops.Time
 
 /-!
 # Laws of time
@@ -13,7 +14,7 @@ import Loops.Occurred
   either end of an interval.
 * **Moments.** Every moment the reader makes is whole seconds, then digits
   0 to 9 that don't end in zero. Comparing two such moments as lists is
-  comparing them as exact decimals, and trailing zeros never change one.
+  comparing them as exact decimals. Accepted fractions already have one spelling.
 * **Span order.** `Span.Before` is a strict total order: no span comes before
   itself, it is transitive, and of two different spans one comes first. Every
   store orders `occurred` the same way.
@@ -276,9 +277,9 @@ theorem stripped_of_digits {ds : List Int} (h : ∀ d ∈ ds, 0 ≤ d ∧ d < 10
 
 /-- Every instant the reader accepts is a canonical moment. -/
 theorem instant_canonical {cs : List Char} {m : Moment} (h : instant? cs = some m) : m.Canonical := by
-  unfold instant? at h
+  unfold instant? instantParts? at h
   repeat' split at h
-  all_goals simp at h
+  all_goals simp [Instant.moment] at h
   rename_i ht _
   subst h
   exact ⟨_, _, rfl, stripped_of_digits (tail_digits ht)⟩

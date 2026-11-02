@@ -8,6 +8,7 @@ import Laws.Parse
 import Laws.Batch
 import Laws.Write
 import Laws.Time
+import Laws.Instant
 import Laws.Order
 import Laws.IdText
 import Laws.IdSource
