@@ -41,17 +41,6 @@
   </div>
   <h3>Build</h3>
   <div class="q">
-    <details class="unfold"><summary>Step 1's choices, carried into the Rust port <span class="pill p-next">please check</span></summary><div class="body">
-      <p>Step 1 needed decisions the page only leaned on. The port keeps them unless you change them; each is cheap to change until records exist.</p>
-      <ul>
-        <li><b>One text encoding for bytes:</b> lower-case base32 without padding, for ids, commitments, salts, keys and signatures. Salts are 16 bytes; a key is <code>k:</code> plus base32 of the public key.</li>
-        <li><b>The id's preimage</b> is the canonical object <code>{"commit", "env"}</code>, not a byte concatenation.</li>
-        <li><b>Signed bytes:</b> <code>"loops/record/v1:" + id</code>; the version in that prefix is how a reader refuses only what is newer than it knows.</li>
-        <li><b><code>emitted</code> is strict RFC 3339:</b> upper-case <code>T</code> and <code>Z</code>, a real calendar day, a leap second allowed. <code>occurred</code> is a span with a closed grammar (see Record).</li>
-        <li><b>Typed references</b> are <code>prefix:value</code> with a lower-case prefix; sets sort by UTF-16 code units.</li>
-        <li><b>Unknown envelope fields are refused</b> when reading, rather than silently left out of the id.</li>
-      </ul>
-    </div></details>
     <details class="unfold"><summary>The crate's name</summary><div class="body"><p>The workspace uses <code>loops</code> internally. Its published crate name remains open and can differ.</p></div></details>
     <details class="unfold"><summary>Schema field names</summary><div class="body"><p>The JSON examples here are proposed grammar, not accepted inputs. <code>protocol/spec.md</code> defines the implemented spec format. No JSON Schema files or <code>schema.md</code> exist. Names for future declarations, places and boundaries remain open.</p></div></details>
     <details class="unfold"><summary>What a numeric fold reads <span class="pill p-done">settled</span></summary><div class="body"><p>The reader reads RFC 8259 numbers as binary64 values. Sum, min, and max accept only safe whole values. Thus <code>1.0</code> counts, but <code>1.5</code> counts as unread. Sum uses an exact integer accumulator. The protocol does not define fixed-scale decimal strings.</p></div></details>

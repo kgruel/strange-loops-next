@@ -63,7 +63,7 @@
         <tr><td>Ids</td><td>standard; any tool verifies</td><td>a custom format to split</td></tr>
         <tr><td>References</td><td>opaque</td><td>every reference says when its target was written</td></tr>
         <tr><td>Across realms</td><td>"references cross, content doesn't" holds exactly</td><td>a shared id leaks when you wrote it</td></tr>
-        <tr><td>Time</td><td>RFC 3339, any precision, with the writer's offset</td><td>fixed precision, UTC</td></tr>
+        <tr><td>Time</td><td>canonical UTC instant, with at most nine fractional digits</td><td>fixed precision, UTC</td></tr>
         <tr><td>Sorting</td><td>ids don't sort by time</td><td>chronological files, index locality</td></tr>
       </tbody>
     </table></div>

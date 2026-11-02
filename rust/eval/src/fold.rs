@@ -218,7 +218,7 @@ mod tests {
         );
         assert!(
             record("r", &parse(&bad_id)).is_err(),
-            "reject nonzero base32 padding"
+            "reject nonzero base32hex padding"
         );
     }
 

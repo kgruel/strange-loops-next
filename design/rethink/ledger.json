@@ -24,6 +24,48 @@
     "kind": "decision",
     "group": "Layer 0 · the record",
     "status": "settled",
+    "claim": "R1: Byte text uses canonical lower-case unpadded base32hex.",
+    "why": "The alphabet follows ASCII order. Canonical id text and digest bytes have the same order. Readers refuse wrong lengths and nonzero pad bits."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "R2: The id preimage is the JCS object containing commit and env.",
+    "why": "The object defines the preimage. It is not a byte concatenation."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "R3: Signed bytes are the version prefix followed by the id text in UTF-8.",
+    "why": "The prefix is <code>loops/record/v1:</code>. It separates the signed record id from other messages."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "R4: Each instant has one canonical UTC spelling.",
+    "why": "The writer uses Z and seconds 00 through 59. An optional fraction has 1 to 9 digits and ends in a nonzero digit. Date precision remains part of the claim."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "R5: Typed references use a lower-case prefix, and sets sort by UTF-16 code units.",
+    "why": "References use <code>prefix:value</code>. Set normalization also removes repeats and omits empty sets."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
+    "claim": "R6: Unknown envelope fields receive a named refusal first.",
+    "why": "The reader checks keys before values. It returns <code>envelope-field-unknown</code> before <code>kind-empty</code>. Variation belongs in the payload."
+  },
+  {
+    "kind": "decision",
+    "group": "Layer 0 · the record",
+    "status": "settled",
     "claim": "A store is a set, not a sequence.",
     "why": "Receipt order leaves the fold. Underneath: immutable single-writer segments, content-addressed blobs, a derived index."
   },
@@ -39,7 +81,7 @@
     "group": "Layer 0 · the record",
     "status": "settled",
     "claim": "<code>occurred</code> is a span with a closed grammar: dates, instants and intervals, never a duration.",
-    "why": "Each <code>occurred</code> value names one span. Content order reads that span; future windows use its start. Calendar dates are UTC days. EDTF Level 1 qualifiers (<code>2009~</code>) and trailing unspecified digits (<code>201X</code>) retain one span. Qualifiers never change it. Intervals join two points and may have an open end (<code>2019/..</code>). Spans order by start, then end, with open ends last. Content order compares span, <code>emitted</code>, then id digest bytes, never spellings. Without <code>occurred</code>, a record has its <code>emitted</code> instant span. Base32 text order differs from digest-byte order. Durations repeat what an end instant says. Seasons, open or unknown starts, unknown ends and years past 9999 fail with <code>occurred-not-span</code>. Accepting less would invalidate stored records. Version 35."
+    "why": "Each <code>occurred</code> value names one span. Content order reads that span; future windows use its start. Calendar dates are UTC days. EDTF Level 1 qualifiers (<code>2009~</code>) and trailing unspecified digits (<code>201X</code>) retain one span. Qualifiers never change it. Intervals join two points and may have an open end (<code>2019/..</code>). Spans order by start, then end, with open ends last. Content order compares span, <code>emitted</code>, then id digest bytes, never spellings. Without <code>occurred</code>, a record has its <code>emitted</code> instant span. Canonical base32hex id text has the same order as digest bytes. Durations repeat what an end instant says. Seasons, open or unknown starts, unknown ends and years past 9999 fail with <code>occurred-not-span</code>. Accepting less would invalidate stored records. Version 35."
   },
   {
     "kind": "decision",

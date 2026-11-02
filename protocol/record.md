@@ -11,7 +11,7 @@ vectors in `vectors/record/`.
 |---|---|---|
 | `kind` | yes | a label, non-empty |
 | `observer` | yes | a typed reference (`prefix:value`), usually a lineage id `sl:…` |
-| `emitted` | yes | the observer's now: RFC 3339 with an offset |
+| `emitted` | yes | the observer's now: a canonical UTC instant |
 | `occurred` | no | the claimed past: a span, below |
 | `about` | no | a set of typed references |
 | `prev` | no | a set of record ids this one replaces |
@@ -21,10 +21,12 @@ vectors in `vectors/record/`.
 * A **typed reference** is `prefix:value`.
   The prefix starts with a lower-case letter and holds lower-case letters, digits and hyphens.
   The value is not empty.
-* A **record id** is `r:` and 52 base32 characters.
-* **`emitted`** is `YYYY-MM-DDTHH:MM:SS`, an optional fraction, then `Z` or
-  `±HH:MM`. Use upper-case `T` and `Z` and a real calendar day.
-  Hours go to 23, minutes to 59, seconds to 60 on any minute, and offsets to `23:59`. The fraction is `.` and one or more digits, of any length.
+* A **record id** is `r:` and 52 canonical base32hex characters.
+* **`emitted`** is `YYYY-MM-DDTHH:MM:SS`, an optional fraction, then `Z`.
+  Use upper-case `T` and `Z`, a real calendar day, and a year from 0000 to 9999.
+  Hours range from 00 to 23, and minutes and seconds from 00 to 59.
+  A fraction is `.` followed by 1 to 9 digits, with a nonzero last digit.
+  Numeric offsets are refused. A writer can put its local offset in the payload.
 * **`occurred`** is a span of time. Its grammar is below.
 * **Sets** (`about`, `prev`, `erases`) have one canonical form: sorted by UTF-16 code
   units, repeats removed, and left out when empty.
@@ -32,7 +34,7 @@ vectors in `vectors/record/`.
 The envelope reader refuses fields outside this table.
 Fields the core does not read belong in the payload; otherwise the id would silently omit them.
 
-The envelope reader uses these refusal codes: `kind-empty`,
+The envelope reader uses these refusal codes: `envelope-field-unknown`, `kind-empty`,
 `observer-not-typed`, `emitted-not-rfc3339`, `occurred-not-span`,
 `about-not-typed`, `prev-not-record-id`, `under-not-record-id`,
 `erases-not-record-id`.
@@ -45,7 +47,8 @@ This rule does not establish signature validity or authority.
 A lone erased form settles as withheld unless a held record names its id in `erases`.
 The reader keeps its envelope and does not restore its payload.
 Write settled, refused, and admitted record arrays in ascending id order.
-Compare ids by unsigned digest bytes, first byte first, not by id text.
+Compare ids by unsigned digest bytes, first byte first.
+Canonical id text has the same order as digest bytes (law `id.text-order`).
 This array order does not change head content order.
 
 Any record may erase, whatever its kind.
@@ -82,21 +85,18 @@ possibly coarse. It is one of:
   the span. Instants take no qualifier.
 * In `a/b`, `b` may not start before `a` does. The span ends where `b` ends, even when that is before `a` ends.
   `2009/2009-06` runs from the start of 2009 to the end of June 2009.
-* The text is kept as written, as `emitted` keeps the writer's offset. Two
-  spellings of one span are two different envelopes with two different ids.
+* The text retains the precision and qualifiers of the claim.
+  For example, `2009` and `2009-01/2009-12` are different claims.
 * **Order.** Spans order by start, then end. A span of no length comes before a longer one with the same start.
   A span with no end comes after any with an end. Content order compares a record's span, then its `emitted`, then its id.
-  A record without `occurred` is an instant at its `emitted`. Ids compare as their 32 digest bytes, unsigned, first
-  byte first, not as text: base32's alphabet doesn't sort as ASCII does.
+  A record without `occurred` is an instant at its `emitted`.
+  Ids compare as their 32 unsigned digest bytes, first byte first.
+  Canonical id text has the same order (law `id.text-order`).
   Newest first reverses the whole order, so a later span, then a later
-  `emitted`, then a greater digest comes first. Each compares what it
-  reads as, never how it is spelled.
+  `emitted`, then a greater digest comes first.
 * **Moments.** An instant's moment is its whole seconds in UTC, then its fraction.
-  Comparison is exact at any length; trailing zeros do not count.
-  `.5` and `.500` are the same moment. `:60` on any minute is the first
-  second of the next minute, its fraction kept: `12:34:60.5Z` is
-  `12:35:00.5Z`. An offset can carry an instant written in year 0000 or 9999
-  just outside those years in UTC; it is accepted as written.
+  Compare fractions exactly. Each instant in `occurred` follows the same
+  canonical rules as `emitted`, whether alone or in an interval.
 
 The forms come from ISO 8601 and EDTF Level 1 (ISO 8601-2).
 This page gives the whole grammar.
@@ -138,13 +138,20 @@ Historical ingestion discussions do not override the magnitude cap.
 ## Commitment, id, signature
 
 ```
-commit = "h:" + base32(SHA-256(salt ‖ JCS(payload)))
-id     = "r:" + base32(SHA-256(JCS({"commit": commit, "env": env})))
+commit = "h:" + base32hex(SHA-256(salt ‖ JCS(payload)))
+id     = "r:" + base32hex(SHA-256(JCS({"commit": commit, "env": env})))
 signed = "loops/record/v1:" + id            (UTF-8)
-sig    = { "key": "k:" + base32(public key), "ed25519": base32(Ed25519(signed)) }
+sig    = { "key": "k:" + base32hex(public key), "ed25519": base32hex(Ed25519(signed)) }
 ```
 
-* `base32` is RFC 4648 in lower case without padding.
+* `base32hex` is RFC 4648 section 7 in lower case without `=` padding.
+  Its alphabet is `0123456789abcdefghijklmnopqrstuv`.
+  All byte strings written as text use this encoding, including salts.
+  Readers refuse upper case, characters outside the alphabet, wrong lengths and nonzero final pad bits.
+  A 16-byte value has 26 characters and 2 pad bits.
+  A 32-byte value has 52 characters and 4 pad bits.
+  A 64-byte value has 103 characters and 3 pad bits.
+  A malformed value uses the field's existing refusal code.
 * The **salt** is 16 random bytes; it stops anyone confirming a guess about a
   payload from its commitment.
 * The **payload** is any JSON value.
