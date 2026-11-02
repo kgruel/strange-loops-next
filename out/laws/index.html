@@ -923,7 +923,7 @@ html:not(.js) .unpremise,html:not(.js) .poke{display:none}
       </li>
       <li class="q-law" id="law-batch-refuse-order" data-shape="invariance">
         <p class="q-s">Change <span class="var">the order writing finds its refusals in</span>, and <span class="inv">the refusal reported</span> stays.</p>
-        <p class="law-scope">Proved for writing's refusals; the order across stages (labels, then writing, then <code>prev</code>) is by construction, pinned by vectors.</p>
+        <p class="law-scope">Across the batch: shape, then labels, then writing, then <code>prev-unknown</code>, then <code>prev-unrelated</code>. Raw shape checks all envelope keys before any draft value, label or salt decode. The keys-only theorem permits arbitrary values and member reorderings. Writing's priority is proved from the refusal set. Stage order is by construction, pinned by raw-input rotations.</p>
         <p class="q-f"><span class="q-shape"><span class="mk" aria-hidden="true">=</span>Invariance</span><code>batch.refuse-order</code><span class="q-go"><a href="../evidence/#law-batch-refuse-order">Evidence</a></span></p>
       </li>
       <li class="q-law" id="law-lens-refuse" data-shape="exactness">
@@ -966,7 +966,7 @@ html:not(.js) .unpremise,html:not(.js) .poke{display:none}
       </li>
       <li class="q-law" id="law-id-text-order" data-shape="order">
         <p class="q-s">Actual String lexical order on id text equals numeric digest order.</p>
-        <p class="law-scope">Both inputs have type RecordId. This type bounds each id below 2^256 and gives each digest exactly 32 bytes. The theorem uses the existing String order, not a separate text-order relation.</p>
+        <p class="law-scope">Both inputs have type RecordId. This type bounds each id below 2^256 and gives each digest exactly 32 bytes. The theorem uses Lean's existing String order, not a separate text-order relation. JS UTF-16 order and Rust byte order agree with Lean String order on ASCII; canonical id text is ASCII by construction.</p>
         <p class="q-f"><span class="q-shape"><span class="mk" aria-hidden="true"><</span>Order</span><code>id.text-order</code><span class="q-go"><a href="../evidence/#law-id-text-order">Evidence</a></span></p>
       </li>
       <li class="q-law" id="law-instant-round-trip" data-shape="round-trip">

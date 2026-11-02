@@ -4,15 +4,15 @@
 
 The tree has three implementations: Lean, JavaScript, and Rust.
 Step 1 applies the six settled rulings before records exist.
-The law index has 76 entries, 627 theorems, and six boundary witnesses.
+The law index has 76 entries, 629 theorems, and 6 boundary witnesses.
 See [the law index](design/laws/laws.json) and [proof and boundary data](design/laws/).
 These proofs apply only under their stated premises.
 
-The tree has 315 JSON fixtures: 303 generated fixtures and 12 standard fixtures.
-Lean replays 294 generated fixtures; nine occurred fixtures use separate checks.
-Rust checks all 315 fixtures, six JCS byte pairs, 4,000 binary64 cases, and 128 SUPERCOP signing cases with ed25519-dalek.
-The verified Rust run passes 122 tests; JavaScript passes 5,184 vector checks and 16 regression tests.
-The fuzz suite passes 40 tests.
+The tree has 328 JSON fixtures: 316 generated fixtures and 12 standard fixtures.
+Lean replays 307 generated fixtures; 9 occurred fixtures use separate checks.
+Rust checks every fixture, six JCS byte pairs, 4,000 binary64 cases, and 128 SUPERCOP signing cases with ed25519-dalek.
+Rust passes 125 tests; JavaScript passes 5,322 vector checks and 17 regression tests.
+The fuzz suite passes 43 tests.
 See [vectors](vectors/README.md), [Rust boundaries](rust/GAPS.md), and [the mutation report](model/mutate/REPORT.md).
 These checks provide bounded evidence, not complete JCS or cryptographic correctness.
 They do not certify browser accessibility, external links, or official ASD dictionary compliance.
@@ -23,21 +23,23 @@ The writer accepts values with magnitude at most 2^53 − 1, including fractions
 Numeric folds read safe whole values only.
 Raw constructors and theorem premises retain separate domains.
 
-The Step-1 sequential gate runs pass on Node 22.
-The `step1-1` campaign checks 5,600 cases, 800 per family, in 155.43 seconds.
-It reports 3,768 matches, 813 protocol refusals, 377 shared decoder refusals, and 42 duplicate-base lens mismatches.
+The review-fix sequential gates pass on Node 22.
+The `step1-2` campaign checks 5,600 cases, 800 per family, in 179.98 seconds.
+It reports 4,212 matches, 947 protocol refusals, 397 shared decoder refusals, and 44 duplicate-base lens mismatches.
 Decoder refusals are not agreement.
-The parent checks all 42 raw and 42 reduced mismatches; no new mismatch class appears.
-Each reduction uses 76 trials and three accepted rounds, below the 80-trial limit.
+The parent checks every raw and reduced mismatch; no new mismatch class appears.
+Each reduction uses 76 trials and 3 accepted rounds, below the 80-trial limit.
 These reductions do not establish absolute minimality.
-See [the three-way campaign report](interop/fuzz/REPORT.md) for current and historical results.
+A Python script derives these counts from the retained artifacts.
+See [the campaign report](interop/fuzz/REPORT.md) for the scripts and current and historical results.
 The CI seed `ci-1` checks 28 three-way cases without mismatches.
 
-The mutation catalogue retains all 189 entries, with four re-anchored replacements.
-The full run at `6fa9857` reports 143 build rejections, 27 vector differences, 12 generator assertion exceptions, and seven survivors.
+The mutation catalogue has 196 entries, including eight new guard mutations.
+It retires only the redundant positive-offset guard under R4.
+The full run reports 147 build rejections, 27 vector differences, 16 generator assertion exceptions, and 6 survivors.
 The runner exits 1 for assertion exceptions; no timeout or infrastructure failure occurs.
-All six old survivors remain, including the four unapproved D6 helpers.
-The new survivor adds a redundant positive-offset guard after R4 already forbids offsets.
+The six old survivors remain, including the four unapproved D6 helpers.
+All new cheap guard mutations compile and then fail runtime checks.
 Build rejections are not semantic proof kills.
 Survival does not prove equivalence.
 See [the mutation report](model/mutate/REPORT.md) for outcomes, restoration checks, and limits.
