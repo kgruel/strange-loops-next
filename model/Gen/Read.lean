@@ -375,6 +375,19 @@ def sections (path : String) : Json → Dec (List Lens.Section) := each path sec
 
 /-! ## Drafts, for a batch -/
 
+/-- Check every raw envelope before decoding any envelope value.
+Malformed shells stay for the decoder; an unknown key in any object wins. -/
+def envelopesKeysProblem (raw : List Json) : Option String :=
+  envelopeKeysProblem (raw.flatMap fun j => match j with
+    | .obj kvs => kvs
+    | _ => [])
+
+/-- Inspect only each draft's envelope keys, not its label, salt or values. -/
+def draftsKeysProblem (raw : List Json) : Option String :=
+  envelopesKeysProblem (raw.flatMap fun j => match j with
+    | .obj kvs => kvs.filterMap fun (k, v) => if k == "env" then some v else none
+    | _ => [])
+
 /-- An envelope as a writer hands it over. Its contents are `write`'s to
 check, so here only its shape is. -/
 def env (path : String) (j : Json) : Dec Env := do
@@ -396,5 +409,17 @@ def draft (path : String) (j : Json) : Dec Draft := do
   let e ← env (dot path "env") (← req path kvs "env")
   let s ← bytes (dot path "salt") (← req path kvs "salt")
   pure { label := label, env := e, salt := s, payload := ← req path kvs "payload" }
+
+/-- All envelope variants pass shape preflight before any value decoding. -/
+def envs (path : String) (j : Json) : Dec (List Env) := do
+  let raw ← list path j
+  if let some why := envelopesKeysProblem raw then throw why
+  each path env j
+
+/-- All drafts pass shape preflight before any label, envelope or salt decoding. -/
+def drafts (path : String) (j : Json) : Dec (List Draft) := do
+  let raw ← list path j
+  if let some why := draftsKeysProblem raw then throw why
+  each path draft j
 
 end Gen.Read

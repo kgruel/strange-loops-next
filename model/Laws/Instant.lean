@@ -58,18 +58,6 @@ private theorem digit_char (c : Char) (hc : c.isDigit = true) :
   have h48 : 48 ≤ c.toNat := hc'.1
   rw [Nat.add_sub_of_le h48, Char.ofNat_toNat]
 
-private theorem stripZeros_eq_of_last {ds : List Int} (h : ds.getLast? ≠ some 0) : stripZeros ds = ds := by
-  unfold stripZeros
-  rw [List.dropWhile_beq_eq_self_of_head?_ne]
-  · simp
-  · simpa using h
-
-private theorem offsetSecs_only {cs : List Char} {o : Int} (h : offsetSecs cs = some o) : cs = ['Z'] ∧ o = 0 := by
-  unfold offsetSecs at h
-  split at h
-  · simp_all
-  · contradiction
-
 private theorem takeWhile_append_drop_length (cs : List Char) :
     cs.takeWhile Char.isDigit ++ cs.drop (cs.takeWhile Char.isDigit).length = cs := by
   induction cs with
@@ -77,9 +65,9 @@ private theorem takeWhile_append_drop_length (cs : List Char) :
   | cons c cs ih =>
     by_cases hc : c.isDigit = true <;> simp_all
 
-private theorem tail_render {rest : List Char} {f : List Int} {o : Int}
-    (h : tail rest = some (f, o)) :
-    rest = (if (stripZeros f).isEmpty then [] else '.' :: (stripZeros f).map (fun d => Char.ofNat (48 + d.toNat))) ++ ['Z'] := by
+private theorem tail_render {rest : List Char} {f : List Int}
+    (h : tail rest = some f) :
+    rest = (if f.isEmpty then [] else '.' :: f.map (fun d => Char.ofNat (48 + d.toNat))) ++ ['Z'] := by
   unfold tail at h
   split at h
   · rename_i rest
@@ -87,30 +75,22 @@ private theorem tail_render {rest : List Char} {f : List Int} {o : Int}
     split at h
     · contradiction
     · rename_i hg
-      simp only [Option.map_eq_some_iff, Prod.mk.injEq] at h
-      obtain ⟨off, hoff, rfl, rfl⟩ := h
-      have zone := (offsetSecs_only hoff).1
-      have hnon : ¬ (rest.takeWhile Char.isDigit).isEmpty = true := by simp_all
-      have hlast : (rest.takeWhile Char.isDigit).getLast? ≠ some '0' := by simp_all
-      have inv : ((rest.takeWhile Char.isDigit).map (fun c => ((c.toNat - 48 : Nat) : Int))).map
-          (fun d => Char.ofNat (48 + d.toNat)) = rest.takeWhile Char.isDigit := by
-        simp only [List.map_map]
-        simpa only [List.map_id_fun', Function.comp_def, id] using List.map_congr_left (l := rest.takeWhile Char.isDigit) (fun c hc => digit_char c (takeWhile_digit hc))
-      have hz : (((rest.takeWhile Char.isDigit).map (fun c => ((c.toNat - 48 : Nat) : Int)))).getLast? ≠ some 0 := by
-        intro he
-        have he' := congrArg (Option.map (fun d => Char.ofNat (48 + d.toNat))) he
-        rw [← List.getLast?_map, inv] at he'
-        exact hlast (by simpa using he')
-      change '.' :: rest = (if (stripZeros ((rest.takeWhile Char.isDigit).map (fun c => ((c.toNat - 48 : Nat) : Int)))).isEmpty then [] else '.' :: (stripZeros ((rest.takeWhile Char.isDigit).map (fun c => ((c.toNat - 48 : Nat) : Int)))).map (fun d => Char.ofNat (48 + d.toNat))) ++ ['Z']
-      rw [stripZeros_eq_of_last hz]
-      have hn : ((rest.takeWhile Char.isDigit).map (fun c => ((c.toNat - 48 : Nat) : Int))).isEmpty = false := by simpa using Bool.eq_false_iff.2 hnon
-      rw [hn]
-      simp only [Bool.false_eq_true, ↓reduceIte, inv, List.cons_append, List.cons.injEq, true_and]
-      rw [← zone]
-      exact (takeWhile_append_drop_length rest).symm
-  · simp only [Option.map_eq_some_iff, Prod.mk.injEq] at h
-    obtain ⟨off, hoff, rfl, rfl⟩ := h
-    simp [stripZeros, (offsetSecs_only hoff).1]
+      split at h
+      · rename_i zone
+        simp only [Option.some.injEq] at h
+        subst f
+        have hnon : (rest.takeWhile Char.isDigit).isEmpty = false := by simp_all
+        have inv : ((rest.takeWhile Char.isDigit).map (fun c => ((c.toNat - '0'.toNat : Nat) : Int))).map
+            (fun d => Char.ofNat (48 + d.toNat)) = rest.takeWhile Char.isDigit := by
+          simp only [List.map_map, show '0'.toNat = 48 from by decide]
+          simpa only [List.map_id_fun', Function.comp_def, id] using List.map_congr_left (l := rest.takeWhile Char.isDigit) (fun c hc => digit_char c (takeWhile_digit hc))
+        simp only [List.isEmpty_map, hnon, Bool.false_eq_true, ↓reduceIte, inv, List.cons_append,
+          List.cons.injEq, true_and]
+        rw [← zone]
+        exact (takeWhile_append_drop_length rest).symm
+      · contradiction
+  · simp_all
+  · contradiction
 
 private def Instant.CalendarValid (t : Instant) : Prop :=
   (1 ≤ t.month ∧ t.month ≤ 12) ∧ (1 ≤ t.day ∧ t.day ≤ daysIn t.year t.month) ∧

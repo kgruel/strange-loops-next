@@ -39,6 +39,11 @@ The envelope reader uses these refusal codes: `envelope-field-unknown`, `kind-em
 `about-not-typed`, `prev-not-record-id`, `under-not-record-id`,
 `erases-not-record-id`.
 It checks them in that order.
+Raw shape comes first: inspect all envelope keys before decoding any envelope value, label or salt.
+An unknown key gives one top-level `envelope-field-unknown` refusal, including when another envelope has malformed values.
+For a batch, the stages are shape, then labels, then writing, then `prev-unknown`, then `prev-unrelated`.
+The typed writer starts at `kind-empty`; its envelope type cannot contain unknown fields.
+Several equivalent envelope variants remain valid when every variant passes shape checks.
 
 The reader settles forms before admission checks `prev`.
 A held record applies `erases` even when admission refuses its `prev`.

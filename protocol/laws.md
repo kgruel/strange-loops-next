@@ -195,7 +195,7 @@ pinned by the vectors rather than proved.
 |---|---|---|---|
 | `batch.meaning` | `Meaning.unique` | An acyclic batch has at most one meaning. This does not prove resolver correctness. | `batch/01`–`03` |
 | `batch.refuse` | (by construction) | Duplicate, unknown and cyclic labels are refused. So are drafts refused by `write`, unheld `prev` targets and targets with no shared thing. | `batch/10`–`17` |
-| `batch.refuse-order` | `firstRefusal_set`, `writeProblem_codes` | the refusal reported depends only on which refusals there are: across the batch, labels, then writing, then `prev-unknown`, then `prev-unrelated`. Proved for writing's refusals (`firstRefusal_set`); the order across stages is by construction | `batch/15`, `16` |
+| `batch.refuse-order` | `envelopeKeysProblem_set`, `firstRefusal_set`, `writeProblem_codes` | Across the batch: shape, then labels, then writing, then `prev-unknown`, then `prev-unrelated`. Raw shape checks every envelope's keys before any draft value, label or salt is decoded. Shape depends only on keys, and writing's priority only on the refusal set; stage order is by construction, pinned by raw-input rotations. | `batch/15`, `16`, `18`–`22` |
 
 `gen` checks batch vectors across draft rotations and reversed `prev` sets.
 Accepted variants must give the same records, one per draft, satisfying `Meaning`.

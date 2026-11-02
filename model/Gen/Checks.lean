@@ -78,8 +78,27 @@ def canonicalTextChecks : IO Unit := do
     let raw := Json.obj (fields ++ [("extension", .null)])
     ensure (match Read.env "env" raw with | .error why => why == "envelope-field-unknown" | _ => false)
       "R6 unknown key does not precede missing, empty or malformed values"
-  ensure (firstRefusal ["kind-empty", "envelope-field-unknown"] == some "envelope-field-unknown")
-    "R6 global write precedence changes"
+  ensure (!writeCodes.contains "envelope-field-unknown") "R6 raw shape leaked into typed writer codes"
+  let unknown := Json.obj [("extra", .null)]
+  let goodEnv := Json.obj [("kind", .str "note"), ("observer", .str "o:test"),
+    ("emitted", .str "2026-10-21T00:00:00Z")]
+  let shape := Json.obj [("env", unknown)]
+  let malformed := [Json.int 7,
+    .obj [("label", .int 7), ("env", goodEnv)],
+    .obj [("env", goodEnv), ("salt", .int 7)],
+    .obj [("env", .obj [("kind", .int 7)])]]
+  for bad in malformed do
+    for ds in [[bad, shape], [shape, bad]] do
+      ensure (match Read.drafts "drafts" (.arr ds) with
+        | .error why => why == "envelope-field-unknown" | _ => false)
+        "R6 all-draft preflight must precede malformed shells, labels, values and salts"
+  ensure (match Read.drafts "drafts" (.arr [.obj [("env", goodEnv), ("env", unknown)]]) with
+    | .error why => why == "envelope-field-unknown" | _ => false)
+    "R6 repeated draft env members must not hide unknown envelope keys"
+  for es in [[goodEnv, unknown], [unknown, goodEnv], [.int 7, unknown]] do
+    ensure (match Read.envs "envs" (.arr es) with
+      | .error why => why == "envelope-field-unknown" | _ => false)
+      "R6 all-envelope preflight must precede value decoding"
   IO.println "R1/R4/R6 canonical text runtime checks pass"
 
 def main (args : List String) : IO Unit := do

@@ -1,6 +1,8 @@
 import Loops
 import Gen.Json
+import Gen.Encode
 import Gen.Ed25519
+import Gen.Read
 
 /-!
 # Record vectors
@@ -199,7 +201,7 @@ def refusedCases : List (String × Env) := [
   ("22-emitted-no-zone", note "2026-10-21T05:30:00"),
   ("23-emitted-lowercase", note "2026-10-21t05:30:00z"),
   ("24-emitted-no-such-day", note "2026-02-29T00:00:00Z"),
-  ("25-emitted-bad-offset", note "2026-10-21T05:30:00+24:00"),
+  ("25-emitted-refused-offset", note "2026-10-21T05:30:00+24:00"),
   ("26-about-untyped", { note with about := ["auth"] }),
   ("27-prev-not-record", { note with prev := ["topic:auth"] }),
   ("28-under-not-record", { note with under := some "r:short" }),
@@ -248,6 +250,15 @@ def shortSalt : List UInt8 := (saltFor "30-salt-short").take 15
 /-! ## Standards the reference code must meet before it writes anything -/
 
 def selfCheck : Except String Unit := do
+  let unknown := Json.obj [("extra", .null)]
+  for fields in [[], [("kind", .int 7)]] do
+    match Gen.Read.env "env" (.obj (fields ++ [("extra", .null)])) with
+    | .error "envelope-field-unknown" => pure ()
+    | _ => throw "R6 raw keys must precede envelope values"
+  for envs in [[Json.int 7, unknown], [unknown, .int 7]] do
+    match Gen.Read.envs "envs" (.arr envs) with
+    | .error "envelope-field-unknown" => pure ()
+    | _ => throw "R6 every envelope variant must pass shape before value decoding"
   let check (what : String) (got want : String) : Except String Unit :=
     if got == want then pure () else throw s!"self-check failed: {what}: {got} ≠ {want}"
   check "sha256 abc" (hex (sha256 (textBytes "abc")))
@@ -289,6 +300,14 @@ def vectors : Except String (List (String × J)) := do
     (name, .obj [("vector", .str name), ("layer", .str "record"), ("laws", .arr [.str "record.refuse"]),
       ("source", .str "model"), ("input", .obj [("envs", .arr [raw]), ("salt", .str (base32 (saltFor name))),
       ("payloads", .arr [.obj []])]), ("expect", .obj [("refused", .str "envelope-field-unknown")])])
-  return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst), unknown false, unknown true]
+  let twoUnknown (reverse : Bool) : String × J :=
+    let name := if reverse then "r6-two-envs-unknown-first" else "r6-two-envs-unknown-last"
+    let raw := match envInput note with | .obj kvs => J.obj (("extra", .null) :: kvs) | other => other
+    let envs := if reverse then [raw, envInput note] else [envInput note, raw]
+    (name, vector name "record" ["record.refuse", "batch.refuse-order"]
+      (.obj [("envs", .arr envs), ("salt", .str (base32 (saltFor name))), ("payloads", .arr [.obj []])])
+      (.obj [("refused", .str "envelope-field-unknown")]))
+  return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst),
+    unknown false, unknown true, twoUnknown false, twoUnknown true]
 
 end Gen.Records

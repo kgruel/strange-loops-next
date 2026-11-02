@@ -154,8 +154,8 @@ def heldEntry (path : String) (j : Json) : Dec (String × List String) := do
 
 def batchRunDecoded (input : Json) : Dec J := do
   let kvs ← members? "input" ["held", "drafts"] input
+  let ds ← drafts "input.drafts" (← req "input" kvs "drafts")
   let held ← each "input.held" heldEntry (← req "input" kvs "held")
-  let ds ← each "input.drafts" draft (← req "input" kvs "drafts")
   pure (match resolveBatch Records.H (held.lookup ·) ds with
     | .ok ws => J.obj [("records", .arr (ws.map fun w =>
         let r := w.stored
@@ -176,14 +176,14 @@ def realmRun (input : Json) : Dec J := do
 
 /-! ## Record -/
 
-/-- `record`: one record written, or `write`'s refusal. The envelope comes in
-the writer's form, perhaps several ways (sets in other orders, repeats), and
+/-- `record`: one record written, or a raw shape or typed writer refusal.
+The envelope comes in the writer's form, perhaps several ways (sets in other orders, repeats), and
 the payload as JSON, perhaps several ways (members in other orders), or as
 text when it repeats a member name. Every way must name the same record, as
 gen requires before writing one. -/
 def recordRunDecoded (input : Json) : Dec J := do
   let kvs ← members? "input" ["envs", "payloads", "payload_text", "salt", "seed"] input
-  let envs ← each "input.envs" env (← req "input" kvs "envs")
+  let envs ← Gen.Read.envs "input.envs" (← req "input" kvs "envs")
   let payloads ← match kvs.lookup "payloads", kvs.lookup "payload_text" with
     | some ps, none => list "input.payloads" ps
     | none, some t => do

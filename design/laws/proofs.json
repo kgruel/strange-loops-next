@@ -91,10 +91,15 @@
    "states":
    "∀ {l : List Char} {c : Char}, c ∈ List.takeWhile Char.isDigit l → c.isDigit = true",
    "module": "Laws.Time"},
+  "Loops.tail_last":
+  {"uses": ["Loops.takeWhile_digit"],
+   "states":
+   "∀ {rest : List Char} {f : List Int}, Loops.tail rest = some f → f.getLast? ≠ some 0",
+   "module": "Laws.Time"},
   "Loops.tail_digits":
   {"uses": ["Loops.digit_lt", "Loops.takeWhile_digit"],
    "states":
-   "∀ {rest : List Char} {f : List Int} {o : Int}, Loops.tail rest = some (f, o) → ∀ (d : Int), d ∈ f → 0 ≤ d ∧ d < 10",
+   "∀ {rest : List Char} {f : List Int}, Loops.tail rest = some f → ∀ (d : Int), d ∈ f → 0 ≤ d ∧ d < 10",
    "module": "Laws.Time"},
   "Loops.subst_congr":
   {"uses": [],
@@ -777,7 +782,7 @@
    "∀ {a b : String} {m : Loops.Moment}, Loops.instant? a.toList = some m → Loops.instant? b.toList = some m → a = b",
    "module": "Laws.Instant"},
   "Loops.instant_canonical":
-  {"uses": ["Loops.stripped_of_digits", "Loops.tail_digits"],
+  {"uses": ["Loops.tail_digits", "Loops.tail_last"],
    "states":
    "∀ {cs : List Char} {m : Loops.Moment}, Loops.instant? cs = some m → m.Canonical",
    "module": "Laws.Time"},
@@ -961,6 +966,11 @@
    "states":
    "∀ {α β : Type} {f : α → β} {l : List α}, (List.map f l).Nodup → ∀ (a : α), a ∈ l → ∀ (b : α), b ∈ l → f a = f b → a = b",
    "module": "Laws.Record"},
+  "Loops.envelopeKeysProblem_set":
+  {"uses": [],
+   "states":
+   "∀ {xs ys : List (String × Loops.Json)}, (∀ (k : String), k ∈ List.map Prod.fst xs ↔ k ∈ List.map Prod.fst ys) → Loops.envelopeKeysProblem xs = Loops.envelopeKeysProblem ys",
+   "module": "Laws.Write"},
   "Loops.env_sets":
   {"uses": ["Loops.canonSet_eq"],
    "states":

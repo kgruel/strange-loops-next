@@ -36,19 +36,16 @@ def dayNumber (y m d : Nat) : Int :=
 
 def stripZeros (ds : List Int) : List Int := (ds.reverse.dropWhile (· == 0)).reverse
 
-/-- The only accepted zone is UTC. -/
-def offsetSecs : List Char → Option Int
-  | ['Z'] => some 0
-  | _ => none
-
-/-- What follows the seconds: an optional canonical fraction, then `Z`. -/
-def tail : List Char → Option (List Int × Int)
+/-- What follows the seconds: canonical fraction digits, with the UTC marker checked inline. -/
+def tail : List Char → Option (List Int)
   | '.' :: rest =>
     let frac := rest.takeWhile Char.isDigit
     if frac.isEmpty || frac.length > 9 || frac.getLast? == some '0' then none
-    else (offsetSecs (rest.drop frac.length)).map
-      fun o => (frac.map fun c => ((c.toNat - '0'.toNat : Nat) : Int), o)
-  | rest => (offsetSecs rest).map fun o => ([], o)
+    else match rest.drop frac.length with
+      | ['Z'] => some (frac.map fun c => ((c.toNat - '0'.toNat : Nat) : Int))
+      | _ => none
+  | ['Z'] => some []
+  | _ => none
 
 /-- Numeric fields of a parsed UTC instant. -/
 structure Instant where
@@ -81,9 +78,9 @@ def instantParts? (cs : List Char) : Option Instant :=
       h1 :: h2 :: ':' :: mi1 :: mi2 :: ':' :: s1 :: s2 :: rest =>
     match digitsVal [y1, y2, y3, y4], digitsVal [mo1, mo2], digitsVal [d1, d2],
       digitsVal [h1, h2], digitsVal [mi1, mi2], digitsVal [s1, s2], tail rest with
-    | some y, some mo, some d, some h, some mi, some s, some (frac, _off) =>
+    | some y, some mo, some d, some h, some mi, some s, some frac =>
       if 1 ≤ mo && mo ≤ 12 && 1 ≤ d && d ≤ daysIn y mo && h ≤ 23 && mi ≤ 59 && s ≤ 59 then
-        some ⟨y, mo, d, h, mi, s, stripZeros frac⟩
+        some ⟨y, mo, d, h, mi, s, frac⟩
       else none
     | _, _, _, _, _, _, _ => none
   | _ => none

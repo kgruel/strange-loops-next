@@ -255,23 +255,55 @@ theorem takeWhile_digit {l : List Char} {c : Char} (h : c ∈ l.takeWhile Char.i
       · exact ih h
     · simp at h
 
-theorem tail_digits {rest : List Char} {f : List Int} {o : Int}
-    (h : tail rest = some (f, o)) : ∀ d ∈ f, 0 ≤ d ∧ d < 10 := by
+theorem tail_digits {rest : List Char} {f : List Int}
+    (h : tail rest = some f) : ∀ d ∈ f, 0 ≤ d ∧ d < 10 := by
   intro d hd
   unfold tail at h
   split at h
   · simp only at h
     split at h
     · contradiction
-    · simp only [Option.map_eq_some_iff, Prod.mk.injEq] at h
-      obtain ⟨_, _, rfl, _⟩ := h
-      simp only [List.mem_map] at hd
-      obtain ⟨c, hc, rfl⟩ := hd
-      have := digit_lt (takeWhile_digit hc)
-      omega
-  · simp only [Option.map_eq_some_iff, Prod.mk.injEq] at h
-    obtain ⟨_, _, rfl, _⟩ := h
-    simp at hd
+    · split at h
+      · simp only [Option.some.injEq] at h
+        subst f
+        obtain ⟨c, hc, rfl⟩ := List.mem_map.1 hd
+        have := digit_lt (takeWhile_digit hc)
+        omega
+      · contradiction
+  · simp_all
+  · contradiction
+
+/-- Accepted fraction digits already have no trailing zero. -/
+theorem tail_last {rest : List Char} {f : List Int}
+    (h : tail rest = some f) : f.getLast? ≠ some 0 := by
+  unfold tail at h
+  split at h
+  · rename_i rest
+    simp only at h
+    split at h
+    · contradiction
+    · rename_i hg
+      split at h
+      · simp only [Option.some.injEq] at h
+        subst f
+        have hlast : (rest.takeWhile Char.isDigit).getLast? ≠ some '0' := by simp_all
+        intro he
+        rw [List.getLast?_map] at he
+        cases hl : (rest.takeWhile Char.isDigit).getLast? with
+        | none => simp [hl] at he
+        | some c =>
+          have hc : c.isDigit = true := takeWhile_digit (List.mem_of_getLast? hl)
+          have h48 : 48 ≤ c.toNat := by
+            simp only [Char.isDigit, Bool.and_eq_true, decide_eq_true_eq, UInt32.le_iff_toNat_le] at hc
+            exact hc.1
+          have hzero : c.toNat = 48 := by simp [hl] at he; omega
+          have hc0 : c = '0' := by
+            rw [← Char.ofNat_toNat c, hzero]
+          exact hlast (by simpa [hc0] using hl)
+      · contradiction
+  · simp_all
+  · contradiction
+
 theorem stripped_of_digits {ds : List Int} (h : ∀ d ∈ ds, 0 ≤ d ∧ d < 10) : Stripped (stripZeros ds) :=
   ⟨fun d hd => h d (stripZeros_sub hd), stripZeros_last ds⟩
 
@@ -282,7 +314,7 @@ theorem instant_canonical {cs : List Char} {m : Moment} (h : instant? cs = some 
   all_goals simp [Instant.moment] at h
   rename_i ht _
   subst h
-  exact ⟨_, _, rfl, stripped_of_digits (tail_digits ht)⟩
+  exact ⟨_, _, rfl, tail_digits ht, tail_last ht⟩
 
 /-- So is every point's start and end. -/
 theorem point_canonical {cs : List Char} {a b : Moment} (h : point? cs = some (a, b)) :

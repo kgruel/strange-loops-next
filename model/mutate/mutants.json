@@ -755,10 +755,10 @@
   {
     "id": "wide-time-095",
     "file": "Time.lean",
-    "before": "| ['Z'] => some 0",
+    "before": "| ['Z'] => some []",
     "after": "| ['Z'] => none",
     "reason": "Reject the only canonical UTC marker.",
-    "definition": "Loops.offsetSecs"
+    "definition": "Loops.tail"
   },
   {
     "id": "wide-time-096",
@@ -1079,14 +1079,6 @@
     "after": "| _ :: b => (cs.takeWhile (· != '/'), some b.reverse)",
     "reason": "Reverse the second half.",
     "definition": "Loops.halves"
-  },
-  {
-    "id": "finish-occurred-stamp-of",
-    "file": "Occurred.lean",
-    "before": "match h : instant? s.toList with\n  | some m => some ⟨s, m, h⟩\n  | none => none",
-    "after": "if s.toList.contains '+' then none else\n  match h : instant? s.toList with\n  | some m => some ⟨s, m, h⟩\n  | none => none",
-    "reason": "Reject positive offsets.",
-    "definition": "Loops.Stamp.of?"
   },
   {
     "id": "finish-occurred-claim-of",
@@ -1479,5 +1471,69 @@
     "after": "String.join (s.toList.reverse.map escapeChar)",
     "reason": "Reverse the quoted characters.",
     "definition": "Loops.quote"
+  },
+  {
+    "id": "step1-base32-reencode",
+    "file": "Base32.lean",
+    "before": "if base32 bs == s then some bs else none",
+    "after": "some bs",
+    "reason": "Accept noncanonical text without re-encode equality.",
+    "definition": "Loops.unbase32"
+  },
+  {
+    "id": "step1-fraction-final-zero",
+    "file": "Time.lean",
+    "before": " || frac.getLast? == some '0'",
+    "after": "",
+    "reason": "Accept a trailing-zero fraction.",
+    "definition": "Loops.tail"
+  },
+  {
+    "id": "step1-seconds-bound",
+    "file": "Time.lean",
+    "before": " && s ≤ 59",
+    "after": "",
+    "reason": "Accept seconds outside 00 through 59.",
+    "definition": "Loops.instantParts?"
+  },
+  {
+    "id": "step1-zone-only-z",
+    "file": "Time.lean",
+    "before": "| ['Z'] => some []",
+    "after": "| ['Z'] | ['+', '0', '0', ':', '0', '0'] => some []",
+    "reason": "Accept a numeric UTC offset as well as Z.",
+    "definition": "Loops.tail"
+  },
+  {
+    "id": "step1-envelope-keys-remove",
+    "file": "Envelope.lean",
+    "before": "then none else some \"envelope-field-unknown\"",
+    "after": "then none else none",
+    "reason": "Ignore unknown raw envelope keys.",
+    "definition": "Loops.envelopeKeysProblem"
+  },
+  {
+    "id": "step1-envelope-keys-after-value",
+    "file": "Gen/Read.lean",
+    "before": "  if let some why := envelopeKeysProblem kvs then throw why\n  let setOf (k : String) : Dec (List String) := (opt kvs k (texts (dot path k))).map (·.getD [])\n  let kind ← text (dot path \"kind\") (← req path kvs \"kind\")",
+    "after": "  let setOf (k : String) : Dec (List String) := (opt kvs k (texts (dot path k))).map (·.getD [])\n  let kind ← text (dot path \"kind\") (← req path kvs \"kind\")\n  if let some why := envelopeKeysProblem kvs then throw why",
+    "reason": "Decode kind before raw envelope keys.",
+    "definition": "Gen.Read.env"
+  },
+  {
+    "id": "step1-draft-keys-after-values",
+    "file": "Gen/Read.lean",
+    "before": "  if let some why := draftsKeysProblem raw then throw why\n  each path draft j",
+    "after": "  let decoded ← each path draft j\n  if let some why := draftsKeysProblem raw then throw why\n  pure decoded",
+    "reason": "Decode draft labels, envelopes and salts before all-draft shape preflight.",
+    "definition": "Gen.Read.drafts"
+  },
+  {
+    "id": "step1-record-keys-after-values",
+    "file": "Gen/Read.lean",
+    "before": "  if let some why := envelopesKeysProblem raw then throw why\n  each path env j",
+    "after": "  let decoded ← each path env j\n  if let some why := envelopesKeysProblem raw then throw why\n  pure decoded",
+    "reason": "Decode envelope variants before all-envelope shape preflight.",
+    "definition": "Gen.Read.envs"
   }
 ]
