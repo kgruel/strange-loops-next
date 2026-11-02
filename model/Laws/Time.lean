@@ -214,26 +214,6 @@ def Stripped (f : List Int) : Prop :=
 /-- Whole seconds, then stripped fraction digits. -/
 def Moment.Canonical (m : Moment) : Prop := ∃ s f, m = s :: f ∧ Stripped f
 
-theorem stripZeros_last (ds : List Int) : (stripZeros ds).getLast? ≠ some 0 := by
-  intro h
-  simp only [stripZeros, List.getLast?_reverse] at h
-  have := List.head?_dropWhile_not (· == 0) ds.reverse
-  simp_all
-
-theorem stripZeros_append_zero (ds : List Int) : stripZeros (ds ++ [0]) = stripZeros ds := by
-  simp [stripZeros]
-
-/-- Trailing zeros never change a fraction. -/
-theorem stripZeros_replicate_zero (ds : List Int) (k : Nat) :
-    stripZeros (ds ++ List.replicate k 0) = stripZeros ds := by
-  induction k with
-  | zero => simp
-  | succ k ih => rw [List.replicate_succ', ← List.append_assoc, stripZeros_append_zero, ih]
-
-theorem stripZeros_sub {ds : List Int} {d : Int} (h : d ∈ stripZeros ds) : d ∈ ds := by
-  simp only [stripZeros, List.mem_reverse] at h
-  exact List.mem_reverse.1 ((List.dropWhile_sublist _).subset h)
-
 theorem digit_lt {c : Char} (h : c.isDigit = true) : c.toNat - '0'.toNat < 10 := by
   simp only [Char.isDigit, Bool.and_eq_true, decide_eq_true_eq] at h
   have := Char.le_def.1 h.2
@@ -303,9 +283,6 @@ theorem tail_last {rest : List Char} {f : List Int}
       · contradiction
   · simp_all
   · contradiction
-
-theorem stripped_of_digits {ds : List Int} (h : ∀ d ∈ ds, 0 ≤ d ∧ d < 10) : Stripped (stripZeros ds) :=
-  ⟨fun d hd => h d (stripZeros_sub hd), stripZeros_last ds⟩
 
 /-- Every instant the reader accepts is a canonical moment. -/
 theorem instant_canonical {cs : List Char} {m : Moment} (h : instant? cs = some m) : m.Canonical := by

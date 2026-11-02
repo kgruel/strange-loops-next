@@ -745,14 +745,6 @@
     "definition": "Loops.daysIn"
   },
   {
-    "id": "wide-time-094",
-    "file": "Time.lean",
-    "before": "(ds.reverse.dropWhile (· == 0)).reverse",
-    "after": "(ds.reverse.dropWhile (· != 0)).reverse",
-    "reason": "Change this selection or check.",
-    "definition": "Loops.stripZeros"
-  },
-  {
     "id": "wide-time-095",
     "file": "Time.lean",
     "before": "| ['Z'] => some []",
@@ -1514,26 +1506,26 @@
   },
   {
     "id": "step1-envelope-keys-after-value",
-    "file": "Gen/Read.lean",
-    "before": "  if let some why := envelopeKeysProblem kvs then throw why\n  let setOf (k : String) : Dec (List String) := (opt kvs k (texts (dot path k))).map (·.getD [])\n  let kind ← text (dot path \"kind\") (← req path kvs \"kind\")",
-    "after": "  let setOf (k : String) : Dec (List String) := (opt kvs k (texts (dot path k))).map (·.getD [])\n  let kind ← text (dot path \"kind\") (← req path kvs \"kind\")\n  if let some why := envelopeKeysProblem kvs then throw why",
+    "file": "Loops/Read.lean",
+    "before": "  if let some why := envelopeKeysProblem kvs then throw why\n  decodeValues path j",
+    "after": "  let decoded ← decodeValues path j\n  if let some why := envelopeKeysProblem kvs then throw why\n  pure decoded",
     "reason": "Decode kind before raw envelope keys.",
-    "definition": "Gen.Read.env"
+    "definition": "Loops.Read.readOne"
   },
   {
     "id": "step1-draft-keys-after-values",
-    "file": "Gen/Read.lean",
-    "before": "  if let some why := draftsKeysProblem raw then throw why\n  each path draft j",
-    "after": "  let decoded ← each path draft j\n  if let some why := draftsKeysProblem raw then throw why\n  pure decoded",
+    "file": "Loops/Read.lean",
+    "before": "  if let some why := draftsKeysProblem raw then throw why\n  each path draftValues j",
+    "after": "  let decoded ← each path draftValues j\n  if let some why := draftsKeysProblem raw then throw why\n  pure decoded",
     "reason": "Decode draft labels, envelopes and salts before all-draft shape preflight.",
-    "definition": "Gen.Read.drafts"
+    "definition": "Loops.Read.drafts"
   },
   {
     "id": "step1-record-keys-after-values",
-    "file": "Gen/Read.lean",
-    "before": "  if let some why := envelopesKeysProblem raw then throw why\n  each path env j",
-    "after": "  let decoded ← each path env j\n  if let some why := envelopesKeysProblem raw then throw why\n  pure decoded",
+    "file": "Loops/Read.lean",
+    "before": "    if let some why := envelopesKeysProblem raw then throw why\n    each path decodeValues j",
+    "after": "    let decoded ← each path decodeValues j\n    if let some why := envelopesKeysProblem raw then throw why\n    pure decoded",
     "reason": "Decode envelope variants before all-envelope shape preflight.",
-    "definition": "Gen.Read.envs"
+    "definition": "Loops.Read.readMany"
   }
 ]

@@ -1,7 +1,7 @@
 # Vectors
 
 `model/` writes the protocol fixture families:
-`fold/`, `lens/`, `record/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/`.
+`fold/`, `lens/`, `record/`, `byte-text/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/`.
 Run `lake exe gen ../vectors` from `model/`; never edit these fixtures by hand.
 CI regenerates them and fails on any difference.
 `standard/` holds external standards data; see its README.
@@ -108,8 +108,9 @@ Readers can admit unknown targets because they cannot judge them.
 
 `expect.records` gives ids and canonical envelopes in draft order, with labels replaced by ids.
 Alternatively, `expect.refused` gives the first refusal.
-Label checks run first: `label-duplicate`, `label-unknown`, then `label-cycle`.
-Next come writer codes, in `protocol/record.md` order across every draft.
+Shape checks run first across every raw envelope, before any draft value: `envelope-field-unknown`.
+Label checks follow: `label-duplicate`, `label-unknown`, then `label-cycle`.
+Next come writer codes from `kind-empty`, in `protocol/record.md` order across every draft.
 Finally, `prev-unknown` and `prev-unrelated` run across the whole batch.
 Every draft order and `prev` order gives the same records or refusal.
 Meaning uniqueness states at most one satisfying label assignment; it does not prove resolver correctness.
@@ -176,7 +177,7 @@ Put-get additionally requires distinct base ids and the exact same ordered id li
 The two stored lines show forms before and after erasure.
 The signed message uses the exact prefix `loops/record/v1:`.
 
-A refused vector's `expect.refused` names the writer refusal from `protocol/record.md`.
+A refused vector's `expect.refused` names the shape or writer refusal from `protocol/record.md`.
 `payload_text` preserves repeated member names in JSON text.
 Use a parser that detects repeated names.
 Writers cap every number's magnitude at 2^53 − 1, whole or not.

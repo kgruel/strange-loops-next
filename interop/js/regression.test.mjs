@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { base32, base32Decode, fixedBytes, canonical, checkEnvelopeKeys, seal, writeText, problem, validEmitted, occurredSpan, signId, verifyId } from "./loops.mjs";
+import { base32, base32Decode, fixedBytes, canonical, checkEnvelopeKeys, seal, writeText, writeRecord, problem, validEmitted, occurredSpan, signId, verifyId } from "./loops.mjs";
 import { resolveBatch } from "./batch.mjs";
 import { heads, latest, sum, min, max } from "./fold.mjs";
 import { parse } from "./lens.mjs";
@@ -40,6 +40,26 @@ test("spec and scenario admit once against all settled records", () => {
 const writerEnv = { kind: "note", observer: "o:test", emitted: "2026-10-21T00:00:00Z" };
 const writerSalt = new Uint8Array(16);
 const writerSeed = new Uint8Array(32);
+
+test("record input delegates the active envelope and checks only siblings", () => {
+  for (const writer of ["seal", "writeText"]) {
+    for (const env of [{ extra: 1 }, { kind: 7, extra: 1 }]) {
+      const input = { envs: [env], payloads: [null], salt: "!", seed: "!" };
+      assert.throws(() => writeRecord(input, { writer }), /envelope-field-unknown/);
+    }
+    const guarded = { get kind() { throw new Error("value read"); } };
+    for (const envs of [[guarded, { extra: 1 }], [{ extra: 1 }, guarded]]) {
+      for (const envIndex of [0, 1]) {
+        assert.throws(() => writeRecord({ envs, payloads: [null], salt: "!" }, { writer, envIndex }), /envelope-field-unknown/);
+      }
+    }
+    // One shape check, not writeText -> seal rechecking the active envelope.
+    let keyReads = 0;
+    const env = new Proxy(writerEnv, { ownKeys(target) { keyReads++; return Reflect.ownKeys(target); } });
+    writeRecord({ envs: [env], payloads: [null], salt: base32(writerSalt), seed: base32(writerSeed) }, { writer });
+    assert.equal(keyReads, 1);
+  }
+});
 
 test("base32hex exact image, width and byte order", () => {
   const alphabet = "0123456789abcdefghijklmnopqrstuv";

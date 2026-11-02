@@ -12,9 +12,9 @@ const model = path.join(root, 'model');
 const lock = path.join(model, '.mutation-run.lock');
 const cataloguePath = path.join(model, 'mutate/mutants.json');
 
-// Legacy catalogue names are relative to Loops; explicit roots also cover raw readers.
+// Catalogue names target the library, including its raw readers.
 export function sourcePath(file) {
-  if (!/^(?:(?:Loops|Gen)\/)?[A-Za-z0-9-]+\.lean$/.test(file)) throw new Error(`Invalid mutant source: ${file}`);
+  if (!/^(?:Loops\/)?[A-Za-z0-9-]+\.lean$/.test(file)) throw new Error(`Invalid mutant source: ${file}`);
   return `model/${file.includes('/') ? file : `Loops/${file}`}`;
 }
 

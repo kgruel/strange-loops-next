@@ -1,0 +1,24 @@
+{
+  "vector": "r6-nonobject-unknown-first",
+  "layer": "record",
+  "laws": ["record.refuse", "batch.refuse-order"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "extra": null,
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
+      },
+      7
+    ],
+    "salt": "si5a1hflaol7vhif7liu15jj8c",
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "envelope-field-unknown"
+  }
+}

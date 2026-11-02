@@ -55,11 +55,12 @@ function hasCycle(drafts, byLabel) {
 const thingsOf = (id, about) => (about.length ? about : [id]);
 
 // The batch's records, one per draft in the order given, each { id,
-// env_canonical }; or { refused } with the first stage that refuses: labels
-// (duplicate, unknown, cycle), writing, then prev-unknown, then prev-unrelated.
+// env_canonical }; or { refused } with the first stage that refuses: shape,
+// labels (duplicate, unknown, cycle), writing from kind-empty, then
+// prev-unknown, then prev-unrelated.
 // Each stage looks at the whole batch, so no draft order changes the answer.
 export function resolveBatch(drafts, held) {
-  // The model's raw decoder refuses unknown keys before resolving labels.
+  // The library checks every envelope's keys before labels or values.
   try { checkEnvelopeKeys(drafts.flatMap(d => d && typeof d === "object" ? [d.env] : [])); }
   catch (e) { if (e.message === "envelope-field-unknown") return { refused: e.message }; throw e; }
   const byLabel = new Map();

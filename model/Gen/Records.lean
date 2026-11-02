@@ -255,7 +255,8 @@ def selfCheck : Except String Unit := do
     match Gen.Read.env "env" (.obj (fields ++ [("extra", .null)])) with
     | .error "envelope-field-unknown" => pure ()
     | _ => throw "R6 raw keys must precede envelope values"
-  for envs in [[Json.int 7, unknown], [unknown, .int 7]] do
+  for envs in [[Json.int 7, unknown], [unknown, .int 7],
+      [.obj [("kind", .int 7)], unknown], [unknown, .obj [("kind", .int 7)]]] do
     match Gen.Read.envs "envs" (.arr envs) with
     | .error "envelope-field-unknown" => pure ()
     | _ => throw "R6 every envelope variant must pass shape before value decoding"
@@ -307,7 +308,21 @@ def vectors : Except String (List (String × J)) := do
     (name, vector name "record" ["record.refuse", "batch.refuse-order"]
       (.obj [("envs", .arr envs), ("salt", .str (base32 (saltFor name))), ("payloads", .arr [.obj []])])
       (.obj [("refused", .str "envelope-field-unknown")]))
+  let rawCase (name : String) (envs : List J) : String × J :=
+    (name, vector name "record" ["record.refuse", "batch.refuse-order"]
+      (.obj [("envs", .arr envs), ("salt", .str (base32 (saltFor name))), ("payloads", .arr [.obj []])])
+      (.obj [("refused", .str "envelope-field-unknown")]))
+  let rawUnknown := match envInput note with
+    | .obj kvs => J.obj (("extra", .null) :: kvs)
+    | other => other
+  let malformed := [("nonobject", J.int 7), ("kind-number", .obj [("kind", .int 7)])]
+  let competing := malformed.flatMap fun (tag, raw) =>
+    [rawCase s!"r6-{tag}-unknown-first" [rawUnknown, raw],
+     rawCase s!"r6-{tag}-unknown-last" [raw, rawUnknown]]
+  let singleton := [
+    rawCase "r6-single-unknown-missing-kind" [.obj [("extra", .null)]],
+    rawCase "r6-single-unknown-kind-number" [.obj [("kind", .int 7), ("extra", .null)]]]
   return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst),
-    unknown false, unknown true, twoUnknown false, twoUnknown true]
+    unknown false, unknown true, twoUnknown false, twoUnknown true] ++ competing ++ singleton
 
 end Gen.Records

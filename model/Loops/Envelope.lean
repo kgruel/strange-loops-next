@@ -57,6 +57,19 @@ def envelopeKeysProblem (kvs : List (String × Json)) : Option String :=
   if kvs.all (fun (k, _) => ["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"].contains k)
   then none else some "envelope-field-unknown"
 
+/-- Check every raw envelope before decoding any envelope value.
+Malformed shells stay for the decoder; an unknown key in any object wins. -/
+def envelopesKeysProblem (raw : List Json) : Option String :=
+  envelopeKeysProblem (raw.flatMap fun j => match j with
+    | .obj kvs => kvs
+    | _ => [])
+
+/-- Inspect only each draft's envelope keys, not its label, salt or values. -/
+def draftsKeysProblem (raw : List Json) : Option String :=
+  envelopesKeysProblem (raw.flatMap fun j => match j with
+    | .obj kvs => kvs.filterMap fun (k, v) => if k == "env" then some v else none
+    | _ => [])
+
 /-- Why a typed envelope is refused, if it is. -/
 def Env.problem (e : Env) : Option String :=
   if e.kind.isEmpty then some "kind-empty"

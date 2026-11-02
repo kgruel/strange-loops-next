@@ -1,6 +1,5 @@
 //! Gen.Run.recordRun, with all Cartesian variants retained for agreement.
 use super::{
-    batch::{env, preflight_envs},
     parse_json,
     reader::{bytes, list, members, optional, required, text},
 };
@@ -78,13 +77,8 @@ fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
         &["envs", "payloads", "payload_text", "salt", "seed"],
         input,
     )?;
-    let raw_envs = list("input.envs", required("input", kvs, "envs")?)?;
-    preflight_envs(raw_envs.iter())?;
-    let envs = raw_envs
-        .iter()
-        .enumerate()
-        .map(|(i, j)| env(&format!("input.envs[{i}]"), j))
-        .collect::<Result<Vec<_>, _>>()?;
+    let envs = loops::envelope::read_all("input.envs", required("input", kvs, "envs")?)
+        .map_err(|e| e.to_string())?;
     let payloads = match (optional(kvs, "payloads"), optional(kvs, "payload_text")) {
         (Some(ps), None) => list("input.payloads", ps)?.to_vec(),
         (None, Some(raw)) => vec![
@@ -167,7 +161,14 @@ mod tests {
 
     #[test]
     fn all_shapes_precede_envelope_values_and_salt() {
-        for envs in [r#"[{"kind":7},{"extra":1}]"#, r#"[{"extra":1},{"kind":7}]"#] {
+        for envs in [
+            r#"[{"kind":7},{"extra":1}]"#,
+            r#"[{"extra":1},{"kind":7}]"#,
+            r#"[7,{"extra":1}]"#,
+            r#"[{"extra":1},7]"#,
+            r#"[{"extra":1}]"#,
+            r#"[{"kind":7,"extra":1}]"#,
+        ] {
             let input = parse(&format!(
                 r#"{{"envs":{envs},"salt":"!","payloads":[null]}}"#
             ));

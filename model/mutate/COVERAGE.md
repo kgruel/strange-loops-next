@@ -5,8 +5,8 @@ Its file headings and exclusions are historical, not a coverage claim for the me
 The catalogue now follows moved definitions into `model/Loops/Id.lean` and `model/Loops/Fold.lean`.
 Use `node model/mutate/run.mjs --list` for current source paths.
 The runner tests check every current replacement site.
-The review fixes retain 188 original entries and add eight guard mutations: 196 entries total.
-The runner accepts explicit Loops and Gen source roots, so raw-reader ordering has direct mutations.
+The round-two fixes retain 187 original entries and eight guard mutations: 195 entries total.
+The raw-reader ordering mutations target library definitions under `Loops`.
 The cheap runner uses the same eight replacements and requires runtime failures after successful builds.
 This inventory does not claim exhaustive coverage of the changed model.
 
@@ -19,7 +19,9 @@ The six older survivor entries remain unchanged.
 
 The parser no longer calls `stripZeros`.
 Its accepted fractions already end with a nonzero digit; `tail_last` proves this property.
-The generic `stripZeros` helper remains for the existing moment algebra laws.
+The helper and its five lemmas have no users outside their own family.
+The exported proof graph confirms this result.
+Remove the family and retire `wide-time-094`, which targets only the removed definition.
 The UTC parser has no offset helper, offset tuple or normalization step.
 
 A covered definition has at least one catalogue entry.
@@ -289,7 +291,6 @@ The catalogue includes existing entries without definition metadata.
 - `Loops.daysIn`: covered by `wide-time-093`
 - `Loops.leapsBefore`: excluded: It computes an arithmetic expression. No direct eligible operation.
 - `Loops.dayNumber`: excluded: Its mapped month lengths are summed; order has no effect. No direct eligible operation.
-- `Loops.stripZeros`: covered by `wide-time-094`
 - `Loops.tail`: covered by `wide-time-095`, `wide-time-096`, `step1-fraction-final-zero`, `step1-zone-only-z`
 - `Loops.instantParts?`: covered by `coverage-time-instant-`, `step1-seconds-bound`
 - `Loops.validEmitted`: covered by `wide-time-097`

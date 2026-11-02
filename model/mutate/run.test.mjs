@@ -9,10 +9,10 @@ import { changedPaths, replaceUnique, command, sourcePath } from './run.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
-test('catalogue keeps 196 unique mutations at current source sites; listing does not mutate', async () => {
+test('catalogue keeps 195 unique mutations at current source sites; listing does not mutate', async () => {
   const catalogue = JSON.parse(await readFile(path.join(here, 'mutants.json'), 'utf8'));
-  assert.equal(catalogue.length, 196);
-  assert.ok(!catalogue.some(m => m.id === 'finish-occurred-stamp-of'));
+  assert.equal(catalogue.length, 195);
+  assert.ok(!catalogue.some(m => ['finish-occurred-stamp-of', 'wide-time-094'].includes(m.id)));
   for (const id of ["wide-families-013","wide-spec-064","extra-families-max-acc","extra-families-min-acc","finish-json-hexdigit","last-spec-tests-conds"]) {
     assert.ok(catalogue.some(m => m.id === id), id);
   }
@@ -32,8 +32,8 @@ test('catalogue keeps 196 unique mutations at current source sites; listing does
 
 test('catalogue source roots exclude traversal and unrelated files', () => {
   assert.equal(sourcePath('Time.lean'), 'model/Loops/Time.lean');
-  assert.equal(sourcePath('Gen/Read.lean'), 'model/Gen/Read.lean');
-  for (const file of ['../Gen/Read.lean', '/Time.lean', 'Laws/Time.lean', 'Gen/../Read.lean']) {
+  assert.equal(sourcePath('Loops/Read.lean'), 'model/Loops/Read.lean');
+  for (const file of ['Gen/Read.lean', '../Gen/Read.lean', '/Time.lean', 'Laws/Time.lean', 'Gen/../Read.lean']) {
     assert.throws(() => sourcePath(file), /Invalid mutant source/);
   }
 });

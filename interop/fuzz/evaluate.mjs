@@ -38,16 +38,13 @@ function lensAnswer({ base, text }) {
   const outcomes = Lens.diff(base, parsed);
   return { parsed, normalized: Lens.render(parsed), outcomes, applied: Lens.apply(base, outcomes) };
 }
-function recordAnswer(input) {
-  const env = input.envs[0];
+function recordAnswer(input, envIndex = 0) {
+  const env = input.envs[envIndex];
   let r, payload;
   try {
-    L.checkEnvelopeKeys(input.envs);
-    const salt = L.base32Decode(input.salt);
-    const seed = () => L.base32Decode(input.seed ?? L.base32(new Uint8Array(32)));
     payload = input.payload_text === undefined ? input.payloads[0] : undefined;
-    r = input.payload_text === undefined ? L.seal(env, salt, payload, seed)
-      : L.writeText(env, salt, input.payload_text, seed);
+    const writerInput = { ...input, seed: input.seed ?? L.base32(new Uint8Array(32)) };
+    r = L.writeRecord(writerInput, { envIndex, writer: input.payload_text === undefined ? "seal" : "writeText" });
     if (input.payload_text !== undefined) payload = L.parse(input.payload_text);
   } catch (error) {
     if (!WRITE_CODES.has(error.message)) throw error;
@@ -71,20 +68,22 @@ export function evaluateJS(vector, rawText) {
       catch { return false; }
     }) }];
     case 'record': {
-      try { L.checkEnvelopeKeys(input.envs); }
-      catch (error) {
+      try {
+        return input.envs.flatMap((_, envIndex) =>
+          (input.payloads ?? [null]).map((payload, i) => {
+            // Keep siblings in the library input; only the selected envelope
+            // goes to the writer. Shape errors escape the Cartesian expansion.
+            const variant = { ...input };
+            if (rawText !== undefined && input.payload_text === undefined && input.payloads) {
+              variant.payload_text = jsonSourceAt(rawText, ['input', 'payloads', i]);
+              delete variant.payloads;
+            } else if (input.payloads) variant.payloads = [payload];
+            return recordAnswer(variant, envIndex);
+          }));
+      } catch (error) {
         if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
         throw error;
       }
-      return input.envs.flatMap(env =>
-      (input.payloads ?? [null]).map((payload, i) => {
-        const variant = { ...input, envs: [env] };
-        if (rawText !== undefined && input.payload_text === undefined && input.payloads) {
-          variant.payload_text = jsonSourceAt(rawText, ['input', 'payloads', i]);
-          delete variant.payloads;
-        } else if (input.payloads) variant.payloads = [payload];
-        return recordAnswer(variant);
-      }));
     }
     case 'lens/section': return [lensAnswer(input)];
     case 'spec/parse': return [S.parseNode(specNode(vector, rawText))];

@@ -26,8 +26,8 @@ def canonicalTextChecks : IO Unit := do
       -- extra byte. Only the fixed-width boundary must reject those texts.
       let canonical := accepted || (i == 3 && (n == 32 || n == 64))
       ensure ((Loops.unbase32 s).isSome == canonical) s!"R1 model decoder {n} bytes, case {i}"
-      ensure ((Read.unbase32 s).isOk == canonical) s!"R1 fixture decoder {n} bytes, case {i}"
-      ensure ((Read.bytes "bytes" (.str s)).isOk == canonical) s!"R1 fixture bytes {n}, case {i}"
+      ensure ((Gen.Read.unbase32 s).isOk == canonical) s!"R1 fixture decoder {n} bytes, case {i}"
+      ensure ((Gen.Read.bytes "bytes" (.str s)).isOk == canonical) s!"R1 fixture bytes {n}, case {i}"
       let prefixes := if n == 32 then ["r:", "h:", "k:"] else [""]
       for pre in prefixes do
         ensure ((Read.fixedBytes "bytes" n pre (.str (pre ++ s))).isOk == accepted)
@@ -89,10 +89,10 @@ def canonicalTextChecks : IO Unit := do
     .obj [("env", .obj [("kind", .int 7)])]]
   for bad in malformed do
     for ds in [[bad, shape], [shape, bad]] do
-      ensure (match Read.drafts "drafts" (.arr ds) with
+      ensure (match Gen.Read.drafts "drafts" (.arr ds) with
         | .error why => why == "envelope-field-unknown" | _ => false)
         "R6 all-draft preflight must precede malformed shells, labels, values and salts"
-  ensure (match Read.drafts "drafts" (.arr [.obj [("env", goodEnv), ("env", unknown)]]) with
+  ensure (match Gen.Read.drafts "drafts" (.arr [.obj [("env", goodEnv), ("env", unknown)]]) with
     | .error why => why == "envelope-field-unknown" | _ => false)
     "R6 repeated draft env members must not hide unknown envelope keys"
   for es in [[goodEnv, unknown], [unknown, goodEnv], [.int 7, unknown]] do

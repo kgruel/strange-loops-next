@@ -256,19 +256,31 @@ const saltProblem = (salt) => (salt.length === 16 ? null : "salt-not-16-bytes");
 // Write a record from its payload as JSON text, checking in the model's order:
 // the envelope, the salt, repeated member names, then numbers.
 export function writeText(env, salt, text, seed) {
+  salt = prepare(env, salt);
+  return finish(env, salt, parse(text), seed);
+}
+
+// Check the envelope once, before the salt supplier or payload text is read.
+function prepare(env, salt) {
   checkEnvelopeKeys([env]);
-  const why = problem(env) ?? saltProblem(salt);
+  const why = problem(env);
   if (why) throw new Error(why);
-  return seal(env, salt, parse(text), seed);
+  salt = typeof salt === "function" ? salt() : salt;
+  const saltWhy = saltProblem(salt);
+  if (saltWhy) throw new Error(saltWhy);
+  return salt;
 }
 
 // Seal a record: the stored line, and the line after erasure. Refuses a bad
 // envelope, a salt that isn't 16 bytes, then a nonfinite or out-of-range payload number.
 // A seed supplier defers fixture seed decoding until all write checks pass.
 export function seal(env, salt, payload, seed) {
-  checkEnvelopeKeys([env]);
-  const why = problem(env) ?? saltProblem(salt) ?? (inRange(payload) ? null : "number-out-of-range");
-  if (why) throw new Error(why);
+  salt = prepare(env, salt);
+  return finish(env, salt, payload, seed);
+}
+
+function finish(env, salt, payload, seed) {
+  if (!inRange(payload)) throw new Error("number-out-of-range");
   const commit = commitOf(salt, payload);
   const id = idOf(env, commit);
   const sig = signId(typeof seed === "function" ? seed() : seed, id);
@@ -277,4 +289,17 @@ export function seal(env, salt, payload, seed) {
     line: canonical({ id, env: envJson(env), salt: base32(salt), payload, sig }),
     erasedLine: canonical({ id, env: envJson(env), commit, sig }),
   };
+}
+
+// A record input can list equivalent envelope variants. Only siblings bypass
+// the selected writer, so only they need this raw-key check. The active
+// envelope goes straight to the writer's own shape boundary.
+export function writeRecord(input, { envIndex = 0, payloadIndex = 0, writer = "seal" } = {}) {
+  checkEnvelopeKeys(input.envs.filter((_, i) => i !== envIndex));
+  const env = input.envs[envIndex];
+  const salt = () => base32Decode(input.salt);
+  const seed = () => base32Decode(input.seed);
+  return writer === "writeText"
+    ? writeText(env, salt, input.payload_text ?? JSON.stringify(input.payloads[payloadIndex]), seed)
+    : seal(env, salt, input.payloads[payloadIndex], seed);
 }

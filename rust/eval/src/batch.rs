@@ -1,70 +1,7 @@
-//! Batch fixture decoding and answers from Gen.Read and Gen.Run.
-use super::reader::{bytes, list, members, optional, required, text, texts};
-use loops::{
-    batch::{self, Draft},
-    envelope::Env,
-    json::Json,
-};
+//! Batch fixture answers from Gen.Run; raw drafts decode in the core library.
+use super::reader::{list, members, required, text, texts};
+use loops::{batch, json::Json};
 use sha2::{Digest, Sha256};
-
-pub(super) fn env(path: &str, j: &Json) -> Result<Env, String> {
-    let Json::Obj(raw) = j else {
-        return Err(format!("{path}: expected object"));
-    };
-    let names: Vec<_> = raw.iter().map(|(k, _)| k.as_str()).collect();
-    let kvs = members(path, &names, j)?;
-    loops::envelope::check_keys(raw.iter().map(|(k, _)| k.as_str())).map_err(|e| e.to_string())?;
-    let required_text =
-        |k: &str| text(&format!("{path}.{k}"), required(path, kvs, k)?).map(str::to_owned);
-    let optional_text = |k: &str| {
-        optional(kvs, k)
-            .map(|v| text(&format!("{path}.{k}"), v).map(str::to_owned))
-            .transpose()
-    };
-    let array = |k: &str| {
-        optional(kvs, k)
-            .map(|v| texts(&format!("{path}.{k}"), v))
-            .transpose()
-            .map(Option::unwrap_or_default)
-    };
-    let kind = required_text("kind")?;
-    let observer = required_text("observer")?;
-    let emitted = required_text("emitted")?;
-    let occurred = optional_text("occurred")?;
-    let under = optional_text("under")?;
-    Ok(Env {
-        kind,
-        observer,
-        emitted,
-        occurred,
-        about: array("about")?,
-        prev: array("prev")?,
-        under,
-        erases: array("erases")?,
-    })
-}
-
-pub(super) fn preflight_envs<'a>(envs: impl IntoIterator<Item = &'a Json>) -> Result<(), String> {
-    for env in envs {
-        if let Json::Obj(fields) = env {
-            loops::envelope::check_keys(fields.iter().map(|(key, _)| key.as_str()))
-                .map_err(|e| e.to_string())?;
-        }
-    }
-    Ok(())
-}
-
-fn draft(path: &str, j: &Json) -> Result<Draft, String> {
-    let kvs = members(path, &["label", "env", "salt", "payload"], j)?;
-    Ok(Draft {
-        label: optional(kvs, "label")
-            .map(|v| text(&format!("{path}.label"), v).map(str::to_owned))
-            .transpose()?,
-        env: env(&format!("{path}.env"), required(path, kvs, "env")?)?,
-        salt: bytes(&format!("{path}.salt"), required(path, kvs, "salt")?)?,
-        payload: required(path, kvs, "payload")?.clone(),
-    })
-}
 
 /// Lean: `Gen.batchRun`, model/Gen/Run.lean.
 /// Computes complete batch answers after strict fixture decoding.
@@ -82,33 +19,22 @@ fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
         return Err(format!("unknown layer {layer}"));
     }
     let kvs = members("input", &["held", "drafts"], input)?;
-    let raw_drafts = list("input.drafts", required("input", kvs, "drafts")?)?;
-    preflight_envs(raw_drafts.iter().flat_map(|draft| {
-        match draft {
-            Json::Obj(fields) => fields
-                .iter()
-                .filter_map(|(key, value)| (key == "env").then_some(value))
-                .collect::<Vec<_>>(),
-            _ => Vec::new(),
-        }
-    }))?;
-    let held: Vec<(String, Vec<String>)> = list("input.held", required("input", kvs, "held")?)?
-        .iter()
-        .enumerate()
-        .map(|(i, j)| {
-            let p = format!("input.held[{i}]");
-            let k = members(&p, &["id", "about"], j)?;
-            Ok((
-                text(&format!("{p}.id"), required(&p, k, "id")?)?.to_owned(),
-                texts(&format!("{p}.about"), required(&p, k, "about")?)?,
-            ))
-        })
-        .collect::<Result<_, String>>()?;
-    let drafts: Vec<_> = raw_drafts
-        .iter()
-        .enumerate()
-        .map(|(i, j)| draft(&format!("input.drafts[{i}]"), j))
-        .collect::<Result<_, _>>()?;
+    let (held, drafts) = batch::read_all("input.drafts", required("input", kvs, "drafts")?, || {
+        let held: Vec<(String, Vec<String>)> = list("input.held", required("input", kvs, "held")?)?
+            .iter()
+            .enumerate()
+            .map(|(i, j)| {
+                let p = format!("input.held[{i}]");
+                let k = members(&p, &["id", "about"], j)?;
+                Ok((
+                    text(&format!("{p}.id"), required(&p, k, "id")?)?.to_owned(),
+                    texts(&format!("{p}.about"), required(&p, k, "about")?)?,
+                ))
+            })
+            .collect::<Result<_, String>>()?;
+        Ok(held)
+    })
+    .map_err(|e| e.to_string())?;
     let hash = |b: &[u8]| Sha256::digest(b).to_vec();
     let lookup = |id: &str| {
         held.iter()
@@ -138,7 +64,14 @@ fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{answers, bytes, draft, env};
+    use super::answers;
+    use crate::reader::bytes;
+    fn env(path: &str, j: &loops::json::Json) -> Result<loops::envelope::Env, String> {
+        loops::envelope::read(path, j).map_err(|e| e.to_string())
+    }
+    fn draft(path: &str, j: &loops::json::Json) -> Result<loops::batch::Draft, String> {
+        loops::batch::read(path, j).map_err(|e| e.to_string())
+    }
     use crate::parse;
     use loops::json::Json;
 
@@ -198,10 +131,9 @@ mod tests {
             vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
         );
         let duplicate = parse(r#"{"extra":1,"extra":2}"#);
-        assert!(
-            env("env", &duplicate)
-                .expect_err("duplicate")
-                .contains("duplicate")
+        assert_eq!(
+            env("env", &duplicate).expect_err("unknown field"),
+            "envelope-field-unknown"
         );
     }
 

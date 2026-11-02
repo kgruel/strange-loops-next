@@ -2,6 +2,7 @@
 use crate::envelope::Env;
 use crate::json::Json;
 use crate::number::Nat;
+use crate::read::{bytes, members, optional, required, text};
 use crate::stored::{self, Stored, Written};
 use num_bigint::BigUint;
 use std::fmt;
@@ -18,6 +19,67 @@ pub struct Draft {
     pub salt: Vec<u8>,
     /// The raw payload that the record commits to.
     pub payload: Json,
+}
+
+fn read_values(path: &str, j: &Json) -> Result<Draft, crate::read::Error> {
+    let kvs = members(path, &["label", "env", "salt", "payload"], j)?;
+    Ok(Draft {
+        label: optional(kvs, "label")
+            .map(|v| text(&format!("{path}.label"), v).map(str::to_owned))
+            .transpose()?,
+        env: crate::envelope::decode_values(&format!("{path}.env"), required(path, kvs, "env")?)?,
+        salt: bytes(&format!("{path}.salt"), required(path, kvs, "salt")?)?,
+        payload: required(path, kvs, "payload")?.clone(),
+    })
+}
+
+fn check_draft_keys<'a>(
+    drafts: impl IntoIterator<Item = &'a Json>,
+) -> Result<(), crate::read::Error> {
+    crate::envelope::check_all_keys(
+        drafts
+            .into_iter()
+            .filter_map(|draft| {
+                if let Json::Obj(fields) = draft {
+                    Some(fields)
+                } else {
+                    None
+                }
+            })
+            .flatten()
+            .filter_map(|(key, value)| (key == "env").then_some(value)),
+    )
+    .map_err(|e| crate::read::Error::from(e.to_string()))
+}
+
+/// Checks every raw draft env occurrence, then reads the intervening input,
+/// then decodes draft values. The callback preserves held-input order.
+///
+/// # Errors
+/// Returns a raw input error from shape, intervening input or draft decoding.
+pub fn read_all<T>(
+    path: &str,
+    j: &Json,
+    before_values: impl FnOnce() -> Result<T, crate::read::Error>,
+) -> Result<(T, Vec<Draft>), crate::read::Error> {
+    let raw = crate::read::list(path, j)?;
+    check_draft_keys(raw)?;
+    let before = before_values()?;
+    let drafts = raw
+        .iter()
+        .enumerate()
+        .map(|(i, j)| read_values(&format!("{path}[{i}]"), j))
+        .collect::<Result<_, _>>()?;
+    Ok((before, drafts))
+}
+
+/// Decodes one draft after checking every raw env member.
+///
+/// # Errors
+/// Returns a raw input error for invalid keys, shapes or values.
+pub fn read(path: &str, j: &Json) -> Result<Draft, crate::read::Error> {
+    check_draft_keys([j])?;
+    read_values(path, j)
 }
 
 /// Lean: refusals in `Loops.resolveBatch` and `Loops.checkPrev`, model/Loops/Batch.lean.
@@ -292,6 +354,42 @@ mod tests {
     use crate::number::Int;
     use sha2::{Digest, Sha256};
     use std::cell::Cell;
+
+    #[test]
+    fn raw_draft_shape_precedes_labels_and_intervening_input() {
+        let unknown = Json::Obj(vec![("extra".into(), Json::Null)]);
+        let malformed = Json::Obj(vec![("label".into(), Json::Null)]);
+        // Both env occurrences must survive, in either order.
+        for envs in [[unknown.clone(), Json::Null], [Json::Null, unknown]] {
+            let repeated = Json::Obj(vec![
+                ("env".into(), envs[0].clone()),
+                ("env".into(), envs[1].clone()),
+                ("label".into(), Json::Null),
+            ]);
+            for drafts in [
+                vec![malformed.clone(), repeated.clone()],
+                vec![repeated.clone(), malformed.clone()],
+            ] {
+                let called = Cell::new(false);
+                let result = read_all("drafts", &Json::Arr(drafts), || {
+                    called.set(true);
+                    Err::<(), _>(crate::read::Error::from("held values".to_owned()))
+                });
+                assert_eq!(
+                    result.expect_err("shape").to_string(),
+                    "envelope-field-unknown"
+                );
+                assert!(!called.get());
+            }
+        }
+        let result = read_all("drafts", &Json::Arr(vec![malformed]), || {
+            Err::<(), _>(crate::read::Error::from("held values".to_owned()))
+        });
+        assert_eq!(
+            result.expect_err("held before draft values").to_string(),
+            "held values"
+        );
+    }
 
     fn hash(bytes: &[u8]) -> Vec<u8> {
         Sha256::digest(bytes).to_vec()

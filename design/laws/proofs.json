@@ -121,29 +121,6 @@
    "states":
    "∀ {d : Int} {ds : List Int}, Loops.Stripped (d :: ds) → Loops.Stripped ds",
    "module": "Laws.Time"},
-  "Loops.stripped_of_digits":
-  {"uses": ["Loops.stripZeros_last", "Loops.stripZeros_sub"],
-   "states":
-   "∀ {ds : List Int}, (∀ (d : Int), d ∈ ds → 0 ≤ d ∧ d < 10) → Loops.Stripped (Loops.stripZeros ds)",
-   "module": "Laws.Time"},
-  "Loops.stripZeros_sub":
-  {"uses": [],
-   "states": "∀ {ds : List Int} {d : Int}, d ∈ Loops.stripZeros ds → d ∈ ds",
-   "module": "Laws.Time"},
-  "Loops.stripZeros_replicate_zero":
-  {"uses": ["Loops.stripZeros_append_zero"],
-   "states":
-   "∀ (ds : List Int) (k : Nat), Loops.stripZeros (ds ++ List.replicate k 0) = Loops.stripZeros ds",
-   "module": "Laws.Time"},
-  "Loops.stripZeros_last":
-  {"uses": [],
-   "states": "∀ (ds : List Int), (Loops.stripZeros ds).getLast? ≠ some 0",
-   "module": "Laws.Time"},
-  "Loops.stripZeros_append_zero":
-  {"uses": [],
-   "states":
-   "∀ (ds : List Int), Loops.stripZeros (ds ++ [0]) = Loops.stripZeros ds",
-   "module": "Laws.Time"},
   "Loops.stopBefore_trichotomy":
   {"uses": [],
    "states":

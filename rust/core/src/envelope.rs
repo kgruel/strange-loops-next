@@ -1,4 +1,5 @@
 //! Env validation and canonical wire data from model/Loops/Envelope.lean.
+use crate::read::{members, optional, required, text, texts};
 use crate::{
     json::{self, Json},
     occurred,
@@ -30,6 +31,83 @@ pub fn check_keys<'a>(keys: impl IntoIterator<Item = &'a str>) -> Result<(), Sha
     } else {
         Ok(())
     }
+}
+
+/// Checks all raw envelopes before any value decoding.
+///
+/// # Errors
+/// Returns a shape error if any object has an unknown envelope field.
+pub fn check_all_keys<'a>(envs: impl IntoIterator<Item = &'a Json>) -> Result<(), ShapeError> {
+    for env in envs {
+        if let Json::Obj(fields) = env {
+            check_keys(fields.iter().map(|(key, _)| key.as_str()))?;
+        }
+    }
+    Ok(())
+}
+
+/// Decodes one raw envelope, checking its keys before its values.
+///
+/// # Errors
+/// Returns a raw input error for duplicate or unknown keys or invalid values.
+pub fn read(path: &str, j: &Json) -> Result<Env, crate::read::Error> {
+    if let Json::Obj(raw) = j {
+        check_keys(raw.iter().map(|(k, _)| k.as_str()))
+            .map_err(|e| crate::read::Error::from(e.to_string()))?;
+    }
+    decode_values(path, j)
+}
+
+/// Decodes variants. A singleton uses the one-envelope boundary directly.
+///
+/// # Errors
+/// Returns a raw input error for invalid keys, shapes or values.
+pub fn read_all(path: &str, j: &Json) -> Result<Vec<Env>, crate::read::Error> {
+    let raw = crate::read::list(path, j)?;
+    if let [one] = raw {
+        return Ok(vec![read(&format!("{path}[0]"), one)?]);
+    }
+    check_all_keys(raw).map_err(|e| crate::read::Error::from(e.to_string()))?;
+    raw.iter()
+        .enumerate()
+        .map(|(i, j)| decode_values(&format!("{path}[{i}]"), j))
+        .collect()
+}
+
+pub(crate) fn decode_values(path: &str, j: &Json) -> Result<Env, crate::read::Error> {
+    let Json::Obj(raw) = j else {
+        return Err(crate::read::Error::from(format!("{path}: expected object")));
+    };
+    let names: Vec<_> = raw.iter().map(|(k, _)| k.as_str()).collect();
+    let kvs = members(path, &names, j)?;
+    let required_text =
+        |k: &str| text(&format!("{path}.{k}"), required(path, kvs, k)?).map(str::to_owned);
+    let optional_text = |k: &str| {
+        optional(kvs, k)
+            .map(|v| text(&format!("{path}.{k}"), v).map(str::to_owned))
+            .transpose()
+    };
+    let array = |k: &str| {
+        optional(kvs, k)
+            .map(|v| texts(&format!("{path}.{k}"), v))
+            .transpose()
+            .map(Option::unwrap_or_default)
+    };
+    let kind = required_text("kind")?;
+    let observer = required_text("observer")?;
+    let emitted = required_text("emitted")?;
+    let occurred = optional_text("occurred")?;
+    let under = optional_text("under")?;
+    Ok(Env {
+        kind,
+        observer,
+        emitted,
+        occurred,
+        about: array("about")?,
+        prev: array("prev")?,
+        under,
+        erases: array("erases")?,
+    })
 }
 
 /// Lean: `Loops.Env`, model/Loops/Envelope.lean.
@@ -135,5 +213,57 @@ impl Env {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod raw_tests {
+    use super::*;
+
+    #[test]
+    fn raw_shape_precedes_singleton_and_variant_values() {
+        let unknown = Json::Obj(vec![("extra".into(), Json::Null)]);
+        let number_kind = Json::Obj(vec![("kind".into(), Json::Int(7_i64.into()))]);
+        for raw in [
+            unknown.clone(),
+            Json::Obj(vec![
+                ("kind".into(), Json::Int(7_i64.into())),
+                ("extra".into(), Json::Null),
+            ]),
+        ] {
+            assert_eq!(
+                read("env", &raw).expect_err("shape").to_string(),
+                "envelope-field-unknown"
+            );
+            assert_eq!(
+                read_all("envs", &Json::Arr(vec![raw]))
+                    .expect_err("singleton shape")
+                    .to_string(),
+                "envelope-field-unknown"
+            );
+        }
+        for malformed in [Json::Null, number_kind] {
+            for raw in [
+                vec![malformed.clone(), unknown.clone()],
+                vec![unknown.clone(), malformed.clone()],
+            ] {
+                assert_eq!(
+                    read_all("envs", &Json::Arr(raw))
+                        .expect_err("all shape")
+                        .to_string(),
+                    "envelope-field-unknown"
+                );
+            }
+        }
+        let duplicate = Json::Obj(vec![
+            ("extra".into(), Json::Null),
+            ("extra".into(), Json::Null),
+        ]);
+        assert_eq!(
+            read("env", &duplicate)
+                .expect_err("raw shape first")
+                .to_string(),
+            "envelope-field-unknown"
+        );
     }
 }

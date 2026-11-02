@@ -39,19 +39,16 @@ function checkRecord(dir) {
     const n = `record/${v.vector}`;
     const envs = v.input.envs;
     if (v.expect.refused) {
-      let got = null;
-      try {
-        L.checkEnvelopeKeys(envs);
-        L.writeText(envs[0], L.base32Decode(v.input.salt), v.input.payload_text, new Uint8Array(32));
+      for (const writer of v.input.payloads ? ["seal", "writeText"] : ["writeText"]) {
+        let got = null;
+        try { L.writeRecord(v.input, { writer }); }
+        catch (e) { got = e.message; }
+        t.expect(`${n} ${writer} refused`, got, v.expect.refused);
       }
-      catch (e) { got = e.message; }
-      t.expect(`${n} refused`, got, v.expect.refused);
       continue;
     }
-    L.checkEnvelopeKeys(envs);
     const salt = L.base32Decode(v.input.salt);
-    const seed = () => L.base32Decode(v.input.seed);
-    const r = L.seal(envs[0], salt, v.input.payloads[0], seed);
+    const r = L.writeRecord(v.input);
     t.expect(`${n} env`, L.canonical(L.envJson(envs[0])), v.expect.env_canonical);
     t.expect(`${n} payload`, L.canonical(v.input.payloads[0]), v.expect.payload_canonical);
     t.expect(`${n} commit`, r.commit, v.expect.commit);
@@ -65,7 +62,7 @@ function checkRecord(dir) {
     for (const [i, e] of envs.entries()) t.expect(`${n} env variant ${i}`, L.idOf(e, r.commit), v.expect.id);
     for (const [i, p] of v.input.payloads.entries()) t.expect(`${n} payload variant ${i}`, L.commitOf(salt, p), v.expect.commit);
     // The same record, its payload read from text by the strict parser.
-    t.expect(`${n} from text`, L.writeText(envs[0], salt, JSON.stringify(v.input.payloads[0]), seed).id, v.expect.id);
+    t.expect(`${n} from text`, L.writeRecord(v.input, { writer: "writeText" }).id, v.expect.id);
   }
   return t;
 }

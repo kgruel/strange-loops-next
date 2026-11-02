@@ -34,8 +34,6 @@ def dayNumber (y m d : Nat) : Int :=
   ((365 * y + leapsBefore y + ((List.range (m - 1)).map fun k => daysIn y (k + 1)).sum + (d - 1) : Nat)
     : Int) - 719528
 
-def stripZeros (ds : List Int) : List Int := (ds.reverse.dropWhile (· == 0)).reverse
-
 /-- What follows the seconds: canonical fraction digits, with the UTC marker checked inline. -/
 def tail : List Char → Option (List Int)
   | '.' :: rest =>

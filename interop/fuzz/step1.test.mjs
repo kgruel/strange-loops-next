@@ -43,6 +43,16 @@ test('record preflight and writer refusal precede seed decoding', () => {
   assert.deepEqual(evaluateJS({ layer: 'record', input }), [{ refused: 'envelope-field-unknown' }]);
 });
 
+test('record shape refusal escapes Cartesian expansion in both malformed orders', () => {
+  for (const raw of [7, { kind: 7 }]) {
+    const unknown = { kind: '', extra: true };
+    for (const envs of [[raw, unknown], [unknown, raw], [{ extra: 1 }], [{ kind: 7, extra: 1 }]]) {
+      const input = { envs, payloads: [null, {}], salt: '!', seed: '!' };
+      assert.deepEqual(evaluateJS({ layer: 'record', input }), [{ refused: 'envelope-field-unknown' }]);
+    }
+  }
+});
+
 test('raw batch preflight retains every repeated envelope member', () => {
   for (const envs of ['"env":{"extra":1},"env":{"kind":""}', '"env":{"kind":""},"env":{"extra":1}']) {
     const raw = `{"layer":"batch","input":{"held":[],"drafts":[{${envs},"salt":"","payload":null}]}}`;
