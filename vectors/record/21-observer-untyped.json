@@ -8,10 +8,10 @@
       {
         "kind": "note",
         "observer": "kyle",
-        "emitted": "2026-10-21T05:30:00-04:00"
+        "emitted": "2026-10-21T09:30:00Z"
       }
     ],
-    "salt": "hln264jfzfcjtawgurjix64yba",
+    "salt": "7bdqus95p529j0m6kh98nuso10",
     "payload_text": "{}"
   },
   "expect": {

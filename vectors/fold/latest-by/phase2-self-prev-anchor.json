@@ -7,12 +7,12 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaua",
+          "id": "r:00000000000000000000000000000000000000000000000000k0",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": [],
           "value": "v40",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaua"],
+          "prev": ["r:00000000000000000000000000000000000000000000000000k0"],
           "emitted": "2026-10-01T00:01:40Z",
           "occurred": "2026-10-01T00:01:40Z",
           "n": 0
@@ -21,7 +21,7 @@
     ]
   },
   "expect": {
-    "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaua": {
+    "r:00000000000000000000000000000000000000000000000000k0": {
       "heads": [],
       "winner": null,
       "others": []

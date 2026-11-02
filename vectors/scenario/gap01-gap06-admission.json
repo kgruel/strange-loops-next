@@ -20,7 +20,7 @@
     "thing": "thing:A",
     "records": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "id": "r:00000000000000000000000000000000000000000000000000q0",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A"],
@@ -31,23 +31,23 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "id": "r:00000000000000000000000000000000000000000000000000qg",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:B"],
         "value": "refused",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
+        "prev": ["r:00000000000000000000000000000000000000000000000000q0"],
         "emitted": "2026-10-01T00:03:20Z",
         "occurred": "2026-10-01T00:03:20Z",
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "id": "r:0000000000000000000000000000000000000000000000000000",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A"],
         "value": "also refused",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q"],
+        "prev": ["r:00000000000000000000000000000000000000000000000000qg"],
         "emitted": "2026-10-01T00:05:00Z",
         "occurred": "2026-10-01T00:05:00Z",
         "n": 0
@@ -58,34 +58,34 @@
         "name": "before",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+            "id": "r:00000000000000000000000000000000000000000000000000q0",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"]
+          ["r:00000000000000000000000000000000000000000000000000q0"]
         ]
       },
       {
         "name": "after",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+            "id": "r:00000000000000000000000000000000000000000000000000q0",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+            "id": "r:00000000000000000000000000000000000000000000000000qg",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": "r:0000000000000000000000000000000000000000000000000000",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q"]
+          ["r:00000000000000000000000000000000000000000000000000q0", "r:00000000000000000000000000000000000000000000000000qg", "r:0000000000000000000000000000000000000000000000000000"],
+          ["r:00000000000000000000000000000000000000000000000000qg", "r:0000000000000000000000000000000000000000000000000000", "r:00000000000000000000000000000000000000000000000000q0"],
+          ["r:0000000000000000000000000000000000000000000000000000", "r:00000000000000000000000000000000000000000000000000q0", "r:00000000000000000000000000000000000000000000000000qg"]
         ]
       }
     ],
@@ -104,13 +104,13 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+            "id": "r:00000000000000000000000000000000000000000000000000q0",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "admitted": ["r:00000000000000000000000000000000000000000000000000q0"],
+        "heads": ["r:00000000000000000000000000000000000000000000000000q0"],
+        "winner": "r:00000000000000000000000000000000000000000000000000q0",
         "slots": {
           "c": {
             "value": 1,
@@ -121,21 +121,21 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "id": "r:0000000000000000000000000000000000000000000000000000",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+            "id": "r:00000000000000000000000000000000000000000000000000q0",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+            "id": "r:00000000000000000000000000000000000000000000000000qg",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "admitted": ["r:00000000000000000000000000000000000000000000000000q0"],
+        "heads": ["r:00000000000000000000000000000000000000000000000000q0"],
+        "winner": "r:00000000000000000000000000000000000000000000000000q0",
         "slots": {
           "c": {
             "value": 1,

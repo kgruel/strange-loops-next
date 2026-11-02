@@ -16,7 +16,7 @@
           "count": true,
           "where": {
             "env.under": {
-              "below": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"
+              "below": "r:000000000000000000000000000000000000000000000000010g"
             }
           }
         }

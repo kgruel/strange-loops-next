@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "id": "r:000000000000000000000000000000000000000000000000030g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:a", "task:b"],
@@ -18,18 +18,18 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "id": "r:0000000000000000000000000000000000000000000000000310",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:a"],
           "value": "v194",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "prev": ["r:000000000000000000000000000000000000000000000000030g"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "id": "r:000000000000000000000000000000000000000000000000031g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:c"],
@@ -42,18 +42,18 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "id": "r:0000000000000000000000000000000000000000000000000310",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:a"],
           "value": "v194",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "prev": ["r:000000000000000000000000000000000000000000000000030g"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "id": "r:000000000000000000000000000000000000000000000000031g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:c"],
@@ -64,7 +64,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "id": "r:000000000000000000000000000000000000000000000000030g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:a", "task:b"],
@@ -77,7 +77,7 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq",
+          "id": "r:000000000000000000000000000000000000000000000000031g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:c"],
@@ -88,7 +88,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
+          "id": "r:000000000000000000000000000000000000000000000000030g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:a", "task:b"],
@@ -99,12 +99,12 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba",
+          "id": "r:0000000000000000000000000000000000000000000000000310",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["task:a"],
           "value": "v194",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq"],
+          "prev": ["r:000000000000000000000000000000000000000000000000030g"],
           "emitted": "2026-10-01T00:03:20Z",
           "occurred": "2026-10-01T00:03:20Z",
           "n": 0
@@ -113,7 +113,7 @@
     ]
   },
   "expect": {
-    "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadaq",
-    "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadba", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadbq"]
+    "winner": "r:000000000000000000000000000000000000000000000000030g",
+    "others": ["r:0000000000000000000000000000000000000000000000000310", "r:000000000000000000000000000000000000000000000000031g"]
   }
 }

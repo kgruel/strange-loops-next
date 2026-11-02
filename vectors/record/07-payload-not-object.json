@@ -7,26 +7,26 @@
     "envs": [
       {
         "kind": "note",
-        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
-        "emitted": "2026-10-21T05:30:00-04:00"
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
       }
     ],
     "payloads": [
       ["a payload can be any JSON value", 7]
     ],
-    "salt": "zu4cxjyu3szpyazrkauzaodxna",
-    "seed": "jpairczaap3nqstmrszbjgpwkrjvfwtbw6gplbcgwfqb4ubyub5a"
+    "salt": "pks2n9okripfo0pha0kp0e3nd0",
+    "seed": "9f08h2p00frdgijchip196fmah9l5mj1mu6fb126m5g1sk1ok1t0"
   },
   "expect": {
-    "env_canonical": "{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}",
+    "env_canonical": "{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}",
     "payload_canonical": "[\"a payload can be any JSON value\",7]",
-    "commit": "h:nutfqvx3ueetuqauuafxppdyzxmopzhumqlj4cphnq3wa6khksoq",
-    "id_preimage": "{\"commit\":\"h:nutfqvx3ueetuqauuafxppdyzxmopzhumqlj4cphnq3wa6khksoq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}}",
-    "id": "r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq",
-    "signing_input": "loops/record/v1:r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq",
-    "key": "k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q",
-    "ed25519": "xg2ylpqjbgj5uw5dbbx43n37ikgx4dfoqkwctzeaahp3wr34rwbxlntcly5g3agyq4ot3bxm477bpkqc3xay5h2uydbq4ayr75ds6ay",
-    "line": "{\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq\",\"payload\":[\"a payload can be any JSON value\",7],\"salt\":\"zu4cxjyu3szpyazrkauzaodxna\",\"sig\":{\"ed25519\":\"xg2ylpqjbgj5uw5dbbx43n37ikgx4dfoqkwctzeaahp3wr34rwbxlntcly5g3agyq4ot3bxm477bpkqc3xay5h2uydbq4ayr75ds6ay\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}",
-    "erased_line": "{\"commit\":\"h:nutfqvx3ueetuqauuafxppdyzxmopzhumqlj4cphnq3wa6khksoq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:peszsrpwqyw5wwnmgzhsg7weppnag743rwtqavu7tnadfdmle3eq\",\"sig\":{\"ed25519\":\"xg2ylpqjbgj5uw5dbbx43n37ikgx4dfoqkwctzeaahp3wr34rwbxlntcly5g3agyq4ot3bxm477bpkqc3xay5h2uydbq4ayr75ds6ay\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}"
+    "commit": "h:dkj5glnrk44jkg0kk05nff3opncefp7kcgb9s2f7dgrm0ua7aieg",
+    "id_preimage": "{\"commit\":\"h:dkj5glnrk44jkg0kk05nff3opncefp7kcgb9s2f7dgrm0ua7aieg\",\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}}",
+    "id": "r:r3kp1uep016d3go39d2ugcmdhlih1jg874bg4oeiriu7pss070g0",
+    "signing_input": "loops/record/v1:r:r3kp1uep016d3go39d2ugcmdhlih1jg874bg4oeiriu7pss070g0",
+    "key": "k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg",
+    "ed25519": "h72lluj1tsqtig1861b10iapgdqb8i126f5r0j2ifsku1k6jetavb8f7riioi31m9aoh74q28aap97ka5h06p615hjbehs6tmclfe08",
+    "line": "{\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:r3kp1uep016d3go39d2ugcmdhlih1jg874bg4oeiriu7pss070g0\",\"payload\":[\"a payload can be any JSON value\",7],\"salt\":\"pks2n9okripfo0pha0kp0e3nd0\",\"sig\":{\"ed25519\":\"h72lluj1tsqtig1861b10iapgdqb8i126f5r0j2ifsku1k6jetavb8f7riioi31m9aoh74q28aap97ka5h06p615hjbehs6tmclfe08\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}",
+    "erased_line": "{\"commit\":\"h:dkj5glnrk44jkg0kk05nff3opncefp7kcgb9s2f7dgrm0ua7aieg\",\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:r3kp1uep016d3go39d2ugcmdhlih1jg874bg4oeiriu7pss070g0\",\"sig\":{\"ed25519\":\"h72lluj1tsqtig1861b10iapgdqb8i126f5r0j2ifsku1k6jetavb8f7riioi31m9aoh74q28aap97ka5h06p615hjbehs6tmclfe08\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}"
   }
 }

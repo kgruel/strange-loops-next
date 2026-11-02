@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
+          "id": "r:000000000000000000000000000000000000000000000000008g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -18,7 +18,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
+          "id": "r:000000000000000000000000000000000000000000000000009g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -31,7 +31,7 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
+          "id": "r:000000000000000000000000000000000000000000000000008g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -42,7 +42,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
+          "id": "r:000000000000000000000000000000000000000000000000009g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -53,7 +53,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
+          "id": "r:000000000000000000000000000000000000000000000000008g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -64,7 +64,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
+          "id": "r:000000000000000000000000000000000000000000000000009g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -77,7 +77,7 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
+          "id": "r:000000000000000000000000000000000000000000000000009g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -88,7 +88,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
+          "id": "r:000000000000000000000000000000000000000000000000008g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -99,7 +99,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
+          "id": "r:000000000000000000000000000000000000000000000000009g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -114,9 +114,9 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
-      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaajq",
-      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"]
+      "heads": ["r:000000000000000000000000000000000000000000000000009g", "r:000000000000000000000000000000000000000000000000008g"],
+      "winner": "r:000000000000000000000000000000000000000000000000009g",
+      "others": ["r:000000000000000000000000000000000000000000000000008g"]
     }
   }
 }

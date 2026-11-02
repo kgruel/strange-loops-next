@@ -7,12 +7,12 @@
     "envs": [
       {
         "kind": "note",
-        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
-        "emitted": "2026-10-21T05:30:00-04:00",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z",
         "occurred": "2026-10-17T09:14/PT4M"
       }
     ],
-    "salt": "ngixoaja7hlfgcrxjvg5por2ie",
+    "salt": "d68ne090v7b562hn9l6tfehq84",
     "payload_text": "{}"
   },
   "expect": {

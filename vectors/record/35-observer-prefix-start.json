@@ -8,10 +8,10 @@
       {
         "kind": "note",
         "observer": "1:x",
-        "emitted": "2026-10-21T05:30:00-04:00"
+        "emitted": "2026-10-21T09:30:00Z"
       }
     ],
-    "salt": "4r6r44q76acagoblpdb2pefdr4",
+    "salt": "shuhssgvu0206e1bf31qf453hs",
     "payload_text": "{}"
   },
   "expect": {

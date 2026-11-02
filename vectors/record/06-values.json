@@ -7,8 +7,8 @@
     "envs": [
       {
         "kind": "note",
-        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
-        "emitted": "2026-10-21T05:30:00-04:00"
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
       }
     ],
     "payloads": [
@@ -32,19 +32,19 @@
         ]
       }
     ],
-    "salt": "5wnjo3nqgtwsbo2js5ficw5vmq",
-    "seed": "jpairczaap3nqstmrszbjgpwkrjvfwtbw6gplbcgwfqb4ubyub5a"
+    "salt": "tmd9erdg6jmi1eq9it582mtlcg",
+    "seed": "9f08h2p00frdgijchip196fmah9l5mj1mu6fb126m5g1sk1ok1t0"
   },
   "expect": {
-    "env_canonical": "{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}",
+    "env_canonical": "{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}",
     "payload_canonical": "{\"empty-arr\":[],\"empty-obj\":{},\"f\":false,\"max-safe\":9007199254740991,\"neg\":-42,\"nested\":[[1,[]],{\"k\":\"\"}],\"null\":null,\"t\":true,\"zero\":0}",
-    "commit": "h:c7ahach53hfsqvwuhmyqlgyw2byjxo6blonqui2c2re4di4zxgdq",
-    "id_preimage": "{\"commit\":\"h:c7ahach53hfsqvwuhmyqlgyw2byjxo6blonqui2c2re4di4zxgdq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}}",
-    "id": "r:rzoe6ya7zqhai5f2iowtvinwkg3sprj36ccsnj3cgg6xyszkowaa",
-    "signing_input": "loops/record/v1:r:rzoe6ya7zqhai5f2iowtvinwkg3sprj36ccsnj3cgg6xyszkowaa",
-    "key": "k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q",
-    "ed25519": "o3emku63aifqk7sd6fmytckrp6ggj5uyilam56pdeol3oyexrb76vbuwboqmdp4wmccyx67oshsxyr7zco5thxic22grz24jhgqm4ba",
-    "line": "{\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:rzoe6ya7zqhai5f2iowtvinwkg3sprj36ccsnj3cgg6xyszkowaa\",\"payload\":{\"empty-arr\":[],\"empty-obj\":{},\"f\":false,\"max-safe\":9007199254740991,\"neg\":-42,\"nested\":[[1,[]],{\"k\":\"\"}],\"null\":null,\"t\":true,\"zero\":0},\"salt\":\"5wnjo3nqgtwsbo2js5ficw5vmq\",\"sig\":{\"ed25519\":\"o3emku63aifqk7sd6fmytckrp6ggj5uyilam56pdeol3oyexrb76vbuwboqmdp4wmccyx67oshsxyr7zco5thxic22grz24jhgqm4ba\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}",
-    "erased_line": "{\"commit\":\"h:c7ahach53hfsqvwuhmyqlgyw2byjxo6blonqui2c2re4di4zxgdq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:rzoe6ya7zqhai5f2iowtvinwkg3sprj36ccsnj3cgg6xyszkowaa\",\"sig\":{\"ed25519\":\"o3emku63aifqk7sd6fmytckrp6ggj5uyilam56pdeol3oyexrb76vbuwboqmdp4wmccyx67oshsxyr7zco5thxic22grz24jhgqm4ba\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}"
+    "commit": "h:2v07027tr75iglmk7cogb6omq1o9neu1bedgk8q2qh4s38spn63g",
+    "id_preimage": "{\"commit\":\"h:2v07027tr75iglmk7cogb6omq1o9neu1bedgk8q2qh4s38spn63g\",\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}}",
+    "id": "r:rrl2d9hce5mc0ac2icmolusjhunbq039q9qg29kp7d0i7u4emo9g",
+    "signing_input": "loops/record/v1:r:rrl2d9hce5mc0ac2icmolusjhunbq039q9qg29kp7d0i7u4emo9g",
+    "key": "k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg",
+    "ed25519": "7v48qu26fe98irvc5itmgrjjk8vq6h70gf0qj2jrifluga2ucq6hfev19o9lihr302vr00d9uih6g3j6h3m9fcfl2nq7l2hs11chc2g",
+    "line": "{\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:rrl2d9hce5mc0ac2icmolusjhunbq039q9qg29kp7d0i7u4emo9g\",\"payload\":{\"empty-arr\":[],\"empty-obj\":{},\"f\":false,\"max-safe\":9007199254740991,\"neg\":-42,\"nested\":[[1,[]],{\"k\":\"\"}],\"null\":null,\"t\":true,\"zero\":0},\"salt\":\"tmd9erdg6jmi1eq9it582mtlcg\",\"sig\":{\"ed25519\":\"7v48qu26fe98irvc5itmgrjjk8vq6h70gf0qj2jrifluga2ucq6hfev19o9lihr302vr00d9uih6g3j6h3m9fcfl2nq7l2hs11chc2g\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}",
+    "erased_line": "{\"commit\":\"h:2v07027tr75iglmk7cogb6omq1o9neu1bedgk8q2qh4s38spn63g\",\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:rrl2d9hce5mc0ac2icmolusjhunbq039q9qg29kp7d0i7u4emo9g\",\"sig\":{\"ed25519\":\"7v48qu26fe98irvc5itmgrjjk8vq6h70gf0qj2jrifluga2ucq6hfev19o9lihr302vr00d9uih6g3j6h3m9fcfl2nq7l2hs11chc2g\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}"
   }
 }

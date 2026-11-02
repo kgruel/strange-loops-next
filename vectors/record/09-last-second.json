@@ -1,0 +1,32 @@
+{
+  "vector": "09-last-second",
+  "layer": "record",
+  "laws": ["record.emitted"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2016-12-31T23:59:59Z"
+      }
+    ],
+    "payloads": [
+      {}
+    ],
+    "salt": "lk6uukcubkh8v38lf376fn2f0o",
+    "seed": "9f08h2p00frdgijchip196fmah9l5mj1mu6fb126m5g1sk1ok1t0"
+  },
+  "expect": {
+    "env_canonical": "{\"emitted\":\"2016-12-31T23:59:59Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}",
+    "payload_canonical": "{}",
+    "commit": "h:510fomsobf5so0kqph1npghm68684k32pe0mc303gk53kvvmoe70",
+    "id_preimage": "{\"commit\":\"h:510fomsobf5so0kqph1npghm68684k32pe0mc303gk53kvvmoe70\",\"env\":{\"emitted\":\"2016-12-31T23:59:59Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}}",
+    "id": "r:bhligrirjrnm27li69t1mi35991hpa16s4fdp26sgjk38vvs1g30",
+    "signing_input": "loops/record/v1:r:bhligrirjrnm27li69t1mi35991hpa16s4fdp26sgjk38vvs1g30",
+    "key": "k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg",
+    "ed25519": "e4rj5jb69akamgdrnbq4nmqjtin1k1bu96300mu6033m61q6h4b1rkn8et043vgtvv8bhboma37dq38t74ekho28qk0a6217mvpse28",
+    "line": "{\"env\":{\"emitted\":\"2016-12-31T23:59:59Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:bhligrirjrnm27li69t1mi35991hpa16s4fdp26sgjk38vvs1g30\",\"payload\":{},\"salt\":\"lk6uukcubkh8v38lf376fn2f0o\",\"sig\":{\"ed25519\":\"e4rj5jb69akamgdrnbq4nmqjtin1k1bu96300mu6033m61q6h4b1rkn8et043vgtvv8bhboma37dq38t74ekho28qk0a6217mvpse28\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}",
+    "erased_line": "{\"commit\":\"h:510fomsobf5so0kqph1npghm68684k32pe0mc303gk53kvvmoe70\",\"env\":{\"emitted\":\"2016-12-31T23:59:59Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:bhligrirjrnm27li69t1mi35991hpa16s4fdp26sgjk38vvs1g30\",\"sig\":{\"ed25519\":\"e4rj5jb69akamgdrnbq4nmqjtin1k1bu96300mu6033m61q6h4b1rkn8et043vgtvv8bhboma37dq38t74ekho28qk0a6217mvpse28\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}"
+  }
+}

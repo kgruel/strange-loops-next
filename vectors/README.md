@@ -36,8 +36,7 @@ Fold each order separately; each must produce `expect`.
 * Extrema: `min` and `max`, each `null` when nothing was folded.
 
 Each record's `about` is a set of things.
-It carries `emitted` and may carry `occurred`, as text per `protocol/record.md`.
-Some fixtures spell one time two ways.
+It carries `emitted` and may carry `occurred`, as defined in `protocol/record.md`.
 Content order compares span start, span end, `emitted`, then id digest bytes.
 A record without `occurred` has an instant span at its `emitted`.
 Newest first reverses this whole order.
@@ -125,7 +124,8 @@ A held eraser can suppress a target's payload; a bare erased copy cannot suppres
 `expect.things` gives per-thing states, as in `fold/latest-by`.
 `expect.sum` gives Sum over admitted records.
 Every rotation must give the same answer when forms are consistent.
-Write `settled` and `refused` in ascending id digest-byte order, not id-text order.
+Write `settled` and `refused` in ascending id digest-byte order.
+Canonical id text has the same order.
 This order does not change head content order.
 
 ## `scenario`
@@ -155,8 +155,8 @@ A reader holds less; a lens edit returns as a record.
 `input.occurred` lists time texts.
 `expect.spans` gives each span's UTC `start` and `end`, or `refused`, in input order.
 An open span has `end: null`.
-UTC offsets can cross years 0000 or 9999.
-Outside years use signed or five-digit forms, such as `-0001-12-31T23:00:00Z` and `10000-01-01T00:00:00Z`.
+Instants use canonical UTC text as specified in `protocol/record.md`.
+A calendar span ending after year 9999 can have a five-digit end year.
 In `08-order`, `expect["oldest-first"]` lists texts ordered by span, per `protocol/record.md`.
 
 ## `lens/section`
@@ -171,7 +171,7 @@ Put-get additionally requires distinct base ids and the exact same ordered id li
 
 `input.envs` gives envelope variants with the same id.
 `input.payloads` gives payload variants with the same commitment.
-`salt` and the signing key's `seed` use base32.
+`salt` and the signing key's `seed` use base32hex.
 `expect` pins canonical envelope and payload, commitment, id preimage, id, signing key, signature and both stored lines.
 The two stored lines show forms before and after erasure.
 The signed message uses the exact prefix `loops/record/v1:`.

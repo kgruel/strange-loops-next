@@ -20,7 +20,7 @@
     "thing": "thing:A",
     "records": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
+        "id": "r:000000000000000000000000000000000000000000000000028g",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A"],
@@ -31,12 +31,12 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
+        "id": "r:0000000000000000000000000000000000000000000000000290",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A"],
         "value": "\nnext\n",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"],
+        "prev": ["r:000000000000000000000000000000000000000000000000028g"],
         "emitted": "2026-10-01T00:03:20Z",
         "occurred": "2026-10-01T00:03:20Z",
         "n": 0
@@ -47,29 +47,29 @@
         "name": "before",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
+            "id": "r:000000000000000000000000000000000000000000000000028g",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"]
+          ["r:000000000000000000000000000000000000000000000000028g"]
         ]
       },
       {
         "name": "after",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
+            "id": "r:000000000000000000000000000000000000000000000000028g",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
+            "id": "r:0000000000000000000000000000000000000000000000000290",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja"],
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"]
+          ["r:000000000000000000000000000000000000000000000000028g", "r:0000000000000000000000000000000000000000000000000290"],
+          ["r:0000000000000000000000000000000000000000000000000290", "r:000000000000000000000000000000000000000000000000028g"]
         ]
       }
     ],
@@ -88,13 +88,13 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
+            "id": "r:000000000000000000000000000000000000000000000000028g",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
+        "admitted": ["r:000000000000000000000000000000000000000000000000028g"],
+        "heads": ["r:000000000000000000000000000000000000000000000000028g"],
+        "winner": "r:000000000000000000000000000000000000000000000000028g",
         "slots": {
           "c": {
             "value": 1,
@@ -105,17 +105,17 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq",
+            "id": "r:000000000000000000000000000000000000000000000000028g",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
+            "id": "r:0000000000000000000000000000000000000000000000000290",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaciq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacja",
+        "admitted": ["r:000000000000000000000000000000000000000000000000028g", "r:0000000000000000000000000000000000000000000000000290"],
+        "heads": ["r:0000000000000000000000000000000000000000000000000290"],
+        "winner": "r:0000000000000000000000000000000000000000000000000290",
         "slots": {
           "c": {
             "value": 2,

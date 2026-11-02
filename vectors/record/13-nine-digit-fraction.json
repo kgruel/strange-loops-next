@@ -1,0 +1,32 @@
+{
+  "vector": "13-nine-digit-fraction",
+  "layer": "record",
+  "laws": ["record.emitted"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T00:00:00.000000001Z"
+      }
+    ],
+    "payloads": [
+      {}
+    ],
+    "salt": "hmarkiqn8855geftt7i33raono",
+    "seed": "9f08h2p00frdgijchip196fmah9l5mj1mu6fb126m5g1sk1ok1t0"
+  },
+  "expect": {
+    "env_canonical": "{\"emitted\":\"2026-10-21T00:00:00.000000001Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}",
+    "payload_canonical": "{}",
+    "commit": "h:girf2t7jdrpl7okr1ak702b7mcpilpcsckl7o6dngumrda6ok7s0",
+    "id_preimage": "{\"commit\":\"h:girf2t7jdrpl7okr1ak702b7mcpilpcsckl7o6dngumrda6ok7s0\",\"env\":{\"emitted\":\"2026-10-21T00:00:00.000000001Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}}",
+    "id": "r:u070qu864j27v5qld55q725lpqt1qq9jcg8nh6t2sg5glkmbq1jg",
+    "signing_input": "loops/record/v1:r:u070qu864j27v5qld55q725lpqt1qq9jcg8nh6t2sg5glkmbq1jg",
+    "key": "k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg",
+    "ed25519": "rkeho53qulhg3toe7pcen1fs6mhjte9qu68uvpvanf1pt3gt7uj2v94mnn35d3m8vao2ourvsokttr5i2q7p8siqbp98fa8jfcs9s18",
+    "line": "{\"env\":{\"emitted\":\"2026-10-21T00:00:00.000000001Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:u070qu864j27v5qld55q725lpqt1qq9jcg8nh6t2sg5glkmbq1jg\",\"payload\":{},\"salt\":\"hmarkiqn8855geftt7i33raono\",\"sig\":{\"ed25519\":\"rkeho53qulhg3toe7pcen1fs6mhjte9qu68uvpvanf1pt3gt7uj2v94mnn35d3m8vao2ourvsokttr5i2q7p8siqbp98fa8jfcs9s18\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}",
+    "erased_line": "{\"commit\":\"h:girf2t7jdrpl7okr1ak702b7mcpilpcsckl7o6dngumrda6ok7s0\",\"env\":{\"emitted\":\"2026-10-21T00:00:00.000000001Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:u070qu864j27v5qld55q725lpqt1qq9jcg8nh6t2sg5glkmbq1jg\",\"sig\":{\"ed25519\":\"rkeho53qulhg3toe7pcen1fs6mhjte9qu68uvpvanf1pt3gt7uj2v94mnn35d3m8vao2ourvsokttr5i2q7p8siqbp98fa8jfcs9s18\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}"
+  }
+}

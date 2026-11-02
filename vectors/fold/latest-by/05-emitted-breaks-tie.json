@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala",
+          "id": "r:00000000000000000000000000000000000000000000000000b0",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -18,31 +18,31 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaamq",
+          "id": "r:00000000000000000000000000000000000000000000000000cg",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v25",
           "prev": [],
           "emitted": "2026-10-01T00:03:25Z",
-          "occurred": "2026-10-01T01:03:20+01:00",
+          "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         }
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaamq",
+          "id": "r:00000000000000000000000000000000000000000000000000cg",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
           "value": "v25",
           "prev": [],
           "emitted": "2026-10-01T00:03:25Z",
-          "occurred": "2026-10-01T01:03:20+01:00",
+          "occurred": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala",
+          "id": "r:00000000000000000000000000000000000000000000000000b0",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -57,9 +57,9 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaamq"],
-      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaala",
-      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaamq"]
+      "heads": ["r:00000000000000000000000000000000000000000000000000b0", "r:00000000000000000000000000000000000000000000000000cg"],
+      "winner": "r:00000000000000000000000000000000000000000000000000b0",
+      "others": ["r:00000000000000000000000000000000000000000000000000cg"]
     }
   }
 }
