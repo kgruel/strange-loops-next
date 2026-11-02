@@ -1,6 +1,63 @@
 # Lean model mutation report
 
-## CURRENT Step-1 snapshot: `6fa98571b0f7d15d5ddbdae3ef12401efc0c92f7`
+## CURRENT review-fix snapshot: `f1b32fbaea4b7abc0bda9ac84eff3d8d9e8cb326`
+
+The Node 22 run completes 196 catalogue entries with a 240-second command timeout.
+A Python script derives all counts here from `.pi/evidence/mutations-fixes/full.json`.
+The checked totals are in `.pi/evidence/fixes-summary.json`.
+
+| Outcome | Count |
+|---|---:|
+| Rejected by build | 147 |
+| Vector differences | 27 |
+| Generator assertion exceptions | 16 |
+| Survivors | 6 |
+
+The runner exits 1 for generator assertions.
+The parent checks every error log ending.
+No command times out, receives a signal, or reports a spawn or cleanup error.
+Build rejections are not semantic proof kills.
+Generator assertions are not vector-difference kills.
+Survival alone proves neither equivalence nor reachability.
+
+### Guard mutations
+
+The catalogue adds eight mutations and retires only `finish-occurred-stamp-of`.
+The retired positive-offset guard is redundant under R4; [COVERAGE.md](COVERAGE.md) records the source-based reason.
+The six older survivors remain unchanged; D6 stays unapproved.
+The cheap CI runner uses the same eight replacements.
+Every cheap guard mutation compiles and then fails runtime checks.
+The full catalogue includes the proof modules, so its detection stages can differ.
+
+| Mutation | Full-catalogue outcome |
+|---|---|
+| `step1-base32-reencode` | rejected-by-build |
+| `step1-fraction-final-zero` | rejected-by-build |
+| `step1-seconds-bound` | rejected-by-build |
+| `step1-zone-only-z` | rejected-by-build |
+| `step1-envelope-keys-remove` | error |
+| `step1-envelope-keys-after-value` | error |
+| `step1-draft-keys-after-values` | error |
+| `step1-record-keys-after-values` | error |
+
+Direct JS and Rust tests also pin canonical byte decoding, fraction endings, second bounds, UTC markers, and raw key checks.
+The JS tests use throwing getters to check shape-before-value ordering.
+Rust tests call the public reader and check all-envelope ordering through its adapter.
+
+Both baseline builds pass; initial generation matches the committed corpus.
+Restored source and vector paths match HEAD, and the mutation lock is absent.
+The parent starts no other Lean build or explicit LSP probe during the run.
+Automatic tooling isolation is not independently established.
+The final integration gate checks the restored tree.
+An earlier interrupted attempt remains in `.pi/evidence/mutations-fixes-interrupted/`.
+The parent restores its unfinished mutation before this complete rerun.
+The interrupted attempt does not enter these counts.
+
+```sh
+fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/review-fix-mutants.json
+```
+
+## HISTORICAL Step-1 snapshot: `6fa98571b0f7d15d5ddbdae3ef12401efc0c92f7`
 
 The Node 22 run completes all 189 entries with a 240-second command timeout.
 The model sources and generated vectors match this snapshot.

@@ -6,7 +6,53 @@ This report covers the Step-1 JS, Lean, and Rust campaign.
 It also preserves evidence from earlier two-way campaigns as historical findings.
 The harness covers record, fold, spec, realm, scenario, batch, and lens inputs.
 
-## Step-1 three-way campaign
+## Review-fix three-way campaign
+
+Node 22 checks 5,600 cases with seed `step1-2`: 800 cases per family.
+The run uses 88 chunks and takes 179.98 seconds.
+Exit 1 records the existing D1 disagreement, not an infrastructure failure.
+A Python script derives every count in this section from the retained artifacts.
+It sums `summary.json` family rows and checks every raw and reduced mismatch.
+Local scripts and totals are `.pi/summarize-fixes.py` and `.pi/evidence/fixes-summary.json`.
+
+| Family | Cases | Match | Protocol refusal | Shared decoder refusal | Mismatch |
+|---|---:|---:|---:|---:|---:|
+| record | 800 | 333 | 445 | 22 | 0 |
+| fold | 800 | 683 | 0 | 117 | 0 |
+| spec | 800 | 694 | 49 | 57 | 0 |
+| realm | 800 | 704 | 0 | 96 | 0 |
+| scenario | 800 | 695 | 0 | 105 | 0 |
+| batch | 800 | 529 | 271 | 0 | 0 |
+| lens | 800 | 574 | 182 | 0 | 44 |
+| Total | 5,600 | 4,212 | 947 | 397 | 44 |
+
+All 397 decoder refusals occur in both Lean and Rust.
+They are not protocol agreement.
+Scheduled shape probes combine unknown keys with duplicate, unknown, and cyclic labels.
+Other probes combine unknown keys with malformed values, malformed salts, and multiple record envelopes.
+Both draft orders occur.
+A separate raw replay checks a repeated `env` member whose earlier value has an unknown key.
+The adapter preserves every raw member for the public JS shape check.
+
+The parent checks all 44 raw and 44 reduced mismatch artifacts.
+Their complete inputs and JS, Lean, and Rust answers match the previous D1 examples.
+Lean and Rust agree against JavaScript in every case.
+No new mismatch class appears.
+Each reduction uses 76 trials and 3 accepted rounds, below the 80-trial limit.
+The total is 3,344 trials; 0 reductions reach the limit.
+These results do not prove absolute minimality.
+D1–D7 remain unchanged.
+
+Local evidence is in `.pi/evidence/step1-2/` and `.pi/evidence/raw-env-repeat/`.
+An interrupted pre-review run remains separately under `.pi/evidence/step1-2-interrupted/`.
+Its cases do not enter these totals.
+The historical `step1-1` match total below is corrected to 4,368 by the same script.
+
+```sh
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-2 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-2
+```
+
+## Historical Step-1 three-way campaign
 
 Node 22 checks 5,600 cases with seed `step1-1`: 800 cases per family.
 The run uses 88 chunks and takes 155.43 seconds.
@@ -21,7 +67,7 @@ Exit 1 records the existing D1 disagreement, not an infrastructure failure.
 | scenario | 800 | 696 | 0 | 104 | 0 |
 | batch | 800 | 615 | 185 | 0 | 0 |
 | lens | 800 | 578 | 180 | 0 | 42 |
-| Total | 5,600 | 3,768 | 813 | 377 | 42 |
+| Total | 5,600 | 4,368 | 813 | 377 | 42 |
 
 All 377 decoder refusals occur in both Lean and Rust.
 They are not protocol agreement.

@@ -217,6 +217,19 @@ export function generate(seed, index, family) {
   }
   // Each named record boundary has a fixed slot and cannot be randomly overwritten.
   let scheduled = false;
+  if (family === 'batch' && index % 64 >= 10 && index % 64 < 20) {
+    const slot = index % 64 - 10, bad = slot % 5;
+    const a = { label: '@a', env: { ...clone(input.drafts[0].env), prev: [] }, salt: input.drafts[0].salt, payload: null };
+    const b = clone(a); b.label = '@b'; b.env.extra = true;
+    if (bad === 0) b.label = '@a';
+    if (bad === 1) a.env.prev = ['@missing'];
+    if (bad === 2) a.env.prev = ['@a'];
+    if (bad === 3) a.env.kind = 17;
+    if (bad === 4) a.salt = '!';
+    input.drafts = slot < 5 ? [a, b] : [b, a];
+    nearMiss = `shape-${['duplicate-label', 'unknown-label', 'cycle-label', 'malformed-value', 'malformed-salt'][bad]}-${slot < 5 ? 'last' : 'first'}`;
+    scheduled = true;
+  }
   if (family === 'record') {
     const slot = index % 64;
     const badTimes = [
@@ -247,8 +260,14 @@ export function generate(seed, index, family) {
     } else if (slot === 27) {
       nearMiss = 'unknown-envelope-key-empty-kind'; scheduled = true;
       clean.kind = ''; clean.extra = true;
+    } else if (slot >= 28 && slot < 32) {
+      const bad = { ...clone(clean), extra: true };
+      const other = { ...clone(clean), kind: slot % 2 ? 17 : '' };
+      if (slot % 2) input.salt = '!';
+      input.envs = slot < 30 ? [other, bad] : [bad, other];
+      nearMiss = `shape-multi-record-${slot}`; scheduled = true;
     }
-    if (scheduled) input.envs = [clean];
+    if (scheduled && slot < 28) input.envs = [clean];
   }
   // A separate one-in-eight draw probes an independent input boundary.
   if (!scheduled && rng.int(8) === 0) {

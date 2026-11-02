@@ -10,7 +10,7 @@ import { resolveBatch } from '../js/batch.mjs';
 import { formOf, step, lensEdit } from '../js/scenario.mjs';
 
 const WRITE_CODES = new Set([
-  'envelope-field-unknown', 'kind-empty', 'observer-not-typed', 'emitted-not-rfc3339', 'occurred-not-span',
+  'kind-empty', 'observer-not-typed', 'emitted-not-rfc3339', 'occurred-not-span',
   'about-not-typed', 'prev-not-record-id', 'under-not-record-id', 'erases-not-record-id',
   'salt-not-16-bytes', 'member-duplicate', 'number-out-of-range',
 ]);
@@ -39,10 +39,12 @@ function lensAnswer({ base, text }) {
   return { parsed, normalized: Lens.render(parsed), outcomes, applied: Lens.apply(base, outcomes) };
 }
 function recordAnswer(input) {
-  const env = input.envs[0], salt = L.base32Decode(input.salt);
-  const seed = L.base32Decode(input.seed ?? L.base32(new Uint8Array(32)));
+  const env = input.envs[0];
   let r, payload;
   try {
+    L.checkEnvelopeKeys(input.envs);
+    const salt = L.base32Decode(input.salt);
+    const seed = () => L.base32Decode(input.seed ?? L.base32(new Uint8Array(32)));
     payload = input.payload_text === undefined ? input.payloads[0] : undefined;
     r = input.payload_text === undefined ? L.seal(env, salt, payload, seed)
       : L.writeText(env, salt, input.payload_text, seed);
@@ -68,7 +70,13 @@ export function evaluateJS(vector, rawText) {
       try { L.fixedBytes(text, input.prefix, input.bytes); return true; }
       catch { return false; }
     }) }];
-    case 'record': return input.envs.flatMap(env =>
+    case 'record': {
+      try { L.checkEnvelopeKeys(input.envs); }
+      catch (error) {
+        if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
+        throw error;
+      }
+      return input.envs.flatMap(env =>
       (input.payloads ?? [null]).map((payload, i) => {
         const variant = { ...input, envs: [env] };
         if (rawText !== undefined && input.payload_text === undefined && input.payloads) {
@@ -77,6 +85,7 @@ export function evaluateJS(vector, rawText) {
         } else if (input.payloads) variant.payloads = [payload];
         return recordAnswer(variant);
       }));
+    }
     case 'lens/section': return [lensAnswer(input)];
     case 'spec/parse': return [S.parseNode(specNode(vector, rawText))];
     case 'spec/run': {
@@ -85,7 +94,21 @@ export function evaluateJS(vector, rawText) {
       // Both spec readers admit their input. Settlement belongs to realm/scenario.
       return input.orders.map(rs => S.runSpec(parsed.parsed, rs));
     }
-    case 'batch': return [resolveBatch(input.drafts, input.held)];
+    case 'batch': {
+      // JSON.parse keeps only the last repeated env; shape checks need every occurrence.
+      if (rawText !== undefined) {
+        const drafts = S.readJson(jsonSourceAt(rawText, ['input', 'drafts']));
+        const envs = drafts.items.flatMap(draft => (draft?.members ?? [])
+          .filter(([key]) => key === 'env')
+          .map(([, env]) => Object.fromEntries((env?.members ?? []).map(([key]) => [key, null]))));
+        try { L.checkEnvelopeKeys(envs); }
+        catch (error) {
+          if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
+          throw error;
+        }
+      }
+      return [resolveBatch(input.drafts, input.held)];
+    }
     case 'realm': {
       const forms = input.forms;
       return Array.from({ length: Math.max(1, forms.length) }, (_, i) => {

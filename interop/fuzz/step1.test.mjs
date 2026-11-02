@@ -28,8 +28,39 @@ test('named record boundaries remain scheduled across seeds', () => {
       if (i === 6) { assert.throws(() => evaluateJS(v)); continue; }
       const expected = i < 6 ? 'prev-not-record-id' : i < 11 ? 'emitted-not-rfc3339'
         : i < 27 ? 'occurred-not-span' : 'envelope-field-unknown';
-      assert.deepEqual(evaluateJS(v), [{ refused: expected }, { refused: expected }], name);
+      assert.deepEqual(evaluateJS(v), Array(i === 27 ? 1 : 2).fill({ refused: expected }), name);
       if (i === 27) { assert.equal(env.kind, ''); assert.equal(env.extra, true); }
+    }
+  }
+});
+
+test('record preflight and writer refusal precede seed decoding', () => {
+  const env = { kind: '', observer: 'o:x', emitted: '2024-01-01T00:00:00Z' };
+  const input = { envs: [env], payloads: [null], salt: '00000000000000000000000000', seed: '!' };
+  assert.deepEqual(evaluateJS({ layer: 'record', input }), [{ refused: 'kind-empty' }]);
+  input.envs.push({ ...env, extra: true });
+  input.salt = '!';
+  assert.deepEqual(evaluateJS({ layer: 'record', input }), [{ refused: 'envelope-field-unknown' }]);
+});
+
+test('raw batch preflight retains every repeated envelope member', () => {
+  for (const envs of ['"env":{"extra":1},"env":{"kind":""}', '"env":{"kind":""},"env":{"extra":1}']) {
+    const raw = `{"layer":"batch","input":{"held":[],"drafts":[{${envs},"salt":"","payload":null}]}}`;
+    assert.deepEqual(evaluateJS(JSON.parse(raw), raw), [{ refused: 'envelope-field-unknown' }]);
+  }
+});
+
+test('shape cases are scheduled in both orders', () => {
+  for (const seed of ['a', 'b']) {
+    for (let i = 10; i < 20; i++) {
+      const v = generate(seed, i, 'batch');
+      assert.match(v.fuzz.nearMiss, /^shape-/);
+      assert.deepEqual(evaluateJS(v), [{ refused: 'envelope-field-unknown' }]);
+    }
+    for (let i = 28; i < 32; i++) {
+      const v = generate(seed, i, 'record');
+      assert.match(v.fuzz.nearMiss, /^shape-multi-record-/);
+      assert.deepEqual(evaluateJS(v), [{ refused: 'envelope-field-unknown' }]);
     }
   }
 });
