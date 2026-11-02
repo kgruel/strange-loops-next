@@ -59,3 +59,12 @@
 15:58 final-gates — All 21 final gates pass. Verify 125 Rust tests from all workspace results, not only the evaluator.
 15:58 complete — Commit the reviewed counts, ledger, and generated pages as 8130da0. The reports list each fix and its commits.
 15:58 complete — All helpers and commands finish. The model and vectors match HEAD, and no mutation lock remains. Commit the report and progress log. Do not push.
+16:29 round2-start — Read G1–G7; keep R1–R6 and D1–D7 unchanged.
+16:33 g5 — The proof graph has no outside user of stripZeros or its five lemmas. Remove the dead family.
+16:41 g1-g3 — Libraries own raw decoding. Singleton replay has no outer precheck. Six new vectors pin malformed variants.
+16:49 core-gate — The first gate finds an old direct-reader duplicate assertion. The library keeps the existing outer shape priority.
+16:58 core-complete — Commit the gated library boundaries, six vectors, prose, and dead-family removal. Rust has 127 passing tests.
+17:01 g2 — Six library deletions or reorderings fail their vector layers. Restore exact committed bytes and pass all three replays.
+17:51 evidence-complete — Finish all 5,600 campaign cases and 195 mutations. Only D1 and the six old survivors remain. Sources restore.
+17:54 final-gates — All 21 restored-tree gates and four evidence tests pass. Sum every Rust suite: 127 tests. Commit retained evidence.
+17:54 complete — G1–G6 map to 8a12ba6 and 20d9bcf. G7 passes. Reports and pages agree; no command or helper remains running. No push.

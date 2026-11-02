@@ -4,15 +4,15 @@
 
 The tree has three implementations: Lean, JavaScript, and Rust.
 Step 1 applies the six settled rulings before records exist.
-The law index has 76 entries, 629 theorems, and 6 boundary witnesses.
+The law index has 76 entries, 624 theorems, and 6 boundary witnesses.
 See [the law index](design/laws/laws.json) and [proof and boundary data](design/laws/).
 These proofs apply only under their stated premises.
 
-The tree has 328 JSON fixtures: 316 generated fixtures and 12 standard fixtures.
-Lean replays 307 generated fixtures; 9 occurred fixtures use separate checks.
+The tree has 334 JSON fixtures: 322 generated fixtures and 12 standard fixtures.
+Lean replays 313 generated fixtures; 9 occurred fixtures use separate checks.
 Rust checks every fixture, six JCS byte pairs, 4,000 binary64 cases, and 128 SUPERCOP signing cases with ed25519-dalek.
-Rust passes 125 tests; JavaScript passes 5,322 vector checks and 17 regression tests.
-The fuzz suite passes 43 tests.
+Rust passes 127 tests; JavaScript passes 5,338 vector checks and 18 regression tests.
+The fuzz suite passes 44 tests.
 See [vectors](vectors/README.md), [Rust boundaries](rust/GAPS.md), and [the mutation report](model/mutate/REPORT.md).
 These checks provide bounded evidence, not complete JCS or cryptographic correctness.
 They do not certify browser accessibility, external links, or official ASD dictionary compliance.
@@ -23,22 +23,24 @@ The writer accepts values with magnitude at most 2^53 − 1, including fractions
 Numeric folds read safe whole values only.
 Raw constructors and theorem premises retain separate domains.
 
-The review-fix sequential gates pass on Node 22.
-The `step1-2` campaign checks 5,600 cases, 800 per family, in 179.98 seconds.
-It reports 4,212 matches, 947 protocol refusals, 397 shared decoder refusals, and 44 duplicate-base lens mismatches.
+The round-two review-fix sequential gates pass on Node 22.
+The `step1-3` campaign checks 5,600 cases, 800 per family, in 155.26 seconds.
+It reports 4,194 matches, 975 protocol refusals, 389 shared decoder refusals, and 42 duplicate-base lens mismatches.
 Decoder refusals are not agreement.
 The parent checks every raw and reduced mismatch; no new mismatch class appears.
 Each reduction uses 76 trials and 3 accepted rounds, below the 80-trial limit.
 These reductions do not establish absolute minimality.
-A Python script derives these counts from the retained artifacts.
+`interop/fuzz/summarize.py` derives these counts from tracked summaries and the D1 mismatch list.
 See [the campaign report](interop/fuzz/REPORT.md) for the scripts and current and historical results.
 The CI seed `ci-1` checks 28 three-way cases without mismatches.
 
-The mutation catalogue has 196 entries, including eight new guard mutations.
-It retires only the redundant positive-offset guard under R4.
-The full run reports 147 build rejections, 27 vector differences, 16 generator assertion exceptions, and 6 survivors.
+The mutation catalogue has 195 entries, including eight new guard mutations.
+It retires the redundant positive-offset guard under R4 and the entry for the deleted `stripZeros` family.
+The full run reports 146 build rejections, 27 vector differences, 16 generator assertion exceptions, and 6 survivors.
 The runner exits 1 for assertion exceptions; no timeout or infrastructure failure occurs.
 The six old survivors remain, including the four unapproved D6 helpers.
+All-envelope shape checks now belong to each library.
+Six deliberate per-envelope faults fail the respective vector layers; restored implementations pass.
 All new cheap guard mutations compile and then fail runtime checks.
 Build rejections are not semantic proof kills.
 Survival does not prove equivalence.
