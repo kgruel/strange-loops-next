@@ -6,12 +6,20 @@ import { spawnSync } from "node:child_process";
 
 const model = dirname(fileURLToPath(import.meta.url));
 const root = dirname(model);
+// Both runners use the same replacement sites. This runner builds only runtime checks.
+const catalogue = JSON.parse(readFileSync(join(model, "mutate/mutants.json"), "utf8"));
+const guardMutants = ["step1-base32-reencode","step1-fraction-final-zero","step1-seconds-bound","step1-zone-only-z","step1-envelope-keys-remove","step1-envelope-keys-after-value","step1-draft-keys-after-values","step1-record-keys-after-values"].map(id => {
+  const m = catalogue.find(m => m.id === id);
+  if (!m) throw new Error(`missing guard mutant: ${id}`);
+  return [m.id, m.file.includes("/") ? m.file : `Loops/${m.file}`, m.before, m.after];
+});
 const mutants = [
   ["typed about", "Gen/Read.lean", 'if typedRef s then pure s else bad p "expected a typed reference"', 'pure s'],
   ["lens validity", "Loops/Lens.lean", 'if Valid d then some d else none', 'some d'],
   ["integer bound", "Loops/Record.lean", 'if -(2^53 - 1) ≤ i ∧ i ≤ 2^53 - 1 then some i else none', 'some i'],
   ["fraction as zero", "Loops/Record.lean", '    | _ => none\n  else none\n\n/-- Withhold', '    | some (.number _) => some 0\n    | _ => none\n  else none\n\n/-- Withhold'],
   ["global heads", "Loops/Fold.lean", 'orderHeads ((perThing xs).flatMap fun ts => ts.2.heads)', '(LatestBy.fold .empty xs).heads'],
+  ...guardMutants,
 ];
 const work = mkdtempSync(join(tmpdir(), "loops-model-mutants-"));
 const copy = join(work, "model");

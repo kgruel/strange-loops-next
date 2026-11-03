@@ -9,7 +9,7 @@
       "from": [
         {
           "store": ".",
-          "about": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"
+          "about": "r:00000000000000000000000000000000000000000000000001og"
         }
       ],
       "fold": {
@@ -24,7 +24,7 @@
           "collect": true,
           "where": {
             "env.about": {
-              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"
+              "is": "r:00000000000000000000000000000000000000000000000001og"
             }
           }
         }
@@ -33,7 +33,7 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "id": "r:00000000000000000000000000000000000000000000000001og",
           "kind": "note",
           "observer": "sl:alice",
           "about": [],
@@ -43,17 +43,17 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "id": "r:00000000000000000000000000000000000000000000000001p0",
           "kind": "note",
           "observer": "sl:bob",
-          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "about": ["r:00000000000000000000000000000000000000000000000001og"],
           "value": "",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "prev": ["r:00000000000000000000000000000000000000000000000001og"],
           "emitted": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabzq",
+          "id": "r:00000000000000000000000000000000000000000000000001pg",
           "kind": "note",
           "observer": "sl:bob",
           "about": ["task:1"],
@@ -65,17 +65,17 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "id": "r:00000000000000000000000000000000000000000000000001p0",
           "kind": "note",
           "observer": "sl:bob",
-          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "about": ["r:00000000000000000000000000000000000000000000000001og"],
           "value": "",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "prev": ["r:00000000000000000000000000000000000000000000000001og"],
           "emitted": "2026-10-01T00:03:20Z",
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabzq",
+          "id": "r:00000000000000000000000000000000000000000000000001pg",
           "kind": "note",
           "observer": "sl:bob",
           "about": ["task:1"],
@@ -85,7 +85,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "id": "r:00000000000000000000000000000000000000000000000001og",
           "kind": "note",
           "observer": "sl:alice",
           "about": [],
@@ -97,7 +97,7 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabzq",
+          "id": "r:00000000000000000000000000000000000000000000000001pg",
           "kind": "note",
           "observer": "sl:bob",
           "about": ["task:1"],
@@ -107,7 +107,7 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "id": "r:00000000000000000000000000000000000000000000000001og",
           "kind": "note",
           "observer": "sl:alice",
           "about": [],
@@ -117,12 +117,12 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "id": "r:00000000000000000000000000000000000000000000000001p0",
           "kind": "note",
           "observer": "sl:bob",
-          "about": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "about": ["r:00000000000000000000000000000000000000000000000001og"],
           "value": "",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"],
+          "prev": ["r:00000000000000000000000000000000000000000000000001og"],
           "emitted": "2026-10-01T00:03:20Z",
           "n": 0
         }
@@ -133,11 +133,11 @@
     "all": {
       "heads": [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "id": "r:00000000000000000000000000000000000000000000000001p0",
           "shown": "here"
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "id": "r:00000000000000000000000000000000000000000000000001og",
           "shown": "here"
         }
       ],
@@ -145,9 +145,9 @@
     },
     "current": {
       "things": {
-        "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq": [
+        "r:00000000000000000000000000000000000000000000000001og": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+            "id": "r:00000000000000000000000000000000000000000000000001p0",
             "shown": "here"
           }
         ]
@@ -157,7 +157,7 @@
     "says-about": {
       "heads": [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabza",
+          "id": "r:00000000000000000000000000000000000000000000000001p0",
           "shown": "here"
         }
       ],

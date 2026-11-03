@@ -1,0 +1,20 @@
+{
+  "vector": "r4-emitted-6",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T00:00:00.Z"
+      }
+    ],
+    "salt": "nmpbnkfv45kpedb5gom973q17g",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "emitted-not-rfc3339"
+  }
+}

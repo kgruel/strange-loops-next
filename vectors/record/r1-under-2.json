@@ -1,0 +1,21 @@
+{
+  "vector": "r1-under-2",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z",
+        "under": "r:000000000000000000000000000000000000000000000000000x"
+      }
+    ],
+    "salt": "a4bjsbtmj4780i4ptdptcsbfrg",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "under-not-record-id"
+  }
+}

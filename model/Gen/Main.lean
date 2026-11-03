@@ -8,6 +8,7 @@ import Gen.Realm
 import Gen.Occurred
 import Gen.Scenario
 import Gen.Rulings
+import Gen.ByteText
 
 /-!
 # Gen: write the vectors
@@ -46,15 +47,14 @@ def r3 := rec (fixtureId 0x13) "topic:auth" 150
 def r4 := rec (fixtureId 0x14) "topic:auth" 300 (prev := [fixtureId 0x12, fixtureId 0x13])
 def r5 := rec (fixtureId 0x15) "topic:cache" 120
 def r6 := rec (fixtureId 0x16) "topic:auth" 200 (emitted := 210)
--- r6's times, each spelled another way, and a greater digest whose text sorts
--- first: only the id, read as digest bytes, puts r7 first
+-- Equal times and a greater digest: numeric and actual text order both put r7 first.
 def r7 := { rec (fixtureId 0x37) "topic:auth" 200 (emitted := 210) with
-  occurred := some (claim "2026-10-01T01:03:20+01:00"), emitted := stamp "2026-10-01T00:03:30.000Z" }
+  occurred := some (claim "2026-10-01T00:03:20Z"), emitted := stamp "2026-10-01T00:03:30Z" }
 def r8 := rec (fixtureId 0x18) "topic:cache" 400 (prev := [fixtureId 0x99])
--- r6's span spelled another way, an earlier `emitted` and a later id: only
+-- r6's span, an earlier `emitted` and a later id: only
 -- `emitted` puts r6 first
 def r9 := { rec (fixtureId 0x19) "topic:auth" 200 (emitted := 205) with
-  occurred := some (claim "2026-10-01T01:03:20+01:00") }
+  occurred := some (claim "2026-10-01T00:03:20Z") }
 
 -- content order on real times: without `occurred`, a record sits at its
 -- `emitted`, between records with one, whatever its id
@@ -102,8 +102,8 @@ def countCases : List FoldCase := [
   ⟨"gap15-multi-thing-once", ["count.perm"], rotations [
     { rec (fixtureId 0xc1) "task:a" 100 with about := ["task:a", "task:b"], n := 99 },
     { rec (fixtureId 0xc2) "task:a" 200 (prev := [fixtureId 0xc1]) with n := 1 }]⟩,
-  ⟨"04-positive-offset-emitted", ["count.perm"],
-    [[{ rec (fixtureId 0x78) "topic:offset" 0 with emitted := stamp "2026-10-01T01:00:00+01:00" }]]⟩
+  ⟨"04-utc-emitted", ["count.perm"],
+    [[{ rec (fixtureId 0x78) "topic:utc" 0 with emitted := stamp "2026-10-01T00:00:00Z" }]]⟩
 ]
 
 def latestCases : List FoldCase := [
@@ -352,7 +352,7 @@ def orFail : Except String J → IO J
 
 def main (args : List String) : IO UInt32 := do
   let dir : System.FilePath := args.headD "../vectors"
-  for sub in ["fold", "lens", "record", "spec", "batch", "realm", "occurred", "scenario"] do
+  for sub in ["fold", "lens", "record", "spec", "batch", "realm", "occurred", "scenario", "byte-text"] do
     if ← (dir / sub).pathExists then IO.FS.removeDirAll (dir / sub)
   let count ← countCases.mapM fun c => do
     pure (c.name, ← orFail (foldVector "fold/count" c fun o => .num (Count.fold 0 o)))
@@ -388,6 +388,7 @@ def main (args : List String) : IO UInt32 := do
   writeAll dir "fold/select" selects
   writeAll dir "lens/section" lens
   writeAll dir "record" records
+  writeAll dir "byte-text" Gen.ByteTextVectors.vectors
   let specs ← match Gen.SpecVectors.vectors with
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
@@ -411,5 +412,5 @@ def main (args : List String) : IO UInt32 := do
     | .ok vs => pure vs
     | .error e => throw (IO.userError e)
   writeAll dir "scenario" (scenarios ++ rulingScenarios)
-  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length + rulingScenarios.length} vectors to {dir}"
+  IO.println s!"wrote {count.length + latestBy.length + latest.length + sum.length + extrema.length + heads.length + views.length + selects.length + lens.length + records.length + specs.length + batches.length + realms.length + occurred.length + scenarios.length + rulingScenarios.length + Gen.ByteTextVectors.vectors.length} vectors to {dir}"
   return 0

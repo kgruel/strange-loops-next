@@ -74,11 +74,11 @@ C · native bindings (the core runs inside the app)
   <div class="tbl"><table>
     <thead><tr><th>Concern</th><th>Choice</th></tr></thead>
     <tbody>
-      <tr><td><code>emitted</code></td><td>RFC 3339 with the writer's offset</td></tr>
+      <tr><td><code>emitted</code></td><td>canonical UTC instant, with at most nine fractional digits</td></tr>
       <tr><td><code>occurred</code></td><td>a span: dates, instants and intervals from ISO 8601 and EDTF Level 1, the grammar closed in <code>protocol/record.md</code></td></tr>
       <tr><td>canonical bytes</td><td>RFC 8785 (JCS): ECMAScript-exact numbers, no NaN</td></tr>
       <tr><td>hash</td><td>SHA-256: WebCrypto and hardware everywhere; speed doesn't matter at this scale</td></tr>
-      <tr><td>id text</td><td>typed prefix plus lowercase base32 (<code>r:</code>, <code>st:</code>, <code>sl:</code>, …); algorithm changes go through the version label</td></tr>
+      <tr><td>id text</td><td>typed prefix plus lowercase unpadded base32hex (<code>r:</code>, <code>st:</code>, <code>sl:</code>, …); algorithm changes go through the version label</td></tr>
       <tr><td>signatures</td><td>RFC 8032 (Ed25519) over <code>loops/record/v1:</code> + id</td></tr>
       <tr><td>specs, declarations, config, drafts</td><td>Implemented specs use JSON (RFC 8259), defined by <code>protocol/spec.md</code>. Future declarations and config shapes remain proposals.</td></tr>
       <tr><td>index, search</td><td>SQLite with FTS5 through <code>rusqlite</code>, bundled; the CLI only, never the core</td></tr>
@@ -177,7 +177,7 @@ C · native bindings (the core runs inside the app)
       <thead><tr><th>Module</th><th>Holds</th><th>Tokens</th></tr></thead>
       <tbody>
         <tr><td><code>record</code></td><td>envelope, ids, salted commitments, Ed25519, the <code>Signer</code> trait</td><td>~6k</td></tr>
-        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers read as binary64), RFC 8785 canonical writer, base32</td><td>~4k</td></tr>
+        <tr><td><code>json</code></td><td>the reader (duplicate members refused, numbers read as binary64), RFC 8785 canonical writer, base32hex</td><td>~4k</td></tr>
         <tr><td><code>spec</code></td><td>JSON to typed specs and declarations; the closed folds and predicates as enums</td><td>~6k</td></tr>
         <tr><td><code>fold</code></td><td>six folds in two families, their modifiers, results that count what they couldn't read; no admission</td><td>~8k</td></tr>
         <tr><td><code>standing</code></td><td>declarations, stances, grants, presence, retire through, name tables, <code>resolve-by</code>, folded with <code>fold</code></td><td>~8k</td></tr>

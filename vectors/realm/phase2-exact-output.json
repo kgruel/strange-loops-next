@@ -6,7 +6,7 @@
   "input": {
     "forms": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "id": "r:00000000000000000000000000000000000000000000000003og",
         "kind": "load",
         "observer": "sl:kyle",
         "about": ["host:a"],
@@ -17,7 +17,7 @@
         "n": 9007199254740991
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "id": "r:00000000000000000000000000000000000000000000000003p0",
         "kind": "load",
         "observer": "sl:kyle",
         "about": ["host:b"],
@@ -32,24 +32,24 @@
   "expect": {
     "settled": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "id": "r:00000000000000000000000000000000000000000000000003og",
         "shown": "here"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "id": "r:00000000000000000000000000000000000000000000000003p0",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
       "host:a": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "heads": ["r:00000000000000000000000000000000000000000000000003og"],
+        "winner": "r:00000000000000000000000000000000000000000000000003og",
         "others": []
       },
       "host:b": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "heads": ["r:00000000000000000000000000000000000000000000000003p0"],
+        "winner": "r:00000000000000000000000000000000000000000000000003p0",
         "others": []
       }
     },

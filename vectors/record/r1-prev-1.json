@@ -1,0 +1,21 @@
+{
+  "vector": "r1-prev-1",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z",
+        "prev": ["r:000000000000000000000000000000000000000000000000000w"]
+      }
+    ],
+    "salt": "tjmhj68v91642d77vtno0dt9ek",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "prev-not-record-id"
+  }
+}

@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { base32, canonical, seal, writeText } from "./loops.mjs";
+import { base32, base32Decode, fixedBytes, canonical, checkEnvelopeKeys, seal, writeText, writeRecord, problem, validEmitted, occurredSpan, signId, verifyId } from "./loops.mjs";
+import { resolveBatch } from "./batch.mjs";
 import { heads, latest, sum, min, max } from "./fold.mjs";
 import { parse } from "./lens.mjs";
 import { check as checkLens } from "./check-lens.mjs";
@@ -39,6 +40,89 @@ test("spec and scenario admit once against all settled records", () => {
 const writerEnv = { kind: "note", observer: "o:test", emitted: "2026-10-21T00:00:00Z" };
 const writerSalt = new Uint8Array(16);
 const writerSeed = new Uint8Array(32);
+
+test("record input delegates the active envelope and checks only siblings", () => {
+  for (const writer of ["seal", "writeText"]) {
+    for (const env of [{ extra: 1 }, { kind: 7, extra: 1 }]) {
+      const input = { envs: [env], payloads: [null], salt: "!", seed: "!" };
+      assert.throws(() => writeRecord(input, { writer }), /envelope-field-unknown/);
+    }
+    const guarded = { get kind() { throw new Error("value read"); } };
+    for (const envs of [[guarded, { extra: 1 }], [{ extra: 1 }, guarded]]) {
+      for (const envIndex of [0, 1]) {
+        assert.throws(() => writeRecord({ envs, payloads: [null], salt: "!" }, { writer, envIndex }), /envelope-field-unknown/);
+      }
+    }
+    // One shape check, not writeText -> seal rechecking the active envelope.
+    let keyReads = 0;
+    const env = new Proxy(writerEnv, { ownKeys(target) { keyReads++; return Reflect.ownKeys(target); } });
+    writeRecord({ envs: [env], payloads: [null], salt: base32(writerSalt), seed: base32(writerSeed) }, { writer });
+    assert.equal(keyReads, 1);
+  }
+});
+
+test("base32hex exact image, width and byte order", () => {
+  const alphabet = "0123456789abcdefghijklmnopqrstuv";
+  for (const [n, pad] of [[16, 2], [32, 4], [64, 3]]) {
+    for (const byte of [0, 1, 127, 255]) {
+      const bytes = new Uint8Array(n).fill(byte);
+      const text = base32(bytes);
+      assert.deepEqual(base32Decode(text), bytes);
+      assert.deepEqual(fixedBytes(text, "", n), bytes);
+      for (let i = 1; i < 2 ** pad; i++) {
+        const last = alphabet.indexOf(text.at(-1));
+        assert.throws(() => base32Decode(text.slice(0, -1) + alphabet[last + i]));
+      }
+      for (const bad of [text + "0", text.slice(1), text + "=", text.slice(0, -1) + "w"]) assert.throws(() => fixedBytes(bad, "", n));
+    }
+    assert.throws(() => base32Decode(base32(new Uint8Array(n).fill(255)).toUpperCase()));
+  }
+  const ordered = Array.from({ length: 256 }, (_, i) => Uint8Array.from({ length: 32 }, (_, j) => j === 0 ? i : 255 - i));
+  assert.deepEqual(ordered.map(base32), ordered.map(base32).toSorted());
+  for (const field of ["prev", "under", "erases"]) {
+    const bad = "r:" + "0".repeat(51) + "1";
+    assert.equal(problem({ ...writerEnv, [field]: field === "under" ? bad : [bad] }), `${field}-not-record-id`);
+  }
+  const signed = signId(writerSeed, id(1));
+  assert.equal(verifyId(signed, id(1)), true);
+  assert.throws(() => verifyId({ ...signed, key: "x:" + signed.key.slice(2) }, id(1)));
+  assert.throws(() => verifyId({ ...signed, ed25519: signed.ed25519.slice(0, -1) + "1" }, id(1)));
+});
+
+test("canonical UTC instants and envelope key priority", () => {
+  for (const s of ["0000-02-29T00:00:00Z", "2024-02-29T23:59:59.123456789Z", "9999-12-31T23:59:59.5Z"]) assert.equal(validEmitted(s), true);
+  for (const s of ["2024-01-01T00:00:00+00:00", "2024-01-01T00:00:60Z", "2024-01-01T00:00:00.0Z", "2024-01-01T00:00:00.50Z", "2024-01-01T00:00:00.1234567891Z", "2023-02-29T00:00:00Z"]) {
+    assert.equal(validEmitted(s), false, s);
+    assert.equal(problem({ ...writerEnv, emitted: s }), "emitted-not-rfc3339");
+    for (const occurred of [s, `${s}/..`, `${s}/2025`, `2020/${s}`]) assert.equal(occurredSpan(occurred), null, occurred);
+  }
+  const env = { ...writerEnv, kind: "", unexpected: 1 };
+  assert.throws(() => seal(env, writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  assert.throws(() => seal(JSON.parse('{"__proto__":0,"kind":""}'), writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  assert.throws(() => seal(Object.defineProperty({ ...writerEnv }, "hidden", { value: 1 }), writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  const guarded = { get kind() { throw new Error('value read'); }, unexpected: 1 };
+  assert.throws(() => seal(guarded, writerSalt, {}, writerSeed), /envelope-field-unknown/);
+  assert.throws(() => writeText(guarded, writerSalt, '{', writerSeed), /envelope-field-unknown/);
+  const draft = { env, salt: base32(writerSalt), payload: {} };
+  assert.deepEqual(resolveBatch([draft], []), { refused: "envelope-field-unknown" });
+  assert.deepEqual(resolveBatch([{ ...draft, env: { ...env, about: ["@missing"] } }], []), { refused: "envelope-field-unknown" });
+});
+
+test("raw shape precedes every variant value, batch label and seed", () => {
+  const unread = { get kind() { throw new Error("value read"); } };
+  const unknown = { ...writerEnv, extra: true };
+  for (const envs of [[unread, unknown], [unknown, unread]]) {
+    assert.throws(() => checkEnvelopeKeys(envs), /envelope-field-unknown/);
+    const drafts = envs.map(env => ({
+      env, get label() { throw new Error("label read"); },
+      get salt() { throw new Error("salt read"); },
+    }));
+    assert.deepEqual(resolveBatch(drafts, []), { refused: "envelope-field-unknown" });
+  }
+  const seed = () => { throw new Error("seed read"); };
+  assert.throws(() => seal({ ...writerEnv, kind: "" }, writerSalt, {}, seed), /kind-empty/);
+  assert.throws(() => seal(writerEnv, writerSalt, {}, seed), /seed read/);
+});
 
 test("writers accept limits and within-range fractions after binary64 rounding", () => {
   for (const n of [Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER, 9007199254740991.1,

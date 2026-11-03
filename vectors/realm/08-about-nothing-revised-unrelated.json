@@ -6,7 +6,7 @@
   "input": {
     "forms": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq",
+        "id": "r:000000000000000000000000000000000000000000000000020g",
         "kind": "note",
         "observer": "sl:kyle",
         "about": [],
@@ -17,12 +17,12 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacca",
+        "id": "r:0000000000000000000000000000000000000000000000000220",
         "kind": "note",
         "observer": "sl:kyle",
         "about": [],
         "value": "",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq"],
+        "prev": ["r:000000000000000000000000000000000000000000000000020g"],
         "emitted": "2026-10-01T00:00:04Z",
         "occurred": "2026-10-01T00:00:04Z",
         "n": 0
@@ -32,24 +32,24 @@
   "expect": {
     "settled": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq",
+        "id": "r:000000000000000000000000000000000000000000000000020g",
         "shown": "here"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacca",
+        "id": "r:0000000000000000000000000000000000000000000000000220",
         "shown": "here"
       }
     ],
     "refused": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacca",
+        "id": "r:0000000000000000000000000000000000000000000000000220",
         "code": "prev-unrelated"
       }
     ],
     "things": {
-      "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaq",
+      "r:000000000000000000000000000000000000000000000000020g": {
+        "heads": ["r:000000000000000000000000000000000000000000000000020g"],
+        "winner": "r:000000000000000000000000000000000000000000000000020g",
         "others": []
       }
     },

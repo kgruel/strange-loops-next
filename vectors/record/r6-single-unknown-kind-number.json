@@ -1,0 +1,21 @@
+{
+  "vector": "r6-single-unknown-kind-number",
+  "layer": "record",
+  "laws": ["record.refuse", "batch.refuse-order"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": 7,
+        "extra": null
+      }
+    ],
+    "salt": "bukup1ivok4l2q3f33bgru0f50",
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "envelope-field-unknown"
+  }
+}

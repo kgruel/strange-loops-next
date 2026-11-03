@@ -74,13 +74,12 @@ all RFC inputs or a claim that raw core constructors satisfy writer premises.
 ## Digests, time, characters, and diagnostics
 
 Reader ids and links use exact bounded 32-byte digests, bytewise ordering and
-canonical base32 roundtrips. No pending unrestricted-Nat-id interpretation
+canonical base32hex roundtrips. No pending unrestricted-Nat-id interpretation
 remains. Writer links intentionally remain text until writer validation.
 
-Parsed moments have private bounded seconds and arbitrary-length fraction
-digits; the port does not expose arbitrary raw Lean moment construction.
-Time parsing keeps the model's second-60 and offset policies rather than a
-general date library's policy. Typed references and character checks retain
+Parsed moments have private bounded seconds and at most nine fraction digits.
+The port does not expose arbitrary raw Lean moment construction.
+Time parsing accepts only UTC `Z`, seconds 00–59, and fractions ending in a nonzero digit. Typed references and character checks retain
 Lean's ASCII rules. Explicit lens lines preserve carriage returns and empty
 strings; text-to-line LF splitting must not discard a trailing empty line.
 
@@ -94,7 +93,7 @@ or execution. Rust validates ignored metadata for Unicode, with regression tests
 
 - Rust rejects nonfinite overflow during decoding. Lean retains an overflow
   value until writer refusal. Error mapping, stage, and precedence remain open.
-- Rust signing fixtures require a 32-byte seed. Lean accepts canonical base32
+- Rust signing fixtures require a 32-byte seed. Lean accepts canonical base32hex
   seeds of other lengths. This is a fixture adapter boundary, not a record rule.
 - Lean returns the first writer refusal for record variants. Rust checks
   Cartesian variants and may report a seed or disagreement error instead.

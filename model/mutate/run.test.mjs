@@ -5,17 +5,21 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { changedPaths, replaceUnique, command } from './run.mjs';
+import { changedPaths, replaceUnique, command, sourcePath } from './run.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
-test('catalogue keeps 189 unique mutations at current source sites; listing does not mutate', async () => {
+test('catalogue keeps 195 unique mutations at current source sites; listing does not mutate', async () => {
   const catalogue = JSON.parse(await readFile(path.join(here, 'mutants.json'), 'utf8'));
-  assert.equal(catalogue.length, 189);
+  assert.equal(catalogue.length, 195);
+  assert.ok(!catalogue.some(m => ['finish-occurred-stamp-of', 'wide-time-094'].includes(m.id)));
+  for (const id of ["wide-families-013","wide-spec-064","extra-families-max-acc","extra-families-min-acc","finish-json-hexdigit","last-spec-tests-conds"]) {
+    assert.ok(catalogue.some(m => m.id === id), id);
+  }
   assert.equal(new Set(catalogue.map(m => m.id)).size, catalogue.length);
   const sources = new Map();
   for (const m of catalogue) {
-    const file = path.resolve(here, '../Loops', m.file);
+    const file = path.resolve(here, '..', sourcePath(m.file).slice('model/'.length));
     if (!sources.has(file)) sources.set(file, await readFile(file, 'utf8'));
     assert.notEqual(m.before, m.after, m.id);
     assert.doesNotThrow(() => replaceUnique(sources.get(file), m.before, m.after), m.id);
@@ -24,6 +28,14 @@ test('catalogue keeps 189 unique mutations at current source sites; listing does
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout.trim().split('\n').length, catalogue.length);
   for (const [file, before] of sources) assert.equal(await readFile(file, 'utf8'), before, file);
+});
+
+test('catalogue source roots exclude traversal and unrelated files', () => {
+  assert.equal(sourcePath('Time.lean'), 'model/Loops/Time.lean');
+  assert.equal(sourcePath('Loops/Read.lean'), 'model/Loops/Read.lean');
+  for (const file of ['Gen/Read.lean', '../Gen/Read.lean', '/Time.lean', 'Laws/Time.lean', 'Gen/../Read.lean']) {
+    assert.throws(() => sourcePath(file), /Invalid mutant source/);
+  }
 });
 
 test('replacement requires one exact site and reports its line', () => {

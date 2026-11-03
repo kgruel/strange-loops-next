@@ -1,4 +1,7 @@
 import Loops
+import Loops.Base32
+import Loops.Envelope
+import Loops.Read
 
 /-!
 # Read: inputs as text, back into the model's values
@@ -195,74 +198,25 @@ def parseExactIntegers (text : String) : Except String Json := parseJsonWith tex
 
 /-! ## Decoding, with the path of each field -/
 
-abbrev Dec := Except String
+abbrev Dec := @Loops.Read.Dec
+abbrev bad := @Loops.Read.bad
+abbrev idx := @Loops.Read.idx
+abbrev dot := @Loops.Read.dot
+abbrev object := @Loops.Read.object
+abbrev members? := @Loops.Read.members?
+abbrev req := @Loops.Read.req
+abbrev text := @Loops.Read.text
+abbrev int := @Loops.Read.int
+abbrev list := @Loops.Read.list
+abbrev each := @Loops.Read.each
+abbrev texts := @Loops.Read.texts
+abbrev opt := @Loops.Read.opt
 
-def bad {α : Type} (path what : String) : Dec α := throw s!"{path}: {what}"
+/-! ## Ids and base32hex -/
 
-def idx (path : String) (i : Nat) : String := s!"{path}[{i}]"
-def dot (path k : String) : String := s!"{path}.{k}"
+abbrev unbase32 := Loops.Read.unbase32
 
-/-- An object's members, each name once. -/
-def object (path : String) : Json → Dec (List (String × Json))
-  | .obj kvs => do
-    let names := kvs.map (·.1)
-    for (k, i) in names.zip (List.range names.length) do
-      if (names.take i).contains k then bad path s!"repeats the member \"{k}\""
-    pure kvs
-  | _ => bad path "expected an object"
-
-/-- An object's members, each name once and each one `allowed`. -/
-def members? (path : String) (allowed : List String) (j : Json) : Dec (List (String × Json)) := do
-  let kvs ← object path j
-  for (k, _) in kvs do
-    if !allowed.contains k then bad path s!"has a member \"{k}\" this input doesn't take"
-  pure kvs
-
-def req (path : String) (kvs : List (String × Json)) (k : String) : Dec Json :=
-  match kvs.lookup k with
-  | some v => pure v
-  | none => bad path s!"is missing \"{k}\""
-
-def text (path : String) : Json → Dec String
-  | .str s => pure s
-  | _ => bad path "expected text"
-
-def int (path : String) : Json → Dec Int
-  | .int i => pure i
-  | _ => bad path "expected an integer"
-
-def list (path : String) : Json → Dec (List Json)
-  | .arr xs => pure xs
-  | _ => bad path "expected an array"
-
-/-- Each element of an array, decoded with its own path. -/
-def each {α : Type} (path : String) (f : String → Json → Dec α) (j : Json) : Dec (List α) := do
-  let xs ← list path j
-  (xs.zip (List.range xs.length)).mapM fun (x, i) => f (idx path i) x
-
-def texts (path : String) : Json → Dec (List String) := each path text
-
-def opt {α : Type} (kvs : List (String × Json)) (k : String) (f : Json → Dec α) : Dec (Option α) :=
-  match kvs.lookup k with
-  | some v => some <$> f v
-  | none => pure none
-
-/-! ## Ids and base32 -/
-
-def base32Val (c : Char) : Option Nat := base32Alphabet.findIdx? (· == c)
-
-/-- Bytes from lowercase, unpadded base32. Only the spelling `base32` writes
-is taken, so trailing bits must be zero and one text names one byte string. -/
-def unbase32 (s : String) : Except String (List UInt8) := do
-  let some vs := s.toList.mapM base32Val | throw "has a character outside lowercase base32 (a-z, 2-7)"
-  let bits : List Bool := vs.flatMap fun v => (List.range 5).reverse.map fun i => (v >>> i) % 2 == 1
-  let bytes := (List.range (bits.length / 8)).map fun k =>
-    ((bits.drop (8 * k)).take 8).foldl (fun n b => 2 * n + if b then 1 else 0) 0
-  let out := bytes.map Nat.toUInt8
-  if base32 out == s then pure out
-  else throw "is not base32 as written: its length or trailing bits name no byte string"
-
-/-- A record id: `r:` and the base32 of a 32-byte digest, read as a number
+/-- A record id: `r:` and the base32hex of a 32-byte digest, read as a number
 the way `idText` writes one. -/
 def recordId (path : String) (j : Json) : Dec RecordId := do
   let s ← text path j
@@ -275,14 +229,16 @@ def recordId (path : String) (j : Json) : Dec RecordId := do
         if idText n == s then pure n else bad path s!"\"{s}\" does not read back as itself"
       else bad path s!"\"{s}\" is not a 32-byte digest"
     | .error why => bad path s!"\"{s}\" {why}"
-  | _ => bad path s!"\"{s}\" is not a record id (r:<base32 digest>)"
+  | _ => bad path s!"\"{s}\" is not a record id (r:<base32hex digest>)"
 
-/-- Bytes written in base32: a salt, a seed. -/
-def bytes (path : String) (j : Json) : Dec (List UInt8) := do
+abbrev bytes := Loops.Read.bytes
+
+/-- The shared fixed-width textual boundary for salts, digests, keys and signatures. -/
+def fixedBytes (path : String) (n : Nat) (pre : String) (j : Json) : Dec (List UInt8) := do
   let s ← text path j
-  match unbase32 s with
-  | .ok bs => pure bs
-  | .error why => bad path s!"\"{s}\" {why}"
+  if s.toList.take pre.length != pre.toList then bad path s!"expected prefix {pre}"
+  let bs ← bytes path (.str (String.ofList (s.toList.drop pre.length)))
+  if bs.length == n then pure bs else bad path s!"expected {n} bytes"
 
 /-! ## Records, as `jRecord` writes them -/
 
@@ -290,7 +246,7 @@ def stampOf (path : String) (j : Json) : Dec Stamp := do
   let s ← text path j
   match Stamp.of? s with
   | some st => pure st
-  | none => bad path s!"\"{s}\" is not an RFC 3339 instant with an offset"
+  | none => bad path s!"\"{s}\" is not a canonical UTC instant"
 
 def claimOf (path : String) (j : Json) : Dec Claim := do
   let s ← text path j
@@ -370,27 +326,11 @@ def sectionOf (path : String) (j : Json) : Dec Lens.Section := do
 
 def sections (path : String) : Json → Dec (List Lens.Section) := each path sectionOf
 
-/-! ## Drafts, for a batch -/
+/-! ## Raw envelopes and drafts use the library boundary. -/
 
-/-- An envelope as a writer hands it over. Its contents are `write`'s to
-check, so here only its shape is. -/
-def env (path : String) (j : Json) : Dec Env := do
-  let kvs ← members? path ["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"] j
-  let setOf (k : String) : Dec (List String) := (opt kvs k (texts (dot path k))).map (·.getD [])
-  let kind ← text (dot path "kind") (← req path kvs "kind")
-  let observer ← text (dot path "observer") (← req path kvs "observer")
-  let emitted ← text (dot path "emitted") (← req path kvs "emitted")
-  let occurred ← opt kvs "occurred" (text (dot path "occurred"))
-  let under ← opt kvs "under" (text (dot path "under"))
-  pure
-    { kind := kind, observer := observer, emitted := emitted, occurred := occurred,
-      about := ← setOf "about", prev := ← setOf "prev", under := under, erases := ← setOf "erases" }
-
-def draft (path : String) (j : Json) : Dec Draft := do
-  let kvs ← members? path ["label", "env", "salt", "payload"] j
-  let label ← opt kvs "label" (text (dot path "label"))
-  let e ← env (dot path "env") (← req path kvs "env")
-  let s ← bytes (dot path "salt") (← req path kvs "salt")
-  pure { label := label, env := e, salt := s, payload := ← req path kvs "payload" }
+abbrev env := Loops.Read.readOne
+abbrev envs := Loops.Read.readMany
+abbrev draft := Loops.Read.draft
+abbrev drafts := Loops.Read.drafts
 
 end Gen.Read

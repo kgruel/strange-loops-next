@@ -25,7 +25,7 @@
     "thing": "decision:auth",
     "records": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+        "id": "r:00000000000000000000000000000000000000000000000003pg",
         "kind": "decision",
         "observer": "sl:ada",
         "about": ["decision:auth", "decision:other"],
@@ -35,12 +35,12 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+        "id": "r:00000000000000000000000000000000000000000000000003q0",
         "kind": "decision",
         "observer": "sl:bo",
         "about": ["decision:auth"],
         "value": "Auth revised.",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"],
+        "prev": ["r:00000000000000000000000000000000000000000000000003pg"],
         "emitted": "2026-10-01T00:01:40Z",
         "n": 0
       }
@@ -50,29 +50,29 @@
         "name": "emit",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "id": "r:00000000000000000000000000000000000000000000000003pg",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"]
+          ["r:00000000000000000000000000000000000000000000000003pg"]
         ]
       },
       {
         "name": "partial-supersession",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "id": "r:00000000000000000000000000000000000000000000000003pg",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+            "id": "r:00000000000000000000000000000000000000000000000003q0",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a"],
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"]
+          ["r:00000000000000000000000000000000000000000000000003pg", "r:00000000000000000000000000000000000000000000000003q0"],
+          ["r:00000000000000000000000000000000000000000000000003q0", "r:00000000000000000000000000000000000000000000000003pg"]
         ]
       }
     ],
@@ -91,25 +91,25 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "id": "r:00000000000000000000000000000000000000000000000003pg",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+        "admitted": ["r:00000000000000000000000000000000000000000000000003pg"],
+        "heads": ["r:00000000000000000000000000000000000000000000000003pg"],
+        "winner": "r:00000000000000000000000000000000000000000000000003pg",
         "slots": {
           "current": {
             "things": {
               "decision:auth": [
                 {
-                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+                  "id": "r:00000000000000000000000000000000000000000000000003pg",
                   "shown": "here"
                 }
               ],
               "decision:other": [
                 {
-                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+                  "id": "r:00000000000000000000000000000000000000000000000003pg",
                   "shown": "here"
                 }
               ]
@@ -125,29 +125,29 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+            "id": "r:00000000000000000000000000000000000000000000000003pg",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+            "id": "r:00000000000000000000000000000000000000000000000003q0",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+        "admitted": ["r:00000000000000000000000000000000000000000000000003pg", "r:00000000000000000000000000000000000000000000000003q0"],
+        "heads": ["r:00000000000000000000000000000000000000000000000003q0"],
+        "winner": "r:00000000000000000000000000000000000000000000000003q0",
         "slots": {
           "current": {
             "things": {
               "decision:auth": [
                 {
-                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad2a",
+                  "id": "r:00000000000000000000000000000000000000000000000003q0",
                   "shown": "here"
                 }
               ],
               "decision:other": [
                 {
-                  "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadzq",
+                  "id": "r:00000000000000000000000000000000000000000000000003pg",
                   "shown": "here"
                 }
               ]

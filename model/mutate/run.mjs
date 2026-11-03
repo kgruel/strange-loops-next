@@ -12,6 +12,12 @@ const model = path.join(root, 'model');
 const lock = path.join(model, '.mutation-run.lock');
 const cataloguePath = path.join(model, 'mutate/mutants.json');
 
+// Catalogue names target the library, including its raw readers.
+export function sourcePath(file) {
+  if (!/^(?:Loops\/)?[A-Za-z0-9-]+\.lean$/.test(file)) throw new Error(`Invalid mutant source: ${file}`);
+  return `model/${file.includes('/') ? file : `Loops/${file}`}`;
+}
+
 export function replaceUnique(source, before, after) {
   const i = source.indexOf(before);
   if (i < 0 || source.indexOf(before, i + 1) !== -1) throw new Error('Replacement site is not unique');
@@ -125,12 +131,12 @@ export async function main(args) {
   const selected = o.only ? catalogue.filter(m => o.only.includes(m.id)) : catalogue;
   if (o.only && (new Set(o.only).size !== o.only.length || selected.length !== o.only.length)) throw new Error('Unknown or duplicate mutant id');
   for (const m of catalogue) {
-    if (!/^[A-Za-z0-9-]+\.lean$/.test(m.file) || !m.before || m.before === m.after) throw new Error(`Invalid mutant: ${m.id}`);
-    const relative = `model/Loops/${m.file}`;
+    if (!m.before || m.before === m.after) throw new Error(`Invalid mutant: ${m.id}`);
+    const relative = sourcePath(m.file);
     git(['ls-files', '--error-unmatch', '--', relative]);
     replaceUnique(await readFile(path.join(root, relative), 'utf8'), m.before, m.after);
   }
-  if (o.list) { for (const m of selected) console.log(`${m.id}\tmodel/Loops/${m.file}\t${m.reason}`); return 0; }
+  if (o.list) { for (const m of selected) console.log(`${m.id}\t${sourcePath(m.file)}\t${m.reason}`); return 0; }
   await mkdir(lock).catch(e => { if (e.code === 'EEXIST') throw new Error(`Mutation lock exists: ${lock}`); throw e; });
   const logs = `${o.output}.logs`;
   const result = { baseline: {}, mutants: [], finalBaseline: null };
@@ -141,7 +147,7 @@ export async function main(args) {
   const handlerInt = () => onSignal('SIGINT'), handlerTerm = () => onSignal('SIGTERM');
   process.on('SIGINT', handlerInt); process.on('SIGTERM', handlerTerm);
   try {
-    const sources = [...new Set(catalogue.map(m => `model/Loops/${m.file}`))];
+    const sources = [...new Set(catalogue.map(m => sourcePath(m.file)))];
     const dirty = git(['status', '--porcelain', '--untracked-files=no', '--', ...sources]);
     if (dirty) throw new Error(`Candidate source files are dirty:\n${dirty}`);
     await mkdir(logs, { recursive: true });
@@ -158,7 +164,7 @@ export async function main(args) {
     await save();
     for (const m of selected) {
       if (interrupted) break;
-      const relative = `model/Loops/${m.file}`, absolute = path.join(root, relative);
+      const relative = sourcePath(m.file), absolute = path.join(root, relative);
       const original = await readFile(absolute, 'utf8');
       const patch = replaceUnique(original, m.before, m.after);
       const entry = { id: m.id, file: relative, line: patch.line, patch: { before: m.before, after: m.after }, reason: m.reason, status: 'error', commands: [], changedPaths: [] };

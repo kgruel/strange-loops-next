@@ -1,6 +1,8 @@
 import Loops
 import Gen.Json
+import Gen.Encode
 import Gen.Ed25519
+import Gen.Read
 
 /-!
 # Record vectors
@@ -120,7 +122,7 @@ def refusedVector (name : String) (env : Env) (payload : Json := .obj [])
 
 /-! ## Cases -/
 
-def note (emitted : String := "2026-10-21T05:30:00-04:00") : Env :=
+def note (emitted : String := "2026-10-21T09:30:00Z") : Env :=
   { kind := "note", observer := kyle, emitted }
 
 def r1Id : String :=
@@ -135,7 +137,7 @@ def storedCases : List Case := [
     envs := [note], payloads := [.obj [("body", .str "hello")]] },
   { name := "02-full-envelope", laws := ["record.id", "record.sets"],
     envs := [{
-      kind := "decision", observer := wren, emitted := "2026-10-21T09:15:02.250+01:00",
+      kind := "decision", observer := wren, emitted := "2026-10-21T08:15:02.25Z",
       occurred := some "2026-10-17T09:14:03Z/2026-10-17T09:18:13Z", about := ["topic:auth", "url:https://example.com/x"],
       prev := [r1Id], under := some grantId }],
     payloads := [.obj [("choice", .str "device flow"), ("why", .arr [.str "no browser on the box"])]],
@@ -168,11 +170,11 @@ def storedCases : List Case := [
     envs := [note], payloads := [.arr [.str "a payload can be any JSON value", .int 7]] },
   { name := "08-erasure", laws := ["record.erasure"],
     envs := [{
-      kind := "note", observer := lineageFor "dev2", emitted := "2026-03-04T10:12:44-05:00",
+      kind := "note", observer := lineageFor "dev2", emitted := "2026-03-04T15:12:44Z",
       about := [r1Id] }],
     payloads := [.obj [("body", .str "Called the customer back at 555-0100")]], key := "dev2" },
-  { name := "09-leap-second", laws := ["record.emitted"],
-    envs := [note "2016-12-31T23:59:60Z"], payloads := [.obj []] },
+  { name := "09-last-second", laws := ["record.emitted"],
+    envs := [note "2016-12-31T23:59:59Z"], payloads := [.obj []] },
   -- `__proto__` is a member name like any other, though a JavaScript object
   -- assigned one sets its prototype instead
   { name := "10-proto-member", laws := ["record.canonical"],
@@ -185,8 +187,8 @@ def storedCases : List Case := [
     payloads := [.obj [("body", .str "hello, without the number")]] },
   { name := "12-negative-exact-boundary", laws := ["record.canonical"],
     envs := [note], payloads := [.int (-9007199254740991)] },
-  { name := "13-offset-hour-23", laws := ["record.emitted"],
-    envs := [note "2026-10-21T00:00:00+23:00"], payloads := [.obj []] },
+  { name := "13-nine-digit-fraction", laws := ["record.emitted"],
+    envs := [note "2026-10-21T00:00:00.000000001Z"], payloads := [.obj []] },
   { name := "38-native-shortest-tie", laws := ["record.canonical"],
     envs := [note], payloads := [.obj [
       ("positive", .number ⟨0x43143ff3c1cb0959⟩),
@@ -196,17 +198,35 @@ def storedCases : List Case := [
 def refusedCases : List (String × Env) := [
   ("20-kind-empty", { note with kind := "" }),
   ("21-observer-untyped", { note with observer := "kyle" }),
-  ("22-emitted-no-offset", note "2026-10-21T05:30:00"),
+  ("22-emitted-no-zone", note "2026-10-21T05:30:00"),
   ("23-emitted-lowercase", note "2026-10-21t05:30:00z"),
   ("24-emitted-no-such-day", note "2026-02-29T00:00:00Z"),
-  ("25-emitted-bad-offset", note "2026-10-21T05:30:00+24:00"),
+  ("25-emitted-refused-offset", note "2026-10-21T05:30:00+24:00"),
   ("26-about-untyped", { note with about := ["auth"] }),
   ("27-prev-not-record", { note with prev := ["topic:auth"] }),
   ("28-under-not-record", { note with under := some "r:short" }),
   ("33-erases-not-record", { note with erases := ["topic:auth"] }),
   ("34-occurred-duration", { note with occurred := some "2026-10-17T09:14/PT4M" }),
   ("35-observer-prefix-start", { note with observer := "1:x" }),
-  ("36-observer-prefix-tail", { note with observer := "a!:x" })
+  ("36-observer-prefix-tail", { note with observer := "a!:x" })] ++
+  ["+00:00", "-00:00", "+01:00", "-23:59"].zipIdx.map (fun (z, i) =>
+    (s!"r4-offset-{i}", note ("2026-10-21T00:00:00" ++ z))) ++
+  ["2026-10-21T00:00:60Z", "2016-12-31T23:59:60Z", "2026-10-21T00:00:00.0Z",
+   "2026-10-21T00:00:00.50Z", "2026-10-21T00:00:00.500Z", "2026-10-21T00:00:00.1234567891Z", "2026-10-21T00:00:00.Z"].zipIdx.map
+    (fun (s, i) => (s!"r4-emitted-{i}", note s)) ++
+  ["2026-10-21T00:00:00+00:00", "2026-10-21T00:00:60Z", "2026-10-21T00:00:00.50Z",
+   "2026-10-21T00:00:00.1234567891Z"].zipIdx.flatMap (fun (s, i) =>
+    [(s!"r4-occurred-single-{i}", { note with occurred := some s }),
+     (s!"r4-occurred-start-{i}", { note with occurred := some (s ++ "/2027") }),
+     (s!"r4-occurred-stop-{i}", { note with occurred := some ("2026/" ++ s) }),
+     (s!"r4-occurred-open-{i}", { note with occurred := some (s ++ "/..") })]) ++
+  ["A", "w", "x", "y", "z", "1"].zipIdx.flatMap (fun (last, i) =>
+    let bad := "r:" ++ String.ofList (List.replicate 51 '0') ++ last
+    [(s!"r1-prev-{i}", { note with prev := [bad] }),
+     (s!"r1-under-{i}", { note with under := some bad }),
+     (s!"r1-erases-{i}", { note with erases := [bad] })]) ++ [
+  ("r1-id-short", { note with prev := ["r:" ++ String.ofList (List.replicate 51 '0')] }),
+  ("r1-id-long", { note with prev := ["r:" ++ String.ofList (List.replicate 53 '0')] })
 ]
 
 /-- Unsafe magnitudes and repeated member names are refused at any depth under a good envelope. -/
@@ -230,6 +250,16 @@ def shortSalt : List UInt8 := (saltFor "30-salt-short").take 15
 /-! ## Standards the reference code must meet before it writes anything -/
 
 def selfCheck : Except String Unit := do
+  let unknown := Json.obj [("extra", .null)]
+  for fields in [[], [("kind", .int 7)]] do
+    match Gen.Read.env "env" (.obj (fields ++ [("extra", .null)])) with
+    | .error "envelope-field-unknown" => pure ()
+    | _ => throw "R6 raw keys must precede envelope values"
+  for envs in [[Json.int 7, unknown], [unknown, .int 7],
+      [.obj [("kind", .int 7)], unknown], [unknown, .obj [("kind", .int 7)]]] do
+    match Gen.Read.envs "envs" (.arr envs) with
+    | .error "envelope-field-unknown" => pure ()
+    | _ => throw "R6 every envelope variant must pass shape before value decoding"
   let check (what : String) (got want : String) : Except String Unit :=
     if got == want then pure () else throw s!"self-check failed: {what}: {got} ≠ {want}"
   check "sha256 abc" (hex (sha256 (textBytes "abc")))
@@ -253,9 +283,9 @@ def selfCheck : Except String Unit := do
     ("92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da" ++
      "085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00")
   -- RFC 4648 section 10, lower-cased and unpadded
-  check "base32" (", ".intercalate (["", "f", "fo", "foo", "foob", "fooba", "foobar"].map
+  check "base32hex" (", ".intercalate (["", "f", "fo", "foo", "foob", "fooba", "foobar"].map
       fun s => base32 (textBytes s)))
-    ", my, mzxq, mzxw6, mzxw6yq, mzxw6ytb, mzxw6ytboi"
+    ", co, cpng, cpnmu, cpnmuog, cpnmuoj1, cpnmuoj1e8"
 
 def vectors : Except String (List (String × J)) := do
   selfCheck
@@ -264,6 +294,35 @@ def vectors : Except String (List (String × J)) := do
   let payloads ← refusedPayloads.mapM fun (n, p) => do pure (n, ← refusedVector n note p)
   let salt ← refusedVector "30-salt-short" note (salt := shortSalt)
   let envelopeFirst ← refusedVector "37-empty-salt-envelope-first" { note with kind := "" } (.obj []) []
-  return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst)]
+  let unknown (empty : Bool) : String × J :=
+    let name := if empty then "r6-unknown-before-kind" else "r6-unknown-field"
+    let e := if empty then { note with kind := "" } else note
+    let raw := match envInput e with | .obj kvs => J.obj (("extra", .null) :: kvs) | other => other
+    (name, .obj [("vector", .str name), ("layer", .str "record"), ("laws", .arr [.str "record.refuse"]),
+      ("source", .str "model"), ("input", .obj [("envs", .arr [raw]), ("salt", .str (base32 (saltFor name))),
+      ("payloads", .arr [.obj []])]), ("expect", .obj [("refused", .str "envelope-field-unknown")])])
+  let twoUnknown (reverse : Bool) : String × J :=
+    let name := if reverse then "r6-two-envs-unknown-first" else "r6-two-envs-unknown-last"
+    let raw := match envInput note with | .obj kvs => J.obj (("extra", .null) :: kvs) | other => other
+    let envs := if reverse then [raw, envInput note] else [envInput note, raw]
+    (name, vector name "record" ["record.refuse", "batch.refuse-order"]
+      (.obj [("envs", .arr envs), ("salt", .str (base32 (saltFor name))), ("payloads", .arr [.obj []])])
+      (.obj [("refused", .str "envelope-field-unknown")]))
+  let rawCase (name : String) (envs : List J) : String × J :=
+    (name, vector name "record" ["record.refuse", "batch.refuse-order"]
+      (.obj [("envs", .arr envs), ("salt", .str (base32 (saltFor name))), ("payloads", .arr [.obj []])])
+      (.obj [("refused", .str "envelope-field-unknown")]))
+  let rawUnknown := match envInput note with
+    | .obj kvs => J.obj (("extra", .null) :: kvs)
+    | other => other
+  let malformed := [("nonobject", J.int 7), ("kind-number", .obj [("kind", .int 7)])]
+  let competing := malformed.flatMap fun (tag, raw) =>
+    [rawCase s!"r6-{tag}-unknown-first" [rawUnknown, raw],
+     rawCase s!"r6-{tag}-unknown-last" [raw, rawUnknown]]
+  let singleton := [
+    rawCase "r6-single-unknown-missing-kind" [.obj [("extra", .null)]],
+    rawCase "r6-single-unknown-kind-number" [.obj [("kind", .int 7), ("extra", .null)]]]
+  return stored ++ refused ++ payloads ++ [("30-salt-short", salt), ("37-empty-salt-envelope-first", envelopeFirst),
+    unknown false, unknown true, twoUnknown false, twoUnknown true] ++ competing ++ singleton
 
 end Gen.Records

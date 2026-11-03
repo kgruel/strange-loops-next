@@ -6,11 +6,11 @@
   "input": {
     "held": [
       {
-        "id": "r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua",
+        "id": "r:tsant02u7bhefv6nom5tukci31agdh8q5sonp4s3h4dhkfbrgli0",
         "about": ["topic:auth"]
       },
       {
-        "id": "r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a",
+        "id": "r:iivodlg66vgkad2knrdqob3e4obh28sea6omq5kk0u25t925276g",
         "about": []
       }
     ],
@@ -18,12 +18,12 @@
       {
         "env": {
           "kind": "note",
-          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
           "emitted": "2026-10-24T09:00:00Z",
-          "about": ["r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a"],
-          "prev": ["r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a"]
+          "about": ["r:iivodlg66vgkad2knrdqob3e4obh28sea6omq5kk0u25t925276g"],
+          "prev": ["r:iivodlg66vgkad2knrdqob3e4obh28sea6omq5kk0u25t925276g"]
         },
-        "salt": "yoy6tjvsr7dxshhvmaen7ouvwa",
+        "salt": "oeouj9lihv3ni77lc04dveklm0",
         "payload": {}
       }
     ]
@@ -31,8 +31,8 @@
   "expect": {
     "records": [
       {
-        "id": "r:rxb5flvb6ovydgbiwnyvwooeuw4jklpu6d3wxe4pyqxb4iu2wrda",
-        "env_canonical": "{\"about\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\",\"prev\":[\"r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a\"]}"
+        "id": "r:atbt633e2clbe0js2tl1c1th2rb2j9lvl01gf0fns6thqf3merpg",
+        "env_canonical": "{\"about\":[\"r:iivodlg66vgkad2knrdqob3e4obh28sea6omq5kk0u25t925276g\"],\"emitted\":\"2026-10-24T09:00:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\",\"prev\":[\"r:iivodlg66vgkad2knrdqob3e4obh28sea6omq5kk0u25t925276g\"]}"
       }
     ]
   }

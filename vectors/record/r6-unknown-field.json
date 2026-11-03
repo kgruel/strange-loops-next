@@ -1,0 +1,23 @@
+{
+  "vector": "r6-unknown-field",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "extra": null,
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
+      }
+    ],
+    "salt": "nollniu2i4oq0a681atkr2k214",
+    "payloads": [
+      {}
+    ]
+  },
+  "expect": {
+    "refused": "envelope-field-unknown"
+  }
+}

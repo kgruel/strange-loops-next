@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
+          "id": "r:000000000000000000000000000000000000000000000000008g",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:auth"],
@@ -22,8 +22,8 @@
   },
   "expect": {
     "topic:auth": {
-      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq"],
-      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiq",
+      "heads": ["r:000000000000000000000000000000000000000000000000008g"],
+      "winner": "r:000000000000000000000000000000000000000000000000008g",
       "others": []
     }
   }

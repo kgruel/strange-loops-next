@@ -21,6 +21,27 @@ namespace Loops
 
 open List
 
+/-- Raw shape depends only on the set of envelope keys, not values or member order. -/
+theorem envelopeKeysProblem_set {xs ys : List (String × Json)}
+    (h : ∀ k, k ∈ xs.map Prod.fst ↔ k ∈ ys.map Prod.fst) :
+    envelopeKeysProblem xs = envelopeKeysProblem ys := by
+  have hall : xs.all (fun (k, _) => ["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"].contains k) =
+      ys.all (fun (k, _) => ["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"].contains k) := by
+    apply Bool.eq_iff_iff.mpr
+    simp only [List.all_eq_true]
+    constructor
+    · intro hx (k, v) hm
+      obtain ⟨⟨k', v'⟩, hm', he⟩ := List.mem_map.1 ((h k).2 (List.mem_map_of_mem hm))
+      simp only at he
+      subst k'
+      exact hx (k, v') hm'
+    · intro hy (k, v) hm
+      obtain ⟨⟨k', v'⟩, hm', he⟩ := List.mem_map.1 ((h k).1 (List.mem_map_of_mem hm))
+      simp only at he
+      subst k'
+      exact hy (k, v') hm'
+  simp only [envelopeKeysProblem, hall]
+
 theorem Env.problem_codes {e : Env} {c : String} (h : e.problem = some c) : c ∈ writeCodes := by
   unfold Env.problem at h
   repeat' split at h

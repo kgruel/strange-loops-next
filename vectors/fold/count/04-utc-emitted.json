@@ -1,5 +1,5 @@
 {
-  "vector": "04-positive-offset-emitted",
+  "vector": "04-utc-emitted",
   "layer": "fold/count",
   "laws": ["count.perm"],
   "source": "model",
@@ -7,13 +7,13 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab4a",
+          "id": "r:00000000000000000000000000000000000000000000000001s0",
           "kind": "decision",
           "observer": "sl:kyle",
-          "about": ["topic:offset"],
+          "about": ["topic:utc"],
           "value": "v120",
           "prev": [],
-          "emitted": "2026-10-01T01:00:00+01:00",
+          "emitted": "2026-10-01T00:00:00Z",
           "occurred": "2026-10-01T00:00:00Z",
           "n": 0
         }

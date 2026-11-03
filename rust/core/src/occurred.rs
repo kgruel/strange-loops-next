@@ -158,7 +158,7 @@ impl Stamp {
         &self.text
     }
     /// Lean: `Loops.Stamp.moment`, model/Loops/Occurred.lean.
-    /// Returns the parsed instant, which is equal for equivalent time spellings.
+    /// Returns the parsed instant.
     pub fn moment(&self) -> &Moment {
         &self.moment
     }

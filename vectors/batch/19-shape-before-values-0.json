@@ -1,0 +1,33 @@
+{
+  "vector": "19-shape-before-values-0",
+  "layer": "batch",
+  "laws": ["batch.refuse", "batch.refuse-order"],
+  "source": "model",
+  "input": {
+    "held": [],
+    "drafts": [
+      {
+        "label": "@d",
+        "env": 7,
+        "salt": "5kgkopd2lk254u63bdk1m5m954",
+        "payload": {
+          "choice": "passkeys"
+        }
+      },
+      {
+        "env": {
+          "extra": null,
+          "kind": "decision",
+          "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+          "emitted": "2026-10-24T09:00:00Z",
+          "about": ["topic:auth"]
+        },
+        "salt": "5kgkopd2lk254u63bdk1m5m954",
+        "payload": {}
+      }
+    ]
+  },
+  "expect": {
+    "refused": "envelope-field-unknown"
+  }
+}

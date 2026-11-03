@@ -1,0 +1,14 @@
+{
+  "vector": "salt-16",
+  "layer": "byte-text",
+  "laws": ["base32.canonical"],
+  "source": "model",
+  "input": {
+    "bytes": 16,
+    "prefix": "",
+    "texts": ["00000000000000000000000000", "vvvvvvvvvvvvvvvvvvvvvvvvvs", "VVVVVVVVVVVVVVVVVVVVVVVVVS", "000000000000000000000000000", "0000000000000000000000000", "00000000000000000000000000=", "0000000000000000000000000w", "0000000000000000000000000x", "0000000000000000000000000y", "0000000000000000000000000z", "00000000000000000000000001", "00000000000000000000000002", "00000000000000000000000003"]
+  },
+  "expect": {
+    "accepted": [true, true, false, false, false, false, false, false, false, false, false, false, false]
+  }
+}

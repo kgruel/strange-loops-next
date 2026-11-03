@@ -5,7 +5,24 @@ Its file headings and exclusions are historical, not a coverage claim for the me
 The catalogue now follows moved definitions into `model/Loops/Id.lean` and `model/Loops/Fold.lean`.
 Use `node model/mutate/run.mjs --list` for current source paths.
 The runner tests check every current replacement site.
-No new definitions or coverage claims form part of this merge.
+The round-two fixes retain 187 original entries and eight guard mutations: 195 entries total.
+The raw-reader ordering mutations target library definitions under `Loops`.
+The cheap runner uses the same eight replacements and requires runtime failures after successful builds.
+This inventory does not claim exhaustive coverage of the changed model.
+
+Retire `finish-occurred-stamp-of`: its extra plus-sign guard is equivalent under R4.
+The actual instant parser already rejects every text containing `+`.
+Accepted instants use only digits and fixed UTC separators.
+Rejected instants still return `none` on either path.
+This is a source-based equivalence reason, not an inference from survival.
+The six older survivor entries remain unchanged.
+
+The parser no longer calls `stripZeros`.
+Its accepted fractions already end with a nonzero digit; `tail_last` proves this property.
+The helper and its five lemmas have no users outside their own family.
+The exported proof graph confirms this result.
+Remove the family and retire `wide-time-094`, which targets only the removed definition.
+The UTC parser has no offset helper, offset tuple or normalization step.
 
 A covered definition has at least one catalogue entry.
 Exclusions state why the definition has no direct eligible operation.
@@ -15,6 +32,7 @@ The catalogue includes existing entries without definition metadata.
 
 - `Loops.base32Alphabet`: excluded: It is a fixed alphabet. No direct eligible operation.
 - `Loops.base32`: covered by `coverage-base32-bit-order`
+- `Loops.unbase32`: covered by `step1-base32-reencode`
 
 ## model/Loops/Batch.lean
 
@@ -36,6 +54,7 @@ The catalogue includes existing entries without definition metadata.
 - `Loops.typedRef`: covered by `wide-envelope-009`
 - `Loops.recordId`: covered by `wide-envelope-010`
 - `Loops.Env.problem`: covered by `wide-envelope-011`
+- `Loops.envelopeKeysProblem`: covered by `step1-envelope-keys-remove`
 
 ## model/Loops/Families.lean
 
@@ -137,7 +156,7 @@ The catalogue includes existing entries without definition metadata.
 - `Loops.spanOf`: covered by `wide-occurred-043`
 - `Loops.occurredSpanOf`: excluded: It delegates to halves and spanOf. No direct eligible operation.
 - `Loops.occurredSpan?`: excluded: It delegates to occurredSpanOf. No direct eligible operation.
-- `Loops.Stamp.of?`: covered by `finish-occurred-stamp-of`
+- `Loops.Stamp.of?`: excluded: It delegates acceptance to `instant?`; the old plus-sign mutation is equivalent under R4, as explained above.
 - `Loops.Claim.of?`: covered by `finish-occurred-claim-of`
 
 ## model/Loops/Record.lean
@@ -272,8 +291,12 @@ The catalogue includes existing entries without definition metadata.
 - `Loops.daysIn`: covered by `wide-time-093`
 - `Loops.leapsBefore`: excluded: It computes an arithmetic expression. No direct eligible operation.
 - `Loops.dayNumber`: excluded: Its mapped month lengths are summed; order has no effect. No direct eligible operation.
-- `Loops.stripZeros`: covered by `wide-time-094`
-- `Loops.offsetSecs`: covered by `wide-time-095`
-- `Loops.tail`: covered by `wide-time-096`
-- `Loops.instant?`: covered by `coverage-time-instant-`
+- `Loops.tail`: covered by `wide-time-095`, `wide-time-096`, `step1-fraction-final-zero`, `step1-zone-only-z`
+- `Loops.instantParts?`: covered by `coverage-time-instant-`, `step1-seconds-bound`
 - `Loops.validEmitted`: covered by `wide-time-097`
+
+## model/Gen/Read.lean
+
+- `Gen.Read.env`: covered by `step1-envelope-keys-after-value`
+- `Gen.Read.drafts`: covered by `step1-draft-keys-after-values`
+- `Gen.Read.envs`: covered by `step1-record-keys-after-values`

@@ -1,4 +1,4 @@
-//! Independent external standards, as required by .pi/decisions.md.
+//! Independent external standards, as required by the binary64 ruling in ROADMAP.md.
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use flate2::read::GzDecoder;
 use loops::number::Number;

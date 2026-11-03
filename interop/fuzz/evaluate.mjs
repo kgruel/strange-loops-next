@@ -38,14 +38,13 @@ function lensAnswer({ base, text }) {
   const outcomes = Lens.diff(base, parsed);
   return { parsed, normalized: Lens.render(parsed), outcomes, applied: Lens.apply(base, outcomes) };
 }
-function recordAnswer(input) {
-  const env = input.envs[0], salt = L.base32Decode(input.salt);
-  const seed = L.base32Decode(input.seed ?? L.base32(new Uint8Array(32)));
+function recordAnswer(input, envIndex = 0) {
+  const env = input.envs[envIndex];
   let r, payload;
   try {
     payload = input.payload_text === undefined ? input.payloads[0] : undefined;
-    r = input.payload_text === undefined ? L.seal(env, salt, payload, seed)
-      : L.writeText(env, salt, input.payload_text, seed);
+    const writerInput = { ...input, seed: input.seed ?? L.base32(new Uint8Array(32)) };
+    r = L.writeRecord(writerInput, { envIndex, writer: input.payload_text === undefined ? "seal" : "writeText" });
     if (input.payload_text !== undefined) payload = L.parse(input.payload_text);
   } catch (error) {
     if (!WRITE_CODES.has(error.message)) throw error;
@@ -64,15 +63,28 @@ export function evaluateJS(vector, rawText) {
   const { layer, input } = vector;
   if (folds[layer]) return input.orders.map(rs => folds[layer](rs, input));
   switch (layer) {
-    case 'record': return input.envs.flatMap(env =>
-      (input.payloads ?? [null]).map((payload, i) => {
-        const variant = { ...input, envs: [env] };
-        if (rawText !== undefined && input.payload_text === undefined && input.payloads) {
-          variant.payload_text = jsonSourceAt(rawText, ['input', 'payloads', i]);
-          delete variant.payloads;
-        } else if (input.payloads) variant.payloads = [payload];
-        return recordAnswer(variant);
-      }));
+    case 'byte-text': return [{ accepted: input.texts.map(text => {
+      try { L.fixedBytes(text, input.prefix, input.bytes); return true; }
+      catch { return false; }
+    }) }];
+    case 'record': {
+      try {
+        return input.envs.flatMap((_, envIndex) =>
+          (input.payloads ?? [null]).map((payload, i) => {
+            // Keep siblings in the library input; only the selected envelope
+            // goes to the writer. Shape errors escape the Cartesian expansion.
+            const variant = { ...input };
+            if (rawText !== undefined && input.payload_text === undefined && input.payloads) {
+              variant.payload_text = jsonSourceAt(rawText, ['input', 'payloads', i]);
+              delete variant.payloads;
+            } else if (input.payloads) variant.payloads = [payload];
+            return recordAnswer(variant, envIndex);
+          }));
+      } catch (error) {
+        if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
+        throw error;
+      }
+    }
     case 'lens/section': return [lensAnswer(input)];
     case 'spec/parse': return [S.parseNode(specNode(vector, rawText))];
     case 'spec/run': {
@@ -81,7 +93,21 @@ export function evaluateJS(vector, rawText) {
       // Both spec readers admit their input. Settlement belongs to realm/scenario.
       return input.orders.map(rs => S.runSpec(parsed.parsed, rs));
     }
-    case 'batch': return [resolveBatch(input.drafts, input.held)];
+    case 'batch': {
+      // JSON.parse keeps only the last repeated env; shape checks need every occurrence.
+      if (rawText !== undefined) {
+        const drafts = S.readJson(jsonSourceAt(rawText, ['input', 'drafts']));
+        const envs = drafts.items.flatMap(draft => (draft?.members ?? [])
+          .filter(([key]) => key === 'env')
+          .map(([, env]) => Object.fromEntries((env?.members ?? []).map(([key]) => [key, null]))));
+        try { L.checkEnvelopeKeys(envs); }
+        catch (error) {
+          if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
+          throw error;
+        }
+      }
+      return [resolveBatch(input.drafts, input.held)];
+    }
     case 'realm': {
       const forms = input.forms;
       return Array.from({ length: Math.max(1, forms.length) }, (_, i) => {

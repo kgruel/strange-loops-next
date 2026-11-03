@@ -1,7 +1,7 @@
 // Each case has its own PRNG stream. Family scheduling does not change a case.
 export const FAMILIES = Object.freeze(['record', 'fold', 'spec', 'realm', 'scenario', 'batch', 'lens']);
 export const FOLD_LAYERS = Object.freeze(['count', 'sum', 'extrema', 'latest', 'latest-by', 'heads', 'view', 'select']);
-const B32 = 'abcdefghijklmnopqrstuvwxyz234567';
+const B32 = '0123456789abcdefghijklmnopqrstuv';
 export function base32(bytes) {
   let value = 0, bits = 0, out = '';
   for (const byte of bytes) {
@@ -37,6 +37,10 @@ function spec(rng) {
     },
   };
 }
+const INSTANTS = ['2024-02-29T12:00:00Z', '2024-02-29T12:00:00.5Z',
+  '2024-02-29T12:00:00.123456789Z'];
+const OCCURRED = ['2024', '2024-02-29', '202X', '2024/..', ...INSTANTS,
+  `${INSTANTS[2]}/${INSTANTS[1]}`, `${INSTANTS[1]}/..`];
 function records(rng) {
   const ids = Array.from({ length: 1 + rng.int(7) }, () => `r:${base32(rng.bytes(32))}`);
   const things = [`t:${rng.int(30)}`, `t:${rng.int(30) + 30}`];
@@ -49,11 +53,11 @@ function records(rng) {
     const prev = i && rng.int(3) ? [ids[rng.int(i)]] : [];
     const record = {
       id, kind: rng.pick(['note', 'vote', 'erase']), observer: `o:${rng.int(3)}`,
-      about, prev, emitted: `2024-02-29T00:00:0${rng.int(3)}Z`,
+      about, prev, emitted: rng.pick(INSTANTS),
       value: rng.pick(['yes', 'no', '', 'α\nline', `value-${rng.int(10000)}`]), n: rng.int(31) - 15,
       fields: { flag: !!rng.int(2), score: rng.int(9), tag: `tag-${rng.int(4)}` },
     };
-    if (rng.int(2)) record.occurred = rng.pick(['2024', '2024-02', '2024-02-29', '202X', '2024?', '2024/..']);
+    if (rng.int(2)) record.occurred = rng.pick([...OCCURRED, '2024-02', '2024?']);
     if (i && rng.int(4) === 0) record.under = ids[rng.int(i)];
     if (i && rng.int(4) === 0) record.erases = [ids[rng.int(i)]];
     if (rng.int(5) === 0) {
@@ -66,7 +70,7 @@ function records(rng) {
 function envelope(rng) {
   return {
     kind: rng.pick(['note', 'vote', `kind-${rng.int(100)}`]), observer: `o:${rng.int(6)}`,
-    emitted: `2024-02-29T12:00:0${rng.int(4)}Z`, occurred: rng.pick(['2024', '2024-02-29', '202X', '2024/..']),
+    emitted: rng.pick(INSTANTS), occurred: rng.pick(OCCURRED),
     about: [`t:${rng.int(5)}`, 't:shared'], prev: [],
   };
 }
@@ -211,8 +215,62 @@ export function generate(seed, index, family) {
     if (index % 16 === 4) input.drafts[0].env.prev = [id];
     else input.drafts[0].env.under = id;
   }
-  // A separate one-in-eight draw probes a named input boundary.
-  if (rng.int(8) === 0) {
+  // Each named record boundary has a fixed slot and cannot be randomly overwritten.
+  let scheduled = false;
+  if (family === 'batch' && index % 64 >= 10 && index % 64 < 20) {
+    const slot = index % 64 - 10, bad = slot % 5;
+    const a = { label: '@a', env: { ...clone(input.drafts[0].env), prev: [] }, salt: input.drafts[0].salt, payload: null };
+    const b = clone(a); b.label = '@b'; b.env.extra = true;
+    if (bad === 0) b.label = '@a';
+    if (bad === 1) a.env.prev = ['@missing'];
+    if (bad === 2) a.env.prev = ['@a'];
+    if (bad === 3) a.env.kind = 17;
+    if (bad === 4) a.salt = '!';
+    input.drafts = slot < 5 ? [a, b] : [b, a];
+    nearMiss = `shape-${['duplicate-label', 'unknown-label', 'cycle-label', 'malformed-value', 'malformed-salt'][bad]}-${slot < 5 ? 'last' : 'first'}`;
+    scheduled = true;
+  }
+  if (family === 'record') {
+    const slot = index % 64;
+    const badTimes = [
+      ['offset', '2024-02-29T12:00:00+01:00'],
+      ['second-60', '2024-02-29T12:00:60Z'],
+      ['trailing-zero', '2024-02-29T12:00:00.50Z'],
+      ['ten-digits', '2024-02-29T12:00:00.1234567891Z'],
+    ];
+    const clean = { ...input.envs[0], emitted: INSTANTS[0], occurred: '2024' };
+    if (slot < 7) {
+      const names = ['id-uppercase', 'id-w', 'id-x', 'id-y', 'id-z', 'id-pad-bits', 'salt-pad-bits'];
+      nearMiss = names[slot]; scheduled = true;
+      const text = '0'.repeat(51);
+      if (slot === 0) clean.prev = [`r:${'A'.repeat(51)}0`];
+      if (slot >= 1 && slot <= 4) clean.prev = [`r:${text}${'wxyz'[slot - 1]}`];
+      if (slot === 5) clean.prev = [`r:${text}1`];
+      if (slot === 6) input.salt = `${'0'.repeat(25)}1`;
+    } else if (slot < 27) {
+      const n = slot - 7, [name, stamp] = badTimes[n % 4];
+      const position = Math.floor(n / 4);
+      const labels = ['emitted', 'occurred-single', 'occurred-start', 'occurred-stop', 'occurred-open'];
+      nearMiss = `${labels[position]}-${name}`; scheduled = true;
+      if (position === 0) clean.emitted = stamp;
+      if (position === 1) clean.occurred = stamp;
+      if (position === 2) clean.occurred = `${stamp}/${INSTANTS[0]}`;
+      if (position === 3) clean.occurred = `${INSTANTS[0]}/${stamp}`;
+      if (position === 4) clean.occurred = `${stamp}/..`;
+    } else if (slot === 27) {
+      nearMiss = 'unknown-envelope-key-empty-kind'; scheduled = true;
+      clean.kind = ''; clean.extra = true;
+    } else if (slot >= 28 && slot < 32) {
+      const bad = { ...clone(clean), extra: true };
+      const other = { ...clone(clean), kind: slot % 2 ? 17 : '' };
+      if (slot % 2) input.salt = '!';
+      input.envs = slot < 30 ? [other, bad] : [bad, other];
+      nearMiss = `shape-multi-record-${slot}`; scheduled = true;
+    }
+    if (scheduled && slot < 28) input.envs = [clean];
+  }
+  // A separate one-in-eight draw probes an independent input boundary.
+  if (!scheduled && rng.int(8) === 0) {
     switch (family) {
       case 'record': {
         const choice = rng.int(6);

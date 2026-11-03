@@ -1,7 +1,7 @@
 # Vectors
 
 `model/` writes the protocol fixture families:
-`fold/`, `lens/`, `record/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/`.
+`fold/`, `lens/`, `record/`, `byte-text/`, `spec/`, `batch/`, `realm/`, `occurred/` and `scenario/`.
 Run `lake exe gen ../vectors` from `model/`; never edit these fixtures by hand.
 CI regenerates them and fails on any difference.
 `standard/` holds external standards data; see its README.
@@ -36,8 +36,7 @@ Fold each order separately; each must produce `expect`.
 * Extrema: `min` and `max`, each `null` when nothing was folded.
 
 Each record's `about` is a set of things.
-It carries `emitted` and may carry `occurred`, as text per `protocol/record.md`.
-Some fixtures spell one time two ways.
+It carries `emitted` and may carry `occurred`, as defined in `protocol/record.md`.
 Content order compares span start, span end, `emitted`, then id digest bytes.
 A record without `occurred` has an instant span at its `emitted`.
 Newest first reverses this whole order.
@@ -109,8 +108,9 @@ Readers can admit unknown targets because they cannot judge them.
 
 `expect.records` gives ids and canonical envelopes in draft order, with labels replaced by ids.
 Alternatively, `expect.refused` gives the first refusal.
-Label checks run first: `label-duplicate`, `label-unknown`, then `label-cycle`.
-Next come writer codes, in `protocol/record.md` order across every draft.
+Shape checks run first across every raw envelope, before any draft value: `envelope-field-unknown`.
+Label checks follow: `label-duplicate`, `label-unknown`, then `label-cycle`.
+Next come writer codes from `kind-empty`, in `protocol/record.md` order across every draft.
 Finally, `prev-unknown` and `prev-unrelated` run across the whole batch.
 Every draft order and `prev` order gives the same records or refusal.
 Meaning uniqueness states at most one satisfying label assignment; it does not prove resolver correctness.
@@ -125,7 +125,8 @@ A held eraser can suppress a target's payload; a bare erased copy cannot suppres
 `expect.things` gives per-thing states, as in `fold/latest-by`.
 `expect.sum` gives Sum over admitted records.
 Every rotation must give the same answer when forms are consistent.
-Write `settled` and `refused` in ascending id digest-byte order, not id-text order.
+Write `settled` and `refused` in ascending id digest-byte order.
+Canonical id text has the same order.
 This order does not change head content order.
 
 ## `scenario`
@@ -155,8 +156,8 @@ A reader holds less; a lens edit returns as a record.
 `input.occurred` lists time texts.
 `expect.spans` gives each span's UTC `start` and `end`, or `refused`, in input order.
 An open span has `end: null`.
-UTC offsets can cross years 0000 or 9999.
-Outside years use signed or five-digit forms, such as `-0001-12-31T23:00:00Z` and `10000-01-01T00:00:00Z`.
+Instants use canonical UTC text as specified in `protocol/record.md`.
+A calendar span ending after year 9999 can have a five-digit end year.
 In `08-order`, `expect["oldest-first"]` lists texts ordered by span, per `protocol/record.md`.
 
 ## `lens/section`
@@ -171,12 +172,12 @@ Put-get additionally requires distinct base ids and the exact same ordered id li
 
 `input.envs` gives envelope variants with the same id.
 `input.payloads` gives payload variants with the same commitment.
-`salt` and the signing key's `seed` use base32.
+`salt` and the signing key's `seed` use base32hex.
 `expect` pins canonical envelope and payload, commitment, id preimage, id, signing key, signature and both stored lines.
 The two stored lines show forms before and after erasure.
 The signed message uses the exact prefix `loops/record/v1:`.
 
-A refused vector's `expect.refused` names the writer refusal from `protocol/record.md`.
+A refused vector's `expect.refused` names the shape or writer refusal from `protocol/record.md`.
 `payload_text` preserves repeated member names in JSON text.
 Use a parser that detects repeated names.
 Writers cap every number's magnitude at 2^53 − 1, whole or not.

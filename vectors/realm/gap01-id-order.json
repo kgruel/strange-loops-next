@@ -6,7 +6,7 @@
   "input": {
     "forms": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "id": "r:00000000000000000000000000000000000000000000000000q0",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A"],
@@ -17,18 +17,18 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "id": "r:00000000000000000000000000000000000000000000000000qg",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:B"],
         "value": "",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
+        "prev": ["r:00000000000000000000000000000000000000000000000000q0"],
         "emitted": "2026-10-01T00:00:02Z",
         "occurred": "2026-10-01T00:00:02Z",
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "id": "r:0000000000000000000000000000000000000000000000000000",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:C"],
@@ -39,12 +39,12 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq",
+        "id": "r:000000000000000000000000000000000000000000000000000g",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:D"],
         "value": "",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        "prev": ["r:0000000000000000000000000000000000000000000000000000"],
         "emitted": "2026-10-01T00:00:04Z",
         "occurred": "2026-10-01T00:00:04Z",
         "n": 0
@@ -54,41 +54,41 @@
   "expect": {
     "settled": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "id": "r:0000000000000000000000000000000000000000000000000000",
         "shown": "here"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq",
+        "id": "r:000000000000000000000000000000000000000000000000000g",
         "shown": "here"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "id": "r:00000000000000000000000000000000000000000000000000q0",
         "shown": "here"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "id": "r:00000000000000000000000000000000000000000000000000qg",
         "shown": "here"
       }
     ],
     "refused": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaq",
+        "id": "r:000000000000000000000000000000000000000000000000000g",
         "code": "prev-unrelated"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2q",
+        "id": "r:00000000000000000000000000000000000000000000000000qg",
         "code": "prev-unrelated"
       }
     ],
     "things": {
       "thing:A": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2a",
+        "heads": ["r:00000000000000000000000000000000000000000000000000q0"],
+        "winner": "r:00000000000000000000000000000000000000000000000000q0",
         "others": []
       },
       "thing:C": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "heads": ["r:0000000000000000000000000000000000000000000000000000"],
+        "winner": "r:0000000000000000000000000000000000000000000000000000",
         "others": []
       }
     },

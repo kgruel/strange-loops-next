@@ -6,11 +6,11 @@
   "input": {
     "held": [
       {
-        "id": "r:blgemv3qysvw64he5vwwmnpax6adub7br5yc6yuvktokimjzr7ua",
+        "id": "r:tsant02u7bhefv6nom5tukci31agdh8q5sonp4s3h4dhkfbrgli0",
         "about": ["topic:auth"]
       },
       {
-        "id": "r:g3yx74gb7nywgnwigpk3tv7db5726h2zqmz2itxv4zei3y24og7a",
+        "id": "r:iivodlg66vgkad2knrdqob3e4obh28sea6omq5kk0u25t925276g",
         "about": []
       }
     ],
@@ -19,11 +19,11 @@
         "label": "@d",
         "env": {
           "kind": "decision",
-          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
           "emitted": "2026-10-24T09:00:00Z",
           "about": ["topic:auth"]
         },
-        "salt": "fuquyzncvucfe6gdlnubwfwjfe",
+        "salt": "5kgkopd2lk254u63bdk1m5m954",
         "payload": {
           "choice": "passkeys"
         }
@@ -31,21 +31,21 @@
       {
         "env": {
           "kind": "",
-          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
           "emitted": "2026-10-24T09:00:00Z",
           "about": ["topic:auth"]
         },
-        "salt": "no3xq6zmgx6242cabckh7elyfm",
+        "salt": "derngupc6nuqsq2012a7v4bo5c",
         "payload": {}
       },
       {
         "env": {
           "kind": "estimate",
-          "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
+          "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
           "emitted": "2026-10-24T09:00:00Z",
           "about": ["topic:auth"]
         },
-        "salt": "5hjrarp4ickeeo33qi2l3f7ihm",
+        "salt": "t79h0hfs82a44errg8qbr5v87c",
         "payload": {
           "n": 9007199254740992
         }

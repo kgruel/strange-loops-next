@@ -1,6 +1,5 @@
 //! Gen.Run.recordRun, with all Cartesian variants retained for agreement.
 use super::{
-    batch::env,
     parse_json,
     reader::{bytes, list, members, optional, required, text},
 };
@@ -61,6 +60,15 @@ fn one(e: &Env, salt: &[u8], payload: &Json, seed: Option<&[u8; 32]>) -> Result<
 }
 
 pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
+    match answers_decoded(layer, input) {
+        Err(e) if e == "envelope-field-unknown" => {
+            Ok(vec![Json::Obj(vec![("refused".into(), Json::Str(e))])])
+        }
+        other => other,
+    }
+}
+
+fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
     if layer != "record" {
         return Err(format!("unknown record layer {layer}"));
     }
@@ -69,11 +77,8 @@ pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
         &["envs", "payloads", "payload_text", "salt", "seed"],
         input,
     )?;
-    let envs = list("input.envs", required("input", kvs, "envs")?)?
-        .iter()
-        .enumerate()
-        .map(|(i, j)| env(&format!("input.envs[{i}]"), j))
-        .collect::<Result<Vec<_>, _>>()?;
+    let envs = loops::envelope::read_all("input.envs", required("input", kvs, "envs")?)
+        .map_err(|e| e.to_string())?;
     let payloads = match (optional(kvs, "payloads"), optional(kvs, "payload_text")) {
         (Some(ps), None) => list("input.payloads", ps)?.to_vec(),
         (None, Some(raw)) => vec![
@@ -155,11 +160,31 @@ mod tests {
     }
 
     #[test]
+    fn all_shapes_precede_envelope_values_and_salt() {
+        for envs in [
+            r#"[{"kind":7},{"extra":1}]"#,
+            r#"[{"extra":1},{"kind":7}]"#,
+            r#"[7,{"extra":1}]"#,
+            r#"[{"extra":1},7]"#,
+            r#"[{"extra":1}]"#,
+            r#"[{"kind":7,"extra":1}]"#,
+        ] {
+            let input = parse(&format!(
+                r#"{{"envs":{envs},"salt":"!","payloads":[null]}}"#
+            ));
+            assert_eq!(
+                answers("record", &input).expect("shape refusal"),
+                vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
+            );
+        }
+    }
+
+    #[test]
     fn seed_and_variant_shapes_fail_without_panics() {
         let env = r#"{"kind":"note","observer":"sl:a","emitted":"2026-01-01T00:00:00Z","about":["thing:a"]}"#;
         for seed in [r#""""#, r#""a""#, r#""aa""#, r#""A""#, "null"] {
             let input = parse(&format!(
-                r#"{{"envs":[{env}],"payloads":[null],"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","seed":{seed}}}"#
+                r#"{{"envs":[{env}],"payloads":[null],"salt":"00000000000000000000000000","seed":{seed}}}"#
             ));
             assert!(answers("record", &input).is_err(), "{seed}");
         }

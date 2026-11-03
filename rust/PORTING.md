@@ -1,7 +1,7 @@
 # Rust port and fixture boundary
 
 The workspace separates the executable model from fixture/process adapters.
-No protocol rule is selected here; the accepted rulings in `.pi/decisions.md`
+No protocol rule is selected here; the accepted rulings in `ROADMAP.md`
 and the immutable model/vector snapshot determine behavior.
 
 ## Crates and public boundary
@@ -66,7 +66,10 @@ Reader ids and links are canonical 32-byte `Digest` values; writer envelopes
 retain raw text so writer refusals remain observable. Reader `about` entries
 must be typed references. Numeric `n` and fields retain finite non-whole values
 without pretending they are readable integers. Successful record signing
-requires a canonical base32 encoding of exactly 32 seed bytes.
+requires a canonical base32hex encoding of exactly 32 seed bytes.
+Byte text uses lowercase base32hex without padding. The decoder checks the
+encoded image and decoded byte count. Instants use UTC `Z`, seconds 00–59,
+and optional fractions of one to nine digits without a trailing zero.
 
 ## Composition rulings
 
@@ -91,8 +94,9 @@ There is no deferred-family or skipped-file allowlist:
 
 | Family | JSON files |
 | --- | ---: |
-| record | 33 |
-| occurred | 8 |
+| record | 82 |
+| occurred | 9 |
+| byte-text | 5 |
 | fold | 48 |
 | spec | 110 |
 | realm | 15 |
@@ -100,7 +104,7 @@ There is no deferred-family or skipped-file allowlist:
 | lens | 16 |
 | batch | 13 |
 | standard | 12 |
-| **Total** | **260** |
+| **Total** | **315** |
 
 All seven evaluator families are checked against immutable fixture answers,
 including every listed arrival order or Cartesian variant. Occurred fixtures
@@ -129,6 +133,5 @@ cargo build -p loops-eval --bin loops-eval
 
 CI preserves the Lean proofs/generator/runtime/mutant checks, JS checks, and
 fixed JS/Lean fuzz prefix while adding these workspace-wide Rust gates.
-Parent integration adds Rust to fuzz separately. Local evaluator logs are
-under `.pi/gates/05-rust/eval`; test coverage is not a claim that every
+Parent integration adds Rust to fuzz separately. Test coverage is not a claim that every
 unchecked model value satisfies a theorem's premises. See `GAPS.md`.

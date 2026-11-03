@@ -22,7 +22,7 @@ written input back, as an implementation receives it, so CI checks that each
 input as written gives its `expect`.
 
 It reads `fold/*`, `lens/section`, `spec/parse`, `spec/run`, `record`,
-`batch`, `realm` and `scenario`. Not `occurred`: its span vectors and its
+`batch`, `realm`, `scenario` and `byte-text`. Not `occurred`: its span vectors and its
 order vector share one input shape, a list of texts, so the input doesn't
 say which question it asks.
 
@@ -152,15 +152,23 @@ def heldEntry (path : String) (j : Json) : Dec (String × List String) := do
   let kvs ← members? path ["id", "about"] j
   pure (← text (dot path "id") (← req path kvs "id"), ← texts (dot path "about") (← req path kvs "about"))
 
-def batchRun (input : Json) : Dec J := do
+def batchRunDecoded (input : Json) : Dec J := do
   let kvs ← members? "input" ["held", "drafts"] input
+  let ds ← drafts "input.drafts" (← req "input" kvs "drafts")
   let held ← each "input.held" heldEntry (← req "input" kvs "held")
-  let ds ← each "input.drafts" draft (← req "input" kvs "drafts")
   pure (match resolveBatch Records.H (held.lookup ·) ds with
     | .ok ws => J.obj [("records", .arr (ws.map fun w =>
         let r := w.stored
         .obj [("id", .str (r.id Records.H)), ("env_canonical", .str r.env.toJson.canon)]))]
     | .error why => J.obj [("refused", .str why)])
+
+/-- Raw envelope key refusals cross the fixture adapter as protocol refusals. -/
+def envelopeOutcome (out : Dec J) : Dec J :=
+  match out with
+  | .error "envelope-field-unknown" => .ok (.obj [("refused", .str "envelope-field-unknown")])
+  | other => other
+
+def batchRun (input : Json) : Dec J := envelopeOutcome (batchRunDecoded input)
 
 def realmRun (input : Json) : Dec J := do
   let kvs ← members? "input" ["forms"] input
@@ -168,14 +176,14 @@ def realmRun (input : Json) : Dec J := do
 
 /-! ## Record -/
 
-/-- `record`: one record written, or `write`'s refusal. The envelope comes in
-the writer's form, perhaps several ways (sets in other orders, repeats), and
+/-- `record`: one record written, or a raw shape or typed writer refusal.
+The envelope comes in the writer's form, perhaps several ways (sets in other orders, repeats), and
 the payload as JSON, perhaps several ways (members in other orders), or as
 text when it repeats a member name. Every way must name the same record, as
 gen requires before writing one. -/
-def recordRun (input : Json) : Dec J := do
+def recordRunDecoded (input : Json) : Dec J := do
   let kvs ← members? "input" ["envs", "payloads", "payload_text", "salt", "seed"] input
-  let envs ← each "input.envs" env (← req "input" kvs "envs")
+  let envs ← Gen.Read.envs "input.envs" (← req "input" kvs "envs")
   let payloads ← match kvs.lookup "payloads", kvs.lookup "payload_text" with
     | some ps, none => list "input.payloads" ps
     | none, some t => do
@@ -208,6 +216,8 @@ def recordRun (input : Json) : Dec J := do
       ("ed25519", .str (base32 (Ed25519.sign seed (signingInput id)))),
       ("line", .str (Records.storedJson e salt payload seed).canon),
       ("erased_line", .str (Records.erasedJson e salt payload seed).canon)])
+
+def recordRun (input : Json) : Dec J := envelopeOutcome (recordRunDecoded input)
 
 /-! ## Scenario -/
 
@@ -269,10 +279,18 @@ def scenarioRun (input : Json) : Dec J := do
     ("lens", .obj [("rendered", jLines (render base)), ("outcomes", .arr (os.map jOutcome)),
       ("applied", jDoc (apply base os))])])
 
+def byteTextRun (input : Json) : Dec J := do
+  let kvs ← members? "input" ["bytes", "prefix", "texts"] input
+  let n ← int "input.bytes" (← req "input" kvs "bytes")
+  if n < 0 then bad "input.bytes" "expected a nonnegative byte count"
+  let pre ← text "input.prefix" (← req "input" kvs "prefix")
+  let ts ← texts "input.texts" (← req "input" kvs "texts")
+  pure (.obj [("accepted", .arr (ts.map fun t => .bool ((fixedBytes "text" n.toNat pre (.str t)).isOk)))])
+
 /-! ## Dispatch -/
 
 /-- The layers `run` reads, and the directories under a vectors dir that hold them. -/
-def layerDirs : List String := ["fold", "lens", "spec", "record", "batch", "realm", "scenario"]
+def layerDirs : List String := ["fold", "lens", "spec", "record", "batch", "realm", "scenario", "byte-text"]
 
 def answer (layer : String) (input : Json) : Dec J :=
   match foldAnswer layer with
@@ -283,6 +301,7 @@ def answer (layer : String) (input : Json) : Dec J :=
     | "spec/parse" => specParseRun input
     | "spec/run" => specRunRun input
     | "record" => recordRun input
+    | "byte-text" => byteTextRun input
     | "batch" => batchRun input
     | "realm" => realmRun input
     | "scenario" => scenarioRun input

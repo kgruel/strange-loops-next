@@ -7,11 +7,11 @@
     "envs": [
       {
         "kind": "note",
-        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
-        "emitted": "2026-10-21T05:30:00-04:00"
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
       }
     ],
-    "salt": "cjajiu4hbzcn24nys74faxtske",
+    "salt": "29098ks71p2dqsdoivs50njia4",
     "payload_text": "{\"largest\":9007199254740991,\"deep\":[{\"n\":-9007199254740992}]}"
   },
   "expect": {

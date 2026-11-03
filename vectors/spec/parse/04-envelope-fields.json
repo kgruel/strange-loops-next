@@ -25,7 +25,7 @@
               "is": "proj:loops"
             },
             "env.prev": {
-              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"
+              "is": "r:000000000000000000000000000000000000000000000000010g"
             },
             "env.under": {
               "absent": true
@@ -38,7 +38,7 @@
             },
             "env.occurred": {
               "at-least": "2026-10",
-              "below": "2026-11-01T01:00:00+01:00",
+              "below": "2026-11-01T00:00:00Z",
               "not": "2026-10-01/2026-10-31"
             }
           }
@@ -68,7 +68,7 @@
               "is": "proj:loops"
             },
             "env.prev": {
-              "is": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaq"
+              "is": "r:000000000000000000000000000000000000000000000000010g"
             },
             "env.under": {
               "absent": true
@@ -81,7 +81,7 @@
             },
             "env.occurred": {
               "at-least": "2026-10",
-              "below": "2026-11-01T01:00:00+01:00",
+              "below": "2026-11-01T00:00:00Z",
               "not": "2026-10-01/2026-10-31"
             }
           }

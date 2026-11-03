@@ -1,0 +1,21 @@
+{
+  "vector": "r4-occurred-stop-3",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z",
+        "occurred": "2026/2026-10-21T00:00:00.1234567891Z"
+      }
+    ],
+    "salt": "n80ielu4oq7ms3p0221oce5gvk",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "occurred-not-span"
+  }
+}

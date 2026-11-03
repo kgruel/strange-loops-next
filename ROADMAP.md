@@ -2,16 +2,17 @@
 
 ## State
 
-The integration merges five branches in order: `f6a86a8`, `cf9d105`, `c97d0ef`, `17bd7d4`, and `52aab85`.
 The tree has three implementations: Lean, JavaScript, and Rust.
-The law index has 72 entries, 606 theorems, and six boundary witnesses.
+Step 1 applies the six settled rulings before records exist.
+The law index has 76 entries, 624 theorems, and 6 boundary witnesses.
 See [the law index](design/laws/laws.json) and [proof and boundary data](design/laws/).
 These proofs apply only under their stated premises.
 
-The tree has 260 JSON fixtures: 248 generated fixtures and 12 standard fixtures.
-Lean replays 240 generated fixtures; eight occurred fixtures use separate checks.
-Rust checks all 260 fixtures, six JCS byte pairs, 4,000 binary64 cases, and 128 SUPERCOP signing cases with ed25519-dalek.
-The last verified Rust run passes 120 tests; JavaScript passes 5,101 checks.
+The tree has 334 JSON fixtures: 322 generated fixtures and 12 standard fixtures.
+Lean replays 313 generated fixtures; 9 occurred fixtures use separate checks.
+Rust checks every fixture, six JCS byte pairs, 4,000 binary64 cases, and 128 SUPERCOP signing cases with ed25519-dalek.
+Rust passes 127 tests; JavaScript passes 5,338 vector checks and 18 regression tests.
+The fuzz suite passes 44 tests.
 See [vectors](vectors/README.md), [Rust boundaries](rust/GAPS.md), and [the mutation report](model/mutate/REPORT.md).
 These checks provide bounded evidence, not complete JCS or cryptographic correctness.
 They do not certify browser accessibility, external links, or official ASD dictionary compliance.
@@ -22,32 +23,47 @@ The writer accepts values with magnitude at most 2^53 − 1, including fractions
 Numeric folds read safe whole values only.
 Raw constructors and theorem premises retain separate domains.
 
-Phase 2 is committed as `e2d1cc9`.
-All 26 isolated gates pass on Node 22 without retries.
-The fixed `integrate-1` campaign completed 5,600 cases, 800 per family, in 160.70 seconds.
-It found 4,655 matches, 532 matching protocol refusals, 369 shared decoder refusals, and 44 duplicate-base mismatches.
+The round-two review-fix sequential gates pass on Node 22.
+The `step1-3` campaign checks 5,600 cases, 800 per family, in 155.26 seconds.
+It reports 4,194 matches, 975 protocol refusals, 389 shared decoder refusals, and 42 duplicate-base lens mismatches.
 Decoder refusals are not agreement.
-All 44 remaining mismatches reduced in 76 trials; none hit the 80-trial limit.
-The earlier 98 disagreements all reduced; 54 scenario cases hit the 80-trial limit.
-Those 54 cases exposed one Rust scenario-adapter bug, not 54 distinct bugs.
-All 108 old scenario raw and shrink replays now match; 88 lens replays still differ.
-The generated `vectors/scenario/phase2-thing-state.json` pins the correction.
-These shrinks do not establish absolute minimality.
-See [the three-way campaign report](interop/fuzz/REPORT.md).
-Phase 3 is committed as `08fa702`; its gates pass after one design mutant re-anchor.
-The CI seed `ci-1` checks 28 three-way cases with zero mismatches.
-The suite includes 14 JavaScript regression tests and 37 fuzz tests.
+The parent checks every raw and reduced mismatch; no new mismatch class appears.
+Each reduction uses 76 trials and 3 accepted rounds, below the 80-trial limit.
+These reductions do not establish absolute minimality.
+`interop/fuzz/summarize.py` derives these counts from tracked summaries and the D1 mismatch list.
+See [the campaign report](interop/fuzz/REPORT.md) for the scripts and current and historical results.
+The CI seed `ci-1` checks 28 three-way cases without mismatches.
 
-The mutation catalogue has 189 entries.
-The full run at `08fa7029485648fdc9de642d8c0f19c1dccc3651` completes all 189 entries.
-It reports 140 build rejections, 27 vector differences, 16 generator assertion exceptions, and six survivors.
-The runner exits 1 for assertion exceptions, not timeout or infrastructure failure.
+The mutation catalogue has 195 entries, including eight new guard mutations.
+It retires the redundant positive-offset guard under R4 and the entry for the deleted `stripZeros` family.
+The full run reports 146 build rejections, 27 vector differences, 16 generator assertion exceptions, and 6 survivors.
+The runner exits 1 for assertion exceptions; no timeout or infrastructure failure occurs.
+The six old survivors remain, including the four unapproved D6 helpers.
+All-envelope shape checks now belong to each library.
+Six deliberate per-envelope faults fail the respective vector layers; restored implementations pass.
+All new cheap guard mutations compile and then fail runtime checks.
 Build rejections are not semantic proof kills.
-The same six survivors include four unapproved helper candidates and two scoped-equivalence interpretations.
-The run does not prove equivalence.
-See [the mutation report](model/mutate/REPORT.md) for the comparison, restoration checks, and isolation limits.
+Survival does not prove equivalence.
+See [the mutation report](model/mutate/REPORT.md) for outcomes, restoration checks, and limits.
 
 ## Decisions for the human
+
+### Settled: Step-1 rulings R1–R6
+
+- **R1:** Every byte string uses lowercase, unpadded base32hex.
+  Readers require canonical lengths and zero pad bits.
+  Proved id text order equals digest order.
+- **R2:** The id preimage remains the JCS object containing `commit` and `env`.
+- **R3:** Signed bytes remain `loops/record/v1:` followed by the id text, encoded as UTF-8.
+- **R4:** Instants use UTC `Z`, seconds 00 through 59, and optional fractions of one through nine digits.
+  A fraction ends in a nonzero digit.
+  The actual parser has proved spelling uniqueness and parse-render recovery.
+- **R5:** Typed references retain lowercase prefixes; sets retain UTF-16 code-unit sorting.
+- **R6:** Raw envelope readers return `envelope-field-unknown` before checking values, including `kind-empty`.
+  The payload remains the extension point.
+
+See [record rules](protocol/record.md) and [the settled ledger](design/rethink/ledger.json).
+D1–D7 below remain open and unchanged.
 
 ### Settled: binary64 standards and writer range
 

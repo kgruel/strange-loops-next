@@ -1,5 +1,6 @@
 import Gen.Read
 import Gen.Encode
+import Gen.ByteText
 
 open Loops Gen
 
@@ -15,7 +16,93 @@ def refused {α} : Except String α → Bool
   | .error _ => true
   | .ok _ => false
 
+def canonicalTextChecks : IO Unit := do
+  -- The expected answers are independent of the decoder used by the vectors.
+  for (n, pad) in [(16, 2), (32, 4), (64, 3)] do
+    let ts := ByteTextVectors.texts n pad
+    for (s, i) in ts.zipIdx do
+      let accepted := i < 2
+      -- Appending zero to the 32- or 64-byte encoding canonically encodes one
+      -- extra byte. Only the fixed-width boundary must reject those texts.
+      let canonical := accepted || (i == 3 && (n == 32 || n == 64))
+      ensure ((Loops.unbase32 s).isSome == canonical) s!"R1 model decoder {n} bytes, case {i}"
+      ensure ((Gen.Read.unbase32 s).isOk == canonical) s!"R1 fixture decoder {n} bytes, case {i}"
+      ensure ((Gen.Read.bytes "bytes" (.str s)).isOk == canonical) s!"R1 fixture bytes {n}, case {i}"
+      let prefixes := if n == 32 then ["r:", "h:", "k:"] else [""]
+      for pre in prefixes do
+        ensure ((Read.fixedBytes "bytes" n pre (.str (pre ++ s))).isOk == accepted)
+          s!"R1 fixed boundary {pre}{n}, case {i}"
+      if n == 32 then
+        ensure (recordId ("r:" ++ s) == accepted) s!"R1 envelope id, case {i}"
+        ensure ((Read.recordId "id" (.str ("r:" ++ s))).isOk == accepted) s!"R1 fixture id, case {i}"
+        let e : Env := { kind := "note", observer := "o:test", emitted := "2026-10-21T00:00:00Z" }
+        for (bad, code) in [({ e with prev := ["r:" ++ s] }, "prev-not-record-id"),
+            ({ e with under := some ("r:" ++ s) }, "under-not-record-id"),
+            ({ e with erases := ["r:" ++ s] }, "erases-not-record-id")] do
+          ensure (bad.problem == if accepted then none else some code) s!"R1 {code}, case {i}"
+    ensure (refused (Read.fixedBytes "bytes" n "k:" (.str ("h:" ++ ts.head!)))) s!"R1 prefix {n}"
+    ensure (refused (Read.fixedBytes "bytes" n "" (.str (base32 (List.replicate (n - 1) 0)))))
+      s!"R1 wrong decoded width {n}"
+  let ids : List RecordId := [fixtureId 0, fixtureId 1, fixtureId 15, fixtureId 16,
+    fixtureId 31, fixtureId 32, fixtureId 255, fixtureId 256,
+    fixtureId (2 ^ 255), fixtureId (2 ^ 256 - 1)]
+  for a in ids do
+    for b in ids do
+      ensure (decide (idText a < idText b) == decide (a < b))
+        s!"R1 actual id text order {a.val}, {b.val}"
+  let good := ["0000-01-01T00:00:00Z", "9999-12-31T23:59:59.999999999Z",
+    "2000-02-29T12:34:56.5Z", "2026-10-21T00:00:00.000000001Z"]
+  for s in good do
+    let some t := instantParts? s.toList | throw (IO.userError s!"R4 refuses control {s}")
+    ensure (t.text == s) s!"R4 parse/render {s}"
+    ensure (instant? s.toList == some t.moment) s!"R4 actual parser moment {s}"
+    ensure (validEmitted s && (Read.stampOf "emitted" (.str s)).isOk) s!"R4 emitted control {s}"
+  let bad := ["2026-10-21T00:00:00+00:00", "2026-10-21T00:00:00-00:00",
+    "2026-10-21T00:00:00+01:00", "2026-10-21T00:00:00-23:59",
+    "2026-10-21T00:00:60Z", "2016-12-31T23:59:60Z", "2026-10-21T00:00:00.0Z",
+    "2026-10-21T00:00:00.50Z", "2026-10-21T00:00:00.500Z",
+    "2026-10-21T00:00:00.1234567891Z", "2026-10-21T00:00:00.Z"]
+  let e : Env := { kind := "note", observer := "o:test", emitted := "2026-10-21T00:00:00Z" }
+  for s in bad do
+    ensure ((instant? s.toList).isNone && !validEmitted s) s!"R4 instant accepts {s}"
+    ensure (refused (Read.stampOf "emitted" (.str s))) s!"R4 fixture emitted accepts {s}"
+    ensure (({ e with emitted := s } : Env).problem == some "emitted-not-rfc3339") s!"R4 emitted code {s}"
+    for occurred in [s, s ++ "/2027", "2026/" ++ s, s ++ "/.."] do
+      ensure ((occurredSpan? occurred).isNone) s!"R4 occurred accepts {occurred}"
+      ensure (refused (Read.claimOf "occurred" (.str occurred))) s!"R4 fixture occurred accepts {occurred}"
+      ensure (({ e with occurred := some occurred } : Env).problem == some "occurred-not-span")
+        s!"R4 occurred code {occurred}"
+  -- Raw keys precede all value checks. The typed envelope keeps its existing rules.
+  ensure (({ e with kind := "" } : Env).problem == some "kind-empty") "R6 typed kind rule changes"
+  for fields in [[], [("kind", .str "")], [("kind", .int 7)], [("kind", .str "note")]] do
+    let raw := Json.obj (fields ++ [("extension", .null)])
+    ensure (match Read.env "env" raw with | .error why => why == "envelope-field-unknown" | _ => false)
+      "R6 unknown key does not precede missing, empty or malformed values"
+  ensure (!writeCodes.contains "envelope-field-unknown") "R6 raw shape leaked into typed writer codes"
+  let unknown := Json.obj [("extra", .null)]
+  let goodEnv := Json.obj [("kind", .str "note"), ("observer", .str "o:test"),
+    ("emitted", .str "2026-10-21T00:00:00Z")]
+  let shape := Json.obj [("env", unknown)]
+  let malformed := [Json.int 7,
+    .obj [("label", .int 7), ("env", goodEnv)],
+    .obj [("env", goodEnv), ("salt", .int 7)],
+    .obj [("env", .obj [("kind", .int 7)])]]
+  for bad in malformed do
+    for ds in [[bad, shape], [shape, bad]] do
+      ensure (match Gen.Read.drafts "drafts" (.arr ds) with
+        | .error why => why == "envelope-field-unknown" | _ => false)
+        "R6 all-draft preflight must precede malformed shells, labels, values and salts"
+  ensure (match Gen.Read.drafts "drafts" (.arr [.obj [("env", goodEnv), ("env", unknown)]]) with
+    | .error why => why == "envelope-field-unknown" | _ => false)
+    "R6 repeated draft env members must not hide unknown envelope keys"
+  for es in [[goodEnv, unknown], [unknown, goodEnv], [.int 7, unknown]] do
+    ensure (match Read.envs "envs" (.arr es) with
+      | .error why => why == "envelope-field-unknown" | _ => false)
+      "R6 all-envelope preflight must precede value decoding"
+  IO.println "R1/R4/R6 canonical text runtime checks pass"
+
 def main (args : List String) : IO Unit := do
+  canonicalTextChecks
   let [root] := args | throw (IO.userError "expected repository root")
   let table ← IO.FS.readFile (root ++ "/vectors/standard/es6-numbers.txt")
   let mut count := 0

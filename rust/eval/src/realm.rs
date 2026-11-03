@@ -118,7 +118,7 @@ mod tests {
         let n = "100";
         let form = |n: &str| {
             format!(
-                r#"{{"id":"r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":{n}}}"#
+                r#"{{"id":"r:0000000000000000000000000000000000000000000000000000","kind":"","observer":"","about":[],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":{n}}}"#
             )
         };
         let a = form(n);

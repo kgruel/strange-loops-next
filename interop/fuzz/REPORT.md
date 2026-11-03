@@ -2,11 +2,57 @@
 
 ## Scope
 
-This report covers the integrated JS, Lean, and Rust campaign and its fixes.
+This report covers the Step-1 JS, Lean, and Rust campaign.
 It also preserves evidence from earlier two-way campaigns as historical findings.
 The harness covers record, fold, spec, realm, scenario, batch, and lens inputs.
 
-## Current integrated three-way campaign
+## Round 2 review-fix three-way campaign
+
+Source commit: `8a12ba6`.
+Node 22 checks 5,600 cases with seed `step1-3`: 800 cases per family.
+The run uses 88 chunks and takes 155.26 seconds.
+Exit 1 records D1, not an infrastructure failure.
+The retained [summary](evidence/step1-3/summary.json) and [D1 mismatch list](evidence/step1-3/d1-mismatches.json) support these counts.
+Run `python3 interop/fuzz/summarize.py report` from the repository root.
+The script derives totals from these tracked artifacts without local logs.
+
+| Family | Cases | Match | Protocol refusal | Shared decoder refusal | Mismatch |
+|---|---:|---:|---:|---:|---:|
+| record | 800 | 325 | 454 | 21 | 0 |
+| fold | 800 | 694 | 0 | 106 | 0 |
+| spec | 800 | 693 | 48 | 59 | 0 |
+| realm | 800 | 699 | 0 | 101 | 0 |
+| scenario | 800 | 698 | 0 | 102 | 0 |
+| batch | 800 | 511 | 289 | 0 | 0 |
+| lens | 800 | 574 | 184 | 0 | 42 |
+| Total | 5,600 | 4,194 | 975 | 389 | 42 |
+
+All 389 decoder refusals occur in both Lean and Rust.
+They are not protocol agreement.
+The importer checks every raw and reduced mismatch against the complete historical D1 input and all three answers.
+All 42 cases match that example exactly, with Lean and Rust agreeing against JS.
+The retained list stores each seed and index, plus shared raw and reduced examples.
+This representation removes repeated content without dropping a mismatch.
+No new mismatch class appears; D1–D7 remain unchanged.
+
+Each reduction uses 76 trials and 3 accepted rounds.
+The totals are 3,192 trials and 126 accepted rounds; 0 reductions reach the limit.
+These results do not prove absolute minimality.
+Raw logs and large per-case files are not committed.
+The artifact tests check totals, D1 identity, and infrastructure-failure rejection.
+Run `python3 -B -m unittest discover -s interop/fuzz/evidence -p 'test_*.py'`.
+
+```sh
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-3 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-3
+python3 interop/fuzz/summarize.py campaign /tmp/fuzz-step1-3 step1-3
+```
+
+Earlier Step-1 campaigns with seeds `step1-1` and `step1-2` found only the same D1 lens mismatch; their evidence is not retained.
+
+## Historical integrated three-way campaign
+
+This campaign predates the Step-1 spelling changes.
+It does not establish results for the updated generator.
 
 A fresh Node 22 run compared JS, Lean, and Rust on 5,600 cases: 800 per family.
 It used seed `integrate-1`, shrink limit 80, 88 chunks, and completed in 160.70 seconds.
@@ -49,13 +95,15 @@ The runner shrinks each generated disagreement within its configured bound.
 All 98 initial mismatches were reduced: 54 scenario reductions hit the 80-trial bound, and 44 lens reductions used 76 trials.
 After the fix, all 44 remaining mismatches used 76 trials, three accepted rounds, and did not hit the bound.
 Their input sizes reduced from 119 to 98 serialized bytes; no absolute-minimality claim follows.
-Per-case classifications and raw/shrunk artifacts are retained locally under `.pi/gates/02-threeway/campaign-fixed/`.
+The local per-case and raw reduction logs are historical provenance only.
+They are not retained evidence in the repository.
 The previous run's successful answer payloads were not persisted, so full answer-by-answer comparison is unavailable for its 5,502 prior non-mismatches.
 Non-scenario family acceptance counts were unchanged.
 
 ## Historical campaigns
 
 These two-way campaigns ran before the gap15, gap16, and gap17 rulings.
+Their local logs are historical provenance only, not retained evidence in the repository.
 Their 105,000-case total and findings below describe historical code, not the current integrated three-way run.
 The two large campaigns contain 105,000 cases: 15,000 per family.
 The first campaign checks the initial adapters.

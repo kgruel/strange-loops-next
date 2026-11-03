@@ -2,6 +2,7 @@ import Loops
 import Gen.Json
 import Gen.Encode
 import Gen.Records
+import Gen.Read
 
 /-!
 # Batch vectors
@@ -158,7 +159,37 @@ def batchVector (c : Case) : Except String J := do
     (.obj [("held", .arr (held.map fun (i, about) => .obj [("id", .str i), ("about", .arr (about.map .str))])),
       ("drafts", .arr (c.drafts.map jDraft))]) expect
 
-def vectors : Except String (List (String × J)) :=
-  cases.mapM fun c => do pure (c.name, ← batchVector c)
+/-- Raw inputs exercise the shape stage that typed drafts cannot represent. -/
+def rawCases : List (String × List J) :=
+  let unknown := match envInput decide1.env with
+    | .obj kvs => J.obj (("extra", .null) :: kvs)
+    | other => other
+  let shape := J.obj [("env", unknown), ("salt", .str (base32 decide1.salt)), ("payload", .obj [])]
+  let malformed (field : String) := match jDraft decide1 with
+    | .obj kvs => J.obj (kvs.map fun (k, v) => if k == field then (k, .int 7) else (k, v))
+    | other => other
+  [("18-shape-before-duplicate-labels", [jDraft decide1, jDraft decide1, shape]),
+   ("19-shape-before-values", [malformed "env", shape]),
+   ("20-shape-before-label-values", [malformed "label", shape]),
+   ("21-shape-before-salt", [malformed "salt", shape]),
+   ("22-shape-before-kind", [jDraft badKind, shape])]
+
+def rawVectors : Except String (List (String × J)) := do
+  let mut out := []
+  for (base, ds) in rawCases do
+    for i in List.range ds.length do
+      let rotated := ds.drop i ++ ds.take i
+      let name := s!"{base}-{i}"
+      let raw ← Gen.Read.parseJson ((J.arr rotated).render 0)
+      match Gen.Read.drafts "input.drafts" raw with
+      | .error "envelope-field-unknown" => pure ()
+      | _ => throw s!"batch/{name}: raw shape did not precede labels and values"
+      out := out ++ [(name, vector name "batch" ["batch.refuse", "batch.refuse-order"]
+        (.obj [("held", .arr []), ("drafts", .arr rotated)])
+        (.obj [("refused", .str "envelope-field-unknown")]))]
+  return out
+
+def vectors : Except String (List (String × J)) := do
+  return (← cases.mapM fun c => do pure (c.name, ← batchVector c)) ++ (← rawVectors)
 
 end Gen.BatchVectors

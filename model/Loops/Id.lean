@@ -16,7 +16,7 @@ def digestDigits : Nat → Nat → List Nat
 /-- An id's digest: its 32 bytes, most significant first. -/
 def idDigest (n : RecordId) : List Nat := digestDigits 32 n.val
 
-/-- An id as text: `r:` and its digest in base32. -/
+/-- An id as text: `r:` and its digest in base32hex. -/
 def idText (n : RecordId) : String := "r:" ++ base32 ((idDigest n).map Nat.toUInt8)
 
 theorem fold_digits_acc {α : Type} (value : α → Nat) (xs : List α) (a : Nat) :

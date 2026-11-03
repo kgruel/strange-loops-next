@@ -6,7 +6,7 @@
   "input": {
     "forms": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+        "id": "r:00000000000000000000000000000000000000000000000002og",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A"],
@@ -17,12 +17,12 @@
         "n": 0
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "id": "r:00000000000000000000000000000000000000000000000002p0",
         "kind": "note",
         "observer": "sl:kyle",
         "about": ["thing:A", "thing:B"],
         "value": "",
-        "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq"],
+        "prev": ["r:00000000000000000000000000000000000000000000000002og"],
         "emitted": "2026-10-01T00:00:02Z",
         "occurred": "2026-10-01T00:00:02Z",
         "n": 0
@@ -32,24 +32,24 @@
   "expect": {
     "settled": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacyq",
+        "id": "r:00000000000000000000000000000000000000000000000002og",
         "shown": "here"
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "id": "r:00000000000000000000000000000000000000000000000002p0",
         "shown": "here"
       }
     ],
     "refused": [],
     "things": {
       "thing:A": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "heads": ["r:00000000000000000000000000000000000000000000000002p0"],
+        "winner": "r:00000000000000000000000000000000000000000000000002p0",
         "others": []
       },
       "thing:B": {
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacza",
+        "heads": ["r:00000000000000000000000000000000000000000000000002p0"],
+        "winner": "r:00000000000000000000000000000000000000000000000002p0",
         "others": []
       }
     },

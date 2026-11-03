@@ -1,5 +1,5 @@
 {
-  "vector": "25-emitted-bad-offset",
+  "vector": "r4-emitted-4",
   "layer": "record",
   "laws": ["record.refuse"],
   "source": "model",
@@ -7,11 +7,11 @@
     "envs": [
       {
         "kind": "note",
-        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
-        "emitted": "2026-10-21T05:30:00+24:00"
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T00:00:00.500Z"
       }
     ],
-    "salt": "uzme5efpebbyqy727y7uy2zfdy",
+    "salt": "n2ffvb3mul6ivnmk54sakaq60g",
     "payload_text": "{}"
   },
   "expect": {

@@ -7,7 +7,7 @@
     "orders": [
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq",
+          "id": "r:00000000000000000000000000000000000000000000000000ag",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:cache"],
@@ -18,12 +18,12 @@
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
+          "id": "r:00000000000000000000000000000000000000000000000000c0",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:cache"],
           "value": "v24",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"],
+          "prev": ["r:00000000000000000000000000000000000000000000000002cg"],
           "emitted": "2026-10-01T00:06:40Z",
           "occurred": "2026-10-01T00:06:40Z",
           "n": 0
@@ -31,18 +31,18 @@
       ],
       [
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
+          "id": "r:00000000000000000000000000000000000000000000000000c0",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:cache"],
           "value": "v24",
-          "prev": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacmq"],
+          "prev": ["r:00000000000000000000000000000000000000000000000002cg"],
           "emitted": "2026-10-01T00:06:40Z",
           "occurred": "2026-10-01T00:06:40Z",
           "n": 0
         },
         {
-          "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq",
+          "id": "r:00000000000000000000000000000000000000000000000000ag",
           "kind": "decision",
           "observer": "sl:kyle",
           "about": ["topic:cache"],
@@ -57,9 +57,9 @@
   },
   "expect": {
     "topic:cache": {
-      "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq"],
-      "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaama",
-      "others": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaakq"]
+      "heads": ["r:00000000000000000000000000000000000000000000000000c0", "r:00000000000000000000000000000000000000000000000000ag"],
+      "winner": "r:00000000000000000000000000000000000000000000000000c0",
+      "others": ["r:00000000000000000000000000000000000000000000000000ag"]
     }
   }
 }

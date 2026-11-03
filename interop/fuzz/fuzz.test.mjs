@@ -28,7 +28,7 @@ async function* jsonFiles(dir) {
 test('generation is deterministic, varied, balanced, and independent of scheduling', () => {
   const corpus = FAMILIES.flatMap(f => Array.from({ length: 8 }, (_, i) => generate('stable', i, f)));
   assert.equal(createHash('sha256').update(JSON.stringify(corpus)).digest('hex'),
-    '29ab67014503e8f9289ea57d57bc8a6fe210485648effeb50c8ee2df08643b5c');
+    'f48cb5fda49b8a2dd2b61f01da5e7b056ef43ad6ec803cfda0e92fc7b053fa39');
   const layers = new Set();
   for (const family of FAMILIES) {
     const seen = new Set();
@@ -43,7 +43,7 @@ test('generation is deterministic, varied, balanced, and independent of scheduli
       }
       const records = vector.input.orders?.flat().filter(r => typeof r === 'object')
         ?? vector.input.records ?? vector.input.forms ?? [];
-      for (const record of records) if (record.id !== 'r:bad') assert.match(record.id, /^r:[a-z2-7]{51}[aq]$/);
+      for (const record of records) if (record.id !== 'r:bad') assert.match(record.id, /^r:[0-9a-v]{51}[0g]$/);
     }
     assert.ok(seen.size > 25, family);
     const isolated = generate('stable', 6, family);
@@ -104,7 +104,7 @@ test('scheduled numeric records reach each reader without dependencies', () => {
     assert.deepEqual(records.map(r => r.n), [Number.MAX_SAFE_INTEGER, 2, -Number.MAX_SAFE_INTEGER]);
     assert.equal(new Set(records.map(r => r.id)).size, 3);
     for (const r of records) {
-      assert.match(r.id, /^r:[a-z2-7]{51}[aq]$/);
+      assert.match(r.id, /^r:[0-9a-v]{51}[0g]$/);
       assert.deepEqual(r.about, ['t:numeric']);
       assert.deepEqual(r.prev, []);
       assert.equal(r.shown, 'here');
@@ -127,7 +127,7 @@ test('scheduled batch references point to held records', () => {
     }
     assert.ok(input);
     const held = input.held[0], draft = input.drafts[0];
-    assert.match(held.id, /^r:[a-z2-7]{51}[aq]$/);
+    assert.match(held.id, /^r:[0-9a-v]{51}[0g]$/);
     assert.deepEqual(held.about, draft.env.about);
     if (index === 4) assert.deepEqual(draft.env.prev, [held.id]);
     else assert.equal(draft.env.under, held.id);
@@ -147,7 +147,7 @@ test('structured equality ignores object order and prototypes, but keeps arrays 
 
 test('all existing supported vectors agree with the public API adapters', async () => {
   let checked = 0, refused = 0;
-  for (const family of FAMILIES) {
+  for (const family of [...FAMILIES, 'byte-text']) {
     for await (const file of jsonFiles(join(ROOT, 'vectors', family))) {
       const rawText = await readFile(file, 'utf8'), vector = readVector(rawText);
       const result = assess(vector, { expect: vector.expect }, { rawText });
@@ -185,9 +185,9 @@ test('official gap17 vectors agree', async () => {
 });
 
 test('adapters align per-thing heads and admission boundaries', async () => {
-  const a = { id: `r:${'a'.repeat(52)}`, kind: 'note', observer: 'o:x', about: ['t:x', 't:y'],
+  const a = { id: `r:${'a'.repeat(51)}0`, kind: 'note', observer: 'o:x', about: ['t:x', 't:y'],
     prev: [], emitted: '2024-01-01T00:00:00Z', value: '', n: 9 };
-  const b = { ...a, id: `r:${'b'.repeat(51)}a`, about: ['t:x'], prev: [a.id], n: 1 };
+  const b = { ...a, id: `r:${'b'.repeat(51)}0`, about: ['t:x'], prev: [a.id], n: 1 };
   const orders = [[a, b], [b, a]];
   const vectors = ['fold/heads', 'fold/view'].map(layer => ({ layer, input: { orders } }));
   vectors.push({ layer: 'fold/latest', input: { orders } });

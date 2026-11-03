@@ -1,0 +1,109 @@
+{
+  "vector": "r4-canonical-refusals",
+  "layer": "occurred",
+  "laws": ["occurred.refuse"],
+  "source": "model",
+  "input": {
+    "occurred": ["2026-10-17T09:14:03+00:00", "2026-10-17T09:14:03+00:00/2027", "2026/2026-10-17T09:14:03+00:00", "2026-10-17T09:14:03+00:00/..", "2026-10-17T09:14:03-00:00", "2026-10-17T09:14:03-00:00/2027", "2026/2026-10-17T09:14:03-00:00", "2026-10-17T09:14:03-00:00/..", "2026-10-17T09:14:60Z", "2026-10-17T09:14:60Z/2027", "2026/2026-10-17T09:14:60Z", "2026-10-17T09:14:60Z/..", "2016-12-31T23:59:60Z", "2016-12-31T23:59:60Z/2027", "2026/2016-12-31T23:59:60Z", "2016-12-31T23:59:60Z/..", "2026-10-17T09:14:03.50Z", "2026-10-17T09:14:03.50Z/2027", "2026/2026-10-17T09:14:03.50Z", "2026-10-17T09:14:03.50Z/..", "2026-10-17T09:14:03.0Z", "2026-10-17T09:14:03.0Z/2027", "2026/2026-10-17T09:14:03.0Z", "2026-10-17T09:14:03.0Z/..", "2026-10-17T09:14:03.500Z", "2026-10-17T09:14:03.500Z/2027", "2026/2026-10-17T09:14:03.500Z", "2026-10-17T09:14:03.500Z/..", "2026-10-17T09:14:03.1234567891Z", "2026-10-17T09:14:03.1234567891Z/2027", "2026/2026-10-17T09:14:03.1234567891Z", "2026-10-17T09:14:03.1234567891Z/.."]
+  },
+  "expect": {
+    "spans": [
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      },
+      {
+        "refused": "occurred-not-span"
+      }
+    ]
+  }
+}

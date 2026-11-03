@@ -23,7 +23,7 @@
     "thing": "decision:auth",
     "records": [
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "id": "r:00000000000000000000000000000000000000000000000003og",
         "kind": "decision",
         "observer": "sl:ada",
         "about": ["decision:auth"],
@@ -36,7 +36,7 @@
         }
       },
       {
-        "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "id": "r:00000000000000000000000000000000000000000000000003p0",
         "kind": "decision",
         "observer": "sl:bo",
         "about": ["decision:auth"],
@@ -54,29 +54,29 @@
         "name": "safe-input",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "id": "r:00000000000000000000000000000000000000000000000003og",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"]
+          ["r:00000000000000000000000000000000000000000000000003og"]
         ]
       },
       {
         "name": "exact-output",
         "forms": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "id": "r:00000000000000000000000000000000000000000000000003og",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+            "id": "r:00000000000000000000000000000000000000000000000003p0",
             "shown": "here"
           }
         ],
         "orders": [
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza"],
-          ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"]
+          ["r:00000000000000000000000000000000000000000000000003og", "r:00000000000000000000000000000000000000000000000003p0"],
+          ["r:00000000000000000000000000000000000000000000000003p0", "r:00000000000000000000000000000000000000000000000003og"]
         ]
       }
     ],
@@ -95,13 +95,13 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "id": "r:00000000000000000000000000000000000000000000000003og",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+        "admitted": ["r:00000000000000000000000000000000000000000000000003og"],
+        "heads": ["r:00000000000000000000000000000000000000000000000003og"],
+        "winner": "r:00000000000000000000000000000000000000000000000003og",
         "slots": {
           "n": {
             "value": 9007199254740991,
@@ -116,17 +116,17 @@
       {
         "settled": [
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq",
+            "id": "r:00000000000000000000000000000000000000000000000003og",
             "shown": "here"
           },
           {
-            "id": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+            "id": "r:00000000000000000000000000000000000000000000000003p0",
             "shown": "here"
           }
         ],
-        "admitted": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza"],
-        "heads": ["r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza", "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadyq"],
-        "winner": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadza",
+        "admitted": ["r:00000000000000000000000000000000000000000000000003og", "r:00000000000000000000000000000000000000000000000003p0"],
+        "heads": ["r:00000000000000000000000000000000000000000000000003p0", "r:00000000000000000000000000000000000000000000000003og"],
+        "winner": "r:00000000000000000000000000000000000000000000000003p0",
         "slots": {
           "n": {
             "value": 9007199254740993,

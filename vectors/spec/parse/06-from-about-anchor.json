@@ -8,7 +8,7 @@
       "vertex": "x",
       "from": [
         {
-          "about": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq",
+          "about": "r:00000000000000000000000000000000000000000000000001og",
           "store": ".",
           "kind": ["note"]
         }
@@ -27,7 +27,7 @@
         {
           "store": ".",
           "kind": ["note"],
-          "about": "r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabyq"
+          "about": "r:00000000000000000000000000000000000000000000000001og"
         }
       ],
       "fold": {

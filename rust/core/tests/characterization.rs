@@ -128,17 +128,30 @@ fn ascii_predicates_and_record_id_quirks() {
     assert!(!envelope::typed_ref("é:x"));
     assert!(!envelope::typed_ref("a９:x"));
     assert!(!envelope::typed_ref("a:"));
-    // Lean checks length/alphabet only, not the final base32 padding bits.
-    assert!(envelope::record_id(&format!("r:{}", "z".repeat(52))));
+    assert!(envelope::record_id(&format!("r:{}", "0".repeat(52))));
+    assert!(!envelope::record_id(&format!("r:{}", "z".repeat(52))));
     assert!(!envelope::record_id(&format!("r:{}", "é".repeat(52))));
     assert!(time::instant("２０２６-01-01T00:00:00Z").is_none());
 }
 #[test]
+fn raw_envelope_keys_and_canonical_base32() {
+    assert!(envelope::check_keys(["kind", "observer", "emitted"]).is_ok());
+    assert_eq!(
+        envelope::check_keys(["kind", "extra"])
+            .expect_err("unknown key")
+            .to_string(),
+        "envelope-field-unknown"
+    );
+    assert_eq!(loops::base32::decode("00"), Some(vec![0]));
+    assert_eq!(loops::base32::decode("01"), None);
+    assert_eq!(loops::base32::decode("000"), None);
+}
+
+#[test]
 fn precise_times_span_order_and_text_proofs() {
-    let a = Stamp::of("1969-12-31T23:59:59.5000Z").expect("valid");
-    let b = Stamp::of("1970-01-01T00:59:59.5+01:00").expect("valid");
-    assert_eq!(a.moment(), b.moment());
-    assert_ne!(a, b);
+    let a = Stamp::of("1969-12-31T23:59:59.5Z").expect("valid");
+    assert!(Stamp::of("1969-12-31T23:59:59.5000Z").is_none());
+    assert!(Stamp::of("1970-01-01T00:59:59.5+01:00").is_none());
     assert_eq!(a.moment().fraction(), &[5]);
     assert!(occurred::occurred_span("2009/2009-01").is_some());
     assert!(occurred::occurred_span("2009-02/2009-01").is_none());
@@ -147,10 +160,10 @@ fn precise_times_span_order_and_text_proofs() {
         occurred::occurred_span("2009/..").expect("open")
             > occurred::occurred_span("2009").expect("year")
     );
-    let digits = "123456789".repeat(456);
-    let precise =
-        time::instant(&format!("1970-01-01T00:00:00.{digits}000Z")).expect("no precision cap");
-    assert_eq!(precise.fraction().len(), digits.len());
+    let precise = time::instant("1970-01-01T00:00:00.123456789Z").expect("nine digits");
+    assert_eq!(precise.fraction().len(), 9);
+    assert!(time::instant("1970-01-01T00:00:00.1234567891Z").is_none());
+    assert!(time::instant("1970-01-01T00:00:60Z").is_none());
     assert!(
         precise
             > *time::instant("1970-01-01T00:00:00.1Z")

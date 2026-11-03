@@ -255,18 +255,19 @@ fn low_level_parsers_do_not_add_boundary_checks() {
 
 #[test]
 fn serialization_retains_spelling_orders_and_only_runtime_members() {
-    let input = r#"{"note":{"anything":true},"vertex":"x","from":[{"about":"task:one","kind":["task","task"],"store":"."},{"store":"other"}],"fold":{"z":{"where":{"env.occurred":{"below":"2026-10-01T01:00:00+01:00","is":"2026-09"},"env.kind":{"not":"draft"}},"limit":2,"follow":"prev","collect":true,"note":"drop"},"a":{"sum":"n"},"b":{"min":"n"},"c":{"max":"n"},"d":{"count":true},"e":{"follow":"prev","latest-by":"about"}},"ticks":[],"order":{},"resolve":true,"window":null,"boundary":[],"param":0,"covers":{},"into":false,"bundle":[]}"#;
+    let input = r#"{"note":{"anything":true},"vertex":"x","from":[{"about":"task:one","kind":["task","task"],"store":"."},{"store":"other"}],"fold":{"z":{"where":{"env.occurred":{"below":"2026-10-01T01:00:00Z","is":"2026-09"},"env.kind":{"not":"draft"}},"limit":2,"follow":"prev","collect":true,"note":"drop"},"a":{"sum":"n"},"b":{"min":"n"},"c":{"max":"n"},"d":{"count":true},"e":{"follow":"prev","latest-by":"about"}},"ticks":[],"order":{},"resolve":true,"window":null,"boundary":[],"param":0,"covers":{},"into":false,"bundle":[]}"#;
     let sp = spec(input);
     let expected = json(
-        r#"{"vertex":"x","from":[{"store":".","kind":["task","task"],"about":"task:one"},{"store":"other"}],"fold":{"z":{"collect":true,"follow":"prev","limit":2,"where":{"env.occurred":{"below":"2026-10-01T01:00:00+01:00","is":"2026-09"},"env.kind":{"not":"draft"}}},"a":{"sum":"n"},"b":{"min":"n"},"c":{"max":"n"},"d":{"count":true},"e":{"latest-by":"about","follow":"prev"}}}"#,
+        r#"{"vertex":"x","from":[{"store":".","kind":["task","task"],"about":"task:one"},{"store":"other"}],"fold":{"z":{"collect":true,"follow":"prev","limit":2,"where":{"env.occurred":{"below":"2026-10-01T01:00:00Z","is":"2026-09"},"env.kind":{"not":"draft"}}},"a":{"sum":"n"},"b":{"min":"n"},"c":{"max":"n"},"d":{"count":true},"e":{"latest-by":"about","follow":"prev"}}}"#,
     );
     assert_eq!(sp.to_json(), expected);
     assert_eq!(Spec::of_json(&expected).expect("round trip"), sp);
-    let other = spec(&input.replace("2026-10-01T01:00:00+01:00", "2026-10-01T00:00:00Z"));
+    let other = spec(&input.replace("2026-09\"", "2026-09?\""));
     assert_ne!(sp, other, "full spec equality includes claim text");
+    assert_ne!(sp.to_json(), other.to_json());
     assert_eq!(
-        loops::time::instant("2026-10-01T01:00:00+01:00"),
-        loops::time::instant("2026-10-01T00:00:00Z")
+        loops::occurred::occurred_span("2026-09"),
+        loops::occurred::occurred_span("2026-09?")
     );
     let raw = json(
         r#"{"z":{"is":true,"not":false,"present":true,"absent":true},"a":{"below":5,"at-least":-3},"z":{"is":""}}"#,

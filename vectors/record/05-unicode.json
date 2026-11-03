@@ -7,8 +7,8 @@
     "envs": [
       {
         "kind": "note",
-        "observer": "sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a",
-        "emitted": "2026-10-21T05:30:00-04:00"
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T09:30:00Z"
       }
     ],
     "payloads": [
@@ -21,19 +21,19 @@
         "€": "euro key"
       }
     ],
-    "salt": "abnbxlkiys5rzvmgvim4ztbhhm",
-    "seed": "jpairczaap3nqstmrszbjgpwkrjvfwtbw6gplbcgwfqb4ubyub5a"
+    "salt": "01d1nba8oithplc6l8cspj177c",
+    "seed": "9f08h2p00frdgijchip196fmah9l5mj1mu6fb126m5g1sk1ok1t0"
   },
   "expect": {
-    "env_canonical": "{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}",
+    "env_canonical": "{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}",
     "payload_canonical": "{\"emoji\":\"😀 and ש\",\"line-sep\":\"a b\",\"text\":\"tab\\there, quote \\\" and backslash \\\\, newline\\nand \\u0001 control\",\"€\":\"euro key\",\"😀\":\"astral key\",\"דּ\":\"BMP key above the surrogates\"}",
-    "commit": "h:a3faazx6ib234jdtbzo3jauhz56ofpinpcxvr7eklztle7cm2snq",
-    "id_preimage": "{\"commit\":\"h:a3faazx6ib234jdtbzo3jauhz56ofpinpcxvr7eklztle7cm2snq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"}}",
-    "id": "r:bexxuek4sln4s3ojuhhllt6ji6apfcdxqzzqxm7p5a6nw4vihqnq",
-    "signing_input": "loops/record/v1:r:bexxuek4sln4s3ojuhhllt6ji6apfcdxqzzqxm7p5a6nw4vihqnq",
-    "key": "k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q",
-    "ed25519": "nuio263qpfnpscwmpadnik5zpzcyi6enxj3kewdfmvb7l7l4ciodhi4o7mr6vnhjse3druconvuhfti6qdfpj427y3pncc54jlcrydy",
-    "line": "{\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:bexxuek4sln4s3ojuhhllt6ji6apfcdxqzzqxm7p5a6nw4vihqnq\",\"payload\":{\"emoji\":\"😀 and ש\",\"line-sep\":\"a b\",\"text\":\"tab\\there, quote \\\" and backslash \\\\, newline\\nand \\u0001 control\",\"€\":\"euro key\",\"😀\":\"astral key\",\"דּ\":\"BMP key above the surrogates\"},\"salt\":\"abnbxlkiys5rzvmgvim4ztbhhm\",\"sig\":{\"ed25519\":\"nuio263qpfnpscwmpadnik5zpzcyi6enxj3kewdfmvb7l7l4ciodhi4o7mr6vnhjse3druconvuhfti6qdfpj427y3pncc54jlcrydy\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}",
-    "erased_line": "{\"commit\":\"h:a3faazx6ib234jdtbzo3jauhz56ofpinpcxvr7eklztle7cm2snq\",\"env\":{\"emitted\":\"2026-10-21T05:30:00-04:00\",\"kind\":\"note\",\"observer\":\"sl:6bbyfuns5mofgy5wkcu4l4xpphxg5ap5ql3w5e4zatfnb3s64p3a\"},\"id\":\"r:bexxuek4sln4s3ojuhhllt6ji6apfcdxqzzqxm7p5a6nw4vihqnq\",\"sig\":{\"ed25519\":\"nuio263qpfnpscwmpadnik5zpzcyi6enxj3kewdfmvb7l7l4ciodhi4o7mr6vnhjse3druconvuhfti6qdfpj427y3pncc54jlcrydy\",\"key\":\"k:y7mte2vm5lqv6picg3hvvfdrvp4rxdb6v2a56ockvrlusvgubg2q\"}}"
+    "commit": "h:0r500pnu81qrs93j1per90k7ptue5f8df2nlhv4abpjb4v2cqidg",
+    "id_preimage": "{\"commit\":\"h:0r500pnu81qrs93j1per90k7ptue5f8df2nlhv4abpjb4v2cqidg\",\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"}}",
+    "id": "r:1c81e8a563jkd6v3qcr0e4kkubk2pmpoes9kg8vnstuqbcm251gg",
+    "signing_input": "loops/record/v1:r:1c81e8a563jkd6v3qcr0e4kkubk2pmpoes9kg8vnstuqbcm251gg",
+    "key": "k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg",
+    "ed25519": "cek2tgptkhernmcu0lcjbm0sdtj5ep3mjigjtj6iq7547fu6umedpk49re3c4lgbpohabilfkvos5op8epbuelemgqmqucfppfkn438",
+    "line": "{\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:1c81e8a563jkd6v3qcr0e4kkubk2pmpoes9kg8vnstuqbcm251gg\",\"payload\":{\"emoji\":\"😀 and ש\",\"line-sep\":\"a b\",\"text\":\"tab\\there, quote \\\" and backslash \\\\, newline\\nand \\u0001 control\",\"€\":\"euro key\",\"😀\":\"astral key\",\"דּ\":\"BMP key above the surrogates\"},\"salt\":\"01d1nba8oithplc6l8cspj177c\",\"sig\":{\"ed25519\":\"cek2tgptkhernmcu0lcjbm0sdtj5ep3mjigjtj6iq7547fu6umedpk49re3c4lgbpohabilfkvos5op8epbuelemgqmqucfppfkn438\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}",
+    "erased_line": "{\"commit\":\"h:0r500pnu81qrs93j1per90k7ptue5f8df2nlhv4abpjb4v2cqidg\",\"env\":{\"emitted\":\"2026-10-21T09:30:00Z\",\"kind\":\"note\",\"observer\":\"sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0\"},\"id\":\"r:1c81e8a563jkd6v3qcr0e4kkubk2pmpoes9kg8vnstuqbcm251gg\",\"sig\":{\"ed25519\":\"cek2tgptkhernmcu0lcjbm0sdtj5ep3mjigjtj6iq7547fu6umedpk49re3c4lgbpohabilfkvos5op8epbuelemgqmqucfppfkn438\",\"key\":\"k:ovcj4qlctbgluf826r7ll53hlfshn31ulq0tue2alhbkil6k16qg\"}}"
   }
 }

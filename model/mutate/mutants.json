@@ -275,9 +275,9 @@
   {
     "id": "wide-envelope-010",
     "file": "Envelope.lean",
-    "before": "rest.length == 52",
-    "after": "rest.length != 52",
-    "reason": "Change this selection or check.",
+    "before": "byteText 32 (String.ofList rest)",
+    "after": "byteText 31 (String.ofList rest)",
+    "reason": "Require the wrong record digest width.",
     "definition": "Loops.recordId"
   },
   {
@@ -745,27 +745,19 @@
     "definition": "Loops.daysIn"
   },
   {
-    "id": "wide-time-094",
-    "file": "Time.lean",
-    "before": "(ds.reverse.dropWhile (· == 0)).reverse",
-    "after": "(ds.reverse.dropWhile (· != 0)).reverse",
-    "reason": "Change this selection or check.",
-    "definition": "Loops.stripZeros"
-  },
-  {
     "id": "wide-time-095",
     "file": "Time.lean",
-    "before": "h ≤ 23 && m ≤ 59",
-    "after": "h < 23 && m ≤ 59",
-    "reason": "Change this selection or check.",
-    "definition": "Loops.offsetSecs"
+    "before": "| ['Z'] => some []",
+    "after": "| ['Z'] => none",
+    "reason": "Reject the only canonical UTC marker.",
+    "definition": "Loops.tail"
   },
   {
     "id": "wide-time-096",
     "file": "Time.lean",
-    "before": "if frac.isEmpty then none",
-    "after": "if !frac.isEmpty then none",
-    "reason": "Change this selection or check.",
+    "before": "if frac.isEmpty || frac.length > 9 || frac.getLast? == some '0' then none",
+    "after": "if !frac.isEmpty || frac.length > 9 || frac.getLast? == some '0' then none",
+    "reason": "Reject nonempty fractions.",
     "definition": "Loops.tail"
   },
   {
@@ -891,10 +883,10 @@
   {
     "id": "coverage-time-instant-",
     "file": "Time.lean",
-    "before": "&& s ≤ 60",
-    "after": "&& s < 60",
-    "reason": "Reject leap seconds.",
-    "definition": "Loops.instant?"
+    "before": "&& s ≤ 59",
+    "after": "&& s < 59",
+    "reason": "Reject the last second of each minute.",
+    "definition": "Loops.instantParts?"
   },
   {
     "id": "coverage-spec-slottests",
@@ -1079,14 +1071,6 @@
     "after": "| _ :: b => (cs.takeWhile (· != '/'), some b.reverse)",
     "reason": "Reverse the second half.",
     "definition": "Loops.halves"
-  },
-  {
-    "id": "finish-occurred-stamp-of",
-    "file": "Occurred.lean",
-    "before": "match h : instant? s.toList with\n  | some m => some ⟨s, m, h⟩\n  | none => none",
-    "after": "if s.toList.contains '+' then none else\n  match h : instant? s.toList with\n  | some m => some ⟨s, m, h⟩\n  | none => none",
-    "reason": "Reject positive offsets.",
-    "definition": "Loops.Stamp.of?"
   },
   {
     "id": "finish-occurred-claim-of",
@@ -1479,5 +1463,69 @@
     "after": "String.join (s.toList.reverse.map escapeChar)",
     "reason": "Reverse the quoted characters.",
     "definition": "Loops.quote"
+  },
+  {
+    "id": "step1-base32-reencode",
+    "file": "Base32.lean",
+    "before": "if base32 bs == s then some bs else none",
+    "after": "some bs",
+    "reason": "Accept noncanonical text without re-encode equality.",
+    "definition": "Loops.unbase32"
+  },
+  {
+    "id": "step1-fraction-final-zero",
+    "file": "Time.lean",
+    "before": " || frac.getLast? == some '0'",
+    "after": "",
+    "reason": "Accept a trailing-zero fraction.",
+    "definition": "Loops.tail"
+  },
+  {
+    "id": "step1-seconds-bound",
+    "file": "Time.lean",
+    "before": " && s ≤ 59",
+    "after": "",
+    "reason": "Accept seconds outside 00 through 59.",
+    "definition": "Loops.instantParts?"
+  },
+  {
+    "id": "step1-zone-only-z",
+    "file": "Time.lean",
+    "before": "| ['Z'] => some []",
+    "after": "| ['Z'] | ['+', '0', '0', ':', '0', '0'] => some []",
+    "reason": "Accept a numeric UTC offset as well as Z.",
+    "definition": "Loops.tail"
+  },
+  {
+    "id": "step1-envelope-keys-remove",
+    "file": "Envelope.lean",
+    "before": "then none else some \"envelope-field-unknown\"",
+    "after": "then none else none",
+    "reason": "Ignore unknown raw envelope keys.",
+    "definition": "Loops.envelopeKeysProblem"
+  },
+  {
+    "id": "step1-envelope-keys-after-value",
+    "file": "Loops/Read.lean",
+    "before": "  if let some why := envelopeKeysProblem kvs then throw why\n  decodeValues path j",
+    "after": "  let decoded ← decodeValues path j\n  if let some why := envelopeKeysProblem kvs then throw why\n  pure decoded",
+    "reason": "Decode kind before raw envelope keys.",
+    "definition": "Loops.Read.readOne"
+  },
+  {
+    "id": "step1-draft-keys-after-values",
+    "file": "Loops/Read.lean",
+    "before": "  if let some why := draftsKeysProblem raw then throw why\n  each path draftValues j",
+    "after": "  let decoded ← each path draftValues j\n  if let some why := draftsKeysProblem raw then throw why\n  pure decoded",
+    "reason": "Decode draft labels, envelopes and salts before all-draft shape preflight.",
+    "definition": "Loops.Read.drafts"
+  },
+  {
+    "id": "step1-record-keys-after-values",
+    "file": "Loops/Read.lean",
+    "before": "    if let some why := envelopesKeysProblem raw then throw why\n    each path decodeValues j",
+    "after": "    let decoded ← each path decodeValues j\n    if let some why := envelopesKeysProblem raw then throw why\n    pure decoded",
+    "reason": "Decode envelope variants before all-envelope shape preflight.",
+    "definition": "Loops.Read.readMany"
   }
 ]

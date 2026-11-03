@@ -254,7 +254,7 @@ fn record_equality_includes_spelling_and_unchecked_state_stays_unchecked() {
         ..rec(1, 5)
     };
     let b = Record {
-        emitted: Stamp::of("2026-01-01T01:00:00+01:00").expect("same instant"),
+        value: "different payload".into(),
         ..a.clone()
     };
     assert!(!a.newer(&b) && !b.newer(&a));

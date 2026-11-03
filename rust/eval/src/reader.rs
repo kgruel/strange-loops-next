@@ -62,26 +62,7 @@ pub(super) fn texts(path: &str, j: &Json) -> Result<Vec<String>, String> {
 }
 /// Gen.Read.unbase32 (model/Gen/Read.lean), canonical lowercase byte spelling.
 fn unbase32(path: &str, s: &str) -> Result<Vec<u8>, String> {
-    let mut acc = 0_u32;
-    let mut bits = 0;
-    let mut bytes = Vec::new();
-    for c in s.bytes() {
-        let digit = b"abcdefghijklmnopqrstuvwxyz234567"
-            .iter()
-            .position(|b| *b == c)
-            .ok_or_else(|| format!("{path}: invalid base32"))?;
-        acc = (acc << 5) | u32::try_from(digit).map_err(|e| format!("{path}: {e}"))?;
-        bits += 5;
-        if bits >= 8 {
-            bits -= 8;
-            bytes.push(u8::try_from((acc >> bits) & 255).map_err(|e| format!("{path}: {e}"))?);
-        }
-        acc &= (1 << bits) - 1;
-    }
-    if base32::base32(&bytes) != s {
-        return Err(format!("{path}: noncanonical base32"));
-    }
-    Ok(bytes)
+    base32::decode(s).ok_or_else(|| format!("{path}: noncanonical base32hex"))
 }
 /// Gen.Read.bytes (model/Gen/Read.lean), strict text and canonical byte decoding.
 pub(super) fn bytes(path: &str, j: &Json) -> Result<Vec<u8>, String> {
@@ -264,7 +245,7 @@ mod tests {
 
     #[test]
     fn typed_about_and_numeric_fields_keep_reader_boundaries() {
-        let raw = r#"{"id":"r:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"note","observer":"sl:a","about":["thing:a"],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":1.0,"fields":{"whole":2e0,"fraction":1.5,"unsafe":9007199254740992}}"#;
+        let raw = r#"{"id":"r:0000000000000000000000000000000000000000000000000000","kind":"note","observer":"sl:a","about":["thing:a"],"prev":[],"emitted":"2026-01-01T00:00:00Z","value":"","n":1.0,"fields":{"whole":2e0,"fraction":1.5,"unsafe":9007199254740992}}"#;
         let input = crate::parse(raw);
         let r = record("record", &input).expect("reader shape");
         assert_eq!(r.num("n"), Some(1_i64.into()));
@@ -288,7 +269,7 @@ mod tests {
             let raw = Json::Str(format!("r:{}", base32::base32(&vec![0; len])));
             assert!(reader_id("id", &raw).is_err(), "length {len}");
         }
-        let raw = Json::Str(format!("r:{}b", "a".repeat(51)));
+        let raw = Json::Str(format!("r:{}b", "0".repeat(51)));
         assert!(reader_id("id", &raw).is_err());
     }
 }

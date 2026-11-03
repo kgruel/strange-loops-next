@@ -1,0 +1,20 @@
+{
+  "vector": "25-emitted-refused-offset",
+  "layer": "record",
+  "laws": ["record.refuse"],
+  "source": "model",
+  "input": {
+    "envs": [
+      {
+        "kind": "note",
+        "observer": "sl:u11o5kditce56otma2ksbsnff7n6t0ftgbrmt4sp0j5d1riusfr0",
+        "emitted": "2026-10-21T05:30:00+24:00"
+      }
+    ],
+    "salt": "5r4smdt4crf2g0insl3psnbqb0",
+    "payload_text": "{}"
+  },
+  "expect": {
+    "refused": "emitted-not-rfc3339"
+  }
+}

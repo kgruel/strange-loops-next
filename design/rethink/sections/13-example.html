@@ -171,8 +171,8 @@ loops tick manuscript --witness                    # beta readers: what you sent
 }
 
 # collectors write JSONL to `loops emit - --stream`, each signing as itself
-{"kind":"mail-message", "about":["org:willowcreek-mgmt.example"], "occurred":"2026-10-02T14:11:00-07:00", "payload":{"subject":"Pool resurfacing bids", "body":"blob:…"}}
-{"kind":"calendar-event", "about":["r:h1"], "occurred":"2026-10-21T19:00:00-07:00/2026-10-21T21:00:00-07:00", "payload":{"title":"HOA board meeting"}}
+{"kind":"mail-message", "about":["org:willowcreek-mgmt.example"], "occurred":"2026-10-02T21:11:00Z", "payload":{"subject":"Pool resurfacing bids", "body":"blob:…"}}
+{"kind":"calendar-event", "about":["r:h1"], "occurred":"2026-10-22T02:00:00Z/2026-10-22T04:00:00Z", "payload":{"title":"HOA board meeting"}}
 {"kind":"feed-item", "about":["url:example.com/essay"]}           ← kyle/rss; fetched twice, two records</pre>
   <p>Parse specs travel with the store; sources and credentials don't.</p>
   </div></details>
@@ -293,12 +293,12 @@ loops emit redaction --erases r:n9                                     # sl:dire
   </div></details>
 
   <details class="unfold"><summary>One record on disk, before and after erasure</summary><div class="body">
-    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T10:12:44-05:00","about":["r:x1"]},
- "salt":"q8Zt…","payload":{"body":"Called the customer back at 555-…"}}
+    <pre style="margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);padding:12px;border-radius:8px;overflow-x:auto">{"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T15:12:44Z","about":["r:x1"]},
+ "salt":"…","payload":{"body":"Called the customer back at 555-…"}}
 
-{"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T10:12:44-05:00","about":["r:x1"]},
+{"id":"r:9f3c…","env":{"kind":"note","observer":"sl:dev2","emitted":"2026-03-04T15:12:44Z","about":["r:x1"]},
  "commit":"h:7ab1…"}</pre>
-    <p><code>id = hash(canonical(env) + commit)</code> and <code>commit = hash(salt + canonical(payload))</code>. The second line still verifies. Every reference to <code>r:9f3c</code> still resolves. Nothing else in the repository changes.</p>
+    <p>The id hashes the JCS object containing <code>commit</code> and <code>env</code>. The commitment hashes the salt and canonical payload. The second line still verifies. Every reference to <code>r:9f3c</code> still resolves. Nothing else in the repository changes.</p>
   </div></details>
 
   <h3>What the example surfaced</h3>

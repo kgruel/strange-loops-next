@@ -1,6 +1,92 @@
 # Lean model mutation report
 
-## CURRENT snapshot: `08fa7029485648fdc9de642d8c0f19c1dccc3651`
+## Round 2 review-fix snapshot: `8a12ba6`
+
+The Node 22 run completes all 195 catalogue entries with a 240-second command timeout.
+The retained [summary](evidence/mutations-fixes2/summary.json) supports these counts.
+Run `python3 interop/fuzz/summarize.py report` from the repository root.
+The script derives the outcome, guard, and survivor counts without raw logs.
+
+| Outcome | Count |
+|---|---:|
+| Rejected by build | 146 |
+| Vector differences | 27 |
+| Generator assertion exceptions | 16 |
+| Survivors | 6 |
+
+The runner exits 1 for generator assertions.
+Each error retains its assertion text in the summary.
+No command times out, receives a signal, or reports a spawn or cleanup error.
+Build rejections are not semantic proof kills.
+Generator assertions are not vector-difference kills.
+Survival alone proves neither equivalence nor reachability.
+
+The proof graph has no outside user of `stripZeros` or its five lemmas.
+The implementation removes that family and retires its sole entry, `wide-time-094`.
+[COVERAGE.md](COVERAGE.md) records the reason.
+The raw-reader mutations now target `Loops.Read`, not `Gen.Read`.
+The catalogue runner accepts only library source paths.
+The eight guard mutations remain:
+
+| Mutation | Full-catalogue outcome |
+|---|---|
+| `step1-base32-reencode` | rejected-by-build |
+| `step1-fraction-final-zero` | rejected-by-build |
+| `step1-seconds-bound` | rejected-by-build |
+| `step1-zone-only-z` | rejected-by-build |
+| `step1-envelope-keys-remove` | error |
+| `step1-envelope-keys-after-value` | error |
+| `step1-draft-keys-after-values` | error |
+| `step1-record-keys-after-values` | error |
+
+The six older survivors remain unchanged:
+
+- `extra-families-max-acc`
+- `extra-families-min-acc`
+- `finish-json-hexdigit`
+- `last-spec-tests-conds`
+- `wide-families-013`
+- `wide-spec-064`
+
+D6 stays unapproved.
+Both baseline builds pass; initial generation matches the committed corpus.
+The completed run covers exactly the current catalogue IDs.
+Source and vector files restore to HEAD, and `model/.mutation-run.lock` is absent.
+No other parent-started Lean build or LSP probe runs during the catalogue.
+Automatic tooling isolation is not independently established.
+The separate G2 probes also fail each implementation's own vector layer after deleting or moving its per-envelope check.
+
+```sh
+fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/review-fixes2-mutants.json
+python3 interop/fuzz/summarize.py mutation /tmp/review-fixes2-mutants.json mutations-fixes2
+```
+
+### Guard and retired mutations
+
+Earlier Step-1 runs at `6fa9857` and `f1b32fb` produced the guard and retirement decisions below; their evidence is not retained.
+The cheap CI runner uses the same eight guard replacements.
+Every cheap guard mutation compiles and then fails runtime checks.
+The full catalogue includes the proof modules, so its detection stages can differ.
+Direct JS and Rust tests also pin canonical byte decoding, fraction endings, second bounds, UTC markers, and raw key checks.
+
+The catalogue retires `finish-occurred-stamp-of` and `wide-time-094`.
+`finish-occurred-stamp-of` added `if s.toList.contains '+' then none else` before the existing parser call in `Stamp.of?`.
+Accepted text contains only decimal digits and the fixed separators `-`, `T`, `:`, `.`, and `Z`.
+It cannot contain `+`; R4 already refuses every numeric offset.
+Thus the added guard is redundant for accepted instants, and rejected instants still return `none` on both paths.
+This is a source-based equivalence interpretation, not a Lean equivalence theorem or a conclusion from survival alone.
+`wide-time-094` targeted the removed `stripZeros` family, as described above.
+
+The Step-1 re-anchors remain in the catalogue:
+
+- `wide-envelope-010` changes decoded width from 32 to 31 bytes.
+- `wide-time-095` refuses the sole accepted UTC marker.
+- `wide-time-096` negates fraction nonemptiness in the new canonical check.
+- `coverage-time-instant-` excludes second 59 in `instantParts?`.
+
+The catalogue does not claim exhaustive mutation coverage for the new decoder and instant helpers.
+
+## HISTORICAL integrated snapshot: `08fa7029485648fdc9de642d8c0f19c1dccc3651`
 
 The full catalogue run completes all 189 entries on Node `v22.23.4`, with a 240-second command timeout.
 
@@ -36,7 +122,7 @@ Fresh checks do not establish that all diagnostics are clean.
 Build diagnostic markers overlap: 62 type mismatches, zero syntax markers, one unknown identifier, one heartbeat, two recursion-depth markers, and 81 unsolved goals.
 A type mismatch can occur in a law; it does not imply a malformed patch.
 These markers neither classify cases by majority nor constitute a complete syntax or semantic audit.
-Local details appear in `.pi/gates/04-final-mutants/RESULTS.md` and `.pi/gates/04-final-mutants/summary.json`.
+The local details are historical provenance only, not retained evidence in the repository.
 
 ## HISTORICAL integration scope
 
@@ -54,14 +140,14 @@ The old counts, detection sites, and proposed laws are historical evidence only.
 The extrema candidates below describe the current safe-whole numeric reader.
 They remain unapproved.
 No proposed law receives a proof or acceptance in this merge.
-The merged gates and vector parity are in `.pi/gates/04-mutants/`.
+The local merged-gate logs are historical provenance only, not retained evidence in the repository.
 
 ## HISTORICAL integration run at `17bd7d4`
 
 The full run at `17bd7d4` covered 189 entries.
 It found 140 build rejections and 29 vector differences.
 It also found 14 generator assertions and six survivors.
-See `.pi/gates/04-mutants/full-summary.md` and `.pi/gates/04-mutants/full.json`.
+The local run logs are historical provenance only, not retained evidence in the repository.
 Of the 140 build rejections, 16 had type or elaboration diagnostics.
 The other 124 were not independently audited semantic proof kills.
 Automated Lean setup-file probes ran concurrently and may have affected shared Lake artifacts.
@@ -264,14 +350,14 @@ node model/mutate/run.mjs --timeout 240 --output /tmp/loops-mutants.json
 node --test model/mutate/run.test.mjs
 ```
 
-The mutation command runs all 189 entries on the current tree.
+The mutation command runs the catalogue on the current tree.
 The full mutation command returns 1 when generator assertions detect mutants.
 Inspect the result categories and logs rather than treating that exit as a baseline failure.
 
 The local initial result is `/tmp/slnext-mutants-brief2-initial.json`.
 The survivor retest is `/tmp/slnext-mutants-brief2-retest.json`.
 Each result has a sibling `.logs` directory.
-These temporary files do not form part of the commit.
+These temporary files are historical provenance only, not retained evidence in the repository.
 The following tables preserve each outcome and its first detection site.
 The catalogue preserves every exact replacement.
 

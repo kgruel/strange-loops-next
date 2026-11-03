@@ -2,8 +2,8 @@
 
 /// Lean: `Loops.Moment`, model/Loops/Time.lean.
 /// A parsed moment holds UTC seconds and exact decimal fraction digits.
-/// Four-digit years and bounded offsets keep seconds within `i64`.
-/// Fractions have no precision limit. The fields exclude arbitrary raw Lean moments.
+/// Four-digit years keep seconds within `i64`.
+/// Fractions have at most nine digits and no trailing zero.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Moment {
     seconds: i64,
@@ -64,23 +64,8 @@ pub(crate) fn day_number(y: u32, m: u32, d: u32) -> i64 {
             - 1,
     ) - 719_528
 }
-// offsetSecs, model/Loops/Time.lean.
-fn offset(cs: &[u8]) -> Option<i64> {
-    match cs {
-        b"Z" => Some(0),
-        [s, h1, h2, b':', m1, m2] => {
-            let h = digits(&[*h1, *h2])?;
-            let m = digits(&[*m1, *m2])?;
-            if !matches!(s, b'+' | b'-') || h > 23 || m > 59 {
-                return None;
-            }
-            Some((if *s == b'+' { 1 } else { -1 }) * i64::from(3600 * h + 60 * m))
-        }
-        _ => None,
-    }
-}
 /// Lean: `Loops.instant?`, model/Loops/Time.lean.
-/// Parses an instant with uppercase `T` and `Z`, exact fractions, and second 60.
+/// Parses a canonical UTC instant with at most nine fraction digits.
 pub fn instant(text: &str) -> Option<Moment> {
     let cs = text.as_bytes();
     if cs.len() < 20
@@ -103,35 +88,32 @@ pub fn instant(text: &str) -> Option<Moment> {
         || day > days_in(year, month)
         || hour > 23
         || minute > 59
-        || second > 60
+        || second > 59
     {
         return None;
     }
     let tail = &cs[19..];
-    let (mut fraction, off) = if tail.first() == Some(&b'.') {
-        let count = tail[1..].iter().take_while(|c| c.is_ascii_digit()).count();
-        if count == 0 {
+    let fraction = if tail == b"Z" {
+        Vec::new()
+    } else {
+        let digits = tail.strip_prefix(b".")?.strip_suffix(b"Z")?;
+        if digits.is_empty()
+            || digits.len() > 9
+            || digits.last() == Some(&b'0')
+            || !digits.iter().all(u8::is_ascii_digit)
+        {
             return None;
         }
-        (
-            tail[1..=count].iter().map(|c| c - b'0').collect::<Vec<_>>(),
-            offset(&tail[count + 1..])?,
-        )
-    } else {
-        (Vec::new(), offset(tail)?)
+        digits.iter().map(|c| c - b'0').collect()
     };
-    while fraction.last() == Some(&0) {
-        fraction.pop();
-    }
     Some(Moment {
         seconds: day_number(year, month, day) * 86400
-            + i64::from(3600 * hour + 60 * minute + second)
-            - off,
+            + i64::from(3600 * hour + 60 * minute + second),
         fraction,
     })
 }
 /// Lean: `Loops.validEmitted`, model/Loops/Time.lean.
-/// Checks whether the text names an RFC 3339 instant with an offset.
+/// Checks whether the text names a canonical UTC instant.
 pub fn valid_emitted(s: &str) -> bool {
     instant(s).is_some()
 }

@@ -1,86 +1,40 @@
-//! Batch fixture decoding and answers from Gen.Read and Gen.Run.
-use super::reader::{bytes, list, members, optional, required, text, texts};
-use loops::{
-    batch::{self, Draft},
-    envelope::Env,
-    json::Json,
-};
+//! Batch fixture answers from Gen.Run; raw drafts decode in the core library.
+use super::reader::{list, members, required, text, texts};
+use loops::{batch, json::Json};
 use sha2::{Digest, Sha256};
-
-pub(super) fn env(path: &str, j: &Json) -> Result<Env, String> {
-    let kvs = members(
-        path,
-        &[
-            "kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases",
-        ],
-        j,
-    )?;
-    let required_text =
-        |k: &str| text(&format!("{path}.{k}"), required(path, kvs, k)?).map(str::to_owned);
-    let optional_text = |k: &str| {
-        optional(kvs, k)
-            .map(|v| text(&format!("{path}.{k}"), v).map(str::to_owned))
-            .transpose()
-    };
-    let array = |k: &str| {
-        optional(kvs, k)
-            .map(|v| texts(&format!("{path}.{k}"), v))
-            .transpose()
-            .map(Option::unwrap_or_default)
-    };
-    let kind = required_text("kind")?;
-    let observer = required_text("observer")?;
-    let emitted = required_text("emitted")?;
-    let occurred = optional_text("occurred")?;
-    let under = optional_text("under")?;
-    Ok(Env {
-        kind,
-        observer,
-        emitted,
-        occurred,
-        about: array("about")?,
-        prev: array("prev")?,
-        under,
-        erases: array("erases")?,
-    })
-}
-
-fn draft(path: &str, j: &Json) -> Result<Draft, String> {
-    let kvs = members(path, &["label", "env", "salt", "payload"], j)?;
-    Ok(Draft {
-        label: optional(kvs, "label")
-            .map(|v| text(&format!("{path}.label"), v).map(str::to_owned))
-            .transpose()?,
-        env: env(&format!("{path}.env"), required(path, kvs, "env")?)?,
-        salt: bytes(&format!("{path}.salt"), required(path, kvs, "salt")?)?,
-        payload: required(path, kvs, "payload")?.clone(),
-    })
-}
 
 /// Lean: `Gen.batchRun`, model/Gen/Run.lean.
 /// Computes complete batch answers after strict fixture decoding.
 pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
+    match answers_decoded(layer, input) {
+        Err(e) if e == "envelope-field-unknown" => {
+            Ok(vec![Json::Obj(vec![("refused".into(), Json::Str(e))])])
+        }
+        other => other,
+    }
+}
+
+fn answers_decoded(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
     if layer != "batch" {
         return Err(format!("unknown layer {layer}"));
     }
     let kvs = members("input", &["held", "drafts"], input)?;
-    let held: Vec<(String, Vec<String>)> = list("input.held", required("input", kvs, "held")?)?
-        .iter()
-        .enumerate()
-        .map(|(i, j)| {
-            let p = format!("input.held[{i}]");
-            let k = members(&p, &["id", "about"], j)?;
-            Ok((
-                text(&format!("{p}.id"), required(&p, k, "id")?)?.to_owned(),
-                texts(&format!("{p}.about"), required(&p, k, "about")?)?,
-            ))
-        })
-        .collect::<Result<_, String>>()?;
-    let drafts: Vec<_> = list("input.drafts", required("input", kvs, "drafts")?)?
-        .iter()
-        .enumerate()
-        .map(|(i, j)| draft(&format!("input.drafts[{i}]"), j))
-        .collect::<Result<_, _>>()?;
+    let (held, drafts) = batch::read_all("input.drafts", required("input", kvs, "drafts")?, || {
+        let held: Vec<(String, Vec<String>)> = list("input.held", required("input", kvs, "held")?)?
+            .iter()
+            .enumerate()
+            .map(|(i, j)| {
+                let p = format!("input.held[{i}]");
+                let k = members(&p, &["id", "about"], j)?;
+                Ok((
+                    text(&format!("{p}.id"), required(&p, k, "id")?)?.to_owned(),
+                    texts(&format!("{p}.about"), required(&p, k, "about")?)?,
+                ))
+            })
+            .collect::<Result<_, String>>()?;
+        Ok(held)
+    })
+    .map_err(|e| e.to_string())?;
     let hash = |b: &[u8]| Sha256::digest(b).to_vec();
     let lookup = |id: &str| {
         held.iter()
@@ -110,9 +64,32 @@ pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{answers, bytes, draft, env};
+    use super::answers;
+    use crate::reader::bytes;
+    fn env(path: &str, j: &loops::json::Json) -> Result<loops::envelope::Env, String> {
+        loops::envelope::read(path, j).map_err(|e| e.to_string())
+    }
+    fn draft(path: &str, j: &loops::json::Json) -> Result<loops::batch::Draft, String> {
+        loops::batch::read(path, j).map_err(|e| e.to_string())
+    }
     use crate::parse;
     use loops::json::Json;
+
+    #[test]
+    fn shape_preflight_precedes_all_draft_and_held_values() {
+        let bad = r#"{"env":{"extra":1}}"#;
+        let malformed = r#"{"label":7,"env":{"kind":7},"salt":"!"}"#;
+        for drafts in [
+            format!("[{bad},{malformed}]"),
+            format!("[{malformed},{bad}]"),
+        ] {
+            let input = parse(&format!(r#"{{"held":null,"drafts":{drafts}}}"#));
+            assert_eq!(
+                answers("batch", &input).expect("shape refusal"),
+                vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
+            );
+        }
+    }
 
     #[test]
     fn strict_shapes_and_base32() {
@@ -129,13 +106,35 @@ mod tests {
         for s in ["A", "a", "ab", "aaa", "aa="] {
             assert!(bytes("salt", &Json::Str(s.into())).is_err(), "{s}");
         }
-        assert!(bytes("salt", &Json::Str("aa".into())).is_ok());
+        assert!(bytes("salt", &Json::Str("00".into())).is_ok());
         let empty = parse(r#"{"held":[],"drafts":[]}"#);
         assert_eq!(
             answers("batch", &empty).expect("shape"),
             vec![parse(r#"{"records":[]}"#)]
         );
         assert!(answers("batch/other", &empty).is_err());
+    }
+
+    #[test]
+    fn unknown_envelope_field_precedes_values() {
+        for raw in [r#"{"extra":1,"kind":""}"#, r#"{"kind":3,"extra":1}"#] {
+            assert_eq!(
+                env("env", &parse(raw)),
+                Err("envelope-field-unknown".into())
+            );
+        }
+        let raw = parse(
+            r#"{"held":[],"drafts":[{"env":{"extra":1,"kind":""},"salt":"","payload":null}]}"#,
+        );
+        assert_eq!(
+            answers("batch", &raw).expect("refusal"),
+            vec![parse(r#"{"refused":"envelope-field-unknown"}"#)]
+        );
+        let duplicate = parse(r#"{"extra":1,"extra":2}"#);
+        assert_eq!(
+            env("env", &duplicate).expect_err("unknown field"),
+            "envelope-field-unknown"
+        );
     }
 
     #[test]
@@ -168,9 +167,9 @@ mod tests {
 
     #[test]
     fn held_first_match_and_arbitrary_ids() {
-        let id = format!("r:{}", "a".repeat(52));
+        let id = format!("r:{}", "0".repeat(52));
         let input = format!(
-            r#"{{"held":[{{"id":"arbitrary","about":[]}},{{"id":"{id}","about":["thing:one"]}},{{"id":"{id}","about":["thing:two"]}}],"drafts":[{{"env":{{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z","about":["thing:one"],"prev":["{id}"]}},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":null}}]}}"#
+            r#"{{"held":[{{"id":"arbitrary","about":[]}},{{"id":"{id}","about":["thing:one"]}},{{"id":"{id}","about":["thing:two"]}}],"drafts":[{{"env":{{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z","about":["thing:one"],"prev":["{id}"]}},"salt":"00000000000000000000000000","payload":null}}]}}"#
         );
         let result = answers("batch", &parse(&input)).expect("shape");
         assert!(matches!(&result[0], Json::Obj(m) if m[0].0 == "records"));
@@ -179,14 +178,14 @@ mod tests {
     #[test]
     fn raw_payload_and_optional_fields() {
         let input = parse(
-            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":{"x":1,"x":2}}]}"#,
+            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"00000000000000000000000000","payload":{"x":1,"x":2}}]}"#,
         );
         assert_eq!(
             answers("batch", &input).expect("shape"),
             vec![parse(r#"{"refused":"member-duplicate"}"#)]
         );
         let large = parse(
-            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":999999999999999999999999999999999999999999999999999999}]}"#,
+            r#"{"held":[],"drafts":[{"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"00000000000000000000000000","payload":999999999999999999999999999999999999999999999999999999}]}"#,
         );
         assert_eq!(
             answers("batch", &large).expect("finite binary64 payload"),
@@ -222,7 +221,7 @@ mod tests {
             vec![parse(r#"{"refused":"number-out-of-range"}"#)]
         );
         let input = parse(
-            r#"{"held":[],"drafts":[{"label":null,"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"aaaaaaaaaaaaaaaaaaaaaaaaaa","payload":null}]}"#,
+            r#"{"held":[],"drafts":[{"label":null,"env":{"kind":"note","observer":"person:x","emitted":"2025-01-01T00:00:00Z"},"salt":"00000000000000000000000000","payload":null}]}"#,
         );
         assert!(answers("batch", &input).is_err());
     }
