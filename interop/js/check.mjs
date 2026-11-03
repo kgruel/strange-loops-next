@@ -92,7 +92,7 @@ function checkOccurred(dir) {
     }
     for (const [i, s] of texts.entries()) {
       const sp = L.occurredSpan(s);
-      const got = sp ? { start: utc(sp.start), end: sp.end && utc(sp.end) } : { refused: "occurred-not-span" };
+      const got = sp ? { start: utc(sp.start), end: sp.end && utc(sp.end) } : { refused: L.OCCURRED_NOT_SPAN };
       t.expect(`${n} ${JSON.stringify(s)}`, JSON.stringify(got), JSON.stringify(v.expect.spans[i]));
     }
   }

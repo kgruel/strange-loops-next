@@ -35,9 +35,8 @@ export function step(spec, thing, forms) {
 
 // The lens edit: the base rendered, the edited text read back against it.
 export function lensEdit({ base, text }) {
-  const parsed = Lens.parse(text);
-  const outcomes = parsed === null ? null : Lens.diff(base, parsed);
-  return { rendered: Lens.render(base), outcomes, applied: outcomes && Lens.apply(base, outcomes) };
+  const result = Lens.edit(base, text);
+  return { rendered: Lens.render(base), outcomes: result?.outcomes ?? null, applied: result?.applied ?? null };
 }
 
 // A thing's head as a keyed section: its id, and the head's value as lines.

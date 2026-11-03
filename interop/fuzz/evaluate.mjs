@@ -9,11 +9,7 @@ import { realm } from '../js/realm.mjs';
 import { resolveBatch } from '../js/batch.mjs';
 import { formOf, step, lensEdit } from '../js/scenario.mjs';
 
-const WRITE_CODES = new Set([
-  'kind-empty', 'observer-not-typed', 'emitted-not-rfc3339', 'occurred-not-span',
-  'about-not-typed', 'prev-not-record-id', 'under-not-record-id', 'erases-not-record-id',
-  'salt-not-16-bytes', 'member-duplicate', 'number-out-of-range',
-]);
+const WRITE_CODES = new Set(L.WRITE_CODES);
 const folds = {
   'fold/count': rs => F.count(rs).value,
   'fold/sum': rs => F.sum(rs).value,
@@ -33,10 +29,7 @@ function specNode(vector, rawText) {
   return input.members.find(([k]) => k === 'spec')[1];
 }
 function lensAnswer({ base, text }) {
-  const parsed = Lens.parse(text);
-  if (parsed === null) return { parsed: null, refused: true };
-  const outcomes = Lens.diff(base, parsed);
-  return { parsed, normalized: Lens.render(parsed), outcomes, applied: Lens.apply(base, outcomes) };
+  return Lens.edit(base, text) ?? { parsed: null, refused: true };
 }
 function recordAnswer(input, envIndex = 0) {
   const env = input.envs[envIndex];
@@ -81,7 +74,7 @@ export function evaluateJS(vector, rawText) {
             return recordAnswer(variant, envIndex);
           }));
       } catch (error) {
-        if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
+        if (error.message === L.ENVELOPE_SHAPE_CODE) return [{ refused: error.message }];
         throw error;
       }
     }
@@ -94,19 +87,8 @@ export function evaluateJS(vector, rawText) {
       return input.orders.map(rs => S.runSpec(parsed.parsed, rs));
     }
     case 'batch': {
-      // JSON.parse keeps only the last repeated env; shape checks need every occurrence.
-      if (rawText !== undefined) {
-        const drafts = S.readJson(jsonSourceAt(rawText, ['input', 'drafts']));
-        const envs = drafts.items.flatMap(draft => (draft?.members ?? [])
-          .filter(([key]) => key === 'env')
-          .map(([, env]) => Object.fromEntries((env?.members ?? []).map(([key]) => [key, null]))));
-        try { L.checkEnvelopeKeys(envs); }
-        catch (error) {
-          if (error.message === 'envelope-field-unknown') return [{ refused: error.message }];
-          throw error;
-        }
-      }
-      return [resolveBatch(input.drafts, input.held)];
+      const rawDrafts = rawText === undefined ? undefined : jsonSourceAt(rawText, ['input', 'drafts']);
+      return [resolveBatch(input.drafts, input.held, rawDrafts)];
     }
     case 'realm': {
       const forms = input.forms;

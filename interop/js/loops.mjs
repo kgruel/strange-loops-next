@@ -160,13 +160,22 @@ const typedRef = (s) => /^[a-z][a-z0-9-]*:./su.test(s);
 const recordId = (s) => {
   try { fixedBytes(s, "r:", 32); return true; } catch { return false; }
 };
+// Shape is separate from the ordered writer codes: record adapters preserve F1.
+export const ENVELOPE_SHAPE_CODE = "envelope-field-unknown";
+export const OCCURRED_NOT_SPAN = "occurred-not-span";
+export const WRITE_CODES = Object.freeze([
+  "kind-empty", "observer-not-typed", "emitted-not-rfc3339", OCCURRED_NOT_SPAN,
+  "about-not-typed", "prev-not-record-id", "under-not-record-id", "erases-not-record-id",
+  "salt-not-16-bytes", "member-duplicate", "number-out-of-range",
+]);
+
 const ENV_KEYS = new Set(["kind", "observer", "emitted", "occurred", "about", "prev", "under", "erases"]);
 
 export const unknownEnvelopeKeys = (env) => env !== null && typeof env === "object" && !Array.isArray(env) && Reflect.ownKeys(env).some((key) => !ENV_KEYS.has(key));
 
 // Check all raw envelope shapes before reading any of their values.
 export function checkEnvelopeKeys(envs) {
-  if (envs.some(unknownEnvelopeKeys)) throw new Error("envelope-field-unknown");
+  if (envs.some(unknownEnvelopeKeys)) throw new Error(ENVELOPE_SHAPE_CODE);
 }
 
 export function problem(env) {

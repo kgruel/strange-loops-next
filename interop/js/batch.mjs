@@ -2,17 +2,11 @@
 // resolved to real ids, written with loops.mjs's writer so the ids match
 // layer 0's. Written from vectors/batch and protocol/; no dependencies.
 
-import { base32Decode, canonical, envJson, idOf, commitOf, checkEnvelopeKeys, seal } from "./loops.mjs";
+import { base32Decode, canonical, envJson, idOf, commitOf, checkEnvelopeKeys, seal, WRITE_CODES, ENVELOPE_SHAPE_CODE } from "./loops.mjs";
+import { readJson } from "./spec.mjs";
 
 const isLabel = (s) => typeof s === "string" && s.startsWith("@");
 const labelsOf = (d) => [...(d.env.about ?? []), ...(d.env.prev ?? [])].filter(isLabel);
-
-// What writing refuses, in the order protocol/record.md checks it.
-const WRITE_CODES = [
-  "kind-empty", "observer-not-typed", "emitted-not-rfc3339", "occurred-not-span",
-  "about-not-typed", "prev-not-record-id", "under-not-record-id", "erases-not-record-id",
-  "salt-not-16-bytes", "member-duplicate", "number-out-of-range",
-];
 
 // A record id that names nothing, standing in for a label while a draft is
 // checked on its own: only its shape matters there.
@@ -59,10 +53,18 @@ const thingsOf = (id, about) => (about.length ? about : [id]);
 // labels (duplicate, unknown, cycle), writing from kind-empty, then
 // prev-unknown, then prev-unrelated.
 // Each stage looks at the whole batch, so no draft order changes the answer.
-export function resolveBatch(drafts, held) {
-  // The library checks every envelope's keys before labels or values.
-  try { checkEnvelopeKeys(drafts.flatMap(d => d && typeof d === "object" ? [d.env] : [])); }
-  catch (e) { if (e.message === "envelope-field-unknown") return { refused: e.message }; throw e; }
+export function resolveBatch(drafts, held, rawDraftsText) {
+  // Raw JSON retains repeated env members that JSON.parse would discard.
+  try {
+    if (rawDraftsText !== undefined) {
+      const raw = readJson(rawDraftsText);
+      const envs = raw.items.flatMap(draft => (draft?.members ?? [])
+        .filter(([key]) => key === "env")
+        .map(([, env]) => Object.fromEntries((env?.members ?? []).map(([key]) => [key, null]))));
+      checkEnvelopeKeys(envs);
+    }
+    checkEnvelopeKeys(drafts.flatMap(d => d && typeof d === "object" ? [d.env] : []));
+  } catch (e) { if (e.message === ENVELOPE_SHAPE_CODE) return { refused: e.message }; throw e; }
   const byLabel = new Map();
   for (const d of drafts) {
     if (d.label === undefined) continue;

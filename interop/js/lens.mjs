@@ -43,6 +43,19 @@ export function parse(lines) {
 
 const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
+// Refuse invalid base ids before reading the edited text.
+export function edit(base, text) {
+  const ids = new Set();
+  for (const section of base) {
+    if (section.id === "" || ids.has(section.id)) return null;
+    ids.add(section.id);
+  }
+  const parsed = parse(text);
+  if (parsed === null) return null;
+  const outcomes = diff(base, parsed);
+  return { parsed, normalized: render(parsed), outcomes, applied: apply(base, outcomes) };
+}
+
 // What the edited sections say against the base, matched by id. An edited
 // section is accepted when its body differs, unknown when the base has no
 // such id; a base section the text leaves out is absent. A section that
