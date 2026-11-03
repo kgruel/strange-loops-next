@@ -3,12 +3,13 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { checkLensOrder } from "./lens-order.mjs";
 
 const model = dirname(fileURLToPath(import.meta.url));
 const root = dirname(model);
 // Both runners use the same replacement sites. This runner builds only runtime checks.
 const catalogue = JSON.parse(readFileSync(join(model, "mutate/mutants.json"), "utf8"));
-const guardMutants = ["step1-base32-reencode","step1-fraction-final-zero","step1-seconds-bound","step1-zone-only-z","step1-envelope-keys-remove","step1-envelope-keys-after-value","step1-draft-keys-after-values","step1-record-keys-after-values"].map(id => {
+const guardMutants = ["step1-base32-reencode","step1-fraction-final-zero","step1-seconds-bound","step1-zone-only-z","step1-envelope-keys-remove","step1-envelope-keys-after-value","step1-draft-keys-after-values","step1-record-keys-after-values","ratchets-lens-base-remove","ratchets-lens-base-after-parse"].map(id => {
   const m = catalogue.find(m => m.id === id);
   if (!m) throw new Error(`missing guard mutant: ${id}`);
   return [m.id, m.file.includes("/") ? m.file : `Loops/${m.file}`, m.before, m.after];
@@ -35,6 +36,7 @@ try {
   cpSync(model, copy, { recursive: true });
   success(run(["build", "checks"]), "baseline build");
   success(run(["exe", "checks", root]), "baseline checks");
+  if (!checkLensOrder(readFileSync(join(copy, "Loops/Lens.lean"), "utf8"))) throw new Error("baseline lens source shape failed");
   let killed = 0;
   for (const [name, file, from, to] of mutants) {
     const path = join(copy, file);
@@ -44,8 +46,8 @@ try {
       writeFileSync(path, original.replace(from, to));
       success(run(["build", "checks"]), `${name} build`);
       const result = run(["exe", "checks", root]);
-      if (result.status === 0) throw new Error(`mutant survives: ${name}`);
-      console.log(`killed ${name}: ${(result.stderr + result.stdout).trim()}`);
+      if (result.status === 0 && !(name.startsWith("ratchets-lens-base-") && !checkLensOrder(readFileSync(join(copy, "Loops/Lens.lean"), "utf8")))) throw new Error(`mutant survives: ${name}`);
+      console.log(result.status === 0 ? `killed ${name}: lens edit source shape differs` : `killed ${name}: ${(result.stderr + result.stdout).trim()}`);
       killed++;
     } finally {
       writeFileSync(path, original);

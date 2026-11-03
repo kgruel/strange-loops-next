@@ -17,7 +17,7 @@ node interop/fuzz/run.mjs --seed ci-1 --n 28 --out /tmp/fuzz-ci
 node interop/fuzz/run.mjs --rust --seed phase2-20261029 --n 5000 --out /tmp/fuzz-large
 node interop/fuzz/run.mjs --seed campaign-1 --n 1000 --family record --no-shrink
 node interop/fuzz/run.mjs --rust --replay /tmp/fuzz-large/mismatches/000000.json --out /tmp/fuzz-replay
-fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-3 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-3-5600
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed ratchets-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-ratchets-1
 fnm exec --using 22 node interop/fuzz/run.mjs --rust --replay interop/fuzz/found/03-duplicate-base-id.json --out /tmp/fuzz-duplicate-base
 ```
 
@@ -25,8 +25,7 @@ An explicit output directory must be empty.
 Without `--out`, the runner creates an artifact directory under the system temporary directory.
 It prints that path with the summary.
 Exit codes are 0 for agreement, 1 for disagreements, and 2 for infrastructure or CLI errors.
-[REPORT.md](REPORT.md) records the Step-1 campaign and its 42 duplicate-base lens mismatches.
-It marks earlier campaign results as historical.
+[REPORT.md](REPORT.md) tracks the current ratchets-1 campaign and historical results.
 
 `--n` is the total case count, not a count per family.
 Without `--family`, cases cycle through record, fold, spec, realm, scenario, batch, and lens.
@@ -58,8 +57,8 @@ The runner rejects `--rust --no-shrink`.
 A trial bound can stop each reduction before the search finds a smaller case.
 Record signing can cost more than the reader families.
 Do not run engine checks or campaigns during source mutation checks.
-The Step-1 command above checks 5,600 cases on Node 22.
-See [REPORT.md](REPORT.md) for counts and limits.
+The ratchets-1 command requests 5,600 cases on Node 22, with 800 per family.
+See [REPORT.md](REPORT.md) for campaign status.
 
 ### Batch interface
 
@@ -110,8 +109,8 @@ Most generated cases pass the model's input decoder.
 Most reader numeric fields stay small.
 Scheduled cases combine safe integer limits with cancellation to test exact sums.
 The record boundary cases also test the writer's number limit.
-Lens cases include escaped fences, empty IDs, repeated edited IDs, and duplicate base IDs.
-Duplicate bases are domain-boundary probes, not valid-base law tests.
+Lens cases include escaped fences, empty IDs, repeated edited IDs, and duplicate or empty base IDs.
+The public edit refuses invalid bases before it parses the text.
 Batch cases include held predecessors and standing references.
 This is not exhaustive numeric or wire validation.
 
@@ -200,9 +199,9 @@ It makes no global minimality claim.
 The other test files include real Lean checks and raw-source replay checks.
 The adapter corpus test covers every supported existing vector.
 The fuzz runner has no mismatch allowlist or ignored disagreement.
-A test reproduces both recorded answers for the duplicate-base candidate.
-The official gap17 vectors test the resolved repeated and empty edited IDs.
-The human ruling resolves gap17. Duplicate-base behavior remains a protocol-domain question.
-The current `step1-3` campaign finds 42 such lens mismatches in 5,600 cases.
+The duplicate-base finding retains historical answers and records the settled ruling.
+The public edit refuses repeated or empty base IDs before parsing.
+The official gap17 vectors test repeated and empty edited IDs.
+The ratchets-1 campaign checks 5,600 cases with zero mismatches.
 
-[REPORT.md](REPORT.md) records the Step-1 result and historical two-way and three-way results.
+[REPORT.md](REPORT.md) records campaign status and historical results.

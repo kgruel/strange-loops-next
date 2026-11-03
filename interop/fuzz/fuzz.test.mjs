@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { FAMILIES, FOLD_LAYERS, generate } from './generate.mjs';
-import { assess } from './evaluate.mjs';
+import { assess, evaluateJS } from './evaluate.mjs';
 import { equal, readVector } from '../answers.mjs';
 import { ROOT, batchVectors, executeBatch, parseResponses, warmLean } from './transport.mjs';
 import { candidates, sameDisagreement, shrink } from './shrink.mjs';
@@ -87,6 +87,25 @@ test('scheduled lens boundaries retain their intended inputs', () => {
   const repeated = pick(7, 'base-repeat');
   assert.deepEqual(repeated.base, [{ id: 't:repeat', body: ['first'] }, { id: 't:repeat', body: ['second'] }]);
   assert.deepEqual(repeated.text, ['::: t:repeat', 'first', ':::']);
+  for (let seed = 0; seed < 100; seed++) {
+    assert.equal(generate(seed, 7, 'lens').fuzz.nearMiss, 'base-repeat');
+    const empty = generate(seed, 8, 'lens');
+    assert.equal(empty.fuzz.nearMiss, 'base-empty');
+    assert.equal(empty.input.base[0].id, '');
+  }
+});
+
+test('scheduled refusal cases reach JS protocol answers', () => {
+  const codes = (family, slots) => slots.map(i => evaluateJS(generate('refusal-coverage-1', i, family))[0].refused);
+  assert.deepEqual(codes('batch', [32, 33, 34, 35, 36]),
+    ['label-duplicate', 'label-unknown', 'label-cycle', 'prev-unknown', 'prev-unrelated']);
+  assert.deepEqual(codes('record', [32, 33, 34, 35, 36, 37, 38, 39]),
+    ['kind-empty', 'observer-not-typed', 'about-not-typed', 'under-not-record-id',
+      'erases-not-record-id', 'prev-not-record-id', 'member-duplicate', 'number-out-of-range']);
+  assert.deepEqual(codes('spec', Array.from({ length: 13 }, (_, i) => 32 + i)),
+    ['spec-not-object', 'vertex-missing', 'vertex-invalid', 'from-missing', 'from-invalid',
+      'fold-invalid', 'fold-type', 'follow-missing', 'follow-invalid', 'limit-invalid',
+      'fold-argument', 'where-invalid', 'unknown-key']);
 });
 
 test('scheduled numeric records reach each reader without dependencies', () => {
@@ -158,7 +177,7 @@ test('all existing supported vectors agree with the public API adapters', async 
   assert.ok(checked > 100); assert.ok(refused > 10);
 });
 
-test('reviewed candidate vectors reproduce both recorded answers', async () => {
+test('settled duplicate-base finding now refuses through public entries', async () => {
   const vectors = [];
   for await (const file of jsonFiles(join(ROOT, 'interop/fuzz/found'))) {
     vectors.push(JSON.parse(await readFile(file, 'utf8')));
@@ -168,9 +187,10 @@ test('reviewed candidate vectors reproduce both recorded answers', async () => {
   const responses = await batchVectors(vectors);
   for (let i = 0; i < vectors.length; i++) {
     const vector = vectors[i], result = assess(vector, responses[i]);
-    assert.ok(equal(responses[i].expect, vector.expect));
-    assert.equal(result.status, 'mismatch', 'A finding resolves. Update or promote its candidate vector.');
-    assert.ok(equal(result.js, vector.js));
+    assert.equal(vector.verdict, 'settled');
+    assert.deepEqual(responses[i].expect, { parsed: null, refused: true });
+    assert.equal(result.status, 'protocol-refusal');
+    assert.deepEqual(result.js, { parsed: null, refused: true });
   }
 });
 
@@ -302,6 +322,19 @@ test('shrinking bounds trials, repairs arrival sets, and persists both answers',
     assert.deepEqual(saved.shrink, result); assert.deepEqual(saved.answer, original);
     const large = await persistMismatch(dir, 1, { answer: { lean: 9007199254740993n, js: 1 } });
     assert.deepEqual(JSON.parse(await readFile(large, 'utf8')).answer.lean, { $integer: '9007199254740993' });
+  });
+});
+
+test('campaign histogram counts only shared answers', async () => {
+  await temporary(async dir => {
+    const options = parseArgs(['--family', 'record', '--n', '3', '--out', dir, '--no-shrink']);
+    const answers = [{ refused: 'kind-empty' }, { refused: [{ code: 'prev-unrelated' }] }, { refused: 'label-cycle' }];
+    const { summary } = await campaign(options, { warm: false,
+      batch: async () => answers.map(expect => ({ expect })),
+      js: vector => [vector.fuzz.index === 2 ? { refused: 'label-unknown' } : answers[vector.fuzz.index]],
+    });
+    assert.deepEqual(summary.refusalCodes, { 'kind-empty': 1, 'prev-unrelated': 1 });
+    assert.equal(summary.mismatches, 1);
   });
 });
 

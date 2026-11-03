@@ -2,8 +2,8 @@
 
 Run `node model/mutate/run.mjs --list` to inspect the catalogue.
 Listing validates every replacement against the current source without changing files.
-The runner tests check all 195 entries and their unique source sites.
-The catalogue retains 187 original entries, retires two mutations, and adds eight guard mutations.
+The runner tests check all 197 entries and their unique source sites.
+The catalogue retains 187 original entries, retires two mutations, and adds ten guard mutations.
 The source paths may name the Loops or Gen root; flat filenames still name Loops sources.
 Run `node model/mutate/run.mjs --only things-prev-or,things-drop-may` to select mutations.
 Use `--output path` to choose the JSON result path.
@@ -30,3 +30,10 @@ A timeout, spawn failure, or generator failure is an error, not a kill.
 Survivors do not cause a nonzero exit.
 Signals stop the active process group and return a signal-specific exit code.
 This runner needs POSIX process groups, Git, Node, and Lake.
+
+Lens base mutations remove validation or move it after parsing.
+The cheap runner checks runtime refusals and the approved source shape.
+The full runner checks the source shape after successful builds and unchanged generated vectors.
+It records that result as `killed-by-guard`, not as a semantic proof kill.
+Untyped lens refusals cannot expose evaluation order.
+Run `node --test model/lens-order.test.mjs` to check the source guard.

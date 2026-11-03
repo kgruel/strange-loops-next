@@ -10,9 +10,8 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CAMPAIGNS = ROOT / 'interop/fuzz/evidence'
 MUTATIONS = ROOT / 'model/mutate/evidence'
-REFERENCE = CAMPAIGNS / 'step1-3/d1-mismatches.json'
 CATEGORIES = ('match', 'protocol-refusal', 'decoder-refusal', 'mismatch')
-STATUSES = {'rejected-by-build', 'killed-by-vector', 'error', 'survived'}
+STATUSES = {'rejected-by-build', 'killed-by-vector', 'killed-by-guard', 'error', 'survived'}
 
 
 def require(condition, message):
@@ -49,65 +48,20 @@ def totals(summary):
     for key, field in [('mismatch', 'mismatches'), ('decoder-refusal', 'decoderRefusals'), ('protocol-refusal', 'protocolRefusals')]:
         require(summary[field] == result[key], f'{field}: total differs')
     require(summary['requested'] == result['cases'], 'requested total differs')
-    return result
-
-
-def example(finding):
-    answer = finding['answer']
-    require(answer['status'] == 'mismatch', 'answer is not a mismatch')
-    require(answer['lean'] == answer['rust'] != answer['js'], 'wrong answer partition')
-    return {'layer': finding['vector']['layer'], 'input': finding['vector']['input'],
-            'answers': {k: answer[k] for k in ('js', 'lean', 'rust')}}
-
-
-def validate_cases(summary, data, reference):
-    result = totals(summary)
-    require(len(data['cases']) == result['mismatch'], 'mismatch count differs')
-    require(data['examples'] == reference, f'D1 examples differ from {REFERENCE.parent.name}')
-    by_family = collections.Counter()
-    seen = set()
-    for case in data['cases']:
-        require(case['seed'] == summary['seed'], 'case seed differs')
-        require(case['family'] in summary['counts'], 'unknown case family')
-        require(type(case['index']) is int and case['index'] >= 0, 'invalid case index')
-        identity = (case['seed'], case['index'])
-        require(identity not in seen, 'duplicate case index')
-        seen.add(identity)
-        require(case['raw'] == 'raw' and case['reduced'] == 'reduced', 'invalid example reference')
-        shrink = case['shrink']
-        require(all(type(shrink[k]) is int and shrink[k] >= 0 for k in ('trials', 'rounds')) and type(shrink['bounded']) is bool, 'invalid shrink stats')
-        by_family[case['family']] += 1
-    for family, row in summary['counts'].items():
-        require(by_family[family] == row['mismatch'], f'{family}: mismatch count differs')
-    require(sum(c['shrink']['trials'] for c in data['cases']) == summary['shrinkTrials'], 'shrink trial total differs')
+    require(result['mismatch'] == 0, 'campaign has mismatches')
+    codes = {code for group in read(ROOT / 'design/grammar/words.json')['refusals'] for code in group['codes']}
+    histogram = summary['refusalCodes']
+    require(isinstance(histogram, dict), 'invalid refusal histogram')
+    for code, count in histogram.items():
+        require(code in codes and type(count) is int and count > 0, f'invalid refusal histogram entry: {code}')
     return result
 
 
 def import_campaign(raw, label):
     summary = read(raw / 'summary.json')
     totals(summary)
-    paths = sorted((raw / 'mismatches').glob('*.json'))
-    require(len(paths) == summary['mismatches'], 'missing mismatch files')
-    if REFERENCE.exists():
-        reference = read(REFERENCE)['examples']
-    else:
-        require(label == REFERENCE.parent.name and paths, f'import {REFERENCE.parent.name} first')
-        first = read(paths[0])
-        reference = {'raw': example(first), 'reduced': example(first['shrink'])}
-        require(reference['raw']['layer'] == reference['reduced']['layer'] == 'lens/section', 'reference layer differs')
-    cases = []
-    for path in paths:
-        finding = read(path)
-        require(example(finding) == reference['raw'] and example(finding['shrink']) == reference['reduced'], f'{path}: not the known D1 example')
-        fuzz = finding['vector']['fuzz']
-        require(finding['shrink']['vector']['fuzz'] == fuzz, f'{path}: reduced case metadata differs')
-        cases.append({**{k: fuzz[k] for k in ('seed', 'index', 'family')}, 'raw': 'raw', 'reduced': 'reduced',
-                      'shrink': {k: finding['shrink'][k] for k in ('trials', 'rounds', 'bounded')}})
-    data = {'examples': reference, 'cases': cases}
-    validate_cases(summary, data, reference)
-    target = label_path(CAMPAIGNS, label)
-    write(target / 'summary.json', summary)
-    write(target / 'd1-mismatches.json', data)
+    require(not list((raw / 'mismatches').glob('*.json')), 'unexpected mismatch files')
+    write(label_path(CAMPAIGNS, label) / 'summary.json', summary)
 
 
 def command_status(command):
@@ -130,6 +84,12 @@ def import_mutation(path, label):
         commands = [command_status(c) for c in mutant['commands']]
         require(bool(commands), 'mutant has no commands')
         item = {'id': mutant['id'], 'status': mutant['status'], 'commands': commands}
+        if mutant['status'] == 'killed-by-guard':
+            require(len(commands) == 2 and all(c['status'] == 'ok' for c in commands), 'guard requires successful build and generator')
+            require(mutant['commands'][0]['command'][:2] == ['lake', 'build'] and mutant['commands'][1]['command'][:3] == ['lake', 'exe', 'gen'], 'guard requires build and generator commands')
+            require(isinstance(mutant.get('failureDetail'), str) and bool(mutant['failureDetail'].strip()), 'guard finding is missing')
+            require(mutant.get('changedPaths') == [], 'guard requires unchanged vectors')
+            item['failureDetail'] = mutant['failureDetail']
         if mutant['status'] == 'error':
             cmd = mutant['commands'][-1]
             require(cmd['command'][:3] == ['lake', 'exe', 'gen'] and commands[-1]['status'] == 'nonzero', 'error is not a generator failure')
@@ -159,7 +119,10 @@ def mutation_report(data):
         for command in mutant['commands']:
             command_status(command)
         outcomes[status] += 1
-        if ident.startswith('step1-'):
+        if status == 'killed-by-guard':
+            require(len(mutant['commands']) == 2 and all(c['status'] == 'ok' for c in mutant['commands']), 'guard requires successful build and generator')
+            require(isinstance(mutant.get('failureDetail'), str) and bool(mutant['failureDetail'].strip()), 'guard finding is missing')
+        if ident.startswith(('step1-', 'ratchets-')) or status == 'killed-by-guard':
             guards[ident] = status
         if status == 'survived':
             survivors.append(ident)
@@ -171,16 +134,13 @@ def mutation_report(data):
 
 
 def report():
-    reference = read(REFERENCE)['examples']
     campaigns = {}
     for path in sorted(CAMPAIGNS.glob('*/summary.json')):
         summary = read(path)
-        data = read(path.parent / 'd1-mismatches.json')
-        counts = validate_cases(summary, data, reference)
+        counts = totals(summary)
         campaigns[path.parent.name] = {'totals': counts, 'families': summary['counts'],
-            'shrinkTrials': sum(c['shrink']['trials'] for c in data['cases']),
-            'shrinkRounds': sum(c['shrink']['rounds'] for c in data['cases']),
-            'shrinkBounded': sum(c['shrink']['bounded'] for c in data['cases'])}
+                                       'refusalCodes': summary['refusalCodes'],
+                                       'shrinkTrials': summary['shrinkTrials']}
     mutations = {path.parent.name: mutation_report(read(path)) for path in sorted(MUTATIONS.glob('*/summary.json'))}
     return {'campaigns': campaigns, 'mutations': mutations}
 

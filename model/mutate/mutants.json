@@ -1527,5 +1527,23 @@
     "after": "    let decoded ← each path decodeValues j\n    if let some why := envelopesKeysProblem raw then throw why\n    pure decoded",
     "reason": "Decode envelope variants before all-envelope shape preflight.",
     "definition": "Loops.Read.readMany"
+  },
+  {
+    "id": "ratchets-lens-base-remove",
+    "file": "Loops/Lens.lean",
+    "before": "  if Valid base then do\n    let parsed ← parse text\n    let outcomes := diff base parsed\n    some { parsed, normalized := render parsed, outcomes, applied := apply base outcomes }\n  else none",
+    "after": "  do\n    let parsed ← parse text\n    let outcomes := diff base parsed\n    some { parsed, normalized := render parsed, outcomes, applied := apply base outcomes }",
+    "reason": "Remove base validation before parsing.",
+    "definition": "Loops.Lens.edit",
+    "guard": "lens-base-order"
+  },
+  {
+    "id": "ratchets-lens-base-after-parse",
+    "file": "Loops/Lens.lean",
+    "before": "  if Valid base then do\n    let parsed ← parse text\n    let outcomes := diff base parsed\n    some { parsed, normalized := render parsed, outcomes, applied := apply base outcomes }\n  else none",
+    "after": "  do\n    let parsed ← parse text\n    if Valid base then\n      let outcomes := diff base parsed\n      some { parsed, normalized := render parsed, outcomes, applied := apply base outcomes }\n    else none",
+    "reason": "Parse text before base validation.",
+    "definition": "Loops.Lens.edit",
+    "guard": "lens-base-order"
   }
 ]

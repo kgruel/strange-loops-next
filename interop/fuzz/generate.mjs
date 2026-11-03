@@ -207,6 +207,9 @@ export function generate(seed, index, family) {
       const base = [{ id: 't:repeat', body: ['first'] }, { id: 't:repeat', body: ['second'] }];
       input = { base, text: renderSections([base[0]]) };
       nearMiss = 'base-repeat';
+    } else if (slot === 8) {
+      input = { base: [{ id: '', body: ['first'] }], text: renderSections([{ id: 't:valid', body: ['edit'] }]) };
+      nearMiss = 'base-empty';
     }
   }
   if (family === 'batch' && (index % 16 === 4 || index % 16 === 5)) {
@@ -216,7 +219,7 @@ export function generate(seed, index, family) {
     else input.drafts[0].env.under = id;
   }
   // Each named record boundary has a fixed slot and cannot be randomly overwritten.
-  let scheduled = false;
+  let scheduled = family === 'lens' && [7, 8].includes(index % 16);
   if (family === 'batch' && index % 64 >= 10 && index % 64 < 20) {
     const slot = index % 64 - 10, bad = slot % 5;
     const a = { label: '@a', env: { ...clone(input.drafts[0].env), prev: [] }, salt: input.drafts[0].salt, payload: null };
@@ -229,6 +232,20 @@ export function generate(seed, index, family) {
     input.drafts = slot < 5 ? [a, b] : [b, a];
     nearMiss = `shape-${['duplicate-label', 'unknown-label', 'cycle-label', 'malformed-value', 'malformed-salt'][bad]}-${slot < 5 ? 'last' : 'first'}`;
     scheduled = true;
+  }
+  if (family === 'batch' && index % 64 >= 32 && index % 64 < 37) {
+    const slot = index % 64 - 32;
+    const draft = clone(input.drafts[0]);
+    draft.label = '@a'; draft.env.prev = []; input.held = []; input.drafts = [draft];
+    if (slot === 0) input.drafts.push(clone(draft));
+    if (slot === 1) draft.env.prev = ['@missing'];
+    if (slot === 2) draft.env.prev = ['@a'];
+    if (slot >= 3) {
+      const id = `r:${base32(Array(32).fill(7))}`;
+      draft.env.prev = [id];
+      if (slot === 4) input.held = [{ id, about: ['t:unrelated'] }];
+    }
+    scheduled = true; nearMiss = `batch-${slot}`;
   }
   if (family === 'record') {
     const slot = index % 64;
@@ -267,7 +284,30 @@ export function generate(seed, index, family) {
       input.envs = slot < 30 ? [other, bad] : [bad, other];
       nearMiss = `shape-multi-record-${slot}`; scheduled = true;
     }
+    if (slot >= 32 && slot < 38) {
+      const changes = [env => { env.kind = ''; }, env => { env.observer = 'bad'; },
+        env => { env.about = ['bad']; }, env => { env.under = 'bad'; },
+        env => { env.erases = ['bad']; }, env => { env.prev = ['bad']; }];
+      changes[slot - 32](clean);
+      input.envs = [clean]; scheduled = true; nearMiss = `envelope-${slot}`;
+    }
+    if (slot === 38) { input.envs = [clean]; delete input.payloads; input.payload_text = '{"x":1,"x":2}'; scheduled = true; }
+    if (slot === 39) { input.envs = [clean]; input.payloads = [Number.MAX_SAFE_INTEGER + 1]; scheduled = true; }
     if (scheduled && slot < 28) input.envs = [clean];
+  }
+  if (family === 'spec' && index % 64 >= 32 && index % 64 < 46) {
+    const invalid = [null, {}, { vertex: '' }, { vertex: 'v' },
+      { vertex: 'v', from: [{ store: 3 }] }, { vertex: 'v', from: [{ store: 's:x' }], fold: [] },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: { x: {} } },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: { x: { 'latest-by': 'about' } } },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: { x: { count: true, follow: 'bad' } } },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: { x: { collect: true, limit: 0 } } },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: { x: { sum: 3 } } },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: { x: { count: true, where: 3 } } },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: {}, extra: true },
+      { vertex: 'v', from: [{ store: 's:x' }], fold: {} }];
+    layer = 'spec/parse'; input = { spec: invalid[index % 64 - 32] };
+    scheduled = true; nearMiss = `spec-${index % 64}`;
   }
   // A separate one-in-eight draw probes an independent input boundary.
   if (!scheduled && rng.int(8) === 0) {

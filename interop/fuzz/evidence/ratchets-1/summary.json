@@ -1,0 +1,98 @@
+{
+  "implementations": [
+    "js",
+    "lean",
+    "rust"
+  ],
+  "seed": "ratchets-1",
+  "requested": 5600,
+  "counts": {
+    "record": {
+      "cases": 800,
+      "match": 246,
+      "protocol-refusal": 537,
+      "decoder-refusal": 17,
+      "mismatch": 0
+    },
+    "fold": {
+      "cases": 800,
+      "match": 694,
+      "protocol-refusal": 0,
+      "decoder-refusal": 106,
+      "mismatch": 0
+    },
+    "spec": {
+      "cases": 800,
+      "match": 561,
+      "protocol-refusal": 194,
+      "decoder-refusal": 45,
+      "mismatch": 0
+    },
+    "realm": {
+      "cases": 800,
+      "match": 705,
+      "protocol-refusal": 0,
+      "decoder-refusal": 95,
+      "mismatch": 0
+    },
+    "scenario": {
+      "cases": 800,
+      "match": 701,
+      "protocol-refusal": 0,
+      "decoder-refusal": 99,
+      "mismatch": 0
+    },
+    "batch": {
+      "cases": 800,
+      "match": 455,
+      "protocol-refusal": 345,
+      "decoder-refusal": 0,
+      "mismatch": 0
+    },
+    "lens": {
+      "cases": 800,
+      "match": 527,
+      "protocol-refusal": 273,
+      "decoder-refusal": 0,
+      "mismatch": 0
+    }
+  },
+  "mismatches": 0,
+  "decoderRefusals": 362,
+  "protocolRefusals": 1349,
+  "refusalCodes": {
+    "prev-not-record-id": 101,
+    "member-duplicate": 56,
+    "label-cycle": 80,
+    "prev-unrelated": 515,
+    "emitted-not-rfc3339": 52,
+    "label-unknown": 100,
+    "envelope-field-unknown": 195,
+    "occurred-not-span": 219,
+    "kind-empty": 12,
+    "spec-not-object": 12,
+    "label-duplicate": 12,
+    "observer-not-typed": 12,
+    "vertex-missing": 12,
+    "about-not-typed": 12,
+    "vertex-invalid": 12,
+    "under-not-record-id": 12,
+    "from-missing": 12,
+    "prev-unknown": 11,
+    "erases-not-record-id": 12,
+    "from-invalid": 12,
+    "fold-invalid": 12,
+    "fold-type": 12,
+    "number-out-of-range": 18,
+    "follow-missing": 12,
+    "follow-invalid": 12,
+    "limit-invalid": 12,
+    "fold-argument": 12,
+    "where-invalid": 12,
+    "unknown-key": 12,
+    "salt-not-16-bytes": 4
+  },
+  "chunks": 88,
+  "shrinkTrials": 0,
+  "seconds": 70.561254334
+}

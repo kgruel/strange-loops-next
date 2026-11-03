@@ -2,52 +2,81 @@
 
 ## Scope
 
-This report covers the Step-1 JS, Lean, and Rust campaign.
-It also preserves evidence from earlier two-way campaigns as historical findings.
+This report tracks the current ratchets-1 JS, Lean, and Rust campaign.
+It also records earlier campaigns as historical results.
 The harness covers record, fold, spec, realm, scenario, batch, and lens inputs.
 
-## Round 2 review-fix three-way campaign
+## Current ratchets-1 three-way campaign
 
-Source commit: `8a12ba6`.
-Node 22 checks 5,600 cases with seed `step1-3`: 800 cases per family.
-The run uses 88 chunks and takes 155.26 seconds.
-Exit 1 records D1, not an infrastructure failure.
-The retained [summary](evidence/step1-3/summary.json) and [D1 mismatch list](evidence/step1-3/d1-mismatches.json) support these counts.
-Run `python3 interop/fuzz/summarize.py report` from the repository root.
-The script derives totals from these tracked artifacts without local logs.
+The Node 22 run checks 5,600 cases, with 800 per family.
+It completes in 70.56 seconds and exits 0.
+It reports 3,889 matches, 1,349 protocol refusals, 362 shared decoder refusals, and zero mismatches.
+It uses 88 chunks and no shrink trials.
+Shared decoder refusals do not establish protocol agreement.
+The [campaign summary](evidence/ratchets-1/summary.json) contains the retained evidence.
 
-| Family | Cases | Match | Protocol refusal | Shared decoder refusal | Mismatch |
-|---|---:|---:|---:|---:|---:|
-| record | 800 | 325 | 454 | 21 | 0 |
-| fold | 800 | 694 | 0 | 106 | 0 |
-| spec | 800 | 693 | 48 | 59 | 0 |
-| realm | 800 | 699 | 0 | 101 | 0 |
-| scenario | 800 | 698 | 0 | 102 | 0 |
-| batch | 800 | 511 | 289 | 0 | 0 |
-| lens | 800 | 574 | 184 | 0 | 42 |
-| Total | 5,600 | 4,194 | 975 | 389 | 42 |
+| Family | Match | Protocol refusal | Decoder refusal | Mismatch |
+|---|---:|---:|---:|---:|
+| record | 246 | 537 | 17 | 0 |
+| fold | 694 | 0 | 106 | 0 |
+| spec | 561 | 194 | 45 | 0 |
+| realm | 705 | 0 | 95 | 0 |
+| scenario | 701 | 0 | 99 | 0 |
+| batch | 455 | 345 | 0 | 0 |
+| lens | 527 | 273 | 0 | 0 |
 
-All 389 decoder refusals occur in both Lean and Rust.
-They are not protocol agreement.
-The importer checks every raw and reduced mismatch against the complete historical D1 input and all three answers.
-All 42 cases match that example exactly, with Lean and Rust agreeing against JS.
-The retained list stores each seed and index, plus shared raw and reduced examples.
-This representation removes repeated content without dropping a mismatch.
-No new mismatch class appears; D1–D7 remain unchanged.
+### Refusal-code histogram
 
-Each reduction uses 76 trials and 3 accepted rounds.
-The totals are 3,192 trials and 126 accepted rounds; 0 reductions reach the limit.
-These results do not prove absolute minimality.
-Raw logs and large per-case files are not committed.
-The artifact tests check totals, D1 identity, and infrastructure-failure rejection.
-Run `python3 -B -m unittest discover -s interop/fuzz/evidence -p 'test_*.py'`.
+Counts cover refusal occurrences in shared answers, including nested answers.
+They are not case counts; lens refusals remain untyped.
+The campaign reaches all 30 implemented codes.
+`prev-not-permitted` and `sum-overflow` remain reserved and unimplemented.
+
+| Code | Occurrences |
+|---|---:|
+| `about-not-typed` | 12 |
+| `emitted-not-rfc3339` | 52 |
+| `envelope-field-unknown` | 195 |
+| `erases-not-record-id` | 12 |
+| `fold-argument` | 12 |
+| `fold-invalid` | 12 |
+| `fold-type` | 12 |
+| `follow-invalid` | 12 |
+| `follow-missing` | 12 |
+| `from-invalid` | 12 |
+| `from-missing` | 12 |
+| `kind-empty` | 12 |
+| `label-cycle` | 80 |
+| `label-duplicate` | 12 |
+| `label-unknown` | 100 |
+| `limit-invalid` | 12 |
+| `member-duplicate` | 56 |
+| `number-out-of-range` | 18 |
+| `observer-not-typed` | 12 |
+| `occurred-not-span` | 219 |
+| `prev-not-record-id` | 101 |
+| `prev-unknown` | 11 |
+| `prev-unrelated` | 515 |
+| `salt-not-16-bytes` | 4 |
+| `spec-not-object` | 12 |
+| `under-not-record-id` | 12 |
+| `unknown-key` | 12 |
+| `vertex-invalid` | 12 |
+| `vertex-missing` | 12 |
+| `where-invalid` | 12 |
 
 ```sh
-fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-3 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-3
-python3 interop/fuzz/summarize.py campaign /tmp/fuzz-step1-3 step1-3
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed ratchets-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-ratchets-1
+python3 interop/fuzz/summarize.py campaign /tmp/fuzz-ratchets-1 ratchets-1
 ```
 
-Earlier Step-1 campaigns with seeds `step1-1` and `step1-2` found only the same D1 lens mismatch; their evidence is not retained.
+## Historical Step-1 campaign
+
+The historical `step1-3` run checked 5,600 cases, with 800 per family.
+It reported 42 duplicate-base lens mismatches.
+Those results describe the earlier implementation, not the settled public edit boundary.
+Earlier `step1-1` and `step1-2` runs found the same class.
+The repository does not retain evidence artifacts for those runs.
 
 ## Historical integrated three-way campaign
 
@@ -56,7 +85,7 @@ It does not establish results for the updated generator.
 
 A fresh Node 22 run compared JS, Lean, and Rust on 5,600 cases: 800 per family.
 It used seed `integrate-1`, shrink limit 80, 88 chunks, and completed in 160.70 seconds.
-Exit 1 was expected because the duplicate-base lens disagreement remains.
+The historical run exited 1 because of the then-unresolved duplicate-base lens disagreement.
 
 | Family | Before: match / protocol refusal / decoder refusal / mismatch | After: match / protocol refusal / decoder refusal / mismatch |
 |---|---:|---:|
@@ -73,12 +102,12 @@ All 369 decoder refusals reject in both Lean and Rust; they are not agreement.
 Only 20 refusal diagnostic pairs are text-identical; wording differences do not change their classification.
 
 The earlier integrated run took 279.98 seconds and had 98 mismatches.
-All 54 prior scenario mismatches now match; all 44 lens mismatches remain.
+That fix resolved all 54 prior scenario mismatches but left 44 lens mismatches at the time.
 Replaying those 54 previous scenario cases restored a single JS/Lean/Rust equality partition in every case.
 All 44 old and new raw and shrunk lens answer payloads match, ignoring artifact-local file paths.
-The remaining lens inputs all repeat base ID `t:repeat`; JS differs from Lean/Rust.
-The public fixture is `found/03-duplicate-base-id.json`; raw replay remains one mismatch and exits 1.
-This probe does not decide whether duplicate base IDs are valid or prescribe protocol behavior.
+Those lens inputs all repeated base ID `t:repeat`; JS differed from Lean and Rust.
+The finding records historical answers in `found/03-duplicate-base-id.json`.
+The later ruling requires public edits to refuse invalid bases before parsing.
 
 The Rust scenario adapter now calls `things::state_in(thing, &admitted)` after settlement and admission.
 That scopes state to the selected thing; it does not reduce the whole admitted view with latest-fold.
@@ -88,7 +117,6 @@ Reproduce into fresh output directories:
 
 ```sh
 fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed integrate-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-integrate-1-5600
-fnm exec --using 22 node interop/fuzz/run.mjs --rust --replay interop/fuzz/found/03-duplicate-base-id.json --out /tmp/fuzz-duplicate-base
 ```
 
 The runner shrinks each generated disagreement within its configured bound.
@@ -104,7 +132,7 @@ Non-scenario family acceptance counts were unchanged.
 
 These two-way campaigns ran before the gap15, gap16, and gap17 rulings.
 Their local logs are historical provenance only, not retained evidence in the repository.
-Their 105,000-case total and findings below describe historical code, not the current integrated three-way run.
+Their 105,000-case total and findings below describe historical code, not the current ratchets-1 run.
 The two large campaigns contain 105,000 cases: 15,000 per family.
 The first campaign checks the initial adapters.
 The final campaign checks corrected API boundaries and adds lens, integer, and held-reference cases.
@@ -146,7 +174,7 @@ The 2,479 protocol refusals match between implementations.
 
 The human gap17 ruling resolves the repeated and empty edited-ID findings.
 The official vectors are `vectors/lens/section/gap17-duplicate-id.json` and `vectors/lens/section/gap17-empty-id.json`.
-The duplicate-base finding remains an open protocol-domain question.
+The human D1 ruling also settles the duplicate-base finding.
 
 ### 1. Repeated edited section IDs — resolved by gap17
 
@@ -168,7 +196,7 @@ JS refuses the text.
 
 The human ruling now requires the parser to refuse empty section IDs.
 
-### 3. Duplicate base IDs — spec gap
+### 3. Duplicate base IDs — settled by D1
 
 File: [`found/03-duplicate-base-id.json`](found/03-duplicate-base-id.json).
 The final campaign contains 273 cases. The first uses family-local index 23.
@@ -177,21 +205,15 @@ Two base sections share one ID and have different bodies.
 The edited text matches the first section.
 Lean reports no edit. JS replaces both bodies with the first body's value.
 
-`model/Loops/Lens.lean:78-91` uses first-match `lookup` in `diffSection` and `diff`.
-`interop/js/lens.mjs:51` constructs a map, which keeps the last base entry.
-`model/Laws/Lens.lean:143,250` requires unique base IDs for `no_op` and `put_get`.
-At the time, the prose table at `protocol/laws.md:186-187` omitted that premise.
-Current `protocol/laws.md` states distinct valid lens premises.
-The historical design premise inventory did name `SectionIds`; the gap was not a claim about every document.
-`model/Gen/Read.lean:328-332` accepts the duplicate base.
-
-This is a domain-boundary probe, not a valid-base law violation.
-The public boundary needs either an explicit unique-base requirement or defined duplicate handling.
-Neither result proves that a valid-base edit loses data.
+The historical implementations differed on duplicate bases at the raw boundary.
+The law table then omitted the distinct-base premise; the design premise inventory did name `SectionIds`.
+This probe did not show a valid-base law violation.
+The ruling requires public edits to refuse empty or repeated base IDs before parsing text.
+The refusal is untyped; raw lookup, diff, and apply retain their behavior.
 
 ### Reduction and replay
 
-The remaining candidate contains its input, Lean `expect`, JS answer, verdict, scope, citations, and reduction evidence.
+The finding retains its input, historical Lean `expect` and JS answer, verdict, scope, citations, and reduction evidence.
 The historical reduction checks use 56, 20, and 35 trials respectively, without reaching their bounds.
 No smaller candidate from those domain-preserving checks retains the same cause.
 This is not a global minimality proof.
@@ -200,9 +222,9 @@ This is not a global minimality proof.
 node interop/fuzz/run.mjs --replay interop/fuzz/found/03-duplicate-base-id.json --out /tmp/fuzz-base
 ```
 
-The command returns exit 1 while its disagreement remains.
+The public edit now requires matching refusals for this input.
 Use a new output directory for each run.
-The tests reproduce both answers and require an update when a finding resolves.
+The recorded answers describe the historical disagreement, not the current expectation.
 `--check` discovers the existing family directory layout, so it does not discover files directly under `found/`.
 
 ## Harness errors, not protocol findings
@@ -260,4 +282,4 @@ Its local timed loop takes 0.430 seconds; the full command takes 1.44 seconds.
 It covers every family, but only the first four generated fold sublayers.
 The adapter corpus test covers every supported existing vector.
 The job uploads run artifacts even on failure.
-The fuzz runner has no mismatch allowlist. The duplicate-base question remains open.
+The fuzz runner has no mismatch allowlist.

@@ -9,9 +9,9 @@ import { changedPaths, replaceUnique, command, sourcePath } from './run.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
-test('catalogue keeps 195 unique mutations at current source sites; listing does not mutate', async () => {
+test('catalogue keeps 197 unique mutations at current source sites; listing does not mutate', async () => {
   const catalogue = JSON.parse(await readFile(path.join(here, 'mutants.json'), 'utf8'));
-  assert.equal(catalogue.length, 195);
+  assert.equal(catalogue.length, 197);
   assert.ok(!catalogue.some(m => ['finish-occurred-stamp-of', 'wide-time-094'].includes(m.id)));
   for (const id of ["wide-families-013","wide-spec-064","extra-families-max-acc","extra-families-min-acc","finish-json-hexdigit","last-spec-tests-conds"]) {
     assert.ok(catalogue.some(m => m.id === id), id);
@@ -86,8 +86,12 @@ async function fixture() {
   const dir = await mkdtemp(path.join(tmpdir(), 'mutation-repo-'));
   for (const sub of ['model/mutate', 'model/Loops', 'vectors', 'bin']) await mkdir(path.join(dir, sub), { recursive: true });
   await copyFile(path.join(here, 'run.mjs'), path.join(dir, 'model/mutate/run.mjs'));
+  await copyFile(path.join(here, '../lens-order.mjs'), path.join(dir, 'model/lens-order.mjs'));
+  await copyFile(path.join(here, '../Loops/Lens.lean'), path.join(dir, 'model/Loops/Lens.lean'));
   await copyFile(path.join(here, 'mutants.json'), path.join(dir, 'model/mutate/mutants.json'));
   const mutants = ['syntax', 'type', 'vector', 'survive', 'genfail', 'timeout', 'signal'].map(id => ({ id, file: 'Test.lean', before: 'ORIGINAL', after: id, reason: id }));
+  const catalogue = JSON.parse(await readFile(path.join(here, 'mutants.json'), 'utf8'));
+  mutants.push(...catalogue.filter(m => m.id.startsWith('ratchets-lens-base-')));
   await writeFile(path.join(dir, 'model/mutate/mutants.json'), JSON.stringify(mutants));
   await writeFile(path.join(dir, 'model/Loops/Test.lean'), 'ORIGINAL\n');
   await writeFile(path.join(dir, 'vectors/data'), 'baseline');
@@ -110,10 +114,10 @@ function runFixture(dir, args) {
 test('synthetic repository exercises mutation outcomes and restoration', async () => {
   const dir = await fixture();
   try {
-    const result = await runFixture(dir, ['--only', 'syntax,type,vector,survive,genfail,timeout', '--timeout', '0.4']).done;
+    const result = await runFixture(dir, ['--only', 'syntax,type,vector,survive,genfail,timeout,ratchets-lens-base-remove,ratchets-lens-base-after-parse', '--timeout', '0.4']).done;
     assert.equal(result.code, 1, result.output);
     const report = JSON.parse(await readFile(path.join(dir, 'result.json')));
-    assert.deepEqual(report.mutants.map(m => m.status), ['rejected-by-build', 'rejected-by-build', 'killed-by-vector', 'survived', 'error', 'error']);
+    assert.deepEqual(report.mutants.map(m => m.status), ['rejected-by-build', 'rejected-by-build', 'killed-by-vector', 'survived', 'error', 'error', 'killed-by-guard', 'killed-by-guard']);
     for (const entry of report.mutants.slice(0, 2)) {
       assert.equal(entry.buildRejectionNeedsAudit, true);
       assert.equal(Object.hasOwn(entry, 'proofKillNeedsAudit'), false);
@@ -122,6 +126,10 @@ test('synthetic repository exercises mutation outcomes and restoration', async (
     }
     assert.equal(report.mutants[4].commands[1].status, 'nonzero');
     assert.equal(report.mutants[5].commands[0].status, 'timeout');
+    for (const entry of report.mutants.slice(6)) {
+      assert.deepEqual(entry.commands.map(c => c.status), ['ok', 'ok']);
+      assert.match(entry.failureDetail, /source.*shape/);
+    }
     assert.equal(report.finalBaseline.status, 'ok');
     assert.equal(await readFile(path.join(dir, 'model/Loops/Test.lean'), 'utf8'), 'ORIGINAL\n');
   } finally { await rm(dir, { recursive: true, force: true }); }

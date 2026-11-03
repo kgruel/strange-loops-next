@@ -2670,6 +2670,37 @@
         }
       ],
       "assertion": "uncaught exception: R6 every envelope variant must pass shape before value decoding"
+    },
+    {
+      "id": "ratchets-lens-base-remove",
+      "status": "rejected-by-build",
+      "commands": [
+        {
+          "status": "nonzero",
+          "code": 1,
+          "signal": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "ratchets-lens-base-after-parse",
+      "status": "killed-by-guard",
+      "commands": [
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        },
+        {
+          "status": "ok",
+          "code": 0,
+          "signal": null,
+          "error": null
+        }
+      ],
+      "failureDetail": "Lens edit source does not match the approved base-before-parse shape"
     }
   ]
 }

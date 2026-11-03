@@ -5,7 +5,6 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { jsonSourceAt } from '../json-source.mjs';
 import { evaluateJS } from './evaluate.mjs';
-import { generate } from './generate.mjs';
 import { campaign, parseArgs } from './run.mjs';
 import { batchVectors } from './transport.mjs';
 
@@ -24,12 +23,8 @@ test('source spans preserve nesting, escapes, lexemes, and primitives', () => {
 test('raw record replay preserves duplicate payload members', { timeout: 120000 }, async () => {
   const dir = await mkdtemp(join(tmpdir(), 'loops-json-source-'));
   try {
-    let vector;
-    for (let i = 0; i < 100; i++) {
-      const candidate = generate('raw-record', i, 'record');
-      if (candidate.fuzz.nearMiss === null) { vector = candidate; break; }
-    }
-    assert.ok(vector);
+    const fixture = JSON.parse(await readFile(new URL('../../vectors/record/01-minimal.json', import.meta.url), 'utf8'));
+    const vector = { layer: fixture.layer, input: fixture.input };
     vector.input.envs = [vector.input.envs[0]];
     vector.input.payloads = [{ x: 1 }];
     const structured = JSON.stringify(vector);

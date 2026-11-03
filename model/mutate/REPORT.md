@@ -1,32 +1,30 @@
 # Lean model mutation report
 
-## Round 2 review-fix snapshot: `8a12ba6`
+## Ratchets snapshot
 
-The Node 22 run completes all 195 catalogue entries with a 240-second command timeout.
-The retained [summary](evidence/mutations-fixes2/summary.json) supports these counts.
+The Node 22 run completes all 197 catalogue entries with a 240-second command timeout.
+The retained [summary](evidence/mutations-ratchets-1/summary.json) supports these counts.
+It replaces the previous mutation summary.
 Run `python3 interop/fuzz/summarize.py report` from the repository root.
 The script derives the outcome, guard, and survivor counts without raw logs.
 
 | Outcome | Count |
 |---|---:|
-| Rejected by build | 146 |
+| Rejected by build | 147 |
 | Vector differences | 27 |
+| Source-shape guard | 1 |
 | Generator assertion exceptions | 16 |
 | Survivors | 6 |
 
 The runner exits 1 for generator assertions.
 Each error retains its assertion text in the summary.
-No command times out, receives a signal, or reports a spawn or cleanup error.
+No command in this retained run times out, receives a signal, or reports a spawn or cleanup error.
+All 147 build-rejection logs contain Lean source diagnostics.
 Build rejections are not semantic proof kills.
 Generator assertions are not vector-difference kills.
 Survival alone proves neither equivalence nor reachability.
 
-The proof graph has no outside user of `stripZeros` or its five lemmas.
-The implementation removes that family and retires its sole entry, `wide-time-094`.
-[COVERAGE.md](COVERAGE.md) records the reason.
-The raw-reader mutations now target `Loops.Read`, not `Gen.Read`.
-The catalogue runner accepts only library source paths.
-The eight guard mutations remain:
+The ten guard mutations have these outcomes:
 
 | Mutation | Full-catalogue outcome |
 |---|---|
@@ -38,6 +36,12 @@ The eight guard mutations remain:
 | `step1-envelope-keys-after-value` | error |
 | `step1-draft-keys-after-values` | error |
 | `step1-record-keys-after-values` | error |
+| `ratchets-lens-base-remove` | rejected-by-build |
+| `ratchets-lens-base-after-parse` | killed-by-guard |
+
+Removing base validation fails `edit_success` and `edit_refuse_base` in `Laws.Lens`.
+Moving validation after parsing builds and leaves vectors unchanged.
+The approved source-shape guard rejects that order; untyped refusals cannot expose it through output differences.
 
 The six older survivors remain unchanged:
 
@@ -54,18 +58,19 @@ The completed run covers exactly the current catalogue IDs.
 Source and vector files restore to HEAD, and `model/.mutation-run.lock` is absent.
 No other parent-started Lean build or LSP probe runs during the catalogue.
 Automatic tooling isolation is not independently established.
-The separate G2 probes also fail each implementation's own vector layer after deleting or moving its per-envelope check.
+An earlier run contains transient toolchain failures; it is not retained as evidence.
+A second attempt hits a helper timeout; its exact source mutation is restored before this complete retry.
 
 ```sh
-fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/review-fixes2-mutants.json
-python3 interop/fuzz/summarize.py mutation /tmp/review-fixes2-mutants.json mutations-fixes2
+fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/mutations-ratchets-1-final.json
+python3 interop/fuzz/summarize.py mutation /tmp/mutations-ratchets-1-final.json mutations-ratchets-1
 ```
 
 ### Guard and retired mutations
 
 Earlier Step-1 runs at `6fa9857` and `f1b32fb` produced the guard and retirement decisions below; their evidence is not retained.
-The cheap CI runner uses the same eight guard replacements.
-Every cheap guard mutation compiles and then fails runtime checks.
+The cheap CI runner retains those eight guards and adds two lens guards.
+All ten compile; runtime checks or the approved lens source shape reject them.
 The full catalogue includes the proof modules, so its detection stages can differ.
 Direct JS and Rust tests also pin canonical byte decoding, fraction endings, second bounds, UTC markers, and raw key checks.
 

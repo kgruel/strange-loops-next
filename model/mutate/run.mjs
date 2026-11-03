@@ -6,6 +6,7 @@ import { realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pathToFileURL } from 'node:url';
+import { checkLensOrder } from '../lens-order.mjs';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const model = path.join(root, 'model');
@@ -132,6 +133,7 @@ export async function main(args) {
   if (o.only && (new Set(o.only).size !== o.only.length || selected.length !== o.only.length)) throw new Error('Unknown or duplicate mutant id');
   for (const m of catalogue) {
     if (!m.before || m.before === m.after) throw new Error(`Invalid mutant: ${m.id}`);
+    if (m.guard !== undefined && (m.guard !== 'lens-base-order' || sourcePath(m.file) !== 'model/Loops/Lens.lean')) throw new Error(`Invalid guard: ${m.id}`);
     const relative = sourcePath(m.file);
     git(['ls-files', '--error-unmatch', '--', relative]);
     replaceUnique(await readFile(path.join(root, relative), 'utf8'), m.before, m.after);
@@ -161,6 +163,7 @@ export async function main(args) {
     if (result.baseline.gen.status !== 'ok') throw new Error('Baseline generator failed');
     result.baseline.changedPaths = await changedPaths(path.join(root, 'vectors'), baselineDir);
     if (result.baseline.changedPaths.length) throw new Error('Baseline vectors differ from generated vectors');
+    if (!checkLensOrder(await readFile(path.join(model, 'Loops/Lens.lean'), 'utf8'))) throw new Error('Baseline lens edit source does not match the approved base-before-parse shape');
     await save();
     for (const m of selected) {
       if (interrupted) break;
@@ -180,7 +183,14 @@ export async function main(args) {
           const dir = await mkdtemp(path.join(temp, `${m.id}-`));
           await cp(path.join(root, 'vectors'), dir, { recursive: true });
           const gen = await run(`${m.id}-gen`, 'lake', ['exe', 'gen', dir]); entry.commands.push(gen);
-          if (gen.status === 'ok') { entry.changedPaths = await changedPaths(path.join(root, 'vectors'), dir); entry.status = entry.changedPaths.length ? 'killed-by-vector' : 'survived'; }
+          if (gen.status === 'ok') {
+            entry.changedPaths = await changedPaths(path.join(root, 'vectors'), dir);
+            entry.status = entry.changedPaths.length ? 'killed-by-vector' : 'survived';
+            if (entry.status === 'survived' && m.guard === 'lens-base-order' && !checkLensOrder(await readFile(absolute, 'utf8'))) {
+              entry.status = 'killed-by-guard';
+              entry.failureDetail = 'Lens edit source does not match the approved base-before-parse shape';
+            }
+          }
           else entry.failureDetail = `Generator ${gen.status}`;
         } else entry.failureDetail = `Build ${build.status}`;
       } catch (e) { entry.failureDetail = e.message; }

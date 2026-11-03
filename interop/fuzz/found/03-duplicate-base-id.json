@@ -71,9 +71,9 @@
       }
     ]
   },
-  "verdict": "spec gap",
-  "note": "Lean uses the first base section; JS uses the last. The protocol law table omits the unique-base premise.",
-  "scope": "This is a domain-boundary probe, not a valid-base law violation. Neither implementation defines a public refusal for duplicate base IDs.",
+  "verdict": "settled",
+  "note": "Historical answers in expect and js record the former disagreement. The public edit now refuses a base with repeated or empty IDs before parsing text.",
+  "scope": "The ruling requires an untyped refusal. Raw lookup, diff, and apply retain their behavior.",
   "citations": [
     "model/Loops/Lens.lean:78-91 (lookup, diffSection, diff)",
     "model/Laws/Lens.lean:143 (no_op)",

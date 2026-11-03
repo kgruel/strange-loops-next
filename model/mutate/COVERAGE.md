@@ -5,9 +5,10 @@ Its file headings and exclusions are historical, not a coverage claim for the me
 The catalogue now follows moved definitions into `model/Loops/Id.lean` and `model/Loops/Fold.lean`.
 Use `node model/mutate/run.mjs --list` for current source paths.
 The runner tests check every current replacement site.
-The round-two fixes retain 187 original entries and eight guard mutations: 195 entries total.
+The ratchets batch retains 187 original entries and ten guard mutations: 197 entries total.
 The raw-reader ordering mutations target library definitions under `Loops`.
-The cheap runner uses the same eight replacements and requires runtime failures after successful builds.
+The cheap runner uses the same ten replacements after successful builds.
+It checks runtime failures or, for lens ordering, the approved source shape.
 This inventory does not claim exhaustive coverage of the changed model.
 
 Retire `finish-occurred-stamp-of`: its extra plus-sign guard is equivalent under R4.
@@ -136,7 +137,7 @@ The catalogue includes existing entries without definition metadata.
 - `Loops.Lens.diff`: covered by `extra-lens-diff`
 - `Loops.Lens.acceptedBody`: covered by `wide-lens-041`
 - `Loops.Lens.apply`: covered by `extra-lens-apply`
-- `Loops.Lens.edit`: excluded: It maps parse results through diff. No direct eligible operation.
+- `Loops.Lens.edit`: covered by `ratchets-lens-base-remove`, `ratchets-lens-base-after-parse`
 - `Loops.Lens.normalize`: excluded: It maps parse results through render. No direct eligible operation.
 
 ## model/Loops/Occurred.lean

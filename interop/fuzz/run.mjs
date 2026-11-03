@@ -8,6 +8,7 @@ import { FAMILIES, generate } from './generate.mjs';
 import { assess } from './evaluate.mjs';
 import { batchVectors, warmLean, warmRust } from './transport.mjs';
 import { shrink } from './shrink.mjs';
+import { addAnswer } from '../ratchets/refusal-coverage.mjs';
 
 function number(text, flag, min = 1) {
   const n = Number(text);
@@ -73,7 +74,7 @@ export async function campaign(options, {
     rawText = content.rawText ?? (!content.vector ? await readFile(options.replay, 'utf8') : undefined);
   }
   const summary = { implementations, seed: String(options.seed), requested: replay ? 1 : options.n, counts: {},
-    mismatches: 0, decoderRefusals: 0, protocolRefusals: 0, chunks: 0, shrinkTrials: 0, seconds: 0 };
+    mismatches: 0, decoderRefusals: 0, protocolRefusals: 0, refusalCodes: {}, chunks: 0, shrinkTrials: 0, seconds: 0 };
   await writeFile(join(out, 'options.json'), JSON.stringify({ ...options, implementations }, null, 2) + '\n');
   const diagnostics = [];
   let failureIndex = 0;
@@ -98,6 +99,7 @@ export async function campaign(options, {
           diagnostic: result.diagnostic, diagnostics: result.diagnostics });
       }
       if (result.status === 'protocol-refusal') summary.protocolRefusals++;
+      if (result.status !== 'mismatch' && result.status !== 'decoder-refusal') addAnswer(summary.refusalCodes, result.lean);
       if (result.status !== 'mismatch') continue;
       summary.mismatches++;
       const artifact = { implementations, vector, rawText, answer: result,
