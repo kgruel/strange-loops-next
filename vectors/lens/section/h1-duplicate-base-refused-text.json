@@ -1,0 +1,23 @@
+{
+  "vector": "h1-duplicate-base-refused-text",
+  "layer": "lens/section",
+  "laws": ["lens.base-valid", "lens.refuse"],
+  "source": "model",
+  "input": {
+    "base": [
+      {
+        "id": "a",
+        "body": ["one"]
+      },
+      {
+        "id": "a",
+        "body": ["two"]
+      }
+    ],
+    "text": ["stray line"]
+  },
+  "expect": {
+    "parsed": null,
+    "refused": true
+  }
+}

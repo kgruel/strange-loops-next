@@ -1,7 +1,7 @@
 {
   "vector": "gap18-reorder-unknown-absent",
   "layer": "lens/section",
-  "laws": ["lens.nothing-dropped"],
+  "laws": ["lens.nothing-dropped", "lens.apply-diff"],
   "source": "model",
   "input": {
     "base": [

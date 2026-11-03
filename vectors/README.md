@@ -165,8 +165,10 @@ In `08-order`, `expect["oldest-first"]` lists texts ordered by span, per `protoc
 `input.base` supplies base sections; `input.text` supplies edited lines.
 `expect` is either `{"parsed": null, "refused": true}` or the parsed document and its normal form.
 It also gives `accepted`, `unknown` and `absent` outcomes, plus the applied base.
+The public edit refuses empty or repeated base ids before it parses edited text.
+The refusal is untyped.
 Render roundtrip requires nonempty, distinct ids.
-Put-get additionally requires distinct base ids and the exact same ordered id list in the edit.
+Put-get also requires the exact same ordered id list in the edit.
 
 ## `record`
 

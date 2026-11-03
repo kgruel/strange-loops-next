@@ -1,7 +1,7 @@
 {
   "vector": "01-round-trip",
   "layer": "lens/section",
-  "laws": ["lens.round-trip"],
+  "laws": ["lens.round-trip", "lens.base-valid"],
   "source": "model",
   "input": {
     "base": [
