@@ -184,10 +184,39 @@ pub fn apply(base: &[Section], outcomes: &[Outcome]) -> Vec<Section> {
         .collect()
 }
 
-/// Parses an edit and compares it with the base. Lean: `Loops.Lens.edit`, model/Loops/Lens.lean.
+/// The parsed edit and its effects on the base.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EditResult {
+    /// The sections parsed from the edit.
+    pub parsed: Vec<Section>,
+    /// The canonical rendering of the parsed sections.
+    pub normalized: Vec<String>,
+    /// The changes and missing sections.
+    pub outcomes: Vec<Outcome>,
+    /// The base with accepted changes applied.
+    pub applied: Vec<Section>,
+}
+
+/// Validates the base before parsing the edit; either failure returns `None`.
 #[must_use]
-pub fn edit(base: &[Section], text: &[String]) -> Option<Vec<Outcome>> {
-    parse(text).map(|edited| diff(base, &edited))
+pub fn edit(base: &[Section], text: &[String]) -> Option<EditResult> {
+    let mut ids = std::collections::HashSet::new();
+    if base
+        .iter()
+        .any(|section| section.id.is_empty() || !ids.insert(&section.id))
+    {
+        return None;
+    }
+    let parsed = parse(text)?;
+    let normalized = render(&parsed);
+    let outcomes = diff(base, &parsed);
+    let applied = apply(base, &outcomes);
+    Some(EditResult {
+        parsed,
+        normalized,
+        outcomes,
+        applied,
+    })
 }
 
 /// Parses text and renders its normal form. Lean: `Loops.Lens.normalize`, model/Loops/Lens.lean.
@@ -247,8 +276,8 @@ mod tests {
             assert_eq!(normalize(&text), None, "edited sections {edited:?}");
         }
         assert_eq!(
-            edit(&base, &[]),
-            Some(vec![Outcome::Absent { id: "x".into() }])
+            edit(&base, &[]).expect("valid edit").outcomes,
+            vec![Outcome::Absent { id: "x".into() }]
         );
     }
 
@@ -277,7 +306,18 @@ mod tests {
             section("new", &["unknown"]),
             section("x", &["x edit"]),
         ];
-        let outcomes = edit(&base, &render(&edited)).expect("unique edited ids");
+        let result = edit(&base, &render(&edited)).expect("unique edited ids");
+        assert_eq!(result.parsed, edited);
+        assert_eq!(result.normalized, render(&edited));
+        assert_eq!(
+            result.applied,
+            vec![
+                section("x", &["x edit"]),
+                section("gone", &[]),
+                section("y", &["y edit"])
+            ]
+        );
+        let outcomes = result.outcomes;
         assert_eq!(
             outcomes,
             vec![
@@ -304,15 +344,23 @@ mod tests {
     }
 
     #[test]
+    fn invalid_bases_refuse_valid_and_invalid_text() {
+        for base in [
+            vec![section("", &[])],
+            vec![section("x", &["first"]), section("x", &["second"])],
+        ] {
+            for text in [render(&[section("x", &[])]), lines(&["invalid"])] {
+                assert_eq!(edit(&base, &text), None, "base {base:?}, text {text:?}");
+            }
+        }
+    }
+
+    #[test]
     fn duplicate_base_ids_keep_first_lookup_and_repeated_absence() {
         let base = vec![section("x", &["first"]), section("x", &["second"])];
-        // A unique edit is compared only with the first base occurrence.
-        assert_eq!(
-            edit(&base, &render(&[section("x", &["first"])])),
-            Some(vec![])
-        );
-        let outcomes = edit(&base, &render(&[section("x", &["second"])]))
-            .expect("duplicate base ids are not refused");
+        // Raw operations retain first-match behavior.
+        assert_eq!(diff(&base, &[section("x", &["first"])]), vec![]);
+        let outcomes = diff(&base, &[section("x", &["second"])]);
         assert_eq!(
             outcomes,
             vec![Outcome::Accepted {
@@ -325,16 +373,11 @@ mod tests {
             vec![section("x", &["second"]), section("x", &["second"])]
         );
         assert_eq!(
-            edit(&base, &[]),
-            Some(vec![
+            diff(&base, &[]),
+            vec![
                 Outcome::Absent { id: "x".into() },
                 Outcome::Absent { id: "x".into() }
-            ])
-        );
-        // Validation belongs to edited text, not the unchecked base.
-        assert_eq!(
-            edit(&[section("", &[])], &[]),
-            Some(vec![Outcome::Absent { id: String::new() }])
+            ]
         );
     }
 

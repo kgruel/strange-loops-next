@@ -51,8 +51,11 @@ fn parse_render_and_normalize_for_character_lists() {
 fn no_op_and_put_get_require_unique_ordered_ids() {
     let base = vec![section("a", &["one"]), section("b", &["two"])];
     let edited = vec![section("a", &["changed"]), section("b", &["::: "])];
-    assert_eq!(lens::edit(&base, &lens::render(&base)), Some(vec![]));
-    assert_eq!(lens::apply(&base, &lens::diff(&base, &edited)), edited);
+    let no_op = lens::edit(&base, &lens::render(&base)).expect("valid base");
+    assert_eq!(no_op.outcomes, vec![]);
+    assert_eq!(no_op.applied, base);
+    let result = lens::edit(&base, &lens::render(&edited)).expect("valid edit");
+    assert_eq!(result.applied, edited);
     let reversed = vec![edited[1].clone(), edited[0].clone()];
     assert_ne!(lens::apply(&base, &lens::diff(&base, &reversed)), reversed);
     let duplicate = vec![section("a", &["first"]), section("a", &["second"])];

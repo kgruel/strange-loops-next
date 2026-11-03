@@ -13,7 +13,7 @@ const FAMILIES: &[(&str, usize)] = &[
     ("spec", 110),
     ("realm", 15),
     ("scenario", 5),
-    ("lens", 16),
+    ("lens", 20),
     ("batch", 24),
     ("standard", 12),
 ];
@@ -177,7 +177,7 @@ fn every_registered_json_and_every_arrival_order() {
     for (family, _) in FAMILIES {
         assert!(seen.iter().any(|s| s == family), "missing {family}");
     }
-    assert_eq!(checked, 334);
+    assert_eq!(checked, 338);
     assert_eq!(checked, json_files(&root).len(), "unconsumed JSON");
     assert_eq!(
         failures,

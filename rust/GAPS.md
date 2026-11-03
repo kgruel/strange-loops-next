@@ -40,11 +40,11 @@ store string is preserved but does not cause I/O during pure execution.
   retains previous-round mappings, first label/held lookup, raw labels,
   mapping/draft order, and the model's global refusal rank. The adapter does
   not claim unique meaning for arbitrary raw drafts.
-- Lens laws retain their validity and success premises.
-  No-op and put-get require distinct base ids.
-  Put-get also requires the same ordered ids.
+- Public lens edits refuse empty or repeated base ids before parsing text.
+  The refusal is untyped, like other lens refusals.
+  Raw lookup, diff, and apply keep their existing first-match behavior.
+  Render laws retain valid-id premises; put-get also requires the same ordered ids.
   Edited duplicate and empty ids are refused.
-  Duplicate base-id policy remains open; raw Lean uses first-match behavior.
   Absent and unknown outcomes leave the base unchanged.
 
 ## Numeric and canonical boundaries

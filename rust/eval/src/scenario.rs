@@ -129,7 +129,7 @@ pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
     )?;
     let base = fixture_lens::sections("input.lens.base", required("input.lens", lk, "base")?)?;
     let edit = texts("input.lens.text", required("input.lens", lk, "text")?)?;
-    let outcomes = lens::edit(&base, &edit).ok_or("input.lens.text: invalid sections")?;
+    let result = lens::edit(&base, &edit).ok_or("input.lens.text: invalid sections")?;
     Ok(vec![object(vec![
         ("steps", Json::Arr(steps)),
         (
@@ -138,9 +138,9 @@ pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
                 ("rendered", fixture_lens::lines(&lens::render(&base))),
                 (
                     "outcomes",
-                    Json::Arr(outcomes.iter().map(fixture_lens::outcome).collect()),
+                    Json::Arr(result.outcomes.iter().map(fixture_lens::outcome).collect()),
                 ),
-                ("applied", fixture_lens::doc(&lens::apply(&base, &outcomes))),
+                ("applied", fixture_lens::doc(&result.applied)),
             ]),
         ),
     ])])

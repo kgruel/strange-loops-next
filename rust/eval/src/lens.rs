@@ -13,15 +13,15 @@ pub(crate) fn answers(layer: &str, input: &Json) -> Result<Vec<Json>, String> {
     let kvs = members("input", &["base", "text"], input)?;
     let base = sections("input.base", required("input", kvs, "base")?)?;
     let text = texts("input.text", required("input", kvs, "text")?)?;
-    let answer = match (lens::parse(&text), lens::edit(&base, &text)) {
-        (Some(parsed), Some(outcomes)) => Json::Obj(vec![
-            ("parsed".into(), doc(&parsed)),
-            ("normalized".into(), lines(&lens::render(&parsed))),
+    let answer = match lens::edit(&base, &text) {
+        Some(result) => Json::Obj(vec![
+            ("parsed".into(), doc(&result.parsed)),
+            ("normalized".into(), lines(&result.normalized)),
             (
                 "outcomes".into(),
-                Json::Arr(outcomes.iter().map(outcome).collect()),
+                Json::Arr(result.outcomes.iter().map(outcome).collect()),
             ),
-            ("applied".into(), doc(&lens::apply(&base, &outcomes))),
+            ("applied".into(), doc(&result.applied)),
         ]),
         _ => Json::Obj(vec![
             ("parsed".into(), Json::Null),
