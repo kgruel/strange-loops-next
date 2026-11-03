@@ -55,131 +55,36 @@ Source and vector files restore to HEAD, and `model/.mutation-run.lock` is absen
 No other parent-started Lean build or LSP probe runs during the catalogue.
 Automatic tooling isolation is not independently established.
 The separate G2 probes also fail each implementation's own vector layer after deleting or moving its per-envelope check.
-`.pi/REPORT.md` retains all six failing excerpts and the exact-restoration checks.
 
 ```sh
 fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/review-fixes2-mutants.json
 python3 interop/fuzz/summarize.py mutation /tmp/review-fixes2-mutants.json mutations-fixes2
 ```
 
-## HISTORICAL round 1 review-fix snapshot: `f1b32fbaea4b7abc0bda9ac84eff3d8d9e8cb326`
+### Guard and retired mutations
 
-The Node 22 run completes 196 catalogue entries with a 240-second command timeout.
-The retained [summary](evidence/mutations-fixes/summary.json) supports these counts.
-Run `python3 interop/fuzz/summarize.py report` from the repository root.
-
-| Outcome | Count |
-|---|---:|
-| Rejected by build | 147 |
-| Vector differences | 27 |
-| Generator assertion exceptions | 16 |
-| Survivors | 6 |
-
-The runner exits 1 for generator assertions.
-The parent checks every error log ending.
-No command times out, receives a signal, or reports a spawn or cleanup error.
-Build rejections are not semantic proof kills.
-Generator assertions are not vector-difference kills.
-Survival alone proves neither equivalence nor reachability.
-
-### Guard mutations
-
-The catalogue adds eight mutations and retires only `finish-occurred-stamp-of`.
-The retired positive-offset guard is redundant under R4; [COVERAGE.md](COVERAGE.md) records the source-based reason.
-The six older survivors remain unchanged; D6 stays unapproved.
-The cheap CI runner uses the same eight replacements.
+Earlier Step-1 runs at `6fa9857` and `f1b32fb` produced the guard and retirement decisions below; their evidence is not retained.
+The cheap CI runner uses the same eight guard replacements.
 Every cheap guard mutation compiles and then fails runtime checks.
 The full catalogue includes the proof modules, so its detection stages can differ.
-
-| Mutation | Full-catalogue outcome |
-|---|---|
-| `step1-base32-reencode` | rejected-by-build |
-| `step1-fraction-final-zero` | rejected-by-build |
-| `step1-seconds-bound` | rejected-by-build |
-| `step1-zone-only-z` | rejected-by-build |
-| `step1-envelope-keys-remove` | error |
-| `step1-envelope-keys-after-value` | error |
-| `step1-draft-keys-after-values` | error |
-| `step1-record-keys-after-values` | error |
-
 Direct JS and Rust tests also pin canonical byte decoding, fraction endings, second bounds, UTC markers, and raw key checks.
-The JS tests use throwing getters to check shape-before-value ordering.
-Rust tests call the public reader and check all-envelope ordering through its adapter.
 
-Both baseline builds pass; initial generation matches the committed corpus.
-Restored source and vector paths match HEAD, and the mutation lock is absent.
-The parent starts no other Lean build or explicit LSP probe during the run.
-Automatic tooling isolation is not independently established.
-The final integration gate checks the restored tree.
-The interrupted attempt is historical provenance only.
-Its local logs are not retained evidence in the repository.
-The parent restores its unfinished mutation before this complete rerun.
-The interrupted attempt does not enter these counts.
-
-```sh
-fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/review-fix-mutants.json
-```
-
-## HISTORICAL Step-1 snapshot: `6fa98571b0f7d15d5ddbdae3ef12401efc0c92f7`
-
-The Node 22 run completes all 189 entries with a 240-second command timeout.
-The model sources and generated vectors match this snapshot.
-The working catalogue contains four reviewed re-anchors, described below.
-
-| Outcome | Count |
-|---|---:|
-| Rejected by build | 143 |
-| Vector differences | 27 |
-| Generator assertion exceptions | 12 |
-| Survivors | 7 |
-
-The runner exits 1 for generator assertions, not for infrastructure failure.
-All 12 error logs end with generator assertion exceptions.
-No command times out, receives a signal, or reports a spawn or cleanup error.
-A build rejection is not a semantic proof kill.
-A generator assertion is an error outcome, not a vector-difference kill.
-Survival alone proves neither equivalence nor reachability.
-
-All six previous survivors remain.
-The four D6 helper candidates remain unapproved: `wide-families-013`, `wide-spec-064`, `extra-families-max-acc`, and `extra-families-min-acc`.
-The prior scoped interpretations for `finish-json-hexdigit` and `last-spec-tests-conds` remain unchanged.
-This run adds no helper law and does not settle D6.
-
-### New survivor: `finish-occurred-stamp-of`
-
-This mutation adds `if s.toList.contains '+' then none else` before the existing parser call in `Stamp.of?`.
-Its build and generator pass, with no changed vector.
-The parent checks `instantParts?`, `digitsVal`, `tail`, and `offsetSecs` in `model/Loops/Time.lean`.
+The catalogue retires `finish-occurred-stamp-of` and `wide-time-094`.
+`finish-occurred-stamp-of` added `if s.toList.contains '+' then none else` before the existing parser call in `Stamp.of?`.
 Accepted text contains only decimal digits and the fixed separators `-`, `T`, `:`, `.`, and `Z`.
 It cannot contain `+`; R4 already refuses every numeric offset.
-Thus the added guard is redundant for accepted instants.
-Rejected instants still return `none` on both paths.
-This is a source-based equivalence interpretation, not a new Lean equivalence theorem or a conclusion from survival alone.
-The entry stays in the catalogue, so the run reports seven survivors without hiding it.
+Thus the added guard is redundant for accepted instants, and rejected instants still return `none` on both paths.
+This is a source-based equivalence interpretation, not a Lean equivalence theorem or a conclusion from survival alone.
+`wide-time-094` targeted the removed `stripZeros` family, as described above.
 
-### Re-anchors and limits
+The Step-1 re-anchors remain in the catalogue:
 
 - `wide-envelope-010` changes decoded width from 32 to 31 bytes.
 - `wide-time-095` refuses the sole accepted UTC marker.
 - `wide-time-096` negates fraction nonemptiness in the new canonical check.
 - `coverage-time-instant-` excludes second 59 in `instantParts?`.
 
-The catalogue retains every entry.
-It does not claim exhaustive mutation coverage for the new decoder and instant helpers.
-Both baseline builds pass; initial vector generation matches the committed corpus.
-After restoration, tracked model sources and vectors match HEAD and the mutation lock is absent.
-The parent starts no Lean build or explicit diagnostic probe during mutation.
-Automatic tooling isolation is not independently established.
-The later full integration gate checks the restored tree.
-
-The retained [summary](evidence/step1/summary.json) supports these counts.
-Run `python3 interop/fuzz/summarize.py report` from the repository root.
-The full result and logs are not retained in the repository.
-Reproduce with:
-
-```sh
-fnm exec --using 22 node model/mutate/run.mjs --timeout 240 --output /tmp/step1-mutants.json
-```
+The catalogue does not claim exhaustive mutation coverage for the new decoder and instant helpers.
 
 ## HISTORICAL integrated snapshot: `08fa7029485648fdc9de642d8c0f19c1dccc3651`
 

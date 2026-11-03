@@ -11,19 +11,26 @@ spec.loader.exec_module(summarize)
 
 
 class EvidenceTest(unittest.TestCase):
-    def test_historical_artifacts(self):
+    def test_retained_artifacts(self):
         result = summarize.report()
-        self.assertEqual(result['campaigns']['step1-1']['totals']['mismatch'], 42)
-        self.assertEqual(result['mutations']['mutations-fixes']['total'], 196)
+        self.assertEqual(list(result['campaigns']), ['step1-3'])
+        campaign = result['campaigns']['step1-3']
+        self.assertEqual(campaign['totals']['cases'], 5600)
+        self.assertEqual(campaign['totals']['mismatch'], 42)
+        self.assertEqual(campaign['families']['lens']['mismatch'], 42)
+        self.assertEqual(list(result['mutations']), ['mutations-fixes2'])
+        mutation = result['mutations']['mutations-fixes2']
+        self.assertEqual(mutation['total'], 195)
+        self.assertEqual(mutation['outcomes'], {'error': 16, 'killed-by-vector': 27, 'rejected-by-build': 146, 'survived': 6})
 
     def test_category_sum_rejected(self):
-        summary = summarize.read(summarize.CAMPAIGNS / 'step1-1/summary.json')
+        summary = summarize.read(summarize.CAMPAIGNS / 'step1-3/summary.json')
         summary['counts']['lens']['match'] += 1
         with self.assertRaises(ValueError):
             summarize.totals(summary)
 
     def test_new_d1_example_rejected(self):
-        path = summarize.CAMPAIGNS / 'step1-1'
+        path = summarize.CAMPAIGNS / 'step1-3'
         summary = summarize.read(path / 'summary.json')
         data = summarize.read(path / 'd1-mismatches.json')
         reference = copy.deepcopy(data['examples'])
@@ -32,7 +39,7 @@ class EvidenceTest(unittest.TestCase):
             summarize.validate_cases(summary, data, reference)
 
     def test_infrastructure_failure_rejected(self):
-        artifact = summarize.read(summarize.MUTATIONS / 'mutations-fixes/summary.json')
+        artifact = summarize.read(summarize.MUTATIONS / 'mutations-fixes2/summary.json')
         artifact['mutants'][0]['commands'][0]['signal'] = 'SIGTERM'
         with self.assertRaises(ValueError):
             summarize.mutation_report(artifact)

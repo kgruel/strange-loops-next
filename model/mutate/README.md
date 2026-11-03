@@ -2,8 +2,8 @@
 
 Run `node model/mutate/run.mjs --list` to inspect the catalogue.
 Listing validates every replacement against the current source without changing files.
-The runner tests check all 196 entries and their unique source sites.
-The catalogue retains 188 original entries, retires one equivalent mutation, and adds eight guard mutations.
+The runner tests check all 195 entries and their unique source sites.
+The catalogue retains 187 original entries, retires two mutations, and adds eight guard mutations.
 The source paths may name the Loops or Gen root; flat filenames still name Loops sources.
 Run `node model/mutate/run.mjs --only things-prev-or,things-drop-may` to select mutations.
 Use `--output path` to choose the JSON result path.

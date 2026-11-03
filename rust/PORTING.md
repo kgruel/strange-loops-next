@@ -1,7 +1,7 @@
 # Rust port and fixture boundary
 
 The workspace separates the executable model from fixture/process adapters.
-No protocol rule is selected here; the accepted rulings in `.pi/decisions.md`
+No protocol rule is selected here; the accepted rulings in `ROADMAP.md`
 and the immutable model/vector snapshot determine behavior.
 
 ## Crates and public boundary
@@ -133,6 +133,5 @@ cargo build -p loops-eval --bin loops-eval
 
 CI preserves the Lean proofs/generator/runtime/mutant checks, JS checks, and
 fixed JS/Lean fuzz prefix while adding these workspace-wide Rust gates.
-Parent integration adds Rust to fuzz separately. Local evaluator logs are
-under `.pi/gates/05-rust/eval`; test coverage is not a claim that every
+Parent integration adds Rust to fuzz separately. Test coverage is not a claim that every
 unchecked model value satisfies a theorem's premises. See `GAPS.md`.

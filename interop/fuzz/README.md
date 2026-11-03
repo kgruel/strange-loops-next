@@ -17,7 +17,7 @@ node interop/fuzz/run.mjs --seed ci-1 --n 28 --out /tmp/fuzz-ci
 node interop/fuzz/run.mjs --rust --seed phase2-20261029 --n 5000 --out /tmp/fuzz-large
 node interop/fuzz/run.mjs --seed campaign-1 --n 1000 --family record --no-shrink
 node interop/fuzz/run.mjs --rust --replay /tmp/fuzz-large/mismatches/000000.json --out /tmp/fuzz-replay
-fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-1 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-1-5600
+fnm exec --using 22 node interop/fuzz/run.mjs --rust --seed step1-3 --n 5600 --shrink-trials 80 --out /tmp/fuzz-step1-3-5600
 fnm exec --using 22 node interop/fuzz/run.mjs --rust --replay interop/fuzz/found/03-duplicate-base-id.json --out /tmp/fuzz-duplicate-base
 ```
 
@@ -203,6 +203,6 @@ The fuzz runner has no mismatch allowlist or ignored disagreement.
 A test reproduces both recorded answers for the duplicate-base candidate.
 The official gap17 vectors test the resolved repeated and empty edited IDs.
 The human ruling resolves gap17. Duplicate-base behavior remains a protocol-domain question.
-The original `step1-1` campaign finds 42 such lens mismatches in 5,600 cases.
+The current `step1-3` campaign finds 42 such lens mismatches in 5,600 cases.
 
 [REPORT.md](REPORT.md) records the Step-1 result and historical two-way and three-way results.

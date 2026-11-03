@@ -10,6 +10,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CAMPAIGNS = ROOT / 'interop/fuzz/evidence'
 MUTATIONS = ROOT / 'model/mutate/evidence'
+REFERENCE = CAMPAIGNS / 'step1-3/d1-mismatches.json'
 CATEGORIES = ('match', 'protocol-refusal', 'decoder-refusal', 'mismatch')
 STATUSES = {'rejected-by-build', 'killed-by-vector', 'error', 'survived'}
 
@@ -62,7 +63,7 @@ def example(finding):
 def validate_cases(summary, data, reference):
     result = totals(summary)
     require(len(data['cases']) == result['mismatch'], 'mismatch count differs')
-    require(data['examples'] == reference, 'D1 examples differ from step1-1')
+    require(data['examples'] == reference, f'D1 examples differ from {REFERENCE.parent.name}')
     by_family = collections.Counter()
     seen = set()
     for case in data['cases']:
@@ -87,11 +88,10 @@ def import_campaign(raw, label):
     totals(summary)
     paths = sorted((raw / 'mismatches').glob('*.json'))
     require(len(paths) == summary['mismatches'], 'missing mismatch files')
-    reference_path = CAMPAIGNS / 'step1-1/d1-mismatches.json'
-    if reference_path.exists():
-        reference = read(reference_path)['examples']
+    if REFERENCE.exists():
+        reference = read(REFERENCE)['examples']
     else:
-        require(label == 'step1-1' and paths, 'import step1-1 first')
+        require(label == REFERENCE.parent.name and paths, f'import {REFERENCE.parent.name} first')
         first = read(paths[0])
         reference = {'raw': example(first), 'reduced': example(first['shrink'])}
         require(reference['raw']['layer'] == reference['reduced']['layer'] == 'lens/section', 'reference layer differs')
@@ -171,7 +171,7 @@ def mutation_report(data):
 
 
 def report():
-    reference = read(CAMPAIGNS / 'step1-1/d1-mismatches.json')['examples']
+    reference = read(REFERENCE)['examples']
     campaigns = {}
     for path in sorted(CAMPAIGNS.glob('*/summary.json')):
         summary = read(path)
