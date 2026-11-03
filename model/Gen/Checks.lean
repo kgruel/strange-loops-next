@@ -229,6 +229,16 @@ def main (args : List String) : IO Unit := do
   ensure (Lens.parse (Lens.render [sect]) == some [sect]) "valid lens control fails"
   ensure ((Lens.parse (Lens.render [⟨[], []⟩])).isNone) "empty section id survives"
   ensure ((Lens.parse (Lens.render [sect, sect])).isNone) "duplicate section id survives"
+  let text := Lens.render [sect]
+  let some result := Lens.edit [sect] text | throw (IO.userError "valid public lens edit refuses")
+  ensure (result.parsed == [sect] && result.normalized == text && result.outcomes == [] && result.applied == [sect])
+    "public lens result fields disagree"
+  ensure ((Lens.edit [] []).isSome) "empty lens document refuses"
+  ensure ((Lens.edit [sect] ["stray line".toList]).isNone) "public lens accepts malformed text"
+  -- These checks cover refusals, not the evaluation order of pure untyped functions.
+  for invalidBase in [[sect, sect], [⟨[], []⟩]] do
+    for editedText in [text, ["stray line".toList]] do
+      ensure ((Lens.edit invalidBase editedText).isNone) "invalid lens base survives"
   let a := { base with id := fixtureId 11, about := ["t:a", "t:b"] }
   let b := { base with id := fixtureId 12, about := ["t:a"], prev := [fixtureId 11] }
   let hs := wholeHeads [a, b]

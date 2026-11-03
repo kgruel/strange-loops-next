@@ -20,7 +20,7 @@ private def scenario (name thing : String) (spj : Json) (pool : List Record)
   let sp ← match Spec.ofJson spj with
     | .ok sp => pure sp
     | .error r => throw s!"{r.code}: {r.path}"
-  let some os := edit base text | throw "lens edit does not parse"
+  let some lens := edit base text | throw "lens edit is refused"
   let result (forms : List Record) : J :=
     let settled := settle forms
     let admitted := admit (fun _ _ => true) settled
@@ -44,8 +44,8 @@ private def scenario (name thing : String) (spj : Json) (pool : List Record)
       ("orders", .arr ((rotations forms).map fun rs => .arr (rs.map (.str ∘ idText ∘ (·.id)))))])),
     ("lens", .obj [("base", sections base), ("text", lines text)])]
   let expected : J := .obj [("steps", .arr results),
-    ("lens", .obj [("rendered", lines (render base)), ("outcomes", .arr (os.map outcomeJ)),
-      ("applied", sections (apply base os))])]
+    ("lens", .obj [("rendered", lines (render base)), ("outcomes", .arr (lens.outcomes.map outcomeJ)),
+      ("applied", sections lens.applied)])]
   pure (vector name "scenario" [] input expected)
 
 private def countSpec : Json := Gen.SpecVectors.fromOf (.obj [("store", .str ".")])

@@ -111,9 +111,21 @@ def apply (base : List Section) (os : List Outcome) : List Section :=
     | some b => ⟨s.id, b⟩
     | none => s
 
-/-- Read an edited text against its base. -/
-def edit (base : List Section) (text : List Line) : Option (List Outcome) :=
-  (parse text).map (diff base)
+/-- A successful public edit includes all lens results. -/
+structure EditResult where
+  parsed : List Section
+  normalized : List Line
+  outcomes : List Outcome
+  applied : List Section
+  deriving Repr, DecidableEq
+
+/-- Validate the base before parsing the edited text. Refusals remain untyped. -/
+def edit (base : List Section) (text : List Line) : Option EditResult :=
+  if Valid base then do
+    let parsed ← parse text
+    let outcomes := diff base parsed
+    some { parsed, normalized := render parsed, outcomes, applied := apply base outcomes }
+  else none
 
 /-- A text's normal form: what rendering its meaning gives back. -/
 def normalize (text : List Line) : Option (List Line) :=

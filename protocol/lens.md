@@ -39,6 +39,26 @@ It refuses text when parsing fails.
 
 ## Edit and apply
 
+The public entry `edit(base, text)` first validates the base document.
+It refuses a base with an empty id or repeated ids before it parses the edited text.
+An empty list of base sections remains valid.
+After base validation, it parses the whole edited text and refuses any parser failure.
+Every refusal stays untyped.
+The vector representation remains `parsed: null` with `refused: true`.
+
+Success returns four fields:
+
+- `parsed`: the parsed edited sections.
+- `normalized`: the render of those sections.
+- `outcomes`: the diff against the base.
+- `applied`: the base with accepted bodies applied.
+
+Only the public entry combines validation, parsing, diff, and apply.
+The replay adapters and expected-answer generators use its returned fields.
+Low-level lookup, diff, and apply keep their existing behavior.
+Lean and Rust keep first-match lookup; raw JavaScript diff keeps its last-match map.
+Public entry points never pass duplicate ids to these helpers.
+
 Match edited sections to base sections by id, not by position.
 A moved section with the same body produces no outcome.
 A changed body for a known id produces an accepted outcome with that id and body.
@@ -48,6 +68,15 @@ List accepted and unknown outcomes in edited order, then absent outcomes in base
 Apply accepted bodies to matching base sections in base order.
 Keep the old body for an absent section.
 Do not add unknown sections.
+
+### Refusal scope
+
+Invalid-base vectors cross repeated or empty base ids with valid or parser-refused text.
+The existing `gap17-*` vectors use valid bases and still check parser behavior.
+These vectors check refusals, not evaluation order.
+Pure untyped outputs cannot distinguish base-before-parse from parse-before-base.
+A separate source guard must check the public entry's evaluation order.
+That guard covers source order, not observable refusal priority.
 
 ## Scenario adapter
 

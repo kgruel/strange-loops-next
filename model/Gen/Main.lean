@@ -297,7 +297,7 @@ structure LensCase where
 def edited (f : List Section → List Section) : List Line := render (f base)
 
 def lensCases : List LensCase := [
-  ⟨"01-round-trip", ["lens.round-trip"], base, render base⟩,
+  ⟨"01-round-trip", ["lens.round-trip", "lens.base-valid"], base, render base⟩,
   ⟨"02-escaping", ["lens.escaping"], [],
     render [S "notes" [":::", "::: decision:auth", ":::x", "\\", "\\:::", "  ::: indented", "::", ""]]⟩,
   ⟨"03-no-op", ["lens.no-op"], base, render base⟩,
@@ -319,22 +319,30 @@ def lensCases : List LensCase := [
     [L "::: notes", L "\\plain", L "\\\\", L "\\:::x", L ":::"]⟩,
   ⟨"gap17-empty-id", ["lens.refuse"], [], [L "::: ", L "body", L ":::"]⟩,
   ⟨"gap17-duplicate-id", ["lens.refuse"], [], render [S "a" ["one"], S "a" ["two"]]⟩,
-  ⟨"gap18-reorder-unknown-absent", ["lens.nothing-dropped"],
+  ⟨"h1-duplicate-base-valid-text", ["lens.base-valid", "lens.refuse"],
+    [S "a" ["one"], S "a" ["two"]], render [S "a" ["changed"]]⟩,
+  ⟨"h1-duplicate-base-refused-text", ["lens.base-valid", "lens.refuse"],
+    [S "a" ["one"], S "a" ["two"]], [L "stray line"]⟩,
+  ⟨"h1-empty-base-id-valid-text", ["lens.base-valid", "lens.refuse"],
+    [S "" ["old"]], render [S "a" ["changed"]]⟩,
+  ⟨"h1-empty-base-id-refused-text", ["lens.base-valid", "lens.refuse"],
+    [S "" ["old"]], [L "stray line"]⟩,
+  ⟨"gap18-reorder-unknown-absent", ["lens.nothing-dropped", "lens.apply-diff"],
     [S "a" ["A"], S "b" ["B"], S "c" ["C"]],
     render [S "b" ["B2"], S "a" ["A2"], S "unknown" ["X"]]⟩
 ]
 
 def lensVector (c : LensCase) : Except String J := do
-  let parsed := parse c.text
-  let outcomes := edit c.base c.text
-  -- normal form must be stable, as the laws say
-  match normalize c.text with
-  | some n => if normalize n != some n then throw s!"lens/{c.name}: normal form unstable"
+  let result := edit c.base c.text
+  -- Check normal form only after the public entry succeeds.
+  match result with
+  | some r =>
+    if normalize r.normalized != some r.normalized then throw s!"lens/{c.name}: normal form unstable"
   | none => pure ()
-  let expect : J := match parsed, outcomes with
-    | some d, some os => .obj [("parsed", jDoc d), ("normalized", jLines (render d)),
-        ("outcomes", .arr (os.map jOutcome)), ("applied", jDoc (apply c.base os))]
-    | _, _ => .obj [("parsed", .null), ("refused", .bool true)]
+  let expect : J := match result with
+    | some r => .obj [("parsed", jDoc r.parsed), ("normalized", jLines r.normalized),
+        ("outcomes", .arr (r.outcomes.map jOutcome)), ("applied", jDoc r.applied)]
+    | none => .obj [("parsed", .null), ("refused", .bool true)]
   return vector c.name "lens/section" c.laws
     (.obj [("base", jDoc c.base), ("text", jLines c.text)]) expect
 

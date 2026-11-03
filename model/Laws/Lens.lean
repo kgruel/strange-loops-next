@@ -8,9 +8,9 @@ import Loops.Lens
   rendering would have written one, so `\\hello` typed into a body stays
   `\\hello` (`unescape_keeps`).
 * **Round trip.** Documents with nonempty, distinct section ids survive rendering and parsing.
-* **No-op.** Rendering a valid base and reading it back gives no outcomes.
-* **Put-get.** The base ids must be distinct.
-  An edit that keeps exactly the base's sections in the same order applies exactly, up to normal form.
+* **Public entry.** Success proves that base ids are nonempty and distinct.
+* **No-op.** A successful edit of the unedited render gives no outcomes and keeps the base.
+* **Put-get.** A successful edit with the same ordered ids applies exactly, up to normal form.
 * **Nothing dropped.** Every section of the edited text is unchanged,
   accepted or reported; every section it drops is reported as absent.
 * **Normal form.** Normalizing twice is normalizing once.
@@ -116,6 +116,35 @@ theorem normalize_idem {text out : List Line} (h : normalize text = some out) :
   obtain ⟨d, hp, rfl⟩ := h
   simp [normalize, parse_render d (parse_valid hp)]
 
+/-! ## Public entry -/
+
+/-- Success establishes base validity, parsing, and the returned fields. -/
+theorem edit_success {base : List Section} {text : List Line} {result : EditResult}
+    (h : edit base text = some result) :
+    Valid base ∧ parse text = some result.parsed ∧
+      result.normalized = render result.parsed ∧
+      result.outcomes = diff base result.parsed ∧ result.applied = apply base result.outcomes := by
+  unfold edit at h
+  split at h
+  · rename_i hb
+    cases hp : parse text with
+    | none => simp [hp] at h
+    | some d =>
+      simp only [hp] at h
+      cases h
+      exact ⟨hb, rfl, rfl, rfl, rfl⟩
+  · simp at h
+
+/-- The public entry accepts only bases with nonempty, distinct ids. -/
+theorem edit_base_valid {base : List Section} {text : List Line} {result : EditResult}
+    (h : edit base text = some result) : Valid base :=
+  (edit_success h).1
+
+/-- An invalid base always refuses, regardless of the edited text. -/
+theorem edit_refuse_base {base : List Section} (h : ¬ Valid base) (text : List Line) :
+    edit base text = none := by
+  simp [edit, h]
+
 /-! ## Lookup -/
 
 theorem lookup_of_mem {d : List Section} (hd : (ids d).Nodup) {s : Section} (hs : s ∈ d) :
@@ -151,9 +180,16 @@ theorem diff_self {base : List Section} (hb : (ids base).Nodup) : diff base base
     have : s.id ∈ base.map (·.id) := mem_map_of_mem hs
     simp [absentSection, this]
 
-/-- No-op: the rendered base, read back unedited, gives no outcomes. -/
-theorem no_op {base : List Section} (hb : Valid base) : edit base (render base) = some [] := by
-  simp [edit, parse_render base hb, diff_self hb.2]
+/-- A successful public edit of the unedited render keeps the base and has no outcomes. -/
+theorem no_op {base : List Section} {result : EditResult}
+    (h : edit base (render base) = some result) :
+    result.outcomes = [] ∧ result.applied = base := by
+  obtain ⟨hb, hp, _, ho, ha⟩ := edit_success h
+  have hd : result.parsed = base := by
+    rw [parse_render base hb] at hp
+    exact Option.some.inj hp.symm
+  rw [hd, diff_self hb.2] at ho
+  exact ⟨ho, by simpa [ho, apply, acceptedBody] using ha⟩
 
 /-! ## Put-get -/
 
@@ -263,11 +299,24 @@ theorem put_get {base edited : List Section} (hb : (ids base).Nodup) (he : ids e
     apply base (diff base edited) = edited := by
   rw [apply_diff hb (he ▸ hb), map_pick hb he]
 
-/-- Put-get on text: applying the outcomes renders the edited text's normal form. -/
-theorem put_get_text {base edited : List Section} {text : List Line} (hb : (ids base).Nodup)
-    (hp : parse text = some edited) (he : ids edited = ids base) :
-    (edit base text).map (fun os => render (apply base os)) = normalize text := by
-  simp [edit, normalize, hp, put_get hb he]
+/-- A successful public edit takes each known body's value from its parsed document. -/
+theorem edit_apply_diff {base : List Section} {text : List Line} {result : EditResult}
+    (h : edit base text = some result) :
+    result.applied = base.map (pick result.parsed) := by
+  obtain ⟨hb, hp, _, ho, ha⟩ := edit_success h
+  rw [ha, ho, apply_diff hb.2 (parse_valid hp).2]
+
+/-- A successful public edit with the same ordered ids applies exactly. -/
+theorem edit_put_get {base : List Section} {text : List Line} {result : EditResult}
+    (h : edit base text = some result) (he : ids result.parsed = ids base) :
+    result.applied = result.parsed := by
+  rw [edit_apply_diff h, map_pick (edit_base_valid h).2 he]
+
+/-- With matching ordered ids, rendering the public result gives its normal form. -/
+theorem put_get_text {base : List Section} {text : List Line} {result : EditResult}
+    (h : edit base text = some result) (he : ids result.parsed = ids base) :
+    render result.applied = result.normalized := by
+  rw [edit_put_get h he, (edit_success h).2.2.1]
 
 /-! ## Nothing dropped -/
 

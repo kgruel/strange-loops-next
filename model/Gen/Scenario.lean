@@ -121,7 +121,7 @@ def exactSumVector : Except String J := do
   let steps := [("safe-input", [first]), ("exact-output", records)]
   let base : List Section := [⟨"decision:auth".toList, [first.value.toList]⟩]
   let text := render [⟨"decision:auth".toList, [second.value.toList]⟩]
-  let some os := edit base text | throw s!"scenario/{name}: the edited text doesn't parse"
+  let some result := edit base text | throw s!"scenario/{name}: the lens edit is refused"
   let mut outs : List J := []
   for (label, forms) in steps do
     let results := (rotations forms).map (outcome sp)
@@ -137,8 +137,8 @@ def exactSumVector : Except String J := do
         ("orders", .arr ((rotations forms).map fun xs => .arr (xs.map (.str ∘ idText ∘ (·.id)))))])),
       ("lens", .obj [("base", jsec base), ("text", jl text)])])
     (.obj [("steps", .arr outs),
-      ("lens", .obj [("rendered", jl (render base)), ("outcomes", .arr (os.map jout)),
-        ("applied", jsec (apply base os))])])
+      ("lens", .obj [("rendered", jl (render base)), ("outcomes", .arr (result.outcomes.map jout)),
+        ("applied", jsec result.applied)])])
 
 -- A superseded record remains a head only for its other thing.
 -- Its later timestamp also exposes an incorrect whole-view winner.
@@ -176,7 +176,7 @@ def thingStateVector : Except String J := do
     | _ => throw s!"scenario/{name}: expected a per-thing current slot"
   let base : List Section := [⟨"decision:auth".toList, [first.value.toList]⟩]
   let text := render [⟨"decision:auth".toList, [second.value.toList]⟩]
-  let some os := edit base text | throw s!"scenario/{name}: the edited text doesn't parse"
+  let some result := edit base text | throw s!"scenario/{name}: the lens edit is refused"
   return vector name "scenario" ["thing.local", "latest-by.order", "spec.set", "lens.put-get"]
     (.obj [("spec", Records.ofJson spec), ("thing", .str "decision:auth"),
       ("records", .arr (records.map jRecord)),
@@ -185,8 +185,8 @@ def thingStateVector : Except String J := do
         ("orders", .arr ((rotations forms).map fun xs => .arr (xs.map (.str ∘ idText ∘ (·.id)))))])),
       ("lens", .obj [("base", jsec base), ("text", jl text)])])
     (.obj [("steps", .arr outs),
-      ("lens", .obj [("rendered", jl (render base)), ("outcomes", .arr (os.map jout)),
-        ("applied", jsec (apply base os))])])
+      ("lens", .obj [("rendered", jl (render base)), ("outcomes", .arr (result.outcomes.map jout)),
+        ("applied", jsec result.applied)])])
 
 def vectors : Except String (List (String × J)) := do
   let sp ← match Spec.ofJson spec with
@@ -201,9 +201,9 @@ def vectors : Except String (List (String × J)) := do
     outs := outs ++ [first]
   -- the lens step: rendering the head and parsing the edit gives one accepted
   -- section, whose body is the record that comes back
-  let some os := edit lensBase edited
-    | throw "scenario/01-decision: the edited text doesn't parse"
-  match os with
+  let some result := edit lensBase edited
+    | throw "scenario/01-decision: the lens edit is refused"
+  match result.outcomes with
   | [.accepted i b] =>
     if i != "decision:auth".toList || b != [dF.value.toList] then
       throw "scenario/01-decision: the accepted edit isn't F's body"
@@ -219,8 +219,8 @@ def vectors : Except String (List (String × J)) := do
     ("lens", .obj [("base", jsec lensBase), ("text", jl edited)])]
   let expect := J.obj [
     ("steps", .arr outs),
-    ("lens", .obj [("rendered", jl (render lensBase)), ("outcomes", .arr (os.map jout)),
-      ("applied", jsec (apply lensBase os))])]
+    ("lens", .obj [("rendered", jl (render lensBase)), ("outcomes", .arr (result.outcomes.map jout)),
+      ("applied", jsec result.applied)])]
   return [("01-decision", vector "01-decision" "scenario"
     ["spec.set", "latest-by.order", "settle.erased", "view.no-resurrection", "lens.put-get"] input expect),
     ("phase2-exact-output", ← exactSumVector),

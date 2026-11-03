@@ -122,10 +122,10 @@ def lensRun (input : Json) : Dec J := do
   let kvs ← members? "input" ["base", "text"] input
   let base ← sections "input.base" (← req "input" kvs "base")
   let text ← lines "input.text" (← req "input" kvs "text")
-  pure (match parse text, edit base text with
-    | some d, some os => .obj [("parsed", jDoc d), ("normalized", jLines (render d)),
-        ("outcomes", .arr (os.map jOutcome)), ("applied", jDoc (apply base os))]
-    | _, _ => .obj [("parsed", .null), ("refused", .bool true)])
+  pure (match edit base text with
+    | some result => .obj [("parsed", jDoc result.parsed), ("normalized", jLines result.normalized),
+        ("outcomes", .arr (result.outcomes.map jOutcome)), ("applied", jDoc result.applied)]
+    | none => .obj [("parsed", .null), ("refused", .bool true)])
 
 /-- `spec/parse`. A spec that repeats a key comes as written in `spec_text`,
 since `spec` as JSON may lose a repeat in another reader; this one keeps
@@ -274,10 +274,10 @@ def scenarioRun (input : Json) : Dec J := do
   let lk ← members? "input.lens" ["base", "text"] (← req "input" kvs "lens")
   let base ← sections "input.lens.base" (← req "input.lens" lk "base")
   let edited ← lines "input.lens.text" (← req "input.lens" lk "text")
-  let some os := edit base edited | bad "input.lens.text" "doesn't parse as keyed sections"
+  let some result := edit base edited | bad "input.lens" "the lens edit is refused"
   pure (.obj [("steps", .arr steps),
-    ("lens", .obj [("rendered", jLines (render base)), ("outcomes", .arr (os.map jOutcome)),
-      ("applied", jDoc (apply base os))])])
+    ("lens", .obj [("rendered", jLines (render base)), ("outcomes", .arr (result.outcomes.map jOutcome)),
+      ("applied", jDoc result.applied)])])
 
 def byteTextRun (input : Json) : Dec J := do
   let kvs ← members? "input" ["bytes", "prefix", "texts"] input

@@ -41,8 +41,8 @@
     },
     {
       "law": "lens.no-op",
-      "premise": "the base's section ids are distinct",
-      "input": "not produced when each thing is rendered once",
+      "premise": "the public edit succeeds",
+      "input": "the public entry refuses repeated base ids",
       "holds": {
         "given": "parse an unedited render of two sections",
         "answer": "nothing to apply"
@@ -54,7 +54,7 @@
     },
     {
       "law": "lens.put-get",
-      "premise": "the edit keeps exactly the base's sections",
+      "premise": "the public edit succeeds and keeps the same ordered ids",
       "input": "a valid input: anyone may delete a section from the text",
       "holds": {
         "given": "edit decision:auth, keep decision:cache",

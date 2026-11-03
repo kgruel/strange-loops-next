@@ -11,9 +11,9 @@ computes both answers; this file checks that the first is what the law
 promises and that the second differs, so a premise shown on the laws page is
 one that matters. CI runs it and fails if the file changed.
 
-These are not vectors. Several inputs here are ones the protocol does not
-produce (two records under one id, a JSON object repeating a member, a lens
-base keying two sections alike), and each says so in `input`, so no implementation reads them as cases to pass.
+These are not vectors. Some inputs violate protocol contracts: two records
+under one id, repeated JSON members, or repeated lens section ids.
+Each case describes its input. The public lens entry refuses invalid bases.
 -/
 
 open Loops Gen
@@ -38,10 +38,10 @@ def tri : Tri → String
 
 def sel (x : Result Int) : String := s!"value {x.value} · unread {x.unread}"
 
-def lensOut : Option (List Lens.Outcome) → String
+def lensOut : Option Lens.EditResult → String
   | none => "refused"
-  | some [] => "nothing to apply"
-  | some os => ", ".intercalate (os.map fun
+  | some result => if result.outcomes.isEmpty then "nothing to apply"
+    else ", ".intercalate (result.outcomes.map fun
       | .accepted i b => s!"accepted {String.ofList i}: {" / ".intercalate (b.map String.ofList)}"
       | .unknown i => s!"unknown {String.ofList i}"
       | .absent i => s!"absent {String.ofList i}")
@@ -77,18 +77,20 @@ def cases : Except String (List Case) := do
   let a := winner [one, twin]
   let b := winner [twin, one]
   if a == b then throw "latest-by.set: two records under one id agree anyway"
-  -- lens.no-op: the base's section ids are distinct
+  -- lens.no-op: the public edit succeeds
   let base := [sec "decision:auth" "Passkeys.", sec "decision:cache" "No cache."]
   let dup := [sec "decision:auth" "Passkeys.", sec "decision:auth" "Device flow."]
   let clean := Lens.edit base (Lens.render base)
   let dirty := Lens.edit dup (Lens.render dup)
-  unless clean == some [] do throw "lens.no-op: held side has something to apply"
+  unless clean.map (·.outcomes) == some [] do throw "lens.no-op: held side has something to apply"
   if lensOut clean == lensOut dirty then throw "lens.no-op: removing the premise changes nothing"
   -- lens.put-get: the edit keeps exactly the base's sections
   let edited := [sec "decision:auth" "Passkeys everywhere.", sec "decision:cache" "No cache."]
   let dropped := [sec "decision:auth" "Passkeys everywhere."]
-  let kept := Lens.apply base (Lens.diff base edited)
-  let lost := Lens.apply base (Lens.diff base dropped)
+  let some keptResult := Lens.edit base (Lens.render edited) | throw "lens.put-get: held edit refuses"
+  let some lostResult := Lens.edit base (Lens.render dropped) | throw "lens.put-get: dropped edit refuses"
+  let kept := keptResult.applied
+  let lost := lostResult.applied
   let shown (d : List Lens.Section) := " · ".intercalate (d.map fun x => String.ofList x.id ++ ": " ++ " / ".intercalate (x.body.map String.ofList))
   unless kept == edited do throw "lens.put-get: held side doesn't apply exactly"
   if lost == dropped then throw "lens.put-get: dropping a section applies anyway"
@@ -111,11 +113,11 @@ def cases : Except String (List Case) := do
       input := "two records under one id: a reader that doesn't check ids against content could hold them",
       holds := (s!"records {ids [one, other]} under two ids, in either order", distinct),
       removed := (s!"records {ids [one, twin]} under one id: one order, then the other", s!"{a}, then {b}") },
-    { law := "lens.no-op", premise := "the base's section ids are distinct",
-      input := "not produced when each thing is rendered once",
+    { law := "lens.no-op", premise := "the public edit succeeds",
+      input := "the public entry refuses repeated base ids",
       holds := ("parse an unedited render of two sections", lensOut clean),
       removed := ("the same, both sections keyed decision:auth", lensOut dirty) },
-    { law := "lens.put-get", premise := "the edit keeps exactly the base's sections",
+    { law := "lens.put-get", premise := "the public edit succeeds and keeps the same ordered ids",
       input := "a valid input: anyone may delete a section from the text",
       holds := ("edit decision:auth, keep decision:cache", s!"{shown kept} (the edit, exactly)"),
       removed := ("edit decision:auth, drop decision:cache", s!"{shown lost} (not the edit: the dropped section stays)") },

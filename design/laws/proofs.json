@@ -2061,9 +2061,9 @@
    "∀ (l : Loops.Lens.Line), Loops.Lens.unescape (Loops.Lens.escape l) = l",
    "module": "Laws.Lens"},
   "Loops.Lens.put_get_text":
-  {"uses": ["Loops.Lens.put_get"],
+  {"uses": ["Loops.Lens.edit_put_get", "Loops.Lens.edit_success"],
    "states":
-   "∀ {base edited : List Loops.Lens.Section} {text : List Loops.Lens.Line}, (Loops.Lens.ids base).Nodup → Loops.Lens.parse text = some edited → Loops.Lens.ids edited = Loops.Lens.ids base → Option.map (fun os => Loops.Lens.render (Loops.Lens.apply base os)) (Loops.Lens.edit base text) = Loops.Lens.normalize text",
+   "∀ {base : List Loops.Lens.Section} {text : List Loops.Lens.Line} {result : Loops.Lens.EditResult}, Loops.Lens.edit base text = some result → Loops.Lens.ids result.parsed = Loops.Lens.ids base → Loops.Lens.render result.applied = result.normalized",
    "module": "Laws.Lens"},
   "Loops.Lens.put_get":
   {"uses": ["Loops.Lens.apply_diff", "Loops.Lens.map_pick"],
@@ -2114,9 +2114,12 @@
    "∀ {text out : List Loops.Lens.Line}, Loops.Lens.normalize text = some out → Loops.Lens.normalize out = some out",
    "module": "Laws.Lens"},
   "Loops.Lens.no_op":
-  {"uses": ["Loops.Lens.diff_self", "Loops.Lens.parse_render"],
+  {"uses":
+   ["Loops.Lens.diff_self",
+    "Loops.Lens.edit_success",
+    "Loops.Lens.parse_render"],
    "states":
-   "∀ {base : List Loops.Lens.Section}, Loops.Lens.Valid base → Loops.Lens.edit base (Loops.Lens.render base) = some []",
+   "∀ {base : List Loops.Lens.Section} {result : Loops.Lens.EditResult}, Loops.Lens.edit base (Loops.Lens.render base) = some result → result.outcomes = [] ∧ result.applied = base",
    "module": "Laws.Lens"},
   "Loops.Lens.map_pick":
   {"uses": ["Loops.Lens.lookup_cons_ne"],
@@ -2156,6 +2159,37 @@
   "Loops.Lens.escape_ne_fence":
   {"uses": ["Loops.Lens.escape_take"],
    "states": "∀ (l : Loops.Lens.Line), Loops.Lens.escape l ≠ Loops.Lens.fence",
+   "module": "Laws.Lens"},
+  "Loops.Lens.edit_success":
+  {"uses": [],
+   "states":
+   "∀ {base : List Loops.Lens.Section} {text : List Loops.Lens.Line} {result : Loops.Lens.EditResult}, Loops.Lens.edit base text = some result → Loops.Lens.Valid base ∧ Loops.Lens.parse text = some result.parsed ∧ result.normalized = Loops.Lens.render result.parsed ∧ result.outcomes = Loops.Lens.diff base result.parsed ∧ result.applied = Loops.Lens.apply base result.outcomes",
+   "module": "Laws.Lens"},
+  "Loops.Lens.edit_refuse_base":
+  {"uses": [],
+   "states":
+   "∀ {base : List Loops.Lens.Section}, ¬Loops.Lens.Valid base → ∀ (text : List Loops.Lens.Line), Loops.Lens.edit base text = none",
+   "module": "Laws.Lens"},
+  "Loops.Lens.edit_put_get":
+  {"uses":
+   ["Loops.Lens.edit_apply_diff",
+    "Loops.Lens.edit_base_valid",
+    "Loops.Lens.map_pick"],
+   "states":
+   "∀ {base : List Loops.Lens.Section} {text : List Loops.Lens.Line} {result : Loops.Lens.EditResult}, Loops.Lens.edit base text = some result → Loops.Lens.ids result.parsed = Loops.Lens.ids base → result.applied = result.parsed",
+   "module": "Laws.Lens"},
+  "Loops.Lens.edit_base_valid":
+  {"uses": ["Loops.Lens.edit_success"],
+   "states":
+   "∀ {base : List Loops.Lens.Section} {text : List Loops.Lens.Line} {result : Loops.Lens.EditResult}, Loops.Lens.edit base text = some result → Loops.Lens.Valid base",
+   "module": "Laws.Lens"},
+  "Loops.Lens.edit_apply_diff":
+  {"uses":
+   ["Loops.Lens.apply_diff",
+    "Loops.Lens.edit_success",
+    "Loops.Lens.parse_valid"],
+   "states":
+   "∀ {base : List Loops.Lens.Section} {text : List Loops.Lens.Line} {result : Loops.Lens.EditResult}, Loops.Lens.edit base text = some result → result.applied = List.map (Loops.Lens.pick result.parsed) base",
    "module": "Laws.Lens"},
   "Loops.Lens.diff_self":
   {"uses": ["Loops.Lens.lookup_of_mem"],
@@ -2279,6 +2313,21 @@
   {"uses": [],
    "states":
    "∀ {id id_1 : Loops.Lens.Line}, Loops.Lens.Outcome.absent id = Loops.Lens.Outcome.absent id_1 → id = id_1",
+   "module": "Loops.Lens"},
+  "Loops.Lens.EditResult.mk.sizeOf_spec":
+  {"uses": [],
+   "states":
+   "∀ (parsed : List Loops.Lens.Section) (normalized : List Loops.Lens.Line) (outcomes : List Loops.Lens.Outcome) (applied : List Loops.Lens.Section), sizeOf { parsed := parsed, normalized := normalized, outcomes := outcomes, applied := applied } = 1 + sizeOf parsed + sizeOf normalized + sizeOf outcomes + sizeOf applied",
+   "module": "Loops.Lens"},
+  "Loops.Lens.EditResult.mk.injEq":
+  {"uses": ["Loops.Lens.EditResult.mk.inj"],
+   "states":
+   "∀ (parsed : List Loops.Lens.Section) (normalized : List Loops.Lens.Line) (outcomes : List Loops.Lens.Outcome) (applied parsed_1 : List Loops.Lens.Section) (normalized_1 : List Loops.Lens.Line) (outcomes_1 : List Loops.Lens.Outcome) (applied_1 : List Loops.Lens.Section), ({ parsed := parsed, normalized := normalized, outcomes := outcomes, applied := applied } = { parsed := parsed_1, normalized := normalized_1, outcomes := outcomes_1, applied := applied_1 }) = (parsed = parsed_1 ∧ normalized = normalized_1 ∧ outcomes = outcomes_1 ∧ applied = applied_1)",
+   "module": "Loops.Lens"},
+  "Loops.Lens.EditResult.mk.inj":
+  {"uses": [],
+   "states":
+   "∀ {parsed : List Loops.Lens.Section} {normalized : List Loops.Lens.Line} {outcomes : List Loops.Lens.Outcome} {applied parsed_1 : List Loops.Lens.Section} {normalized_1 : List Loops.Lens.Line} {outcomes_1 : List Loops.Lens.Outcome} {applied_1 : List Loops.Lens.Section}, { parsed := parsed, normalized := normalized, outcomes := outcomes, applied := applied } = { parsed := parsed_1, normalized := normalized_1, outcomes := outcomes_1, applied := applied_1 } → parsed = parsed_1 ∧ normalized = normalized_1 ∧ outcomes = outcomes_1 ∧ applied = applied_1",
    "module": "Loops.Lens"},
   "Loops.LatestBy.winner_newer":
   {"uses":
