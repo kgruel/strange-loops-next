@@ -208,14 +208,14 @@ Refused variants must give the same code. What isn't proved yet is that `resolve
 |---|---|---|---|
 | `lens.escaping` | `escaping`, `unescape_keeps` | any body survives when its section id is nonempty; reading removes only an escape backslash | `lens/section/02`, `10` |
 | `lens.round-trip` | `parse_render`, `parse_render_iff` | rendering roundtrips exactly when section ids are nonempty and distinct | `lens/section/01` |
-| `lens.base-valid` | `edit_base_valid` | A successful public edit establishes nonempty, distinct base ids. | `lens/section/01`, `h1-duplicate-base-valid-text`, `h1-duplicate-base-refused-text`, `h1-empty-base-id-valid-text`, `h1-empty-base-id-refused-text` |
+| `lens.base-valid` | `edit_base_valid` | A successful public edit establishes nonempty, distinct base ids. | `lens/section/01`, `lens/section/h1-duplicate-base-valid-text`, `lens/section/h1-duplicate-base-refused-text`, `lens/section/h1-empty-base-id-valid-text`, `lens/section/h1-empty-base-id-refused-text` |
 | `lens.no-op` | `no_op` | A successful public edit of the unedited render gives no outcomes and keeps the base. | `lens/section/03` |
 | `lens.put-get` | `edit_put_get`, `put_get_text` | A successful public edit with the same ordered ids applies exactly. Rendering the applied result gives its normal form. | `lens/section/04`, `10` |
 | `lens.apply-diff` | `edit_apply_diff` | A successful public edit takes each known body's parsed value and keeps absent base sections in base order. | `lens/section/gap18-reorder-unknown-absent` |
 | `lens.nothing-dropped` | `nothing_dropped`, `absence_reported` | every section is unchanged, accepted or reported; every dropped one is reported | `lens/section/05`, `06` |
 | `lens.absence-not-edit` | `absence_not_edit` | a dropped section leaves that section in the state as it was; the other sections' accepted edits still apply | `lens/section/06` |
 | normal form | `normalize_idem` | normalizing twice is normalizing once | every lens vector |
-| `lens.refuse` | `parse_valid`, `edit_refuse_base` | The parser refuses malformed text, empty ids and repeated ids. The public entry also refuses invalid bases. | `lens/section/07`–`09`, `gap17-empty-id`, `gap17-duplicate-id`, `h1-duplicate-base-valid-text`, `h1-duplicate-base-refused-text`, `h1-empty-base-id-valid-text`, `h1-empty-base-id-refused-text` |
+| `lens.refuse` | `parse_valid`, `edit_refuse_base` | The parser refuses malformed text, empty ids and repeated ids. The public entry also refuses invalid bases. | `lens/section/07`–`09`, `lens/section/gap17-empty-id`, `lens/section/gap17-duplicate-id`, `lens/section/h1-duplicate-base-valid-text`, `lens/section/h1-duplicate-base-refused-text`, `lens/section/h1-empty-base-id-valid-text`, `lens/section/h1-empty-base-id-refused-text` |
 
 The public base-valid, no-op, put-get, and apply-diff laws take an explicit successful-entry premise.
 They need no separate base-validity premise.

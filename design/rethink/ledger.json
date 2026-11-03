@@ -291,7 +291,14 @@
     "group": "Lenses and context",
     "status": "settled",
     "claim": "A lens is a collector with a base.",
-    "why": "Render roundtrip requires nonempty, distinct section ids. Put-get additionally requires distinct base ids and the exact same ordered id list in the edit. A dropped section retains its old body. The broader lens plan records a base of tick, lens hash and audience. It renders, parses edits, diffs by id and emits a changeset. Committed renders are promotions. One tick can have several renders. Absence is never an edit. Anything an observer writes remains its own record."
+    "why": "Render roundtrip requires nonempty, distinct section ids. Public edits check base ids first; put-get also requires the exact same ordered id list in the edit. A dropped section retains its old body. The broader lens plan records a base of tick, lens hash and audience. It renders, parses edits, diffs by id and emits a changeset. Committed renders are promotions. One tick can have several renders. Absence is never an edit. Anything an observer writes remains its own record."
+  },
+  {
+    "kind": "decision",
+    "group": "Lenses and context",
+    "status": "settled",
+    "claim": "A public lens edit checks its base before parsing text.",
+    "why": "A base is a document, so its section ids must be nonempty and distinct. An invalid base receives an untyped refusal. Raw lookup, diff and apply keep their existing behavior. Typed lens refusal codes wait until the UI needs all lens codes at once."
   },
   {
     "kind": "decision",
@@ -361,7 +368,7 @@
     "group": "Building",
     "status": "settled",
     "claim": "Rust now implements the modeled protocol; product storage and higher transitions remain planned.",
-    "why": "The model proves LatestBy's set law and Count's repeat behavior under their stated premises. Lens render laws require valid ids; put-get also preserves the exact ordered id list. Layer 0 vectors compare modeled, JS and Rust bytes. Hash-parametric laws cover erasure, sets and member order. Step 2 introduced distinct-id fold families, per-thing heads, consistent-form settling, honest unread results, spec parsing and at-most-one batch meaning. Historical boundary reviews produced PRs 7 and 9–13. PR 7 checks writing; PR 9 adds <code>erases</code>; PR 10 preserves unneeded backslashes. PR 11 defines occurred grammar; PR 12 orders real times and digest bytes. PR 13 extends envelope tests and defines the normative spec grammar. Its historical snapshot had 171 vectors. The law catalogue lists 76 entries across 624 theorem declarations. Fixture counts change with the integration campaign; consult the final campaign report. Rust checks all families and standards. Current writers cap every number's magnitude at 2<sup>53</sup> − 1, whole or not. Numeric folds additionally require safe whole values. Ticks, references, boundaries and storage transitions still need future models and proofs."
+    "why": "The model proves LatestBy's set law and Count's repeat behavior under their stated premises. Lens render laws require valid ids; put-get also preserves the exact ordered id list. Layer 0 vectors compare modeled, JS and Rust bytes. Hash-parametric laws cover erasure, sets and member order. Step 2 introduced distinct-id fold families, per-thing heads, consistent-form settling, honest unread results, spec parsing and at-most-one batch meaning. Historical boundary reviews produced PRs 7 and 9–13. PR 7 checks writing; PR 9 adds <code>erases</code>; PR 10 preserves unneeded backslashes. PR 11 defines occurred grammar; PR 12 orders real times and digest bytes. PR 13 extends envelope tests and defines the normative spec grammar. Its historical snapshot had 171 vectors. The law catalogue lists 78 entries across 632 theorem declarations. Fixture counts change with the integration campaign; consult the final campaign report. Rust checks all families and standards. Current writers cap every number's magnitude at 2<sup>53</sup> − 1, whole or not. Numeric folds additionally require safe whole values. Ticks, references, boundaries and storage transitions still need future models and proofs."
   },
   {
     "kind": "decision",
