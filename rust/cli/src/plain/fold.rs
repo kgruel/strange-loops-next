@@ -1,12 +1,12 @@
 //! Render the typed slot results before JSON sorts their member names.
-use super::{Prefixes, headline, keyed_fields, label, now, relative, text, value};
+use super::{Prefixes, headline, keyed_fields, now, relative, text, value};
 use crate::{
     Fail,
     description::Description,
     values::{Fields, View, records_by_thing, shown_name, thing_about},
 };
 use loops::{
-    json::{Json, str_cmp},
+    json::Json,
     live::LiveState,
     number::Nat,
     record::{Digest, Record, Shown, id_text},
@@ -105,19 +105,11 @@ impl Reading<'_> {
                 }
             }
             if detail == Detail::Payload {
-                write!(out, "\n{indent}  payload").expect("write string");
-                match line.payload().filter(|_| *shown == Shown::Here) {
-                    Some(Json::Obj(members)) if !members.is_empty() => {
-                        let mut fields: Vec<_> = members.iter().collect();
-                        fields.sort_by(|a, b| str_cmp(&a.0, &b.0));
-                        for (key, v) in fields {
-                            write!(out, "\n{indent}    {}  {}", label(key), value(v))
-                                .expect("write string");
-                        }
-                    }
-                    Some(v) => write!(out, "  {}", value(v)).expect("write string"),
-                    None => out.push_str("  unknown"),
-                }
+                super::write_payload(
+                    out,
+                    indent,
+                    line.payload().filter(|_| *shown == Shown::Here),
+                );
             }
         }
         Ok(())

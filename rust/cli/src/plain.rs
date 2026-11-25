@@ -10,7 +10,7 @@ use crate::{
     values::{Field, Fields, member, thing_about},
 };
 use loops::{
-    json::{Json, quote},
+    json::{Json, quote, str_cmp},
     live::LiveState,
     record::{Record, Shown, id_text},
     time::{Moment, instant},
@@ -197,6 +197,7 @@ pub(crate) fn thing(
     state: &LiveState<'_>,
     heads: &[Record],
     desc: Option<&Description>,
+    detail: crate::values::Setters,
 ) -> Result<String, Fail> {
     let now = now()?;
     let mut out = format!("thing  {}", label(name));
@@ -222,7 +223,40 @@ pub(crate) fn thing(
         )
         .expect("write string");
     }
+    if detail == crate::values::Setters::All {
+        let mut live = crate::values::SetterRecords::default();
+        for key in &fields.names {
+            live.add(key, &state.setters(key));
+        }
+        for (record, keys) in live.ordered() {
+            write!(
+                out,
+                "\nlive  {}\n  emitted  {}\n  keys  {}\n  about  {}",
+                id_text(&record.id),
+                relative(record.emitted.moment(), &now),
+                mentions(keys.iter().map(String::as_str)),
+                mentions(record.about.iter().map(String::as_str))
+            )
+            .expect("write string");
+            write_payload(&mut out, "", crate::values::payload(held, &record));
+        }
+    }
     Ok(out)
+}
+
+fn write_payload(out: &mut String, indent: &str, payload: Option<&Json>) {
+    write!(out, "\n{indent}  payload").expect("write string");
+    match payload {
+        Some(Json::Obj(members)) if !members.is_empty() => {
+            let mut fields: Vec<_> = members.iter().collect();
+            fields.sort_by(|a, b| str_cmp(&a.0, &b.0));
+            for (key, v) in fields {
+                write!(out, "\n{indent}    {}  {}", label(key), value(v)).expect("write string");
+            }
+        }
+        Some(v) => write!(out, "  {}", value(v)).expect("write string"),
+        None => out.push_str("  unknown"),
+    }
 }
 
 /// Field state is read identically in the thing and keyed fold views.

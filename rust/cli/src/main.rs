@@ -86,6 +86,9 @@ usage: loops [-C <dir>] <verb> ...
                                 each --base-id adds a record to the selection
                                 include stated prev targets, then follow held prev within the thing
                                 add the thing's live records to prev and copy its heads' about
+                                about holds the thing's mentions, and each revision carries them on;
+                                it does not say what one record rests on. To cite that, state a declared
+                                reference field on each write (evidence=firing:one)
                                 copy occurred when every head states the same text
                                 --about (repeatable) or --no-about states the whole mention set
                                 --add-about and --drop-about edit the copied mentions by literal name
@@ -111,15 +114,18 @@ usage: loops [-C <dir>] <verb> ...
   ls --refers-to <thing> [--plain | --json]
                                 list things whose declared reference fields match the literal typed target
                                 report stores, field declarations and coverage counts
-  describe [--plain]            show each store's description and fit against the selected union
+  describe [--plain]            show each store's description and fit against the selected union,
+                                including things that leave each declared reference field unset
                                 its counts include typed references whose prefix the field's refs list
                                 does not name; a refs list holds kind prefixes ([a-z][a-z0-9-]*, not r),
                                 or [] for any prefix; a kind's naming guidance goes in its note
                                 default: current store; loops --group describe reads the local group
   get <id>                      one record
-  of <thing> [--plain]          a thing's values, each key's from its live
+  of <thing> [--setters] [--plain]
+                                a thing's values, each key's from its live
                                 setters; its about, its heads, and how many
                                 records are of it
+                                --setters shows every key's live setters and the records that set them
                                 conflict previews shorten long values; loops of without --plain shows them whole
                                 --plain is for reading and may change; scripts use the JSON
   read <vertex> [--store <name>=<dir>]... [--values] [--plain]
@@ -685,8 +691,15 @@ fn get(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {
 }
 
 fn of(ctx: &Context<'_>, args: &[String], format: Format) -> Result<(), Fail> {
-    let [thing] = args else {
-        return Err(usage("of takes one thing"));
+    let (thing, detail) = match args {
+        [flag, thing] if flag == "--setters" && !thing.starts_with("--") => {
+            (thing, values::Setters::All)
+        }
+        [thing, flag] if flag == "--setters" && !thing.starts_with("--") => {
+            (thing, values::Setters::All)
+        }
+        [thing] if thing != "--setters" => (thing, values::Setters::Compact),
+        _ => return Err(usage("of takes one thing")),
     };
     let store = ctx.store()?;
     let held = store.read()?;
@@ -706,7 +719,7 @@ fn of(ctx: &Context<'_>, args: &[String], format: Format) -> Result<(), Fail> {
     let heads = state.heads();
     if format == Format::Plain {
         let desc = Description::load(store.dir.root())?;
-        let output = plain::thing(&held, &thing, n, &state, &heads, desc.as_ref())?;
+        let output = plain::thing(&held, &thing, n, &state, &heads, desc.as_ref(), detail)?;
         return answered(&held, say(&output));
     }
     let mut members = vec![
@@ -717,7 +730,7 @@ fn of(ctx: &Context<'_>, args: &[String], format: Format) -> Result<(), Fail> {
         ),
         ("records", count(n)),
     ];
-    members.extend(values::thing(&held, &state));
+    members.extend(values::thing(&held, &state, detail));
     answered(&held, say(&object(members).canon()))
 }
 

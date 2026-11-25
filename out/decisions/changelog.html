@@ -201,7 +201,8 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <a href="note-retained-boundaries.html">Retained boundaries</a></nav>
 <p class="source">Rendered from <code>CHANGELOG.md</code> in the repository.</p>
 <details class="contents"><summary>On this page</summary>
-<ul><li><a href="#2026-11-24">2026-11-24</a></li>
+<ul><li><a href="#2026-11-25">2026-11-25</a></li>
+<li><a href="#2026-11-24">2026-11-24</a></li>
 <li><a href="#2026-11-23">2026-11-23</a></li>
 <li><a href="#2026-11-22">2026-11-22</a></li>
 <li><a href="#2026-11-21">2026-11-21</a></li>
@@ -219,6 +220,38 @@ What is next is in <a href="roadmap.html">ROADMAP.md</a>. What waits on Kyle is 
 <p>Each date starts with a short list. Under it is the record as it was written at the time, moved here from <code>ROADMAP.md</code> on 2026-11-21 and changed only where a sentence pointed at a place in that file.
 Since Kyle's ruling of 2026-11-21 (W7), only a choice that changes a record's bytes or id, a result's bytes or hash, a refusal code, or what a spec answers comes to him, through <a href="index.html">DECISIONS.md</a>. Every other implementer choice is written here and stands unless he objects.
 The record starts where the old roadmap's did. For anything earlier, and for every merge, see <code>git log</code>.</p>
+<h2 id="2026-11-25">2026-11-25</h2>
+<p>In brief:</p>
+<ul>
+<li><p><strong>Built: <code>loops of --setters</code>, and a <code>describe</code> count of things that leave a reference field unset.</strong> Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The <code>emit</code> help now says what <code>about</code> is. Nothing changes for a command that does not use the flag.</p></li>
+<li><p>Two stops asked for in the same issues wait on Kyle: a stated <code>--sets</code> that leaves out a key the command gives, and a field every write of a kind must state.</p></li>
+</ul>
+<h3 id="built-a-things-setters-and-a-count-of-unset-references">Built: a thing's setters, and a count of unset references</h3>
+<p>Four issues came from an agent rebuilding a private group of stores from first principles, which is the use ST1 was ruled for. Each was rerun here on main (<code>369b100</code>) in scratch stores with invented names, and each is as reported.</p>
+<p><strong>What the four have in common.</strong> The writers want to record two things about each record: what it rests on, and why it was written. <code>about</code>, the message and every payload field are read as facts about the thing: the heads' mentions are the thing's, and each key shows the value from its live setter. So a fact about one record, kept in any of them, reads as the latest one. It is then wrong for every key the latest record did not set. A reference field in place of a mention removes the silent copy and leaves this as it was: after a second record cites <code>firing:two</code> and sets only <code>cone</code>, the thing reads <code>evidence=firing:two</code> beside a <code>name</code> that the first record set under <code>firing:one</code>, and <code>ls --refers-to firing:one</code> no longer lists it. What answers &quot;what backs this key&quot; is the key's live setter, and what that record cites is in its own payload. Nothing showed the setter unless two competed.</p>
+<p><strong>Built</strong> (Codex wrote it from a brief; the coordinator reviewed the diff, reran the gate and compared the binaries):</p>
+<ul>
+<li><p><strong><code>loops of &lt;thing&gt; --setters</code></strong> (issue 25). Under the flag <code>setters</code> is always written and holds every key that has a live setter, a key with one setter included; a key that a held record unset has a row with no <code>value</code>. A new member, <code>live</code>, lists each record in those rows once, newest first, as a shown line with one more member, <code>keys</code>: the keys it is a live setter of. So one read gives each key, the record that set it, and that record's own payload and mentions. A head that sets no key is in <code>heads</code> and not in <code>live</code>. The plain view adds one block for each live record after the heads. The flag is for <code>of</code> alone: <code>read --values</code> and <code>fold --values</code> are as they were.</p></li>
+<li><p><strong><code>describe</code> counts things that leave a declared reference field unset</strong> (issue 24, its first part). Each reference field's row gains <code>things_unset</code>, and the plain table one last column. It counts things, where the row's other members count occurrences, and reads the field as the key and lifecycle counts do. An empty list is a value and is not counted; neither is a conflict or a setter that cannot be read.</p></li>
+<li><p><strong>The <code>emit</code> help says what <code>about</code> is</strong> (issue 23): the thing's mentions, which each revision carries on, and not what one record rests on. The copy of 2026-11-14 stays. Copying only under a flag would make every plain revision drop a thing's mentions, and a switch for each kind would give <code>about</code> two meanings that no reader could tell apart.</p></li>
+<li><p><code>rust/PLACE.md</code>, choices 12, 16 and 36, say the same.</p></li>
+</ul>
+<p><strong>What does not change.</strong> No record's bytes or id, no refusal code, and no answer of <code>read</code>, <code>fold</code>, <code>tick</code>, <code>ls</code>, <code>get</code> or <code>export</code>. <code>loops of</code> without the flag is byte for byte as before, in JSON and plain. <code>describe</code> differs by the one member and the one column.</p>
+<p><strong>Implementer choices; they stand under W7 unless Kyle objects:</strong></p>
+<ul>
+<li><p>The flag may come before or after the thing. Given twice, it is a usage error.</p></li>
+<li><p><code>live</code> follows the order of <code>heads</code>, and <code>keys</code> is in canonical order.</p></li>
+<li><p>A live record read whole whose payload is erased or withheld is in <code>unheld</code>, as before, and is in <code>live</code> only when it is the setter of a key the view knows.</p></li>
+<li><p>The plain block gives the id in full, then <code>emitted</code>, <code>keys</code>, <code>about</code> and <code>payload</code>; a payload that is not held shows <code>unknown</code>.</p></li>
+<li><p><code>things_unset</code> is the name, so that its unit is in it.</p></li>
+</ul>
+<p><strong>Checked here:</strong> the five commands of the rust job (438 tests); the old and the new binary over three scratch stores, 30 reads byte for byte equal, and <code>describe</code> equal once the new member is taken out; by hand, the example of issue 25, a fork, an unset, a pure join, and a whole record erased while still live.</p>
+<p><strong>Found and not built.</strong> <code>things_unset</code> finds a thing with no value at all. It does not find a record written without the field while the thing still shows an older one. A count of records would, and belongs with the second stop below.</p>
+<p><strong>Waiting on Kyle,</strong> and being talked through with him:</p>
+<ul>
+<li><p><strong>Issue 26.</strong> <code>emit kiln --of kiln:east cone=9 --sets cone &quot;second&quot;</code> writes <code>text</code> into the payload and does not set it, so the thing keeps its earlier message. It is wider than the message: <code>cone=10 shelf=5 --sets cone</code> writes <code>shelf</code> unread, without a word. Recommended: the shorthand stops when a stated <code>--sets</code> leaves out a key the command gives, and names the way out. Adding <code>text</code> to a stated <code>--sets</code> would fill in over what was typed.</p></li>
+<li><p><strong>Issue 24, its second and third parts.</strong> A kind's description names fields that every shorthand write of that kind must state. ST1 left required fields out. Recommended now, as a rule about the write and named as one: it needs no read of the store, a revision is held to it too, and it is not standing, since nothing is refused at the store and <code>emit -</code> writes anything. Standing reads envelopes, and this field is in the payload, so the stop is not a first step toward enforcing it there.</p></li>
+</ul>
 <h2 id="2026-11-24">2026-11-24</h2>
 <p>In brief:</p>
 <ul>

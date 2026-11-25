@@ -114,10 +114,11 @@ struct References {
     not_read: usize,
     without_mention: usize,
     unlisted_prefix: usize,
+    things_unset: usize,
 }
 
 impl References {
-    fn counts(&self) -> [(&'static str, usize); 7] {
+    fn counts(&self) -> [(&'static str, usize); 8] {
         [
             ("held_here", self.held_here),
             ("held_elsewhere_in_group", self.elsewhere),
@@ -126,10 +127,14 @@ impl References {
             ("not_read", self.not_read),
             ("without_mention", self.without_mention),
             ("unlisted_prefix", self.unlisted_prefix),
+            ("things_unset", self.things_unset),
         ]
     }
 
     fn observe(&mut self, field: &str, prefixes: &[String], thing: &Thing<'_>, site: usize) {
+        if matches!(thing.fields.read(field), Field::Unset) {
+            self.things_unset += 1;
+        }
         let coverage = count_values(setter_values(thing.held, thing.state, field), |target| {
             let (prefix, _) = target
                 .split_once(':')
@@ -341,7 +346,8 @@ impl Site {
                             "NOT TYPED",
                             "NOT READ",
                             "WITHOUT MENTION",
-                            "UNLISTED PREFIX"
+                            "UNLISTED PREFIX",
+                            "THINGS UNSET"
                         ],
                         rows
                     )

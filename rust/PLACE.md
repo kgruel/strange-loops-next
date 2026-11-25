@@ -221,7 +221,8 @@ Every verb that reads the store says when either happened (choice 18).
 12. **`emit` copies `about` from the heads.** The head's mentions are the
     thing's, so with no `--about` an emit of a thing is given the union of
     the mentions of the thing's heads, every one of which it now names, in
-    canonical order. A root and a first record copy nothing.
+    canonical order. A root and a first record copy nothing. The copied mentions
+    are the thing's and do not cite what this record rests on.
 13. **`--about` states the whole `about`, and `--no-about` an empty one.**
     `--about`, once or more, replaces the copy rather than adding to it, so
     a task moves from one project to another by naming the new one alone.
@@ -292,7 +293,12 @@ Every verb that reads the store says when either happened (choice 18).
       withheld, which shows its `shown` and no value. Nothing compares values;
     - `unheld` lists the live records read whole that are erased or withheld,
       `{"id", "shown"}`: what keys they set beside those written is unknown.
-    `setters` and `unheld` are written only when they hold something.
+    By default `setters` and `unheld` are written only when they hold something.
+    With `loops of <thing> --setters`, `setters` is always written, even
+    when empty. It lists every key with a live setter, including a held
+    setter that leaves the key unset. `live` lists the records in those
+    rows once each, in head order, as shown lines with their live `keys`
+    in canonical order. A pure join sets no key and has no row in `live`.
 17. **`--values` writes the values beside the ids.** `loops read <vertex>
     --values` and `loops fold <spec> --values` answer the protocol's result
     with members added where the protocol has none: each thing of a
@@ -1176,7 +1182,9 @@ Every verb that reads the store says when either happened (choice 18).
     For each declared reference field, count a scalar once or each immediate
     list member once per distinct live setter. Preserve repeats. A missing
     member and an empty list supply zero occurrences. A hidden setter supplies
-    one `not_read`. Classify readable occurrences by their written form.
+    one `not_read`. `things_unset` counts things of the kind whose live
+    field reads as unset. An empty list is a value and does not count.
+    Classify readable occurrences by their written form.
     A typed target held in this store counts in `held_here`. Other typed targets count
     in `held_elsewhere_in_group` or `not_in_group` according to residence.
     A target's residence requires an admitted record of it. Other values,
@@ -1264,6 +1272,13 @@ history to be anchored (every record above a live record names it) and each
 thing's live records, with their erasers, to answer every slot that follows
 `keys` as the whole holding does. Expected answers come from the
 vectors or from the walk's own statements, not from the code.
+
+The setters walk checks the JSON and plain bytes of ordinary `of` and
+the full setter rows and live records for a whole write, a keyed revision,
+a fork, a pure join, an unset and an erasure. It checks both flag positions
+and the plain live blocks. The describe walk checks `things_unset` in JSON
+and plain for a kind with zero things, an absent field, an explicit unset,
+an empty list and competing setters.
 
 Not checked: nothing in the model says what a place is, so there is no law
 behind the layout, and no second implementation reads it yet.

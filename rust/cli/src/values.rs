@@ -32,7 +32,7 @@ pub(crate) fn shown_name(shown: Shown) -> &'static str {
 }
 
 /// The payload a reader holds of a record: none unless it is shown here.
-fn payload<'a>(held: &'a Held, record: &Record) -> Option<&'a Json> {
+pub(crate) fn payload<'a>(held: &'a Held, record: &Record) -> Option<&'a Json> {
     if record.shown != Shown::Here {
         return None;
     }
@@ -145,7 +145,11 @@ impl<'a, 'r> Fields<'a, 'r> {
                 Field::Unknown(hidden)
             };
         }
-        match live.as_slice() {
+        self.read_named(key, &live)
+    }
+
+    fn read_named(&self, key: &str, live: &[&Record]) -> Field {
+        match live {
             [] => Field::Unset,
             [one] if one.shown == Shown::Here => payload(self.held, one)
                 .and_then(|p| member(p, key))
@@ -157,21 +161,76 @@ impl<'a, 'r> Fields<'a, 'r> {
     }
 }
 
+/// Gather each record once, with the names visited in Fields' canonical order.
+#[derive(Default)]
+pub(crate) struct SetterRecords {
+    records: Vec<Record>,
+    keys: HashMap<loops::record::Digest, Vec<String>>,
+}
+
+impl SetterRecords {
+    pub(crate) fn add(&mut self, key: &str, records: &[&Record]) {
+        for &record in records {
+            self.keys
+                .entry(record.id)
+                .or_insert_with(|| {
+                    self.records.push(record.clone());
+                    Vec::new()
+                })
+                .push(key.to_owned());
+        }
+    }
+
+    pub(crate) fn ordered(mut self) -> impl Iterator<Item = (Record, Vec<String>)> {
+        loops::fold::order_heads(&self.records)
+            .into_iter()
+            .map(move |record| {
+                let keys = self.keys.remove(&record.id).expect("collected setter");
+                (record, keys)
+            })
+    }
+}
+
 pub(crate) fn thing_about(heads: &[Record]) -> Vec<String> {
     let mentions: Vec<_> = heads.iter().flat_map(|r| r.about.iter().cloned()).collect();
     canon_set(&mentions)
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Setters {
+    Compact,
+    All,
+}
+
 /// Preserve the existing values/setters/unheld view on of, read and fold.
-pub(crate) fn thing(held: &Held, state: &live::LiveState<'_>) -> Vec<(&'static str, Json)> {
+pub(crate) fn thing(
+    held: &Held,
+    state: &live::LiveState<'_>,
+    detail: Setters,
+) -> Vec<(&'static str, Json)> {
     let fields = Fields::new(held, state);
     let mut values = Vec::new();
-    let mut several = Vec::new();
+    let mut setters = Vec::new();
+    let mut live = (detail == Setters::All).then(SetterRecords::default);
     for key in &fields.names {
-        match fields.read(key) {
-            Field::Value(v) => values.push((key.clone(), v)),
-            Field::Unknown(rs) | Field::Conflict(rs) => several.push((key.clone(), Json::Arr(rs))),
-            Field::Unset => {}
+        let records = state.setters(key);
+        if let Some(live) = &mut live {
+            live.add(key, &records);
+        }
+        let rows = match fields.read_named(key, &records) {
+            Field::Unknown(rows) | Field::Conflict(rows) => rows,
+            field => {
+                if let Field::Value(v) = field {
+                    values.push((key.clone(), v));
+                }
+                if detail == Setters::Compact {
+                    continue;
+                }
+                records.into_iter().map(|r| setter(held, r, key)).collect()
+            }
+        };
+        if !rows.is_empty() {
+            setters.push((key.clone(), Json::Arr(rows)));
         }
     }
     let unheld: Vec<Json> = state
@@ -197,8 +256,21 @@ pub(crate) fn thing(held: &Held, state: &live::LiveState<'_>) -> Vec<(&'static s
         ),
         ("values", Json::Obj(values)),
     ];
-    if !several.is_empty() {
-        out.push(("setters", Json::Obj(several)));
+    if let Some(records) = live {
+        let live = records.ordered().filter_map(|(record, keys)| {
+            let Json::Obj(mut members) = crate::shown_line(held, &record)? else {
+                unreachable!("shown line is an object")
+            };
+            members.push((
+                "keys".into(),
+                Json::Arr(keys.into_iter().map(Json::Str).collect()),
+            ));
+            Some(Json::Obj(members))
+        });
+        out.push(("live", Json::Arr(live.collect())));
+    }
+    if detail == Setters::All || !setters.is_empty() {
+        out.push(("setters", Json::Obj(setters)));
     }
     if !unheld.is_empty() {
         out.push(("unheld", Json::Arr(unheld)));
@@ -287,7 +359,7 @@ fn slot(held: &Held, by_thing: &HashMap<String, Vec<&Record>>, slot: &Slot, valu
                         let state =
                             live::LiveState::new(by_thing.get(name).cloned().unwrap_or_default());
                         members.extend(
-                            thing(held, &state)
+                            thing(held, &state, Setters::Compact)
                                 .into_iter()
                                 .map(|(k, v)| (k.to_owned(), v)),
                         );
