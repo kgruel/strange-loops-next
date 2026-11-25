@@ -10,7 +10,7 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 ## 2026-11-24
 
 In brief:
-- **A walk of identity, standing and sharing is written, at Kyle's request:** identity through three scenes, then the thinnest slice through standing and sharing, ending in fourteen draft entries. Nothing is put or ruled.
+- **A walk of identity, standing and sharing is written, at Kyle's request:** identity through three scenes, then the thinnest slice through standing and sharing, then stewardship, ending in nineteen draft entries. Nothing is put or ruled.
 - **The first outside contribution:** the import's exporter reads an old kind whose fold has several named slots, as the old tool does. John Spann wrote it, from a pilot of his own.
 - Built: `--in <name>`, a store by name on every verb that takes one; `.loops/store.json` read and used by the plain views; `ls --active`; `loops describe` and `ls --refers-to`, with `--group`; and the import's recipe for a payload, with no change to what it writes.
 - **Kyle rules the strict shorthand:** with a description, `emit` stops on a kind, a status or a reference the description does not allow. He declines the mention in AD5's row 2 and defers the import's AD5 work; the homelab is not cut over a second time.
@@ -32,6 +32,7 @@ Kyle and Neon worked out a plan on the evening of 2026-11-24 that puts identity 
 - **What part two found.** "More standing" holds as being counted for more kinds and being able to accept a proposal, and breaks as a rank. Standing is a clause of admission, before the heads: a filter on the observer applied afterwards makes a thing vanish from the view (run). A record that does not count is held and shown as a proposal. Accepting one by restating it works today. Sharing without pull requests leaves a plain shared file with no guardian, which brings signed declarations forward. A trial of the whole slice needs no anchor.
 - **Run for part two:** one git ref per writer on a bare repository, two writers pushing and a third clone reading the union with `loops check` clean; and the observer filter before and after a lead restates a junior's value.
 - **Six more draft entries, SL1 to SL6.** Part two withdraws the leaning of ID5 that the git host is the admission boundary.
+- **Part three, stewardship.** Kyle said part two raises how stewardship is managed, for the description file and everything else that defines a store, and agreed that the steward should be a lineage for the team, with grants from it. Part three takes that as given. One mechanism covers every definition: the steward alone counts for a closed set of definition kinds, and anyone else's change is a proposal. One steward removes the case of two removing each other. A grant's scope fits the envelope when it is a set of kinds, written as `kind:` mentions (run today as an ordinary record, and read again after its payload was erased), which makes a kind a thing. Someone leaving is routine in a company, so an end of grant is the one later piece a kept team store needs early. Five more draft entries, SW1 to SW5.
 - **Not changed:** the order in `ROADMAP.md`. Kyle has said identity is the next question; he has not ruled a new order.
 
 ### The exporter reads a fold of several slots

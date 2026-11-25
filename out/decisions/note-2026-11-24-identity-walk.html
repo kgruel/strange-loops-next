@@ -214,12 +214,15 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <li><a href="#11-standing-walked">11. Standing, walked</a></li>
 <li><a href="#12-the-slice">12. The slice</a></li>
 <li><a href="#13-draft-entries-for-the-slice">13. Draft entries for the slice</a></li>
-<li><a href="#14-an-order-if-the-leanings-hold">14. An order, if the leanings hold</a></li>
-<li><a href="#15-what-this-walk-did-not-do">15. What this walk did not do</a></li></ul></details>
+<li><a href="#14-one-question-asked-three-times">14. One question, asked three times</a></li>
+<li><a href="#15-stewardship-walked">15. Stewardship, walked</a></li>
+<li><a href="#16-draft-entries-for-stewardship">16. Draft entries for stewardship</a></li>
+<li><a href="#17-an-order-if-the-leanings-hold">17. An order, if the leanings hold</a></li>
+<li><a href="#18-what-this-walk-did-not-do">18. What this walk did not do</a></li></ul></details>
 <article>
 <h1 id="identity-standing-and-sharing-a-walk-before-anything-is-anchored">Identity, standing and sharing: a walk before anything is anchored</h1>
 <p><strong>Written on 2026-11-24 at Kyle's request. Nothing here is put to him or ruled.</strong> It is a walk in the manner of <a href="../rethink/#trust">the trust walk</a>: three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries are what the walk found to decide. They are drafts: none is in <code>DECISIONS.md</code> yet.</p>
-<p>The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so <a href="#part-two-the-thinnest-slice-through-standing-and-sharing">part two</a>, sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5).</p>
+<p>The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so <a href="#part-two-the-thinnest-slice-through-standing-and-sharing">part two</a>, sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5). Kyle then said that this raises how stewardship is managed, for the description file and everything else that defines a store as much as for the list, so <a href="#part-three-stewardship">part three</a>, sections 14 to 16, walks that.</p>
 <p>It was prompted by a plan Kyle and Neon worked out the same evening, kept outside the repository, which puts identity and names first among the next steps: lineages with two tiers of key, a seat per agent, <code>name</code> records, and key profiles in the CLI. This walk asks what that step has to settle, and finds it is wider in one place and narrower in another.</p>
 <p>&quot;Today&quot; below is the <code>loops</code> binary built from main on 2026-11-24 (<code>6ebbca7</code>). Every &quot;today&quot; answer was run in a scratch store with invented names.</p>
 <h2 id="1-why-identity-is-walked-before-it-is-built">1. Why identity is walked before it is built</h2>
@@ -516,18 +519,88 @@ $ loops check                           (a third clone, after one fetch of refs/
 <tr><td>C</td><td>Segment files in the working tree, as today.</td><td>Thousands of small files in every diff and search, and a pull request or a push to a branch for every record.</td></tr>
 </tbody></table></div>
 <p><strong>Changes:</strong> nothing in bytes. It is a second place beside the directory.</p>
-<h2 id="14-an-order-if-the-leanings-hold">14. An order, if the leanings hold</h2>
+<h1 id="part-three-stewardship">Part three: stewardship</h1>
+<p><strong>Added later still on 2026-11-24.</strong> Kyle, on reading part two: this &quot;raises, of course, how stewardship is managed. Which is the same consideration for store.json, and anything else defining how a Place is structured.&quot; And, of one answer: &quot;I agree on the steward being a lineage for the team, and grants from there.&quot; That agreement is taken as given below. It is not yet a ruling.</p>
+<h2 id="14-one-question-asked-three-times">14. One question, asked three times</h2>
+<p>Who may change the list of who counts? Who may change the description of kinds? Who may change the stewards? Each is the same question about a different definition of the store.</p>
+<p><strong>One mechanism.</strong> A definition is a thing of one of a small closed set of kinds. The steward counts for those kinds and nobody else does. Then part two's rule covers all three: the steward's change takes effect, and anyone else's is a proposal the steward can accept. The Residence page says this of declarations. Here it is said of every definition.</p>
+<p><strong>Where it stops.</strong> The steward is named by the store's anchor, and the anchor's hash is the store's id. Nothing changes the anchor. A store is defined by its founding steward, and everything after is that steward's signed change.</p>
+<p><strong>What is the store's and what is the reader's.</strong> Kinds, who counts and the steward travel with the store and must read the same for everyone. Where stores are on a machine, pinned names and keys belong to one reader. Only the first need a steward.</p>
+<h2 id="15-stewardship-walked">15. Stewardship, walked</h2>
+<p>The cast is part two's: a director, a lead, two junior developers, a seat for each, and now a lineage for the team.</p>
+<p><strong>The team makes the store.</strong> A lineage for the team, whose root the organisation holds, signs the store's anchor. It is the only steward.</p>
+<p><em>Holds, and it removes a problem.</em> With two stewards, each could remove the other at once, and some order among them would have to decide. One steward cannot be removed by another. Two changes signed by the one root on two machines are a fork on <code>prev</code> by one writer, which is shown and which a later change by the same root settles.</p>
+<p><strong>The team grants.</strong> A grant is the team's record about a person's lineage: this lineage counts for these kinds, and may accept proposals for them. The director and the lead are granted <code>decision</code> and <code>service</code>, the juniors <code>note</code> and <code>task</code>.</p>
+<p><em>Holds.</em> The list of part two is the set of grants the store holds. Admission looks for a grant from the store's steward to the record's observer that covers the record's kind. No record has to cite its grant with <code>under</code> for that: there is one steward to look under.</p>
+<p><strong>Where a grant's scope is written.</strong> The trust walk leaned to standing that reads envelopes only, and noted that a scope &quot;does not fit an envelope&quot;. A set of kinds does fit, as mentions. Written today as an ordinary record:</p>
+<pre><code>$ loops emit grant --root --about sl:junior-example --about kind:note --about kind:task
+r:9480a85q…
+  kind   grant
+  about  kind:note, kind:task, sl:junior-example
+  payload {}
+</code></pre>
+<p>A spec that takes grants mentioning <code>kind:note</code> finds it, and finds it again after its payload is erased.</p>
+<p><em>Holds for a scope that is a set of kinds.</em> A reader needs no payload to judge a record, so admission answers yes or no and never unknown. A finer scope (these things, these fields) would not fit, and nothing asks for one yet (<a href="#sw3-where-a-grants-scope-is-written">SW3</a>).</p>
+<p><strong>A kind is then a thing.</strong> <code>kind:note</code> is a typed reference like any other. The description of the <code>note</code> kind, which <code>.loops/store.json</code> holds today, can be fields on the thing <code>kind:note</code>, written by the steward.</p>
+<p><em>Holds, and it is the unification again.</em> The file stays what people read and edit. For a store that is kept it is a rendering of those records, and an edit to it becomes a proposal, or the steward's change.</p>
+<p><strong>Someone joins.</strong> Their grant needs the team's root. The root is in the organisation's keeping and is not a tap away.</p>
+<p><em>Breaks on friction, two ways out.</em> Either the team's root grants someone the right to grant within a scope, which is delegation and has to narrow at each step. Or the review the team already has stays the way definitions change, and what it produces is signed: a change to the grants or the description is reviewed on a branch, and on merge a signer that holds the team's root writes the records. The first is more machinery in the model. The second keeps the root in a service, and whoever controls that service controls the store (<a href="#sw2-how-the-teams-root-is-used">SW2</a>, <a href="#sw4-who-may-grant">SW4</a>).</p>
+<p><strong>Someone leaves.</strong> In a company this is routine, where a lost key is rare. Their grant has to end, and an ended grant must not take their past decisions out of the canon.</p>
+<p><em>Breaks until retiring exists, and sooner than part one's lost key.</em> An end of grant is a retirement: the steward's record about the grant, with a tick that covers what stands. Ticks are built. This is the one piece of &quot;later&quot; that a team store that is kept needs from its first month (<a href="#sw5-ending-a-grant">SW5</a>).</p>
+<p><strong>A seat.</strong> An agent's seat needs no grant in this slice. It proposes, and its person accepts under their own grant.</p>
+<p><em>Holds.</em> A grant to a seat is &quot;presence given ahead of time&quot; and can come when someone wants it.</p>
+<p><strong>The team's root is lost, or taken.</strong> Lost: the store's definitions are frozen as they stand, and its records go on. Taken: whoever has it defines the store.</p>
+<p><em>Breaks, as every root does.</em> The answers are the ones the trust walk gave for a person: keep it where it is seldom used, and if it is gone, a new store that takes the old records as history.</p>
+<p><strong>Several stores.</strong> One team lineage can anchor many stores. A grant is held in the store it applies to, so that each store can be judged from what it holds.</p>
+<p><em>Holds, with copying.</em> A person granted in six stores has six grants. Tooling can write them together.</p>
+<p><strong>Before any of it is built.</strong> In the trial of part two, the list is a reviewed file and whoever can merge to that branch is the steward in practice. Nothing here is needed for it.</p>
+<p><em>Holds, and the step up is small:</em> the same review, with a signature at the end of it.</p>
+<h2 id="16-draft-entries-for-stewardship">16. Draft entries for stewardship</h2>
+<h3 id="sw1-one-mechanism-for-every-definition">SW1: one mechanism for every definition</h3>
+<p><strong>Leaning.</strong> Yes. A closed set of definition kinds; the steward alone counts for them; anyone else's change is a proposal. The description of kinds, the grants and the anchor are all read by it.</p>
+<p><strong>Changes:</strong> what admission reads first. It is the trust walk's ladder with the rungs named.</p>
+<h3 id="sw2-how-the-teams-root-is-used">SW2: how the team's root is used</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">The root</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>In the organisation's vault, taken out by a person for each change.</td><td>Every joiner, leaver and change of description waits for that person.</td></tr>
+<tr><td><strong>B (leaning)</strong></td><td>Held by a signer that writes a definition record when a reviewed change merges.</td><td>The signer and the review are the boundary for definitions. A compromised signer defines the store.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> nothing in bytes. It is custody, which Kyle called the application's business on 2026-11-10.</p>
+<h3 id="sw3-where-a-grants-scope-is-written">SW3: where a grant's scope is written</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">Scope</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>A (leaning)</strong></td><td>A set of kinds, as <code>kind:</code> mentions in the grant's envelope. Run above.</td><td>No finer scope. A kind becomes a thing with a reserved prefix.</td></tr>
+<tr><td>B</td><td>In the payload, in spec vocabulary.</td><td>A reader without the payload cannot judge, so admission answers three ways.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> what a grant's envelope holds. Permanent for each grant written.</p>
+<h3 id="sw4-who-may-grant">SW4: who may grant</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">Granting</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>A (leaning, first)</strong></td><td>The team's root only. A grant carries the right to accept proposals for its kinds, and no right to grant.</td><td>See SW2: every grant needs the root.</td></tr>
+<tr><td>B</td><td>A grant may carry the right to grant within its own scope.</td><td>Chains of grants, each narrower, each to be checked.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> B adds a rule to admission. A adds none.</p>
+<h3 id="sw5-ending-a-grant">SW5: ending a grant</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">A leaver</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>Keeps counting until retiring is built. The host takes away their right to deliver.</td><td>The host is the boundary again, for this one case.</td></tr>
+<tr><td><strong>B (leaning, before a team store is kept)</strong></td><td>The steward writes an end of grant with a tick that covers what stands.</td><td>A law of the model changes: holding more can now silence a writer, after a cut.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> B changes what a reader counts.</p>
+<h2 id="17-an-order-if-the-leanings-hold">17. An order, if the leanings hold</h2>
 <ol>
 <li><p><strong>SL1 and SL2 put to Kyle</strong>, with ID4, since they decide what a fold answers.</p></li>
 <li><p><strong>The trial slice</strong>, on stores declared disposable and with keys as they are: admission by a list in the model, vectors and Rust; delivery by one ref per writer; reads that show canon and proposals; the list as a reviewed file.</p></li>
-<li><p><strong>ID1 and ID6 put to Kyle</strong>, then anchors and bindings, and the list moved into signed records. Only then a store that is kept.</p></li>
-<li><p><strong>Afterwards:</strong> the affirm stance, retiring, grants with <code>under</code>, strict.</p></li>
+<li><p><strong>ID1, ID6, SW1 and SW3 put to Kyle.</strong> Then anchors and bindings, a lineage for the team, the store's anchor, and grants as records in place of the file.</p></li>
+<li><p><strong>SW5, an end of grant,</strong> before the first team store that is kept.</p></li>
+<li><p><strong>Afterwards:</strong> the affirm stance, grants with <code>under</code>, a right to grant, strict.</p></li>
 </ol>
-<h2 id="15-what-this-walk-did-not-do">15. What this walk did not do</h2>
+<h2 id="18-what-this-walk-did-not-do">18. What this walk did not do</h2>
 <ul>
 <li><p>It did not test a git host. What a host does with refs outside branches and tags, and who may move them, is argued and not run.</p></li>
-<li><p>It did not walk a scope finer than a set of kinds, a policy that two stewards change apart, or who may erase.</p></li>
-<li><p>It did not walk declarations of kinds as records, though section 11 shows they come forward with the list.</p></li>
+<li><p>It did not walk a scope finer than a set of kinds, or who may erase.</p></li>
+<li><p>It did not walk more than one steward. Part three avoids the case by having one; a store between two teams would bring it back.</p></li>
+<li><p>It did not walk a company above its teams: who makes a team's lineage, and what a team is called outside itself.</p></li>
 <li><p>It rests on one workbench and on a description of one team.</p></li>
 <li><p>It takes the two tiers as settled. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which ID1 leans on, and costs the trap in ID6.</p></li>
 </ul>
