@@ -4,6 +4,8 @@
 
 The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so [part two](#part-two-the-thinnest-slice-through-standing-and-sharing), sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5). Kyle then said that this raises how stewardship is managed, for the description file and everything else that defines a store as much as for the list, so [part three](#part-three-stewardship), sections 14 to 16, walks that. [Part four](#part-four-two-stewards), sections 17 and 18, takes the case part three had set aside.
 
+**Read [part five](#part-five-what-the-council-broke) beside the rest.** Kyle had the walk put to margins, Neon and Astra in a chat room, asking where it is wrong. Several steps marked as holding do not hold. Parts one to four are left as they were written, and part five says what broke and what replaces it. Where they differ, part five is the current reading.
+
 It was prompted by a plan Kyle and Neon worked out the same evening, kept outside the repository, which puts identity and names first among the next steps: lineages with two tiers of key, a seat per agent, `name` records, and key profiles in the CLI. This walk asks what that step has to settle, and finds it is wider in one place and narrower in another.
 
 "Today" below is the `loops` binary built from main on 2026-11-24 (`6ebbca7`). Every "today" answer was run in a scratch store with invented names.
@@ -269,6 +271,8 @@ None of these is put. Each says what it would change, so that the ones that reac
 
 # Part two: the thinnest slice through standing and sharing
 
+*Part five breaks steps in this part: see [section 19](#19-what-broke-and-what-replaces-it), items 1, 4, 5 and 10.*
+
 **Added later on 2026-11-24.** Kyle's direction for this part, in his words where they are short:
 
 - Git is where sharing starts, and this walk presumes it. It "will not be the only storage method of which we can control access", which makes standing more important.
@@ -468,6 +472,8 @@ So "more standing" is being counted for more kinds, and being able to accept wha
 
 # Part three: stewardship
 
+*Part five breaks steps in this part: see [section 19](#19-what-broke-and-what-replaces-it), items 3, 6, 7 and 14.*
+
 **Added later still on 2026-11-24.** Kyle, on reading part two: this "raises, of course, how stewardship is managed. Which is the same consideration for store.json, and anything else defining how a Place is structured." And, of one answer: "I agree on the steward being a lineage for the team, and grants from there." That agreement is taken as given below. It is not yet a ruling.
 
 ## 14. One question, asked three times
@@ -582,6 +588,8 @@ A spec that takes grants mentioning `kind:note` finds it, and finds it again aft
 
 # Part four: two stewards
 
+*Part five breaks steps in this part: see [section 19](#19-what-broke-and-what-replaces-it), items 2, 8 and 9.*
+
 **Added on 2026-11-24, after part three.** Kyle: "I suppose the two stewards case needs to be tackled. A lineage on the store is always going to start with one - so a second has to be added, then."
 
 That second sentence is most of the answer. The walk follows it.
@@ -665,20 +673,103 @@ heads  2
 
 **Changes:** what the shorthand and the plain views do during a fork. B follows the principle Kyle gave for BP1: what was entered is taken as entered, and nothing is chosen for the writers.
 
-## 19. An order, if the leanings hold
+# Part five: what the council broke
 
-1. **SL1 and SL2 put to Kyle**, with ID4, since they decide what a fold answers.
-2. **The trial slice**, on stores declared disposable and with keys as they are: admission by a list in the model, vectors and Rust; delivery by one ref per writer; reads that show canon and proposals; the list as a reviewed file.
+**Added on 2026-11-24, the same night.** At Kyle's word the walk was put to margins, Neon and Astra in a room, `#identity-and-standing`, with one request: say where it is wrong. Neon and margins have answered. Astra has not yet. What could be run was run again here on main (`c483cb9`) before it was accepted.
+
+## 19. What broke, and what replaces it
+
+**1. Leaving a record out before the heads (sections 9 and 11, SL2, SL3). Found by margins.** Part two said a record that does not count is left out of the state, and that a lead accepts a proposal by restating it. The two do not go together. `emit` anchors a write on the heads, so the lead's restatement names the junior's proposal and not the canonical record the proposal had replaced. Leave the proposal out and that chain is cut. The lead wrote `monthly` and then `weekly`, the junior wrote `daily`, and the lead wrote once more. Each store was then read without the junior's record:
+
+| The lead's last write | Everything held | The junior's record left out |
+| --- | --- | --- |
+| `chosen=daily` | `chosen daily` | `heads 2`, `chosen conflict (2): daily \| weekly` |
+| `chosen=weekly` | `chosen weekly` | `heads 2`, `chosen conflict (2): weekly \| weekly` |
+| `note=kiln-two` | `chosen daily`, `note kiln-two` | `heads 2`, `chosen weekly`, `note kiln-two` |
+
+Section 9's third row did not show this, because there the canonical value was the thing's first record, which every later write names.
+
+*Replaced by:* a record that does not count stays in the order of what is above what, and sets nothing, its envelope included. Heads and live setters come from the records that count. The canonical value then stands until a record that counts is above it and sets that key. It asks nothing of writers, and it is the reading for a record whose key does not speak for its observer as well, so SL2 and ID4 have one answer.
+
+**2. A tree of grants over lineages (section 17, SW6). Found by margins.** Nothing stops a steward from granting its own granter. The founder grants A, A grants B, and B grants A. Each of A and B is now above the other, the founder's end of A's grant does nothing, and if A and B end each other at once there are two consistent readings and no rule between them. Who counts was defined in terms of itself.
+
+*Replaced by:* the tree is over grant records. Every grant and every end names, in `under`, the grant it acts under, down to the store's anchor. A record's id covers its envelope, so `under` cannot form a cycle. An end takes with it the grants made under the ended grant, from then on. A record stands only if every end that counts covers it.
+
+*A consequence for a team:* ending a lead's grant ends the standing of everyone that lead granted. People are better granted by the team's lineage directly, and a right to grant kept rare.
+
+**3. A grant that names no store (section 15, SW3). Found by Neon.** One team lineage anchors a sandbox and a production store. A grant made in the sandbox is a valid line when copied into production, and "anybody can emit" lets anyone copy it. The same holds for an ordinary record by someone granted in both.
+
+*Replaced by:* the `under` chain of item 2 ends at one store's anchor, and an ordinary record names its grant in `under`. This reverses section 15's "no record has to cite its grant". It changes the bytes of every record written in a store that has standing.
+
+**4. One ref per writer, with no history (section 10, SL6). Found by Neon, run again here.** One key wrote from two clones. The second clone's push was refused without force, and with force the hub's ref held one segment, the first clone's gone. "No race on push and never anything to merge" is false once one key writes from two places, which two checkouts on one laptop already are.
+
+*Replaced by, as a leaning:* an outbox for each place that writes, with ordinary history, so a push adds to what is there. Readers take the union and drop duplicates by a segment's hash. It also gives imported lines and copied anchors a place to go. A forced push is kept for an erasure, which then has to reach every outbox that holds the segment. That last part is open.
+
+**5. "Only a writer writes under their own prefix" (section 10). Found by Neon.** A steward who erases a leaver's payload has to rewrite a segment the leaver wrote.
+
+*Replaced by:* the writer and the store's stewards.
+
+**6. A kind as a thing, across stores (section 15). Found by Neon.** Two stores that each describe `kind:note` conflict when read together, on equal values too. And a steward's description copied from one of its stores into another arrives as a valid second head there.
+
+*Replaced by:* a definition is bound to its store by `under` like everything else. A read of several stores judges each record by its own store's standing. Whether a definition is ever read through a union is open.
+
+**7. A right to grant, written as a mention (SW3, SW4). Found by Neon.** `kind:grant` among a grant's mentions cannot say which kinds may be granted onward.
+
+*Replaced by:* the right to grant is a record kind of its own, with the kinds it may pass on as its mentions.
+
+**8. The cover of an end, withheld (section 17). Answered by margins.** The model proves that a withheld or erased payload never changes who speaks. An end whose cover is in a payload would break that.
+
+*Replaced by, as the leading answer:* a cover is closed downward over `prev` and `under`, so its topmost ids determine it. An end carries those ids as mentions in its envelope. The cost is an envelope about as wide as the number of things the leaver wrote in.
+
+**9. What a tick covers (ID4). Found by margins.** Anchors, bindings and grants are not enough. A cover also needs every held end that applies to them, or a tick records an answer in which a leaver still counts.
+
+**10. The trial's list as a reviewed file (section 12, SL4). Found by Neon.** A tick covers record ids in the store. It cannot cover a file outside it, so a result computed with such a list could not be checked on a second machine.
+
+*Replaced by:* grants are records from the first day, and the spec names the steward: a key in the trial, the store's anchor afterwards. Nothing is built for the trial that is thrown away.
+
+*Still argued.* Neon would run the trial on anchors declared disposable, since one person with two machines and a seat is three observers on bare keys, and stratum 1 is already modelled. The cost is that ID4 has to be ruled and built first. This is Kyle's to choose.
+
+**11. A short `sl:` value (section 5, ID8). Found by Neon.** `owner=sl:7f3a` is a typed reference, so today the shorthand signs it as written and it matches nothing afterwards.
+
+*Replaced by:* a reference field that takes `sl` stops on a value that is not a whole lineage id.
+
+**12. Names (ID8). Argued by Neon.** A name for a seat, signed by a person the reader has pinned, needs no steward. It joins the first step.
+
+**13. A tick as a person's word (ID2, option B).** Withdrawn. Restating by someone with standing is that word.
+
+**14. `emit grant` beside a description (section 15). Found by Neon.** ST1 stops it, since the description does not name the kind. The example in section 15 ran in a store with no description. Standing kinds get their own verbs, or go through `emit -`.
+
+## 20. What stands, and what goes to Kyle now
+
+**Unbroken so far:** "more standing" as being counted for more kinds and not as a rank (SL1); standing as a clause of admission; the team's lineage as the founder; removal running one way, now over grant records; grants and ends that only grow.
+
+**The entries that would go to Kyle, as they now read:**
+
+| Entry | Now |
+| --- | --- |
+| SL1 | Unchanged. |
+| SL2 with ID4 | A record that does not count stays in the order and sets nothing. It is shown as proposed and counted beside the result. |
+| A new one | In a store with standing, every record names its grant in `under`, and every grant names the grant above it, down to the anchor. |
+| ID1 | Unchanged. |
+| SW3 | A grant's mentions are the one granted and the kinds. Its store comes from `under`. A right to grant is a separate kind. |
+| SW5 | An end names the grant, carries the topmost ids of what stands, and takes the grants beneath it. |
+| SW6 | A second steward holds a right to grant. The tree is over grant records. |
+
+## 21. An order, if the leanings hold
+
+1. **SL1 and SL2 put to Kyle**, with ID4 and `under` on every record, since they decide what a fold answers and what a record holds. As they read in section 20.
+2. **The trial slice**, on stores declared disposable: admission by grants in the model, vectors and Rust, with the steward named by the spec; delivery by an outbox per place; reads that show canon and proposals. On keys as they are, or on disposable anchors, as Kyle chooses (section 19, item 10).
 3. **ID1, ID6, SW1 and SW3 put to Kyle.** Then anchors and bindings, a lineage for the team, the store's anchor, and grants as records in place of the file.
 4. **SW5, an end of grant,** before the first team store that is kept.
 5. **A second steward, when a store wants one:** SW6 and SW7, and the right to grant.
 6. **Afterwards:** the affirm stance, grants with `under`, strict.
 
-## 20. What this walk did not do
+## 22. What this walk did not do
 
 - It did not test a git host. What a host does with refs outside branches and tags, and who may move them, is argued and not run.
 - It did not walk a scope finer than a set of kinds, or who may erase.
-- It did not settle what a reader does when the cover of an end is withheld (section 17), or whether one founder may end another's grant (SW6).
+- It did not settle whether one founder may end another's grant (SW6), how an erasure reaches every outbox, or whether a definition is ever read through a union of stores.
+- Astra had not answered when part five was written.
 - It did not walk a company above its teams: who makes a team's lineage, and what a team is called outside itself.
 - It rests on one workbench and on a description of one team.
 - It takes the two tiers as settled. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which ID1 leans on, and costs the trap in ID6.
