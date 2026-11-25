@@ -768,7 +768,28 @@ Section 9's third row did not show this, because there the canonical value was t
 
 **21. What an end holds (items 2 and 8). Proposed by margins.** An end has three things to say: the grant it ends, the right it ends it by, and what stands. A grant is a root, so an end can be `of` it. Its right is in `under`, and its mentions hold only the cover.
 
-**Found to hold, by margins, run on main:** a tick already follows `under`, so its cover takes in a record's grants and its store's anchor with nothing built. And an `under` whose target is not held is refused only at the write, so outboxes can be read in any order.
+**Found to hold, by margins, run on main:** a bare tick already follows `under`, so its cover takes in a record's grants and its store's anchor with nothing built (an explicit cut does not: item 23). And an `under` whose target is not held is refused only at the write, so outboxes can be read in any order.
+
+**22. The trial has no anchor to name (items 10 and 17). Found by Neon.** If every record names its grant or the store's anchor, a trial in which only the spec names the steward leaves grants and proposals with nothing to name.
+
+*Replaced by:* the trial's store has an anchor too, signed by the steward's key as keys are today. `under` and the spec then have one shape from the trial to a store that is kept.
+
+**23. An explicit cut does not follow `under` (items 18 and 19). Found by Neon, run again here.** A note under a grant under an anchor:
+
+```
+bare tick           {"answer":"same","closure":"yes"}   covers 3 ids
+tick --cover <note> {"answer":"same","closure":"no"}    covers 1 id
+```
+
+A cut by ids or by time closes over `prev` only, as it is documented to. An end's closed cut, and the tick a continuing store names, need it to close over `under` as well. That changes what a cut covers.
+
+**24. A store raised from open, and promotion between stores (section 11, item 19). Found by Neon.** A store that was open holds records with no `under`. And the Residence page has a record promoted from one store to another as a verbatim copy with the same id, which one erasure then covers.
+
+*Replaced by:* a store's anchor can name a tick over what the store held before it, by the same means as a store that continues another, and those records count as they did. Promotion between stores stops being a verbatim copy that counts: it is a restatement with a new id, or an affirm in the receiving store of the record as it is. That is a third reason for the affirm stance, after items 15 and 13.
+
+**25. A person's own seats (item 2, ID1). Found by Neon.** `under` holds one id. If a lead has no right to grant, the lead cannot grant their own seat, and the team's root would have to grant and end every seat, which loses whose seat it is.
+
+*Replaced by:* "a right to grant kept rare" is about granting people. A person's grant carries the right to grant its kinds to that person's seats, and the rule that an end takes what is beneath it is exactly right there: ending a person ends their seats. In the slice a seat still needs no grant. It proposes under the anchor, and its person accepts.
 
 ## 20. What stands, and what goes to Kyle now
 
@@ -785,6 +806,7 @@ Section 9's third row did not show this, because there the canonical value was t
 | SW3 | A grant's mentions are the one granted and the kinds. Its store comes from `under`. A right to grant is a separate kind. |
 | SW5 | An end is of the grant it ends. It carries the topmost ids of a closed cut of what stands, and takes the grants beneath it. |
 | Another new one | A store that continues another names the old anchor and a tick in its own anchor. |
+| And one more | A cut by ids or by time closes over `under` as well as `prev`. |
 | SW6 | A second steward holds a right to grant. The tree is over grant records. |
 | SL3 | Accepting is a verb that restates the proposal's `sets` exactly. The affirm stance comes sooner. |
 
@@ -792,10 +814,10 @@ Section 9's third row did not show this, because there the canonical value was t
 
 1. **SL1 and SL2 put to Kyle**, with ID4 and `under` on every record, since they decide what a fold answers and what a record holds. As they read in section 20.
 2. **The trial slice**, on stores declared disposable: admission by grants in the model, vectors and Rust, with the steward named by the spec; delivery by an outbox per place; reads that show canon and proposals. On keys as they are, or on disposable anchors, as Kyle chooses (section 19, item 10).
-3. **ID1, ID6, SW1 and SW3 put to Kyle.** Then anchors and bindings, a lineage for the team, the store's anchor, and grants as records in place of the file.
+3. **ID1, ID6, SW1 and SW3 put to Kyle.** Then anchors and bindings, a lineage for the team, and the store's anchor and grants signed by it in place of a bare key.
 4. **SW5, an end of grant,** before the first team store that is kept.
 5. **A second steward, when a store wants one:** SW6 and SW7, and the right to grant.
-6. **Afterwards:** the affirm stance, grants with `under`, strict.
+6. **The affirm stance,** sooner than this order first had it (items 15 and 24). Then strict.
 
 ## 22. What this walk did not do
 
