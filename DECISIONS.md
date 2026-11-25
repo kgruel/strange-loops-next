@@ -27,7 +27,7 @@ Nothing here needs you yet. It is listed so that you know what is coming.
 
 **Numbers stored as text**, with the import ([W1](notes/2026-11-21-order-of-work.md#w1-an-adoption-step-before-standing-and-sharing)). [TK6](notes/2026-11-21-tick-record.md#tk6-what-a-spec-reads-of-a-tick) shows one use for it.
 
-**Identity: lineages, and what a reader does with a record it cannot attribute.** [The identity walk](notes/2026-11-24-identity-walk.md) takes three scenes step by step and ends in eight draft entries, ID1 to ID8. None is put. Three of them fix what an anchor is and what a fold answers, and would come here first: who gets a lineage (ID1), a record whose key does not speak for its observer (ID4), and what a person keeps so that a new machine is the same lineage (ID6).
+**Identity, standing and sharing.** [The walk](notes/2026-11-24-identity-walk.md) has two parts and fourteen draft entries. None is put. Part one walks identity through three scenes (ID1 to ID8). Part two walks the thinnest slice through standing and sharing, on your direction that anybody can emit, that records travel as git objects without pull requests, and that standing decides what is canonical (SL1 to SL6). The ones that decide what a fold answers would come here first: what "more standing" means (SL1), a record that does not count (SL2), and a record whose key does not speak for its observer (ID4). Who gets a lineage (ID1) and recovery (ID6) come before the first store that is kept.
 
 ## Deferred by you
 

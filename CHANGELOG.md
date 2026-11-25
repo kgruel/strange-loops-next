@@ -10,7 +10,7 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 ## 2026-11-24
 
 In brief:
-- **An identity walk is written, at Kyle's request:** three scenes taken step by step before any anchor is made, ending in eight draft entries. Nothing is put or ruled.
+- **A walk of identity, standing and sharing is written, at Kyle's request:** identity through three scenes, then the thinnest slice through standing and sharing, ending in fourteen draft entries. Nothing is put or ruled.
 - **The first outside contribution:** the import's exporter reads an old kind whose fold has several named slots, as the old tool does. John Spann wrote it, from a pilot of his own.
 - Built: `--in <name>`, a store by name on every verb that takes one; `.loops/store.json` read and used by the plain views; `ls --active`; `loops describe` and `ls --refers-to`, with `--group`; and the import's recipe for a payload, with no change to what it writes.
 - **Kyle rules the strict shorthand:** with a description, `emit` stops on a kind, a status or a reference the description does not allow. He declines the mention in AD5's row 2 and defers the import's AD5 work; the homelab is not cut over a second time.
@@ -20,7 +20,7 @@ In brief:
 - SD1 to SD3 are put to Kyle: what a store says about its kinds. A plain `.loops/store.json` that describes each kind and refuses nothing (SD1); `emit` stopping before it signs a write that contradicts a declared key (SD2); and whether reference fields are copied into `about`, where an erasure does not reach them (SD3: recommended, describe them and copy nothing). Nothing is built.
 - SD4 and AD5 are put to Kyle, later the same day: a read of everything that refers to a thing, taken from the declared reference fields (SD4); and the import writing a reference field as `kind:key` where the old store proves it, which means importing the homelab afresh (AD5). Nothing is built.
 
-### The identity walk
+### The walk of identity, standing and sharing
 
 Kyle and Neon worked out a plan on the evening of 2026-11-24 that puts identity and names first among the next steps. Kyle asked this session for a walk before anything is built. It is [the identity walk](notes/2026-11-24-identity-walk.md).
 
@@ -28,6 +28,10 @@ Kyle and Neon worked out a plan on the evening of 2026-11-24 that puts identity 
 - **What it found.** Keys and names say which keys are one writer, and say nothing about on whose word a record was written, which is the question a workflow run through agents raises. On a machine where an agent runs as the person, the person's signature means no more than the agent's. The one change to what a spec answers is the reader's rule for a record whose key does not speak for its observer. Shared name tables need a steward and can wait. A store with several writers before retiring exists rests on the git host as the boundary, which nobody has ruled.
 - **Eight draft entries, ID1 to ID8,** each with a leaning. None is put to Kyle. `DECISIONS.md` lists the walk under "Being prepared".
 - **Run for it, on the binary from main:** two keys writing one thing, and the plain view naming neither; a write as a lineage refused (`observer-unbound`); a tick by one key over a record another key wrote, which checks `same`.
+- **Part two, the same evening.** Kyle read part one and said identity cannot be settled alone. He gave the direction for a second part: anybody can emit; records travel as git objects, without pull requests; standing decides what is canonical, and a director or a lead has more of it than a junior developer; git is presumed for now and will not be the only storage.
+- **What part two found.** "More standing" holds as being counted for more kinds and being able to accept a proposal, and breaks as a rank. Standing is a clause of admission, before the heads: a filter on the observer applied afterwards makes a thing vanish from the view (run). A record that does not count is held and shown as a proposal. Accepting one by restating it works today. Sharing without pull requests leaves a plain shared file with no guardian, which brings signed declarations forward. A trial of the whole slice needs no anchor.
+- **Run for part two:** one git ref per writer on a bare repository, two writers pushing and a third clone reading the union with `loops check` clean; and the observer filter before and after a lead restates a junior's value.
+- **Six more draft entries, SL1 to SL6.** Part two withdraws the leaning of ID5 that the git host is the admission boundary.
 - **Not changed:** the order in `ROADMAP.md`. Kyle has said identity is the next question; he has not ruled a new order.
 
 ### The exporter reads a fold of several slots

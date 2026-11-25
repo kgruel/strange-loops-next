@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Identity: a walk before anything is anchored · Strange Loops</title>
+<title>Identity, standing and sharing: a walk before anything is anchored · Strange Loops</title>
 <style>
 /* The register: a warm grey table, white sheets resting on it, height shown by shadow and
    hairline. One colour only, for what is erased or in conflict. */
@@ -196,7 +196,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <a href="note-2026-11-21-tick-record.html">Step 4: the tick record, design note</a>
 <a href="note-2026-11-22-adoption.html">The adoption step: AD1 to AD4</a>
 <a href="note-2026-11-23-store-descriptions.html">Store descriptions: what the first two conversions asked for</a>
-<a href="note-2026-11-24-identity-walk.html" aria-current="page">Identity: a walk before anything is anchored</a>
+<a href="note-2026-11-24-identity-walk.html" aria-current="page">Identity, standing and sharing: a walk before anything is anchored</a>
 <a href="note-2026-11-24-kinds-and-references.html">What a store says about its kinds, and references after an import: SD1 to SD4, AD5, BP1 and ST1</a>
 <a href="note-retained-boundaries.html">Retained boundaries</a></nav>
 <p class="source">Rendered from <code>notes/2026-11-24-identity-walk.md</code> in the repository.</p>
@@ -209,11 +209,17 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <li><a href="#6-scene-three-someone-outside">6. Scene three: someone outside</a></li>
 <li><a href="#7-what-the-three-scenes-show">7. What the three scenes show</a></li>
 <li><a href="#8-draft-entries">8. Draft entries</a></li>
-<li><a href="#9-an-order-if-the-leanings-hold">9. An order, if the leanings hold</a></li>
-<li><a href="#10-what-this-walk-did-not-do">10. What this walk did not do</a></li></ul></details>
+<li><a href="#9-what-exists-today-for-this">9. What exists today for this</a></li>
+<li><a href="#10-sharing-walked">10. Sharing, walked</a></li>
+<li><a href="#11-standing-walked">11. Standing, walked</a></li>
+<li><a href="#12-the-slice">12. The slice</a></li>
+<li><a href="#13-draft-entries-for-the-slice">13. Draft entries for the slice</a></li>
+<li><a href="#14-an-order-if-the-leanings-hold">14. An order, if the leanings hold</a></li>
+<li><a href="#15-what-this-walk-did-not-do">15. What this walk did not do</a></li></ul></details>
 <article>
-<h1 id="identity-a-walk-before-anything-is-anchored">Identity: a walk before anything is anchored</h1>
-<p><strong>Written on 2026-11-24 at Kyle's request. Nothing here is put to him or ruled.</strong> It is a walk in the manner of <a href="../rethink/#trust">the trust walk</a>: three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries at the end are what the walk found to decide. They are drafts: none is in <code>DECISIONS.md</code> yet.</p>
+<h1 id="identity-standing-and-sharing-a-walk-before-anything-is-anchored">Identity, standing and sharing: a walk before anything is anchored</h1>
+<p><strong>Written on 2026-11-24 at Kyle's request. Nothing here is put to him or ruled.</strong> It is a walk in the manner of <a href="../rethink/#trust">the trust walk</a>: three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries are what the walk found to decide. They are drafts: none is in <code>DECISIONS.md</code> yet.</p>
+<p>The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so <a href="#part-two-the-thinnest-slice-through-standing-and-sharing">part two</a>, sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5).</p>
 <p>It was prompted by a plan Kyle and Neon worked out the same evening, kept outside the repository, which puts identity and names first among the next steps: lineages with two tiers of key, a seat per agent, <code>name</code> records, and key profiles in the CLI. This walk asks what that step has to settle, and finds it is wider in one place and narrower in another.</p>
 <p>&quot;Today&quot; below is the <code>loops</code> binary built from main on 2026-11-24 (<code>6ebbca7</code>). Every &quot;today&quot; answer was run in a scratch store with invented names.</p>
 <h2 id="1-why-identity-is-walked-before-it-is-built">1. Why identity is walked before it is built</h2>
@@ -308,7 +314,7 @@ $ loops tick --check r:egmc3nev…
 <p><strong>The separation between a person and their agent is physical before it is cryptographic.</strong> On a machine where an agent runs as the person, no arrangement of lineages makes the person's signature mean more than the agent's.</p>
 <p><strong>The reader's rule is the protocol change.</strong> Everything else in stratum 1 is new records of ordinary shape. What a fold and a tick do with a record that cannot be attributed changes what a spec answers.</p>
 <p><strong>Shared names can wait, and typed names should.</strong> A reader's own list and a self-chosen name beside a short id cover the need that rex-chat found.</p>
-<p><strong>Retiring can wait only if the premise about the git host is said out loud.</strong></p>
+<p><strong>Retiring can wait only if the premise about the git host is said out loud.</strong> (Part two withdraws that premise: the host delivers, and standing decides what counts.)</p>
 <h2 id="8-draft-entries">8. Draft entries</h2>
 <p>None of these is put. Each says what it would change, so that the ones that reach bytes or answers can be told from the rest.</p>
 <h3 id="id1-who-gets-a-lineage">ID1: who gets a lineage</h3>
@@ -355,9 +361,10 @@ $ loops tick --check r:egmc3nev…
 <div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">Rule</th><th scope="col">Cost</th></tr></thead>
 <tbody>
 <tr><td>A</td><td>No. The trust walk's interim rule stands, and retiring is built in the same step.</td><td>A larger first step: a retirement is a tick with a stance, and a law (<code>speaks.grows</code>) gives way to one with a cut.</td></tr>
-<tr><td><strong>B (leaning)</strong></td><td>Yes, for a store shared only through a git host, on the stated premise that the host's access control is admission. A <code>key-lost</code> kind exists from the start, ordinary now, for a later retirement to cite.</td><td>The premise is outside the records. A store that leaves git, or a host that is misconfigured, has no defence.</td></tr>
+<tr><td>B (the leaning when part one was written; <strong>withdrawn in part two</strong>)</td><td>Yes, for a store shared only through a git host, on the stated premise that the host's access control is admission. A <code>key-lost</code> kind exists from the start, ordinary now, for a later retirement to cite.</td><td>The premise is outside the records. A store that leaves git, or a host that is misconfigured, has no defence.</td></tr>
 </tbody></table></div>
 <p><strong>Changes:</strong> nothing in bytes for B. A changes what a reader counts.</p>
+<p><strong>After part two.</strong> Kyle's direction is that anybody can emit and that standing, not the host, decides what is canonical. So the host is not the boundary, and this entry becomes: what a lost key can do once standing is in records (<a href="#11-standing-walked">section 11</a>). A junior's lost key can propose. A lead's can write what a lead's records count for, and cannot change who counts. Retiring is still what closes it.</p>
 <h3 id="id6-recovery-and-a-second-anchor">ID6: recovery, and a second anchor</h3>
 <p><strong>Question.</strong> What does a person keep so that a new machine is the same lineage?</p>
 <p><strong>Leaning.</strong> The root key and the anchor line together. The first-run step looks for an anchor that its root signed, in the recovery material and in the stores it can reach, and makes one only when told to. A second anchor by the same root is allowed by the model and is almost always a mistake.</p>
@@ -374,19 +381,155 @@ $ loops tick --check r:egmc3nev…
 <tr><td>B</td><td>A, and shared name records ranked by trust, and names accepted in reference fields.</td><td>Nothing yet says who may name for a team. ST1 would need an exception.</td></tr>
 </tbody></table></div>
 <p><strong>Changes:</strong> nothing in bytes for A. B changes what the shorthand accepts.</p>
-<h2 id="9-an-order-if-the-leanings-hold">9. An order, if the leanings hold</h2>
-<ol>
-<li><p>ID1, ID4 and ID6 put to Kyle, since they fix what an anchor is and what a reader does.</p></li>
-<li><p>The model: <code>Attributed</code> in the read path and in a tick's cover, with vectors. Then Rust.</p></li>
-<li><p>The CLI: first run, pairing a machine, <code>whoami</code>, and the observer shown in the plain views.</p></li>
-<li><p>A trial on stores declared disposable, with the person's key kept off the agent's machine, to learn what ID2 and ID3 cost in daily use.</p></li>
-</ol>
-<h2 id="10-what-this-walk-did-not-do">10. What this walk did not do</h2>
+<h1 id="part-two-the-thinnest-slice-through-standing-and-sharing">Part two: the thinnest slice through standing and sharing</h1>
+<p><strong>Added later on 2026-11-24.</strong> Kyle's direction for this part, in his words where they are short:</p>
 <ul>
-<li><p>It did not walk stewards, grants or admission by policy. Where a step leaned on them, it says so.</p></li>
-<li><p>It did not test a git host. The premise in ID5 is argued, not run.</p></li>
-<li><p>It rests on one workbench and on a description of one team. Scene two is the least certain of the three.</p></li>
-<li><p>It takes the two tiers as settled and did not reopen them. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which is what ID1 leans on, and costs the trap in ID6.</p></li>
+<li><p>Git is where sharing starts, and this walk presumes it. It &quot;will not be the only storage method of which we can control access&quot;, which makes standing more important.</p></li>
+<li><p>&quot;Anybody can emit into a continual stream of records&quot;, and strictness is progressive.</p></li>
+<li><p>For git: records travel as git objects, without pull requests.</p></li>
+<li><p>What is canonical in a view of the store is decided by standing: &quot;my director or myself would have more standing than our junior devs&quot;.</p></li>
+</ul>
+<p>None of that is a ruling. It is what this part takes as given.</p>
+<h2 id="9-what-exists-today-for-this">9. What exists today for this</h2>
+<p><strong>Anyone replaces anything.</strong> <code>emit</code> anchors a write on the thing's heads, and admission permits every replacement of a held, related record (<a href="https://github.com/kgruel/strange-loops-next/blob/main/rust/PLACE.md"><code>rust/PLACE.md</code></a>, choice 5). A lead wrote <code>chosen=weekly</code> and a junior then wrote <code>chosen=daily</code>:</p>
+<pre><code>$ loops of decision:kiln-schedule --plain
+thing  decision:kiln-schedule
+records  2
+heads  1
+  chosen  daily
+</code></pre>
+<p>One head, no conflict, and nobody named.</p>
+<p><strong>A filter on the observer is not standing.</strong> A spec can test <code>env.observer</code> in a slot's <code>where</code>. But <code>where</code> is applied after the heads are found. Run after each of three writes, with a slot that keeps only the lead's records:</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col">After</th><th scope="col">The slot shows</th></tr></thead>
+<tbody>
+<tr><td>the lead writes <code>weekly</code></td><td><code>chosen: weekly</code></td></tr>
+<tr><td>the junior writes <code>daily</code></td><td>nothing: the decision is gone from the view</td></tr>
+<tr><td>the lead writes <code>daily</code> again, anchored on the junior's</td><td><code>chosen: daily</code></td></tr>
+</tbody></table></div>
+<p>The middle row is the one that matters. A view of what the lead has said should still say <code>weekly</code>.</p>
+<p><strong>The spec already has the right place.</strong> <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/spec.md"><code>protocol/spec.md</code></a>: &quot;Settle forms before admission, then run heads and all slots over admitted records.&quot; Admission today reads only <code>prev</code> and <code>of</code>. A source selects by <code>store</code>, <code>kind</code>, <code>about</code> and <code>of</code>, and that too comes after the heads. So standing is a clause of admission, and nothing else in a spec can stand in for it.</p>
+<p><strong>The design's sentence for this.</strong> &quot;A steward's changeset takes effect. Anyone else's is a visible proposal that takes effect if a steward affirms it&quot; (<a href="../rethink/#residence">Residence</a>, of declarations). And of an agent: &quot;admission at read ignores records outside the grant&quot; (<a href="../rethink/#sharing">Sharing</a>).</p>
+<p><strong>Git objects, one ref per writer.</strong> Run on a bare repository on one machine, with no host involved. Each of two writers put the tree of their own closed segments on a ref named for their key, with no history, and pushed only that ref:</p>
+<pre><code>lead pushed    refs/loops/w/a73s4gdr…
+junior pushed  refs/loops/w/m8rb4ohk…
+working trees: 0 changed files          branches on the hub: main
+a plain clone brings 2 refs, of which loops: 0
+git ls-remote lists 2 loops refs
+$ loops check                           (a third clone, after one fetch of refs/loops/*)
+{&quot;altered&quot;:[],&quot;lines&quot;:2,&quot;records&quot;:2,&quot;refused&quot;:[],&quot;segments&quot;:2,&quot;unbound&quot;:0}
+</code></pre>
+<h2 id="10-sharing-walked">10. Sharing, walked</h2>
+<p>The cast for both walks: a director, a lead, two junior developers and an agent seat for each, in one repository that people outside the team can read.</p>
+<p><strong>Each writer pushes their own ref.</strong> The ref holds that writer's segments and nothing else.</p>
+<p><em>Holds.</em> No two writers touch the same ref, so there is no race on push and never anything to merge. It is the single-writer segment carried into git. The working tree and the branches are untouched, and no pull request is involved.</p>
+<p><strong>A reader fetches every ref and keeps the union.</strong></p>
+<p><em>Holds, with one rule: a reader never drops a record because a ref moved.</em> A ref is a mailbox, and the store is what has been taken out of it. A ref that loses a segment is either an erasure, which arrives as a record and is applied as one, or the alarm the Sharing page describes.</p>
+<p><strong>Who can deliver.</strong> Whoever the host lets push can move or delete any writer's ref. Hosts guard branches and tags. Whether either of Kyle's hosts can guard other refs is not tested.</p>
+<p><em>Holds for delivery and for nothing else.</em> A signature stops a forged record. It does not stop a removed one, though every clone that fetched still holds it. This is &quot;anybody can emit&quot;, seen from the storage.</p>
+<p><strong>Who can read.</strong> A plain clone does not fetch these refs. Anyone who can read the repository can list and fetch them.</p>
+<p><em>Breaks one hope.</em> The store is out of sight of an outside contributor, not withheld from one. A store that has to be withheld is a separate repository, or a storage that withholds.</p>
+<p><strong>An erasure.</strong> The writer's segment is rewritten and their ref moves. The hub drops the old object when it next collects, and each clone does when it does.</p>
+<p><em>Holds as a request.</em> It is better than a branch, where history keeps the payload for good.</p>
+<p><strong>Another storage, later.</strong> A bucket or a server with access rules per prefix can enforce what git cannot: that only a writer writes under their own prefix. The layout by writer is what makes that possible, so it is the part to keep. What decides canonical cannot live in the storage's access rules, because they differ from one storage to the next.</p>
+<p><em>Holds, and it is the reason standing ends up in records.</em></p>
+<h2 id="11-standing-walked">11. Standing, walked</h2>
+<p><strong>Everyone emits.</strong> This is today. Nothing is canonical: the junior's write above replaced the lead's.</p>
+<p><em>Holds as the first rung.</em></p>
+<p><strong>What &quot;more standing&quot; means.</strong> There are three readings.</p>
+<ul>
+<li><p><em>Rank: where two disagree, the higher wins.</em> <strong>Breaks.</strong> The junior's write above was a replacement, not a disagreement, so rank had nothing to decide. To help, rank would have to say who may replace whom, which puts an order among writers inside admission. Two leads who disagree still conflict. And a junior's dissent, which ought to be seen, is hidden.</p></li>
+<li><p><em>Counted or not, for the whole store.</em> Holds, and is coarse.</p></li>
+<li><p><em>Counted or not, kind by kind.</em> A junior's <code>note</code> and <code>task</code> count. Only a lead's or a director's <code>decision</code> and <code>service</code> do. <strong>Holds.</strong> It is the design's grant with a scope, and the description file already lists a store's kinds.</p></li>
+</ul>
+<p>So &quot;more standing&quot; is being counted for more kinds, and being able to accept what others propose. It is not a rank.</p>
+<p><strong>A record that does not count.</strong> It is held, it is shown as a proposal, and it is never part of the canonical state. Every result says how many it left out. After the junior's write, the decision still reads <code>weekly</code>, with one proposal against it.</p>
+<p><em>Holds.</em> It is one clause more in the admission stage that exists. It changes what a spec answers.</p>
+<p><strong>Accepting a proposal, with no pull request.</strong></p>
+<ul>
+<li><p><em>Restating.</em> The lead emits the same fields, anchored on the proposal. This works today: it is the third row of the table in section 9. The lead's record is canonical and its <code>prev</code> leads back to the junior's. The cost is a copied payload, and a canonical record whose author is the lead.</p></li>
+<li><p><em>Affirming.</em> A stance by someone with standing that mentions the proposal, after which the proposal itself counts. It is the design's answer and keeps the junior as the author. It is a new kind that admission reads, and admission then reads stances before it reads anything else.</p></li>
+</ul>
+<p><em>Both hold. Restating needs nothing built.</em></p>
+<p><strong>Where the list of who counts is kept.</strong> There are three places, in order of effort.</p>
+<ol>
+<li><p><em>A file of the reader's own,</em> as rex-chat keeps names. Each reader then has their own canon, which is not what a team means by the word.</p></li>
+<li><p><em>A plain file that all share.</em> <strong>Breaks under sharing without pull requests.</strong> What guarded <code>.loops/store.json</code> was review on a branch. In git objects that anyone can push, a plain file belongs to whoever pushed last. So the file stays on the branch under ordinary review, or it becomes:</p></li>
+<li><p><em>Signed records.</em> A store anchor that names the stewards, and a steward's record that says who counts for which kinds.</p></li>
+</ol>
+<p><em>A finding of this walk:</em> sharing without pull requests is what brings signed declarations forward. The same holds for the description file itself, now that ST1 lets it stop a write.</p>
+<p><strong>The list changes.</strong> A junior is added for <code>decision</code>: do their old proposals become canonical, the ones a lead passed over included? A director leaves and is taken off: does every decision they made drop out of the canon?</p>
+<p><em>Breaks on removal.</em> That is &quot;retire through&quot; again: a removal has to cover what stands, and a cover is a tick. Until retiring exists the list only grows, and a departure is recorded and waits. An addition is open: the design judges a record by what was in effect at its <code>emitted</code>, which a writer can backdate.</p>
+<p><strong>An agent seat.</strong> If the lead's seat is listed for <code>decision</code>, the agent makes canon alone. If it is not, the agent proposes and the lead accepts with their own key, which means something only where that key is out of the agent's reach.</p>
+<p><em>Holds, and it joins the two parts.</em> Accepting a proposal is the person's word that part one was looking for (ID2), and it is worth what the person's key is worth (ID3). Listing a seat for some kinds is what the Sharing page calls &quot;presence given ahead of time&quot;.</p>
+<p><strong>A lost key.</strong> A junior's can propose and no more. A lead's can write what a lead's records count for. Neither can change who counts, which takes a root key.</p>
+<p><em>Holds better than in part one,</em> where a lost key could do anything its owner could. Retiring is still what closes it.</p>
+<p><strong>Strict.</strong> The last rung: a store refuses, at the write or at the import, what would not count. Nothing in this slice needs it.</p>
+<p><em>Open.</em> With it, &quot;progressive&quot; has four rungs: open, listed, anchored, strict. Each keeps the records of the one before, as the Residence page says of a store raised to strict.</p>
+<h2 id="12-the-slice">12. The slice</h2>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">Piece</th><th scope="col">What it changes</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Delivery by one ref per writer.</strong> <code>loops</code> pushes this writer's ref and fetches the rest into the union.</td><td>The place and the CLI. No record's bytes.</td></tr>
+<tr><td>2</td><td><strong>Admission by a list.</strong> A record counts for its kind when its observer is listed for it. Every other record is held and counted as proposed.</td><td>What a spec answers. The model and vectors.</td></tr>
+<tr><td>3</td><td><strong>Reads that show both.</strong> The canonical state, the proposals against it, and who wrote each.</td><td>The CLI.</td></tr>
+<tr><td>4</td><td><strong>Accepting by restating.</strong></td><td>Nothing. A verb for it would be a convenience.</td></tr>
+<tr><td>5</td><td><strong>The list.</strong> For a trial, a file on the reviewed branch that names keys. For a store that is kept, a store anchor and a steward's records that name lineages.</td><td>The trial form: one input a spec must name. The kept form: two standing kinds.</td></tr>
+</tbody></table></div>
+<p><strong>Not in it:</strong> grants with <code>under</code>, the affirm stance, retiring, strict refusal, shared names, and declarations of kinds as records.</p>
+<p><strong>One constraint on piece 2.</strong> The list has to be something the spec names or the store holds. A tick records a result, and a second machine can check it only if it can find the same list.</p>
+<p><strong>What this means for part one.</strong> The trial form of the slice needs no anchor: the list can name keys as they are today. So a team can learn what it wants canonical to mean on stores declared disposable, before any lineage is made. ID1, ID4 and ID6 are then settled before the first store that is kept.</p>
+<h2 id="13-draft-entries-for-the-slice">13. Draft entries for the slice</h2>
+<h3 id="sl1-what-more-standing-means">SL1: what &quot;more standing&quot; means</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">Standing is</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>A rank among writers.</td><td>Decides nothing when a write replaces another. Hides dissent.</td></tr>
+<tr><td>B</td><td>Counted or not, per store.</td><td>A junior's notes are proposals too.</td></tr>
+<tr><td><strong>C (leaning)</strong></td><td>Counted or not, per kind, with the right to accept.</td><td>A scope has to be written somewhere. A set of kinds is the smallest one.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> what the list holds.</p>
+<h3 id="sl2-a-record-that-does-not-count">SL2: a record that does not count</h3>
+<p><strong>Example.</strong> The junior's <code>chosen=daily</code> on a decision the lead set to <code>weekly</code>.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">A fold</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>Leaves it out and says nothing.</td><td>A proposal nobody knows about.</td></tr>
+<tr><td><strong>B (leaning)</strong></td><td>Leaves it out of the state, lists it as proposed, and counts it beside the result.</td><td>Every read has a second part.</td></tr>
+<tr><td>C</td><td>Includes it and marks it.</td><td>It is not canonical then, which was the point.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> what a spec answers. This is the same question as ID4 with a different reason for not counting, and the two should have one answer.</p>
+<h3 id="sl3-accepting-a-proposal">SL3: accepting a proposal</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">By</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>A (leaning, first)</strong></td><td>Restating it, anchored on it. Works today.</td><td>The payload is written twice, and the canonical author is the one who accepted.</td></tr>
+<tr><td>B</td><td>An affirm stance.</td><td>A kind that admission reads, and stances read before everything else.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> nothing for A. B is standing work.</p>
+<h3 id="sl4-where-the-list-is-kept-rung-by-rung">SL4: where the list is kept, rung by rung</h3>
+<p><strong>Leaning.</strong> For a trial: a plain file on the reviewed branch, naming keys, read as an input the spec names. For a store that is kept: a store anchor and a steward's records, naming lineages. Never a plain file among the git objects that anyone can push.</p>
+<p><strong>Changes:</strong> the kept form adds two standing kinds, with everything standing reads in the envelope, as the trust walk has it.</p>
+<h3 id="sl5-when-the-list-changes">SL5: when the list changes</h3>
+<p><strong>Leaning.</strong> The list only grows until retiring exists. In the trial a record is judged by the list as it is held now. In the kept form an addition names a tick it takes effect from, so that a backdated <code>emitted</code> gains nothing.</p>
+<p><strong>Changes:</strong> what a spec answers after an addition.</p>
+<h3 id="sl6-how-records-travel-in-git">SL6: how records travel in git</h3>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">Layout</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>A (leaning)</strong></td><td>One ref per writer, no history, holding that writer's segments. Run above.</td><td>A setup step per clone, and a host that does not guard these refs.</td></tr>
+<tr><td>B</td><td>One shared ref.</td><td>Every push races every other, and a fetch, union and retry loop is needed.</td></tr>
+<tr><td>C</td><td>Segment files in the working tree, as today.</td><td>Thousands of small files in every diff and search, and a pull request or a push to a branch for every record.</td></tr>
+</tbody></table></div>
+<p><strong>Changes:</strong> nothing in bytes. It is a second place beside the directory.</p>
+<h2 id="14-an-order-if-the-leanings-hold">14. An order, if the leanings hold</h2>
+<ol>
+<li><p><strong>SL1 and SL2 put to Kyle</strong>, with ID4, since they decide what a fold answers.</p></li>
+<li><p><strong>The trial slice</strong>, on stores declared disposable and with keys as they are: admission by a list in the model, vectors and Rust; delivery by one ref per writer; reads that show canon and proposals; the list as a reviewed file.</p></li>
+<li><p><strong>ID1 and ID6 put to Kyle</strong>, then anchors and bindings, and the list moved into signed records. Only then a store that is kept.</p></li>
+<li><p><strong>Afterwards:</strong> the affirm stance, retiring, grants with <code>under</code>, strict.</p></li>
+</ol>
+<h2 id="15-what-this-walk-did-not-do">15. What this walk did not do</h2>
+<ul>
+<li><p>It did not test a git host. What a host does with refs outside branches and tags, and who may move them, is argued and not run.</p></li>
+<li><p>It did not walk a scope finer than a set of kinds, a policy that two stewards change apart, or who may erase.</p></li>
+<li><p>It did not walk declarations of kinds as records, though section 11 shows they come forward with the list.</p></li>
+<li><p>It rests on one workbench and on a description of one team.</p></li>
+<li><p>It takes the two tiers as settled. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which ID1 leans on, and costs the trap in ID6.</p></li>
 </ul>
 </article>
 </main>
