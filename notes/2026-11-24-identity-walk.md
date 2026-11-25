@@ -758,7 +758,7 @@ Section 9's third row did not show this, because there the canonical value was t
 
 **18. A cover by its topmost ids needs a closed cut (item 8). Found and run by Astra.** Two stores held the same topmost record. One also held its parent and one did not. A tick over that record reported `closure: yes` in the first and `closure: no` in the second, with the same topmost id.
 
-*Replaced by:* the verb that writes an end refuses to sign unless its tick checks `closure: yes`. A reader that is missing an envelope in between cannot show that a leaver's record lies under a topmost id, so that record does not count until the envelope arrives. The error is on one side only: nothing is counted that should not be, and it mends as a late binding does. So a withheld payload is fine, and a missing envelope is late (margins).
+*Replaced by:* the verb that writes an end refuses to sign unless its tick checks `closure: yes`. A reader that is missing an envelope in between cannot show that a leaver's record lies under a topmost id, so that record does not count yet: it is shown as proposed, and counts once the envelope arrives. Admission keeps two answers, and no third is added. The error is on one side only: nothing is counted that should not be, and it mends as a late binding does. So a withheld payload is fine, and a missing envelope is late (margins).
 
 **19. "A new store that takes the old records as history" (sections 15 and 17). Found by margins.** The walk gave this as the remedy for a root that is lost or taken, and for founders who part. Under the chain, every old record ends at the old anchor, so none of them counts in the new store.
 
