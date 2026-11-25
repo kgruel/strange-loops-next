@@ -27,6 +27,32 @@ It also holds the first product slice: a directory place and the `loops` CLI, fo
 Standing, ticks, sync, budget tooling and the repo's own `.loops/` decision store remain planned.
 `vectors/scenario/` already covers reader scenarios, not the future product CLI.
 
+## Installing `loops`
+
+**From a release.** Each [release](https://github.com/kgruel/strange-loops-next/releases) carries the `loops` binary for four machines, each archive with its SHA-256:
+
+| Archive | For |
+|---|---|
+| `x86_64-unknown-linux-musl` | Linux, x86-64 (static) |
+| `aarch64-unknown-linux-musl` | Linux, arm64 (static) |
+| `aarch64-apple-darwin` | macOS, Apple silicon |
+| `x86_64-apple-darwin` | macOS, Intel |
+
+Download the archive for your machine and its `.sha256` file, check one against the other, unpack it and put `loops` on your PATH:
+
+```sh
+shasum -a 256 -c loops-v0.1.1-aarch64-apple-darwin.tar.gz.sha256
+tar -xzf loops-v0.1.1-aarch64-apple-darwin.tar.gz
+install loops-v0.1.1-aarch64-apple-darwin/loops ~/.local/bin/loops
+loops --version
+```
+
+A release's name is the version `loops --version` prints. The record format is not frozen yet, so read [CHANGELOG.md](CHANGELOG.md) before moving a store to a newer release.
+
+**From source,** with the Rust release `rust/rust-toolchain.toml` names: `cargo install --locked --path rust/cli`.
+
+**Making a release.** Raise `version` in `rust/cli/Cargo.toml` (and its entry in `rust/Cargo.lock`) through a merge request, then push the tag `v<version>` on main to GitHub. `.github/workflows/release.yml` builds the four archives and publishes the release. Run by hand from the Actions page, the same workflow leaves a draft.
+
 ## Checking
 
 ```sh

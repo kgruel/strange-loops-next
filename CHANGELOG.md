@@ -10,8 +10,20 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 ## 2026-11-25
 
 In brief:
+- **Releases begin.** A tag `v<version>` on the GitHub copy builds `loops` for four machines and publishes the archives with their checksums. The first is `v0.1.1`, and `loops --version` now says so. Kyle asked for it after a machine with no Rust toolchain could not get the day's build.
 - **Built: `loops of --setters`, and a `describe` count of things that leave a reference field unset.** Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The `emit` help now says what `about` is. Nothing changes for a command that does not use the flag.
 - **Kyle rules two stops in the shorthand, and they are built:** a kind's description can list fields that every shorthand write must state (`every_write`, in version 2 of the file), and a stated `--sets` stops when it leaves out a key the command gives. `describe` counts the records that lack a listed field. Asked for in the same issues, put to margins, Neon and Astra in the room, and ruled the same day.
+
+### Releases begin
+
+Kyle asked for GitHub releases of the binary: a machine with no Rust toolchain could not get the day's build, and every build printed `strange-loops-next 0.1.0`, so nobody could tell which one a machine had.
+
+- **`.github/workflows/release.yml`.** A pushed tag `v<version>` opens a draft release, builds `loops` on GitHub's runners for Linux x86-64 and arm64 (static, against musl) and for macOS arm64 and x86-64, attaches each archive with its SHA-256, and publishes. It uses the pinned Rust release and `--locked`, the two actions the CI job already pins by commit, and GitHub's own `gh` for the release. The tag must be the version in `rust/cli/Cargo.toml`; three of the four binaries are run and must print it.
+- **A manual run leaves a draft,** whose tag is not created until it is published, so the workflow can be tried without publishing anything.
+- **The crate's version is the release's name.** `loops-cli` goes from 0.1.0 to 0.1.1. Nothing reads the version but `--version`.
+- **The README says how to install** from a release or from source, and how a release is made.
+
+**Implementer choices; they stand under W7 unless Kyle objects:** the tag is `v` and the crate version; releases are not marked as pre-releases, so that "latest" finds them, and the notes say the record format is not frozen; the Linux builds are static; a build between two releases still prints the earlier release's version, and a commit id in `--version` is the next small piece.
 
 ### Kyle rules two stops in the shorthand, and they are built
 

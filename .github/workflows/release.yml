@@ -1,0 +1,141 @@
+name: release
+
+# Builds the loops CLI for four targets and attaches the archives, each with
+# its SHA-256, to a GitHub release.
+#
+# A pushed tag v<version> publishes. A manual run opens a draft and leaves it
+# a draft unless asked to publish, so the workflow can be tried without
+# publishing anything; a draft's tag is not created until it is published.
+#
+# The tag must be the version in rust/cli/Cargo.toml, so that the release's
+# name is what `loops --version` prints. A suffix after a hyphen is allowed
+# (v0.1.1-dryrun).
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Name of the release and of its tag (v<version>, or v<version>-<suffix>)
+        required: true
+      publish:
+        description: Publish the release (otherwise it stays a draft)
+        type: boolean
+        default: false
+
+permissions: {}
+
+env:
+  # Read from the environment in every script, never written into one.
+  TAG: ${{ inputs.tag || github.ref_name }}
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+        with:
+          persist-credentials: false
+      - name: Check the tag against the crate version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' rust/cli/Cargo.toml | head -n 1)
+          case "$TAG" in
+            "v$version" | "v$version"-*) ;;
+            *)
+              echo "tag $TAG is not v$version, the version in rust/cli/Cargo.toml" >&2
+              exit 1
+              ;;
+          esac
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "tag $TAG is not v<major>.<minor>.<patch> with an optional -<suffix>" >&2
+            exit 1
+          fi
+      - name: Open a draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "The \`loops\` command line tool, built from \`$GITHUB_SHA\` by this repository's release workflow."
+            echo
+            echo "The record format is not frozen yet. What changed is in [CHANGELOG.md](https://github.com/$GH_REPO/blob/$GITHUB_SHA/CHANGELOG.md)."
+            echo
+            echo "**To install:** download the archive for your machine and its \`.sha256\` file, check one against the other (\`shasum -a 256 -c <archive>.sha256\`), unpack it, and put \`loops\` on your PATH. \`loops --version\` then prints this release's version."
+            echo
+            echo "| Archive | For |"
+            echo "|---|---|"
+            echo "| \`x86_64-unknown-linux-musl\` | Linux, x86-64 (static) |"
+            echo "| \`aarch64-unknown-linux-musl\` | Linux, arm64 (static) |"
+            echo "| \`aarch64-apple-darwin\` | macOS, Apple silicon |"
+            echo "| \`x86_64-apple-darwin\` | macOS, Intel |"
+          } > notes.md
+          gh release create "$TAG" --draft --target "$GITHUB_SHA" --title "loops $TAG" --notes-file notes.md
+
+  build:
+    needs: draft
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            runs: true
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-24.04-arm
+            runs: true
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            runs: true
+          # Built on the arm64 runner; not run there.
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            runs: false
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    env:
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+        with:
+          persist-credentials: false
+      # The release rust/rust-toolchain.toml names.
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec
+        with:
+          toolchain: 1.100.0
+          targets: ${{ matrix.target }}
+      - name: Build
+        working-directory: rust
+        run: cargo build --release --locked -p loops-cli --target "$TARGET"
+      - name: Run the binary
+        if: matrix.runs
+        run: |
+          printed=$("rust/target/$TARGET/release/loops" --version)
+          echo "$printed"
+          version=${TAG#v}
+          test "$printed" = "strange-loops-next ${version%%-*}"
+      - name: Package and attach
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          name="loops-$TAG-$TARGET"
+          mkdir "$name"
+          cp "rust/target/$TARGET/release/loops" "$name/loops"
+          tar -czf "$name.tar.gz" "$name"
+          shasum -a 256 "$name.tar.gz" > "$name.tar.gz.sha256"
+          cat "$name.tar.gz.sha256"
+          gh release upload "$TAG" "$name.tar.gz" "$name.tar.gz.sha256"
+
+  publish:
+    needs: build
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$TAG" --draft=false
