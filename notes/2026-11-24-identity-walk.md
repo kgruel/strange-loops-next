@@ -1,0 +1,278 @@
+# Identity: a walk before anything is anchored
+
+**Written on 2026-11-24 at Kyle's request. Nothing here is put to him or ruled.** It is a walk in the manner of [the trust walk](../design/rethink/sections/11-trust.html): three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries at the end are what the walk found to decide. They are drafts: none is in `DECISIONS.md` yet.
+
+It was prompted by a plan Kyle and Neon worked out the same evening, kept outside the repository, which puts identity and names first among the next steps: lineages with two tiers of key, a seat per agent, `name` records, and key profiles in the CLI. This walk asks what that step has to settle, and finds it is wider in one place and narrower in another.
+
+"Today" below is the `loops` binary built from main on 2026-11-24 (`6ebbca7`). Every "today" answer was run in a scratch store with invented names.
+
+## 1. Why identity is walked before it is built
+
+Most of what was built this month can be redone. A storage layout, a plain view, a description file and a search index are all computed from the records, and the records do not change when they are replaced.
+
+Three things are not like that, because they are inside what is signed:
+
+- **The observer.** It is in the envelope, and an erasure keeps the envelope. A record written by a device key says so for as long as it exists.
+- **Which store holds a thing's records.**
+- **The reference vocabulary in payloads.**
+
+Identity is the first of these. An anchor made in haste is kept forever or abandoned, and the trust walk says so in one line: "No anchor that anyone means to keep should be made until this walk is closed." This note is an attempt to close it for stratum 1.
+
+## 2. What exists today
+
+**The observer is the signing key.** `loops emit` refuses any other, on the write side:
+
+```
+$ loops emit kiln --of kiln:east status=warm --observer sl:example
+refused: observer-unbound: sl:example is not this key
+```
+
+**No reader compares an observer with a key.** A reader checks each line's envelope, commitment, id and signature. A line whose observer is not its signing key can arrive through `loops import`, is read like any other, and is counted by `loops check` as `unbound` ([`rust/PLACE.md`](../rust/PLACE.md), choice 3 under "Choices made here"). So today's answer to "what does a reader do with a record it cannot attribute" is: include it, and count it in one verb.
+
+**The plain views do not say who wrote anything.** Two keys wrote `kiln:east` here, and the second replaced the first:
+
+```
+$ loops of kiln:east --plain
+thing  kiln:east
+records  2
+heads  1
+  status  hot
+head  r:v2a8cfeu…
+  emitted  now
+```
+
+**The envelope already has a place for "on whose behalf".** `under` is an optional envelope field, "the record id of the grant it acts on", with its own refusals (`under-not-record-id`, `under-unknown`). Nothing writes it yet.
+
+**A tick by one key can cover a record another key wrote.** An agent's key wrote a proposal, and the potter's key wrote a tick over it:
+
+```
+$ loops tick spec.json --cover r:gmg55s2b…          (as the potter's key)
+r:egmc3nev…
+$ loops tick --check r:egmc3nev…
+{"answer":"same","closure":"yes","taken-not-covered":1}
+```
+
+The tick's observer is the potter's key, and its payload lists what it covers.
+
+**The model has stratum 1.** [`model/Loops/Keys.lean`](../model/Loops/Keys.lean) defines an anchor, a binding, `Speaks` and `Attributed`, and [`model/Laws/Keys.lean`](../model/Laws/Keys.lean) proves six laws. A record is attributed when its observer is its signing key, or when that key speaks for the observer. Nothing in the model retires a key, and nothing outside the model reads these definitions.
+
+**The one outside user already keeps names.** rex-chat pins a name to each key in a file on the reader's machine, one line per name. Its room has five writers, and five keys are not readable as five people.
+
+## 3. What the design already says
+
+These are settled or leaning in the design pages, and the walk takes them as its starting point.
+
+- **An observer is a lineage id** ([Observers](../design/rethink/sections/03-observers.html)). Names never take part in matching.
+- **A lineage id is the hash of its anchor record** ([Lineage](../design/rethink/sections/04-lineage.html)). The same key signing a second anchor starts a second lineage.
+- **Two tiers of key**, settled by Kyle on 2026-11-10. The root signs what changes standing, and a bound key signs the rest. Only the root binds a key.
+- **An agent is not a key of yours.** The seat has its own lineage and root. Your root signs a grant naming it, and its records carry `under`.
+- **The root is presence:** the key that asks for you before it signs. Grants, retirements and the affirming of a proposal need you present. Ordinary emits do not.
+- **A lost bound key speaks for you for good** until retiring exists. Retiring is a tick with a stance, and so waited for ticks, which are now built.
+- **Left open on the Lineage page:** whether a model swap is the same observer (leaning yes), what two sessions of one lineage at once mean, and whether people get lineages at all (leaning yes).
+
+## 4. Scene one: one person, several agents, one machine
+
+The cast is the workbench as it is: a person, a coordinating agent session, workers that session starts, an agent from a second vendor, and a chat room between them kept in a store. All of them run as one operating-system user.
+
+**Who writes.** Nearly every record is written by an agent at the person's word. That includes the person's own decisions: an agent types them into a changelog, and git records the person as the author. The person's key signs almost nothing.
+
+*Holds, as far as "which agent wrote this" goes.* A seat per harness gives each agent its own observer. rex-chat does this today with a key per agent.
+
+**The person decides something.** The agent writes "the potter ruled A". Under the design that record is the seat's word about the potter: hearsay. The design's answer is that the potter affirms it, with the root key, which asks for them.
+
+*Breaks for a step that is only keys and names.* Stances are part of standing and are not in that step. So after it, the store still cannot tell a decision the person made from a decision an agent says they made. In a workflow run through agents, that is the question people will ask of it. Three ways to answer it are in [ID2](#id2-a-persons-word-when-an-agent-does-the-writing).
+
+**A session.** Each session of a harness could be its own observer, or all sessions could be one seat. The Lineage page leans to one seat, and to a session saying what it is in a record.
+
+*Holds, with one consequence.* What changes per session (the model, the task, the repository) belongs on a thing for the session, written by the seat. Kept as fields on the seat's own thing, two sessions at once would conflict on them.
+
+**A worker.** The coordinating session starts workers and collects their reports. The workers here write code and no records, so there is nothing yet to attribute.
+
+*Open, and nothing asks for it.* A worker that never writes a record needs no identity. One that writes into a shared store is a seat like any other.
+
+**Where the keys are.** Every key on this machine is a file the one user can read. An agent running as that user can sign with any of them. The trust walk calls this "the honest limit".
+
+*Breaks more than it first seems.* On such a machine, a record signed by the person's bound key proves no more than one signed by the agent's. The separation between "the potter" and "the potter's agent" is a convention there, however the lineages are drawn. It becomes real only where the person's key is out of the agent's reach: on another machine, or behind a prompt. That suggests a rule stronger than "the root stays off the workbench" ([ID3](#id3-a-persons-keys-on-a-machine-where-agents-run-as-them)).
+
+## 5. Scene two: a small team
+
+The cast is three people with laptops their employer issues and replaces, an agent harness on each, a shared CI, and one git repository that holds the store. The git host decides who can push.
+
+**The first write.** A person's anchor, the binding for their laptop's key and their first record land in the store together. Every clone can then check all three offline.
+
+*Holds.* It is what the Sharing page calls "stores verify themselves".
+
+**The laptop is replaced.** The root key has to be on the new one, or reachable from it. "Make it where it will stay" cannot mean an employer's laptop, which lasts three years. So the root key is recovery material from the first day: in a vault, and on whichever laptop is current.
+
+*Holds, with a trap.* The lineage is the anchor, not the key. A person who restores the root key on a new laptop and runs the first-run step again makes a second anchor, and with it a second lineage that shares nothing with the first but its root. The recovery material is the key and the anchor line together, and the first-run step must look for an anchor before it makes one ([ID6](#id6-recovery-and-a-second-anchor)).
+
+**A record arrives before its binding.** Two people work on branches. One binds a new laptop on their branch and writes from it. The other merges only the records. For a while, a clone holds a record whose key does not yet speak for its observer.
+
+*Open, and the largest choice here.* The model says the set decides and that holding more never silences a key, so this record becomes attributed when the binding arrives. A reader that refused the whole store in the meantime would refuse over a state that mends itself. A reader that leaves the record out changes what a fold answers before and after. A reader that includes it and says so, as today's does, lets anyone write as anyone until someone looks. And a tick has to say which of these its result was computed under ([ID4](#id4-a-record-whose-key-does-not-speak-for-its-observer)).
+
+**Two stores.** A binding is held in one store, and the bound key writes into another. Read alone, the second store cannot attribute the record. Read together, it can.
+
+*Holds if each store carries what its own records need.* That is the copy on first write, and it has to happen again for each new binding, in each store that key writes to. `loops check` can then say which records a store cannot attribute from what it holds alone.
+
+**A profile.** A person's email, team and the like are fields on a thing named by their lineage. If two stores each hold a first write of that thing, a read of both shows no value for any field, equal values included. That is the whole-read rule as built, and it was run on 2026-11-24 with a service in place of a person.
+
+*Breaks unless one store is the home of a lineage's own thing.* It is the same trap as any thing written first in two stores, and it needs its rule whatever identity does.
+
+**A laptop is lost.** Its bound key is in someone else's hands. Under the trust walk's rule, no store meant to last has a second writer until retiring exists. This team's store has several.
+
+*Holds only on a premise that nobody has ruled.* The premise is that the git host is the admission boundary: a stolen key is no use without the right to push, and a person who leaves loses that right. It is a reasonable premise for these stores. It is also the first time the project would rest on something outside the records, and it stops holding the day a store is shared any other way ([ID5](#id5-the-git-host-as-the-boundary-and-a-lost-key)).
+
+**A person leaves.** Their records stand, as they should. The employer wants their keys to stop, which is the same premise. The person may want their name and email gone. Those are payloads and can be erased. Their lineage id cannot: it is on every record they wrote, in every clone.
+
+*Holds, and shows what a lineage id is: a permanent pseudonym.* It also links every store that person writes in. One lineage used for an employer's stores and for a public repository joins the two for anyone who reads both ([ID1](#id1-who-gets-a-lineage), [ID7](#id7-what-identity-leaves-erasable)).
+
+**Names.** The plan has `potter` and `potter/agent` shown in place of ids, with "trusted team names" ranked above a self-chosen one. But nothing yet says who may name for a team: that is a steward, and stewards are stratum 2. Until then any writer can sign a name record calling their lineage `potter`.
+
+*Breaks for shared name tables, holds for two smaller things.* A self-chosen name shown with a few characters of the id is honest. So is a reader's own list of names, which is what rex-chat already keeps. A table the team shares has to wait for someone with the standing to keep it ([ID8](#id8-names-in-the-first-step)).
+
+**Typing a name.** The plan lets `owner=potter` stand for `owner=sl:…`, resolved before signing. ST1, ruled on 2026-11-24, makes that a stop: a reference field takes a typed reference. And a name resolved from the writer's own list means the same command signs different bytes on two machines.
+
+*Breaks against a ruling of the same day.* A unique start of an id, as `r:` ids already allow, has neither problem.
+
+## 6. Scene three: someone outside
+
+The cast is a contributor outside the project. On 2026-11-24 the first one sent a change through the public mirror, after importing a store of his own with the old tool's exporter.
+
+**He sends code.** His identity is a git author line and an account on the host. Nothing of this protocol is involved, and nothing needs to be.
+
+*Holds.*
+
+**He sends records, one day.** His anchor certifies itself: every record under it is provably from one writer. Who that writer is, nothing says. A name he gives himself is a claim, and the reader's own name for him is the only one that means anything to the reader.
+
+*Holds, with no registry.* A stranger is checkable as consistent and not as anyone in particular. That is the right amount.
+
+**He imports old history.** The old tool's observers were free text such as `potter/agent`. The import signs every record with the importing key and carries the old observer as a mention, `observer:<old text>`. So imported history is the importer's word about what an old store said.
+
+*Holds, and stays as it is.* No later lineage can honestly claim those records. They can be adopted, record by record, once stances exist.
+
+**The store is public.** Every lineage id, every binding and every time a key was added is readable by anyone, for good.
+
+*Holds, as long as it is known in advance.* It is one more reason for a lineage per realm.
+
+## 7. What the three scenes show
+
+**Keys and names answer "which keys are one writer". They do not answer "on whose word".** In scene one, the second question is the one that matters, and the envelope already has `under` for it. A first step that is honest for a workflow run through agents needs some way for a person's own word to be in the store, even a small one.
+
+**The separation between a person and their agent is physical before it is cryptographic.** On a machine where an agent runs as the person, no arrangement of lineages makes the person's signature mean more than the agent's.
+
+**The reader's rule is the protocol change.** Everything else in stratum 1 is new records of ordinary shape. What a fold and a tick do with a record that cannot be attributed changes what a spec answers.
+
+**Shared names can wait, and typed names should.** A reader's own list and a self-chosen name beside a short id cover the need that rex-chat found.
+
+**Retiring can wait only if the premise about the git host is said out loud.**
+
+## 8. Draft entries
+
+None of these is put. Each says what it would change, so that the ones that reach bytes or answers can be told from the rest.
+
+### ID1: who gets a lineage
+
+**Question.** What is the unit that an observer names?
+
+**Example.** One person has a laptop from an employer, a machine at home, an agent harness on each, and writes in an employer's stores and in a public repository.
+
+| | Lineages | Cost |
+| --- | --- | --- |
+| **A (leaning)** | One per person per realm (work, own). One per harness per person per realm. A session and a worker are things a seat writes about, and get none. | "The same person" across realms is a claim they may make and need not. Four lineages for the example. |
+| B | One per person, everywhere. Seats as in A. | Every store that person writes in is linked by one id that cannot be erased. |
+| C | One per session. | No continuity for an agent, which the Lineage page was written to give. |
+
+**Changes:** the observer in every record written afterwards. Permanent.
+
+### ID2: a person's word when an agent does the writing
+
+**Question.** After the first step, can the store hold a person's own decision, as distinct from an agent's account of it?
+
+**Example.** An agent writes `ruling:kiln-schedule` with `chosen=A`, at the potter's word in a conversation.
+
+| | What the store holds | Cost |
+| --- | --- | --- |
+| A | The agent's record only. A person's word exists only where their key signed. | Honest and empty: almost nothing is the person's word. |
+| **B (leaning, as the interim)** | The agent's record, and a tick signed by the person's key that covers it. Run today, above. | A tick says "this spec over these records gave this result". It does not say "I agree", and what it covers is in its payload. It is evidence that the person's key saw the record, and no more. |
+| C | The agent's record, and an `affirm` stance by the person, signed with presence, as the design has it. | Stances are standing work. It is the right answer and not a small one. |
+
+**Changes:** nothing in bytes for A or B. C adds a kind that admission will read.
+
+### ID3: a person's keys on a machine where agents run as them
+
+**Question.** Does a person have any key of their own on such a machine?
+
+| | On the agent's machine | Cost |
+| --- | --- | --- |
+| **A (leaning)** | Seats only. The person's keys are on a machine the agent does not run on, or behind a prompt. The person writes there or affirms from there. | The person cannot emit as themselves from the workbench shell. Today that is where nearly all of Kyle's own typing happens. |
+| B | A bound key of the person, in a file. The root is elsewhere, as the trust walk has it. | A record under the person's lineage from that machine proves nothing an agent could not have produced. |
+
+**Changes:** nothing in bytes. It decides what a person's signature is worth.
+
+### ID4: a record whose key does not speak for its observer
+
+**Question.** What does a reader do with it?
+
+**Example.** A clone holds a record with observer `sl:7f3a…` signed by a key that no held binding names, because the binding is on a branch not yet merged.
+
+| | A fold | Cost |
+| --- | --- | --- |
+| A | Refuses the read. | A store is unreadable in a state that the next merge mends. |
+| **B (leaning)** | Leaves the record out and counts it beside the result, as `where` counts what it could not read. | A fold's answer changes when the binding arrives. That is already true of a late `prev`. |
+| C | Includes it and counts it, as `loops check` does today with `unbound`. | Anyone who can add a line can write as anyone, until someone reads the count. |
+
+**With it:** a tick's cover would take in the anchors and bindings that make its covered records count, as it takes in `prev` and `under` ancestors today. Otherwise two machines holding different bindings check the same tick differently.
+
+**Changes:** what a spec answers, and what a tick covers. This is the entry that needs the model and vectors.
+
+### ID5: the git host as the boundary, and a lost key
+
+**Question.** May a store with several writers be kept before retiring exists?
+
+| | Rule | Cost |
+| --- | --- | --- |
+| A | No. The trust walk's interim rule stands, and retiring is built in the same step. | A larger first step: a retirement is a tick with a stance, and a law (`speaks.grows`) gives way to one with a cut. |
+| **B (leaning)** | Yes, for a store shared only through a git host, on the stated premise that the host's access control is admission. A `key-lost` kind exists from the start, ordinary now, for a later retirement to cite. | The premise is outside the records. A store that leaves git, or a host that is misconfigured, has no defence. |
+
+**Changes:** nothing in bytes for B. A changes what a reader counts.
+
+### ID6: recovery, and a second anchor
+
+**Question.** What does a person keep so that a new machine is the same lineage?
+
+**Leaning.** The root key and the anchor line together. The first-run step looks for an anchor that its root signed, in the recovery material and in the stores it can reach, and makes one only when told to. A second anchor by the same root is allowed by the model and is almost always a mistake.
+
+**Changes:** nothing in bytes. It is what the CLI does on first run.
+
+### ID7: what identity leaves erasable
+
+**Question.** What about a person can be removed later?
+
+**Leaning.** The anchor's payload is empty. A name, an email and everything else are fields on the lineage's own thing, in one home store, and can be erased. The id, the bindings and the fact of each record cannot.
+
+**Changes:** nothing in bytes beyond ID1. It is a convention to write down before the first profile is written.
+
+### ID8: names in the first step
+
+**Question.** How much of naming does the first step build?
+
+| | Built | Cost |
+| --- | --- | --- |
+| **A (leaning)** | A self-chosen name, shown beside the start of the id. A reader's own list of names, as rex-chat keeps. A unique start of an `sl:` id accepted wherever an `r:` start is. | No team table, and no `owner=potter`. |
+| B | A, and shared name records ranked by trust, and names accepted in reference fields. | Nothing yet says who may name for a team. ST1 would need an exception. |
+
+**Changes:** nothing in bytes for A. B changes what the shorthand accepts.
+
+## 9. An order, if the leanings hold
+
+1. ID1, ID4 and ID6 put to Kyle, since they fix what an anchor is and what a reader does.
+2. The model: `Attributed` in the read path and in a tick's cover, with vectors. Then Rust.
+3. The CLI: first run, pairing a machine, `whoami`, and the observer shown in the plain views.
+4. A trial on stores declared disposable, with the person's key kept off the agent's machine, to learn what ID2 and ID3 cost in daily use.
+
+## 10. What this walk did not do
+
+- It did not walk stewards, grants or admission by policy. Where a step leaned on them, it says so.
+- It did not test a git host. The premise in ID5 is argued, not run.
+- It rests on one workbench and on a description of one team. Scene two is the least certain of the three.
+- It takes the two tiers as settled and did not reopen them. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which is what ID1 leans on, and costs the trap in ID6.

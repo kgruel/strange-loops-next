@@ -10,6 +10,7 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 ## 2026-11-24
 
 In brief:
+- **An identity walk is written, at Kyle's request:** three scenes taken step by step before any anchor is made, ending in eight draft entries. Nothing is put or ruled.
 - **The first outside contribution:** the import's exporter reads an old kind whose fold has several named slots, as the old tool does. John Spann wrote it, from a pilot of his own.
 - Built: `--in <name>`, a store by name on every verb that takes one; `.loops/store.json` read and used by the plain views; `ls --active`; `loops describe` and `ls --refers-to`, with `--group`; and the import's recipe for a payload, with no change to what it writes.
 - **Kyle rules the strict shorthand:** with a description, `emit` stops on a kind, a status or a reference the description does not allow. He declines the mention in AD5's row 2 and defers the import's AD5 work; the homelab is not cut over a second time.
@@ -18,6 +19,16 @@ In brief:
 - **Kyle rules SD1 to SD4 and AD5, each as recommended.** A store describes its kinds in a plain file that refuses nothing; `emit` stops on a key slip; reference fields are described and not copied into `about`; `ls --refers-to` reads them; the import writes a reference as `kind:key`, and the homelab will be imported afresh. Nothing is built yet.
 - SD1 to SD3 are put to Kyle: what a store says about its kinds. A plain `.loops/store.json` that describes each kind and refuses nothing (SD1); `emit` stopping before it signs a write that contradicts a declared key (SD2); and whether reference fields are copied into `about`, where an erasure does not reach them (SD3: recommended, describe them and copy nothing). Nothing is built.
 - SD4 and AD5 are put to Kyle, later the same day: a read of everything that refers to a thing, taken from the declared reference fields (SD4); and the import writing a reference field as `kind:key` where the old store proves it, which means importing the homelab afresh (AD5). Nothing is built.
+
+### The identity walk
+
+Kyle and Neon worked out a plan on the evening of 2026-11-24 that puts identity and names first among the next steps. Kyle asked this session for a walk before anything is built. It is [the identity walk](notes/2026-11-24-identity-walk.md).
+
+- **Three scenes:** one person with several agents on one machine; a small team sharing a store through a git host; and someone outside the project.
+- **What it found.** Keys and names say which keys are one writer, and say nothing about on whose word a record was written, which is the question a workflow run through agents raises. On a machine where an agent runs as the person, the person's signature means no more than the agent's. The one change to what a spec answers is the reader's rule for a record whose key does not speak for its observer. Shared name tables need a steward and can wait. A store with several writers before retiring exists rests on the git host as the boundary, which nobody has ruled.
+- **Eight draft entries, ID1 to ID8,** each with a leaning. None is put to Kyle. `DECISIONS.md` lists the walk under "Being prepared".
+- **Run for it, on the binary from main:** two keys writing one thing, and the plain view naming neither; a write as a lineage refused (`observer-unbound`); a tick by one key over a record another key wrote, which checks `same`.
+- **Not changed:** the order in `ROADMAP.md`. Kyle has said identity is the next question; he has not ruled a new order.
 
 ### The exporter reads a fold of several slots
 
