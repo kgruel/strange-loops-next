@@ -375,7 +375,9 @@ fn store_flags_are_read_and_fold_options_only() {
     for bad in ["lab", "=.", "lab="] {
         assert_eq!(s.fails(&["fold", "-", "--store", bad], MORNING).0, 2);
     }
-    let literal = s.ok(&["emit", "note", "--sets", "--store", "--", "--store"]);
+    let literal = s.ok(&[
+        "emit", "note", "--sets", "--store", "--sets", "text", "--", "--store",
+    ]);
     assert_eq!(
         text(&s.json(&["get", &literal]), &["payload", "text"]),
         "--store"

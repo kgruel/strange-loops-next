@@ -78,7 +78,8 @@ usage: loops [-C <dir>] <verb> ...
                                   a stated reference field takes kind:key or a flat list, [] included,
                                     with a listed prefix (an empty list allows any, r included) and no
                                     comma; several targets: owners:='[\"yard:a\",\"yard:b\"]'
-                                  lifecycle and reference fields may be left out or unset
+                                  lifecycle and reference fields may be left out or unset, unless every_write lists them
+                                  state each every_write field on each write, except an explicit --sets-nothing join
                                 emit -, emit - --fill and tick never read the file;
                                 emit - writes anything the store accepts
                                 by default the writer claims to have read everything held
@@ -94,6 +95,7 @@ usage: loops [-C <dir>] <verb> ...
                                 --add-about and --drop-about edit the copied mentions by literal name
                                 repeat either flag freely. Adding and dropping the same name is an error.
                                 --occurred and --no-occurred override the copied occurrence
+                                stated --sets must cover every payload field, including text; --sets-nothing takes none
                                 for a thing held in that view, set the payload keys unless stated
   emit - [--fill [--base <tick-id>] [--base-id <id>]...]
                                 read one JSONL changeset from stdin
@@ -103,7 +105,7 @@ usage: loops [-C <dir>] <verb> ...
   ls [--things | <prefix>] [--fields a,b,c] [--plain]
                                 list things by literal prefix or project their live fields
                                 --plain on ls, of, read and fold uses the working store's optional
-                                .loops/store.json (version 1) for headlines. With a file, every head
+                                .loops/store.json (version 1 or 2) for headlines. With a file, every head
                                 kind must agree on a declared headline field (headline, then text key).
                                 A kind prefix selects preview columns unless --fields is supplied.
   ls <kind>:<prefix> --active [--fields a,b,c] [--plain]
@@ -116,6 +118,7 @@ usage: loops [-C <dir>] <verb> ...
                                 report stores, field declarations and coverage counts
   describe [--plain]            show each store's description and fit against the selected union,
                                 including things that leave each declared reference field unset
+                                and records missing or unread for each every_write field
                                 its counts include typed references whose prefix the field's refs list
                                 does not name; a refs list holds kind prefixes ([a-z][a-z0-9-]*, not r),
                                 or [] for any prefix; a kind's naming guidance goes in its note
@@ -463,8 +466,9 @@ fn write_changeset(
     held: &Held,
     key: &Key,
     drafts: &[batch::Draft],
+    before_sign: impl FnOnce() -> Result<(), Fail>,
 ) -> Result<Vec<Line>, Fail> {
-    let lines = prepare_changeset(&|id| held.writer_view(id), key, drafts)?;
+    let lines = prepare_changeset(&|id| held.writer_view(id), key, drafts, before_sign)?;
     place.append(&lines)?;
     Ok(lines)
 }
@@ -473,8 +477,10 @@ fn prepare_changeset(
     view: &impl Fn(&str) -> Option<batch::Held>,
     key: &Key,
     drafts: &[batch::Draft],
+    before_sign: impl FnOnce() -> Result<(), Fail>,
 ) -> Result<Vec<Line>, Fail> {
     let written = batch::resolve_batch(&hash, view, drafts).map_err(|e| refused(e.code()))?;
+    before_sign()?;
     Ok(written.iter().map(|w| Line::sign(w, key)).collect())
 }
 
@@ -571,7 +577,7 @@ fn emit(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {
                     .map_err(|e| refused(e.code()))?
             }
         };
-        let lines = write_changeset(&place.dir, &held, &key, &drafts)?;
+        let lines = write_changeset(&place.dir, &held, &key, &drafts, || Ok(()))?;
         base_notices(notices);
         let records = drafts
             .iter()
@@ -588,7 +594,25 @@ fn emit(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {
     }
     let single = draft::from_args(args, None, &now, &key.public(), &held)?;
     let description = Description::load(place.dir.root())?;
-    write_one(&place.dir, &held, &key, single, description.as_ref())
+    write_one(
+        &place.dir,
+        &held,
+        &key,
+        single,
+        SingleWrite::Emit {
+            args,
+            description: description.as_ref(),
+        },
+    )
+}
+
+#[derive(Clone, Copy)]
+enum SingleWrite<'a> {
+    Emit {
+        args: &'a [String],
+        description: Option<&'a Description>,
+    },
+    Tick,
 }
 
 fn write_one(
@@ -596,14 +620,20 @@ fn write_one(
     held: &Held,
     key: &Key,
     mut single: draft::Single,
-    description: Option<&Description>,
+    mode: SingleWrite<'_>,
 ) -> Result<(), Fail> {
+    let explicit_sets = single.statement.draft.env.sets.is_some();
+    let based = single.base.is_some();
     let source = if single.statement.draft.env.of.is_some() {
         "--of"
     } else {
         "--prev"
     };
-    let compare = if let Some(desc) = description {
+    let compare = if let SingleWrite::Emit {
+        description: Some(desc),
+        ..
+    } = mode
+    {
         shorthand::prepare(desc, &mut single)?
     } else {
         None
@@ -620,9 +650,39 @@ fn write_one(
     }
     single.mentions.apply(&mut draft.env.about)?;
     bound(key, [&draft])?;
-    let lines = write_changeset(place, held, key, &[draft])?;
+    let lines = write_changeset(place, held, key, std::slice::from_ref(&draft), || {
+        let SingleWrite::Emit { args, description } = mode else {
+            return Ok(());
+        };
+        let kind = description.and_then(|d| d.kinds.get(&draft.env.kind));
+        let sets = if explicit_sets {
+            draft.env.sets.as_deref()
+        } else {
+            None
+        };
+        shorthand::check_write(args, kind, &draft, sets, || {
+            would_infer_sets(held, &draft, based.then_some(&notices))
+        })
+    })?;
     base_notices(notices);
     say(lines.first().map_or("", Line::id))
+}
+
+/// Choice 15 uses the admitted records visible to the filler. On a based
+/// write the filler reports an empty or unadmitted selection for this thing.
+fn would_infer_sets(held: &Held, draft: &batch::Draft, base: Option<&[fill::BaseNotice]>) -> bool {
+    let Some(thing) = &draft.env.of else {
+        return false;
+    };
+    match base {
+        Some(notices) => !notices.iter().any(|n| {
+            matches!(
+                n,
+                fill::BaseNotice::Empty(_) | fill::BaseNotice::Unadmitted(_)
+            )
+        }),
+        None => realm(held).iter().any(|r| r.is_of(thing)),
+    }
 }
 
 fn erase(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {
@@ -666,7 +726,7 @@ fn erase(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {
         ),
     };
     bound(&key, [&draft])?;
-    let lines = write_changeset(&place.dir, &held, &key, &[draft])?;
+    let lines = write_changeset(&place.dir, &held, &key, &[draft], || Ok(()))?;
     let gone = place.dir.purge(&ids)?;
     say(&object(vec![
         ("id", text(lines.first().map_or("", Line::id))),
@@ -873,7 +933,7 @@ fn tick(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {
     let key = signing_key(Missing::Make)?;
     let now = clock::now().ok_or_else(|| Fail::System("the clock is outside 1970–9999".into()))?;
     let single = draft::from_args(flags, Some(spec), &now, &key.public(), &held)?;
-    write_one(&place.dir, &held, &key, single, None)
+    write_one(&place.dir, &held, &key, single, SingleWrite::Tick)
 }
 
 fn export(ctx: &Context<'_>, args: &[String]) -> Result<(), Fail> {

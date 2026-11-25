@@ -352,7 +352,7 @@ fn prepare(
         drafts.push(d);
     }
     let view = |id: &str| staged.get(id).cloned().or_else(|| held.writer_view(id));
-    let lines = prepare_changeset(&view, key, &drafts)?;
+    let lines = prepare_changeset(&view, key, &drafts, || Ok(()))?;
     for (item, line) in chunk.items.iter().zip(&lines) {
         if line.id() != item.id {
             return Err(mismatch("checked batch disagrees with prospective id"));

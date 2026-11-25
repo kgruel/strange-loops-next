@@ -11,7 +11,60 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 
 In brief:
 - **Built: `loops of --setters`, and a `describe` count of things that leave a reference field unset.** Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The `emit` help now says what `about` is. Nothing changes for a command that does not use the flag.
-- Two stops asked for in the same issues wait on Kyle: a stated `--sets` that leaves out a key the command gives, and a field every write of a kind must state.
+- **Kyle rules two stops in the shorthand, and they are built:** a kind's description can list fields that every shorthand write must state (`every_write`, in version 2 of the file), and a stated `--sets` stops when it leaves out a key the command gives. `describe` counts the records that lack a listed field. Asked for in the same issues, put to margins, Neon and Astra in the room, and ruled the same day.
+
+### Kyle rules two stops in the shorthand, and they are built
+
+Issues 24 and 26 each asked for a stop in the `emit` shorthand. Kyle asked whether the first needs standing, since ST1 had left required fields out as something that "belongs to standing, or would burden an agent's ordinary write". The answer the coordinator gave him, and that he took:
+
+- "Required" can mean three things. The shorthand stops before it signs: that binds whoever uses `loops emit` in a store whose file says so, and needs no standing. `describe` counts what leaves the field out: a read. A record without the field does not count: that is admission, it binds every writer and every tool, and it is standing.
+- ST1's sentence gave two reasons for four items. "Belongs to standing" was the third meaning. "A burden" was the first, pictured as "the thing must have the field". Issue 24 asks for the first, for a fact about the record, where stating it on each write is the meaning.
+- The stop is not a guarantee. `emit -`, another tool, an older binary and a record that arrives by merge all write without the field, and the file is unsigned.
+- It is also not a first step toward the standing version. Standing, as the walk has it, reads envelopes ([IS4](DECISIONS.md#is4-what-a-grants-envelope-holds), option B), and this field is in the payload.
+
+Kyle's view: it gives the rebuilding agent what it asked for and is a matter for the CLI and not the core model; it helps the design of a store's relationships and an agent's use of it, changes no core assumption, and is not strict at the store. He asked for a round in the room (`shorthand-stops`). margins, Neon and Astra answered in one round, and the coordinator reran each thing they found. He then ruled: yes to both, as the lines below read.
+
+**What the round changed.**
+
+- **The two stops together left no pure join** (Astra, margins, Neon, each on its own). A join could neither leave the field out nor carry it without setting it. Astra first proposed that a listed field may be carried outside a stated `--sets`; Neon showed that with `text` listed this brings issue 26 back for the fields it was meant to guard, and Astra withdrew it. Settled: an explicit `--sets-nothing` is exempt.
+- **"Drop `--sets`" was wrong advice in two cases** (Astra): beside an unset it would keep the old value, and on a first write it signs a record read whole, which is another record.
+- **The `--sets` stop must not reach `tick`,** which shares the flag parser (Neon).
+- **Version 2 of the description file** (Neon; margins first held to amending version 1 and came over). An older binary refuses either way; "expected version 1" tells someone on another machine to upgrade, where "unknown member" reads like a slip.
+- **The count is of records, in each store's own lines, and its name says so** (Neon, Astra). It is literal: a move signs the same record with and without `--sets-nothing`, so no reader can tell an exempt join from a slip (Astra).
+
+**A. `every_write`.**
+
+1. A kind gains `every_write`: a list of distinct payload field names, any field. Refused when the file is loaded: an empty list, a repeated name, a name that starts `env.`, and the kind's own key field (margins).
+2. A file with the member is version 2. Version 1 files read as before, and the member in one is the unknown member it was. `describe --plain` prints the version it read.
+3. With a description, shorthand `emit <kind>` stops unless each listed field is a member of the record's own payload as written: a field on the command, or the trailing message for `text`. Presence is the test, so `[]`, `""` and `null` satisfy it; a reference field keeps ST1's own checks, so `null` still stops there.
+4. Held to it: a first write, a revision, `--whole`, `--root`, and a move that gives no field. Not held to it: an explicit `--sets-nothing`. A record that sets no key backs no value. `--sets evidence` with no value stops.
+5. `emit -`, `emit - --fill`, `tick` and `erase` never read the file. The store refuses nothing.
+6. `describe` gains, in each kind's `fit`, `every_write`: for each listed field, `records_missing` and `records_not_read`, over the admitted records of that kind in that store's own lines, with `shown` as the union settles it. It counts absent members over all history, an exempt join included. A kind that lists nothing has `{}`.
+
+**B. The `--sets` stop.**
+
+7. On shorthand `emit` only, never `tick`, with or without a description: a stated `--sets` or `--sets-nothing` that leaves out a field or a message the command gives is usage error 2 before anything is signed. What the flags already refused stays ahead of it: `--sets ""` is still `sets-not-keys`.
+8. The message names the keys left out. For `--sets` it says to add `--sets <key>` for each; for `--sets-nothing`, to replace it with those. It offers "drop `--sets`" only on a revision of a held thing with no unset. It names `emit -` for a carried key that is meant.
+9. No exception for `every_write` fields. A citation on a pure join itself is written with `emit -`.
+10. This amends PLACE choice 10, which wrote a stated `--sets` as given. The protocol is as it was: nothing compares `sets` with the payload, and `emit -` writes such a record.
+
+**What does not change.** No record's bytes or id, no refusal code, and no answer of a read. A command that both binaries accept signs the same line. This changes a store that has no description too: an agent that writes `--sets status "note"` there now gets a usage error that names the fix, where the note was stored unread. Kyle was told this before he ruled.
+
+**Built** (Codex wrote it from a brief; the coordinator reviewed the diff, reran the gate and the stops by hand):
+
+- `rust/cli/src/description.rs` reads both versions; `shorthand.rs` holds both checks and their messages; `main.rs` runs them for `emit` alone, after the writer's own checks and before signing; `describe.rs` counts the records. `rust/PLACE.md`, choices 10, 34 and 36.
+- Six existing tests gave the shorthand a field or a message that a stated `--sets` did not name. Four now write that record as a changeset and two use a command the stop accepts; each keeps what it reads.
+
+**Implementer choices; they stand under W7 unless Kyle objects:**
+
+- Both stops come after the existing argument, description and writer checks, so a refusal such as `prev-unknown` is still reported first. `every_write` is checked before the `--sets` cover.
+- The `every_write` message repeats the command as typed and lists the missing fields in the file's order. The `--sets` message lists keys in canonical order.
+- With `--base`, the "drop `--sets`" hint follows the writer's selected view.
+- `fit.<kind>.every_write` is always written, `{}` when the kind lists nothing, as `refs` is. The plain table comes after the kind's other tables and only for a kind that lists a field.
+
+**Checked here:** the five commands of the rust job (443 tests); seven accepted writes with a fixed clock and salt, byte for byte the same line from main's binary and this one; each stop by hand, with and without a description, on a first write, a revision, `--whole`, a move, an unset and `--sets-nothing`; `tick` with either flag as before; the counts for a record without the field, an exempt join, an empty list and an erased record; five refused files with the place named; main's binary on a version 2 file, which stops with `expected version 1`.
+
+**For whoever designs a store around this** (Neon and Astra): when every write sets `evidence`, each write replaces that field's live setter. `of --setters` shows each key's setter and that record's own `evidence`. `ls --refers-to` reads the field's live setters: in a linear history that is the latest record's citation, and on a fork whose two setters cite different things it lists the thing under neither and counts it as not read, until a write joins the heads.
 
 ### Built: a thing's setters, and a count of unset references
 
@@ -40,7 +93,7 @@ Four issues came from an agent rebuilding a private group of stores from first p
 
 **Found and not built.** `things_unset` finds a thing with no value at all. It does not find a record written without the field while the thing still shows an older one. A count of records would, and belongs with the second stop below.
 
-**Waiting on Kyle,** and being talked through with him:
+**Waiting on Kyle,** and being talked through with him (as written before he ruled; the ruling is the next section):
 
 - **Issue 26.** `emit kiln --of kiln:east cone=9 --sets cone "second"` writes `text` into the payload and does not set it, so the thing keeps its earlier message. It is wider than the message: `cone=10 shelf=5 --sets cone` writes `shelf` unread, without a word. Recommended: the shorthand stops when a stated `--sets` leaves out a key the command gives, and names the way out. Adding `text` to a stated `--sets` would fill in over what was typed.
 - **Issue 24, its second and third parts.** A kind's description names fields that every shorthand write of that kind must state. ST1 left required fields out. Recommended now, as a rule about the write and named as one: it needs no read of the store, a revision is held to it too, and it is not standing, since nothing is refused at the store and `emit -` writes anything. Standing reads envelopes, and this field is in the payload, so the stop is not a first step toward enforcing it there.

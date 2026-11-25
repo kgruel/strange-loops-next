@@ -18,6 +18,7 @@ Every earlier entry is ruled.
 - What a store says about its kinds, SD1 to SD3, a read of what refers to a thing, SD4, and one written form for a reference at the import, AD5: put and ruled on 2026-11-24, each as recommended. The entries as put are in [the kinds and references note](notes/2026-11-24-kinds-and-references.md).
 - The nine narrow cases the build plan found open, BP1: ruled on 2026-11-24, seven rows as recommended and two the other way, on the principle that what was entered is accepted strictly. The entry as put is at the end of the same note.
 - The strict shorthand, ST1: ruled in direction on 2026-11-24 and settled in the room; with it a mention declined and the import's AD5 work deferred. It is the last section of the same note.
+- Two more stops in the shorthand, asked for in the first issues filed from a store being rebuilt: a field every write of a kind must state (`every_write`), and a stated `--sets` that leaves out a key given. Ruled on 2026-11-25 after a round in the room, and built. They were never entries here; the record is in the changelog under that date.
 
 Below: [what is being prepared](#being-prepared), [what you deferred](#deferred-by-you) and [what is ruled](#ruled). Nothing waits to be confirmed: under your ruling of 2026-11-21 an implementer choice comes here only when it changes bytes or answers.
 
@@ -248,9 +249,7 @@ Under A the second lead cannot end the first, and the first can end the second. 
 
 ## Being prepared
 
-Listed so that you know what is coming. The first item wants a yes or a no; the second needs nothing yet.
-
-**Two stops in the shorthand,** asked for in GitHub issues 24 and 26 on 2026-11-25 and being talked through with you: a stated `--sets` that leaves out a key the command gives, and a field that every write of a kind must state. Neither changes a record's bytes, a refusal code or what a spec answers. The second reverses a line of ST1, so it waits for your yes. Both are set out in [the changelog](CHANGELOG.md#built-a-things-setters-and-a-count-of-unset-references) under that date.
+Nothing here needs you yet. It is listed so that you know what is coming.
 
 **Numbers stored as text**, with the import ([W1](notes/2026-11-21-order-of-work.md#w1-an-adoption-step-before-standing-and-sharing)). [TK6](notes/2026-11-21-tick-record.md#tk6-what-a-spec-reads-of-a-tick) shows one use for it.
 
@@ -271,6 +270,7 @@ One line for each ruling, newest first. The full text is in [CHANGELOG.md](CHANG
 
 | Date | Ruling | Where |
 | --- | --- | --- |
+| 2026-11-25 | Two stops in the shorthand: a kind's `every_write` fields must be stated on every shorthand write, an explicit `--sets-nothing` excepted (version 2 of the description file), with a count of records in `describe`; and a stated `--sets` stops when it leaves out a key the command gives. Neither is standing: `emit -` and the store refuse nothing | Changelog |
 | 2026-11-24 | ST1: the shorthand is strict. With a description, `emit` stops on a kind it does not name, a lifecycle value in neither list, a reference field holding anything but references of a listed kind, and a comma in a reference or a key; the description loses `key_format` and `search`; no `name` headline once a description exists | Changelog; [the kinds and references note](notes/2026-11-24-kinds-and-references.md#st1-the-shorthand-is-strict-and-the-description-says-what-it-allows) |
 | 2026-11-24 | AD5 amended: the mention in row 2 is declined; the import's AD5 work is deferred and the homelab is not cut over a second time | Changelog; [the kinds and references note](notes/2026-11-24-kinds-and-references.md#st1-the-shorthand-is-strict-and-the-description-says-what-it-allows) |
 | 2026-11-24 | BP1: what was entered is accepted strictly. A key that is not text stops the shorthand; a root that is meant keeps its payload; `--add-about` and `--drop-about` of one thing is a usage error; the import leaves a bare key beside a twin as entered, makes a list from a comma or a reviewed comma and space, and mentions only what it repaired | Changelog; [the kinds and references note](notes/2026-11-24-kinds-and-references.md#bp1-nine-narrow-cases-the-build-plan-found-open) |

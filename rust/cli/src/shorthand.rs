@@ -164,3 +164,81 @@ fn check_reference(field: &str, prefixes: &[String], item: &Json) -> Result<(), 
     }
     Err(usage(format!("{message} {RAW}")))
 }
+
+/// Quote operands containing spaces or shell punctuation in a suggested command.
+fn argument(s: &str) -> String {
+    if !s.is_empty()
+        && s.bytes()
+            .all(|c| c.is_ascii_alphanumeric() || b"_./:=-".contains(&c))
+    {
+        s.to_owned()
+    } else if s.chars().any(char::is_control) {
+        format!("$'{}'", s.as_bytes().escape_ascii())
+    } else {
+        format!("'{}'", s.replace('\'', "'\\''"))
+    }
+}
+
+pub(crate) fn check_write(
+    args: &[String],
+    kind: Option<&Kind>,
+    draft: &Draft,
+    stated_sets: Option<&[String]>,
+    would_infer_sets: impl FnOnce() -> bool,
+) -> Result<(), Fail> {
+    if stated_sets != Some(&[]) {
+        if let Some(kind) = kind {
+            let missing: Vec<_> = kind
+                .every_write
+                .iter()
+                .filter(|field| member(&draft.payload, field).is_none())
+                .collect();
+            if !missing.is_empty() {
+                let typed = args
+                    .iter()
+                    .map(|a| argument(a))
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                return Err(usage(format!(
+                    "emit {typed}: missing every_write fields {}. State each field on this write, use --sets-nothing for a join with no payload fields, or use emit - for an exception.",
+                    names(missing)
+                )));
+            }
+        }
+    }
+    let Some(sets) = stated_sets else {
+        return Ok(());
+    };
+    let Json::Obj(fields) = &draft.payload else {
+        unreachable!("shorthand payload is an object")
+    };
+    let omitted = loops::json::canon_set(
+        &fields
+            .iter()
+            .filter(|(k, _)| !sets.contains(k))
+            .map(|(k, _)| k.clone())
+            .collect::<Vec<_>>(),
+    );
+    if omitted.is_empty() {
+        return Ok(());
+    }
+    let flags = omitted
+        .iter()
+        .map(|k| format!("--sets {}", argument(k)))
+        .collect::<Vec<_>>()
+        .join(" ");
+    let fields = names(&omitted);
+    let mut message = if sets.is_empty() {
+        format!(
+            "--sets-nothing cannot carry payload fields {fields}. Replace --sets-nothing with {flags}, or drop the fields."
+        )
+    } else {
+        let mut msg = format!("--sets leaves out payload fields {fields}. Add {flags}.");
+        if sets.iter().all(|k| member(&draft.payload, k).is_some()) && would_infer_sets() {
+            msg.push_str(" You can also drop --sets to infer the keys on this revision.");
+        }
+        msg
+    };
+    message.push_str(" Use emit - to carry a payload field without setting it.");
+    Err(usage(message))
+}

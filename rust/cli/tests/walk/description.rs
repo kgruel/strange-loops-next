@@ -164,7 +164,7 @@ fn grammar_checks_the_version_and_kind_map() {
         ("{}", "version: missing"),
         (r#"{"version":1}"#, "kinds: missing"),
         (r#"{"version":"1","kinds":{}}"#, "version: expected"),
-        (r#"{"version":2,"kinds":{}}"#, "version: expected"),
+        (r#"{"version":3,"kinds":{}}"#, "version: expected"),
         (r#"{"version":1,"kinds":[]}"#, "kinds: expected"),
         (r#"{"version":1,"kinds":{},"note":false}"#, "note: expected"),
         (r#"{"version":1,"kinds":{},"stores":[]}"#, "stores: unknown"),
@@ -520,4 +520,40 @@ fn headlines_keep_field_states_and_root_prefixes_keep_the_headline_column() {
             .expect("thing headline")
             .ends_with("  unknown")
     );
+}
+
+#[test]
+fn every_write_uses_the_version_two_kind_grammar() {
+    let s = fixed_store("kiln-every-write-grammar");
+    for (fields, at) in [
+        ("[]", "every_write: expected"),
+        (r#"[""]"#, "every_write[0]: expected nonempty"),
+        (r#"["cone","cone"]"#, "every_write[1]: repeated"),
+        (r#"["env.about"]"#, "every_write[0]: expected"),
+        (r#"["name"]"#, "every_write[0]: also names"),
+        ("null", "every_write: expected an array"),
+    ] {
+        describe(
+            &s,
+            format!(
+                r#"{{"kinds":{{"kiln":{{"every_write":{fields},"key":"name"}}}},"version":2}}"#
+            ),
+        );
+        error(&s, &["describe"], "", 2, &format!("kinds.kiln.{at}"));
+    }
+    let v2 = r#"{"kinds":{"kiln":{"every_write":["evidence"]}},"version":2}"#;
+    describe(&s, v2);
+    stdout(&s, &["describe"], "");
+    describe(&s, v2.replace(":2", ":1"));
+    error(
+        &s,
+        &["describe"],
+        "",
+        2,
+        "kinds.kiln.every_write: unknown member",
+    );
+    describe(&s, FULL);
+    let original = stdout(&s, &["ls", "kiln:", "--plain"], "");
+    describe(&s, FULL.replace("\"version\":1", "\"version\":2"));
+    assert_eq!(stdout(&s, &["ls", "kiln:", "--plain"], ""), original);
 }

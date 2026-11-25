@@ -57,7 +57,7 @@ fn descriptions_preserve_declarations_and_measure_key_and_lifecycle_drift() {
     expect(
         here,
         &["fit", "kiln"],
-        r#"{"declared":true,"things":7,
+        r#"{"every_write":{},"declared":true,"things":7,
         "key":{"equal":1,"different":2,"unset":1,"conflict":1,"not_read":1,"keyless_roots":1},
         "lifecycle":{"outside":[{"value":"parked","count":2},{"value":{"yard":2},"count":1}],
                      "unset":1,"conflict":1,"not_read":1},"refs":{}}"#,
@@ -65,21 +65,22 @@ fn descriptions_preserve_declarations_and_measure_key_and_lifecycle_drift() {
     expect(
         here,
         &["fit", "potter"],
-        r#"{"declared":false,"things":1,"key":null,"lifecycle":null,"refs":{}}"#,
+        r#"{"every_write":{},"declared":false,"things":1,"key":null,"lifecycle":null,"refs":{}}"#,
     );
     expect(
         here,
         &["fit", "backups"],
-        r#"{"declared":true,"things":0,"key":null,"lifecycle":null,"refs":{}}"#,
+        r#"{"every_write":{},"declared":true,"things":0,"key":null,"lifecycle":null,"refs":{}}"#,
     );
     expect(
         here,
         &["fit", "yard"],
-        r#"{"declared":true,"things":0,"key":{"equal":0,"different":0,"unset":0,"conflict":0,"not_read":0,"keyless_roots":0},
+        r#"{"every_write":{},"declared":true,"things":0,"key":{"equal":0,"different":0,"unset":0,"conflict":0,"not_read":0,"keyless_roots":0},
         "lifecycle":{"outside":[],"unset":0,"conflict":0,"not_read":0},
         "refs":{"kilns":{"held_here":0,"held_elsewhere_in_group":0,"not_in_group":0,"not_typed":0,"not_read":0,"without_mention":0,"unlisted_prefix":0,"things_unset":0}}}"#,
     );
     let plain = s.ok(&["describe", "--plain"]);
+    assert!(!plain.contains(" every write\n"));
     for part in [
         "description  version 1",
         "note  Workshop kilns",
@@ -377,7 +378,7 @@ fn one_shared_setter_counts_once_even_with_different_local_visibility() {
     for s in [&shop, &yard] {
         put(
             s,
-            r#"{"version":1,"kinds":{"kiln":{"refs":{"owners":[]}}}}"#,
+            r#"{"version":2,"kinds":{"kiln":{"refs":{"owners":[]},"every_write":["owners","evidence"]}}}"#,
         );
     }
     let single = shop.json(&["describe"]);
@@ -386,10 +387,20 @@ fn one_shared_setter_counts_once_even_with_different_local_visibility() {
         &["fit", "kiln", "refs", "owners", "not_read"],
         "1",
     );
+    expect(
+        site(&single, &shop),
+        &["fit", "kiln", "every_write", "owners"],
+        r#"{"records_missing":0,"records_not_read":1}"#,
+    );
     let binding = format!("yard={}", yard.dir.display());
     let report = shop.json(&["--store", &binding, "--in", "yard", "--in", ".", "describe"]);
     for entry in sites(&report) {
         expect(entry, &["fit", "kiln", "things"], "1");
+        expect(
+            entry,
+            &["fit", "kiln", "every_write"],
+            r#"{"owners":{"records_missing":0,"records_not_read":0},"evidence":{"records_missing":1,"records_not_read":0}}"#,
+        );
         expect(
             entry,
             &["fit", "kiln", "refs", "owners"],
@@ -467,4 +478,47 @@ fn reference_fields_count_things_left_unset() {
 {"kind":"kiln","of":"kiln:south","sets":["evidence"],"payload":{"evidence":"firing:two"}}"#,
     );
     check(2);
+}
+
+#[test]
+fn every_write_counts_local_admitted_history_with_union_visibility() {
+    let s = fixed_store("workshop-write-history");
+    let yard = fixed_store("yard-write-history");
+    let desc = r#"{"version":2,"kinds":{"kiln":{"every_write":["evidence"]},"potter":{"every_write":["name"]},"firing":{}}}"#;
+    for store in [&s, &yard] {
+        put(store, desc);
+    }
+    let missing = s.changeset(r#"{"kind":"kiln","of":"kiln:east","payload":{"cone":6}}"#);
+    copy_id(&s, &yard, &missing[0]);
+    let erased = s.ok(&["emit", "kiln", "--of", "kiln:east", "evidence=firing:one"]);
+    copy_id(&s, &yard, &erased);
+    s.ok(&["emit", "kiln", "--of", "kiln:east", "evidence:=[]"]);
+    s.ok(&["emit", "kiln", "--of", "kiln:east", "--sets-nothing"]);
+    s.changeset(r#"{"kind":"kiln","of":"kiln:east","payload":null}"#);
+    s.ok(&["emit", "kiln", "--of", "kiln:east", "evidence=firing:two"]);
+    // The head is now of another kind. The older kiln records still count.
+    s.ok(&["emit", "firing", "--of", "kiln:east"]);
+    s.ok(&["erase", &erased]);
+    let binding = format!("yard={}", yard.dir.display());
+    let args = ["--store", &binding, "--in", ".", "--in", "yard", "describe"];
+    let report = s.json(&args);
+    for (store, n) in [(&s, 3), (&yard, 1)] {
+        let fit = at(site(&report, store), &["fit"]);
+        expect(fit, &["kiln", "things"], "0");
+        expect(
+            fit,
+            &["kiln", "every_write", "evidence"],
+            &format!(r#"{{"records_missing":{n},"records_not_read":1}}"#),
+        );
+        expect(
+            fit,
+            &["potter", "every_write", "name"],
+            r#"{"records_missing":0,"records_not_read":0}"#,
+        );
+    }
+    let plain = s.ok(&[&args[..], &["--plain"]].concat());
+    assert!(plain.contains("description  version 2"));
+    for missing in [1, 3] {
+        assert!(plain.contains(&format!("kiln every write\nFIELD     RECORDS MISSING  RECORDS NOT READ\nevidence  {missing}                1")), "{plain}");
+    }
 }
