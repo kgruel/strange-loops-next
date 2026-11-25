@@ -223,9 +223,19 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 <h2 id="2026-11-25">2026-11-25</h2>
 <p>In brief:</p>
 <ul>
+<li><p><strong>Releases begin.</strong> A tag <code>v&lt;version&gt;</code> on the GitHub copy builds <code>loops</code> for four machines and publishes the archives with their checksums. The first is <code>v0.1.1</code>, and <code>loops --version</code> now says so. Kyle asked for it after a machine with no Rust toolchain could not get the day's build.</p></li>
 <li><p><strong>Built: <code>loops of --setters</code>, and a <code>describe</code> count of things that leave a reference field unset.</strong> Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The <code>emit</code> help now says what <code>about</code> is. Nothing changes for a command that does not use the flag.</p></li>
 <li><p><strong>Kyle rules two stops in the shorthand, and they are built:</strong> a kind's description can list fields that every shorthand write must state (<code>every_write</code>, in version 2 of the file), and a stated <code>--sets</code> stops when it leaves out a key the command gives. <code>describe</code> counts the records that lack a listed field. Asked for in the same issues, put to margins, Neon and Astra in the room, and ruled the same day.</p></li>
 </ul>
+<h3 id="releases-begin">Releases begin</h3>
+<p>Kyle asked for GitHub releases of the binary: a machine with no Rust toolchain could not get the day's build, and every build printed <code>strange-loops-next 0.1.0</code>, so nobody could tell which one a machine had.</p>
+<ul>
+<li><p><strong><code>.github/workflows/release.yml</code>.</strong> A pushed tag <code>v&lt;version&gt;</code> opens a draft release, builds <code>loops</code> on GitHub's runners for Linux x86-64 and arm64 (static, against musl) and for macOS arm64 and x86-64, attaches each archive with its SHA-256, and publishes. It uses the pinned Rust release and <code>--locked</code>, the two actions the CI job already pins by commit, and GitHub's own <code>gh</code> for the release. The tag must be the version in <code>rust/cli/Cargo.toml</code>; three of the four binaries are run and must print it.</p></li>
+<li><p><strong>A manual run leaves a draft,</strong> whose tag is not created until it is published, so the workflow can be tried without publishing anything.</p></li>
+<li><p><strong>The crate's version is the release's name.</strong> <code>loops-cli</code> goes from 0.1.0 to 0.1.1. Nothing reads the version but <code>--version</code>.</p></li>
+<li><p><strong>The README says how to install</strong> from a release or from source, and how a release is made.</p></li>
+</ul>
+<p><strong>Implementer choices; they stand under W7 unless Kyle objects:</strong> the tag is <code>v</code> and the crate version; releases are not marked as pre-releases, so that &quot;latest&quot; finds them, and the notes say the record format is not frozen; the Linux builds are static; a build between two releases still prints the earlier release's version, and a commit id in <code>--version</code> is the next small piece.</p>
 <h3 id="kyle-rules-two-stops-in-the-shorthand-and-they-are-built">Kyle rules two stops in the shorthand, and they are built</h3>
 <p>Issues 24 and 26 each asked for a stop in the <code>emit</code> shorthand. Kyle asked whether the first needs standing, since ST1 had left required fields out as something that &quot;belongs to standing, or would burden an agent's ordinary write&quot;. The answer the coordinator gave him, and that he took:</p>
 <ul>
