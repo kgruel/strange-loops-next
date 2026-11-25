@@ -8,9 +8,9 @@ Everything that waits on Kyle, in one place. Each entry has the question, an exa
 - "Today" in an example means the `loops` binary built from main on 2026-11-21. Every "today" answer below was run, not predicted.
 ## At a glance
 
-Nothing waits on a ruling. Two things are [being prepared](#being-prepared).
+**Eleven entries wait on a ruling: [IS1 to IS11](#identity-and-standing-is1-to-is11), on identity and standing.** They were put on 2026-11-24, after a walk in five parts and a review by margins, Neon and Astra. One other question is [being prepared](#being-prepared).
 
-Every entry is ruled.
+Every earlier entry is ruled.
 
 - The tick record, TK1 to TK13: ruled and built. Step 4 is closed. The questions as they were put are in [the tick record note](notes/2026-11-21-tick-record.md#10-the-questions-as-they-were-put), sections 10 and 11.
 - The order of work, W1 to W6, and W3b, the look at the JavaScript after ticks: ruled. The entries as put are in [the order-of-work note](notes/2026-11-21-order-of-work.md).
@@ -21,13 +21,236 @@ Every entry is ruled.
 
 Below: [what is being prepared](#being-prepared), [what you deferred](#deferred-by-you) and [what is ruled](#ruled). Nothing waits to be confirmed: under your ruling of 2026-11-21 an implementer choice comes here only when it changes bytes or answers.
 
+## Identity and standing: IS1 to IS11
+
+**Put on 2026-11-24.** These come from [the walk](notes/2026-11-24-identity-walk.md), written at your request in four parts and then put to margins, Neon and Astra, who were asked where it is wrong. Part five of the note is what they broke and what replaces it. Each entry below is as it reads after that review, and names the draft entry and the items of part five it comes from. All four reviewers said the round had converged.
+
+They take as given what you said during the walk, none of which was a ruling: anybody can emit; records travel as git objects without pull requests; standing decides what is canonical; the steward is a lineage for the team, with grants from it.
+
+"Today" in these examples is the `loops` binary built from main at `c483cb9`. Every "today" answer was run in a scratch store with invented names. Where something is proposed and cannot be run, it says so.
+
+**What needs ruling first.** IS1, IS2, IS3 and IS11 are what a trial needs. The rest are needed before the first store that is kept.
+
+**What is not here.** Leanings that change no bytes and no answers stay in the note and stand unless you object: recovery (ID6), where a person's keys are kept (ID3), what stays erasable (ID7), names (ID8), how the team's root is used (SW2), a description two stewards changed apart (SW7), and how records travel in git (SL6, now an outbox for each place that writes). Four questions are left open on purpose and listed in section 22 of the note.
+
+### IS1: what "more standing" means
+
+*From SL1. Nobody in the review broke it.*
+
+**Question.** You said a director or a lead has more standing than a junior developer. More of what?
+
+**Example, run today.** A lead wrote a decision and a junior then wrote over it:
+
+```
+$ loops emit decision --of decision:kiln-schedule chosen=weekly      (the lead's key)
+$ loops emit decision --of decision:kiln-schedule chosen=daily       (the junior's key)
+$ loops of decision:kiln-schedule --plain
+heads  1
+  chosen  daily
+```
+
+One head and no conflict: the junior's write anchored on the lead's and replaced it.
+
+| | Standing is | Cost |
+| --- | --- | --- |
+| A | A rank: where two disagree, the higher wins. | The example is a replacement, not a disagreement, so a rank decides nothing in it. It would have to say who may replace whom. A junior's dissent is hidden. |
+| B | Counted or not, for the whole store. | A junior's notes become proposals as well. |
+| **C (recommended)** | Counted or not, kind by kind, with the right to accept what others propose. A junior's `note` counts; only a lead's `decision` does. | A scope has to be written down. A set of kinds is the smallest one. |
+
+**Changes:** what a grant holds, and so what IS4 writes.
+
+### IS2: a record that does not count
+
+*From SL2 and ID4, and item 1 of part five (margins).*
+
+**Question.** What does a read do with a record whose writer has no standing for its kind, or whose key does not speak for its observer?
+
+**Example, run today.** The lead wrote `monthly` and then `weekly`. The junior wrote `daily`. The lead then accepted it by writing `daily`, anchored on the junior's record as `emit` does. Read with the junior's record taken out:
+
+```
+$ loops of decision:kiln-schedule --plain
+heads  2
+  chosen  conflict (2): daily | weekly
+```
+
+Taking the record out cut the chain between the lead's two writes.
+
+| | A fold | Cost |
+| --- | --- | --- |
+| A | Leaves the record out before it finds the heads. | The example: accepting a proposal breaks. |
+| **B (recommended)** | The record stays in the order of what is above what, and sets nothing, its envelope included. It is shown as proposed and counted beside the result. One reading for both reasons a record may not count. | Every read has a second part. A fold's answer changes when a late grant or binding arrives, as it already does for a late `prev`. |
+| C | Includes it and counts it, as `loops check` does today with `unbound`. | Nothing is canonical. |
+
+Under B the example reads `chosen weekly` with one proposal against it, then `chosen daily` after the lead accepts. That is proposed and not run: it needs the clause built.
+
+**With it.** A record that cannot yet be shown to count (its grant, its binding or an envelope in between has not arrived) does not count yet. Admission keeps two answers.
+
+**Changes:** what a spec answers. The model, the vectors and Rust.
+
+### IS3: every record in a store with standing names what it stands on
+
+*New in part five: items 2, 3, 17 and 20 (Neon, margins, Astra).*
+
+**Question.** How is a record tied to the store it counts in, and a grant to the grant that allowed it?
+
+**Example, run today.** One team lineage anchors a workshop store and a yard store. A grant written in the workshop:
+
+```
+$ loops -C workshop emit grant --root --about sl:junior-example --about kind:decision
+$ loops -C workshop export | loops -C yard import -
+$ loops -C yard check
+{"altered":[],"lines":1,"records":1,"refused":[],"segments":1,"unbound":0}
+```
+
+The same signed line is held in the yard, with the same id. Nothing in it says which store it was for, and anybody can emit. The same is true of an ordinary record by someone granted in both.
+
+| | Tie | Cost |
+| --- | --- | --- |
+| **A (recommended)** | Every record names one thing in `under`: its grant, or the store's anchor when it has none. Every grant names the grant above it, down to the anchor. Admission checks that the record's observer is the one its grant names, that its kind is one the grant covers, and the same of each grant above. A record under the anchor from anyone but a founder is a proposal addressed to that store. | The bytes of every record written in such a store. A record counts by the one grant it names, so a second valid grant does not keep it counting when the first ends. |
+| B | A grant names its store among its mentions. Ordinary records name nothing, and admission searches for a grant. | An ordinary record still replays from one store to another. A tree of grants over lineages can loop (margins: the founder grants A, A grants B, B grants A). |
+| C | Nothing names a store. | The example. |
+
+`under` is already an envelope field, "the record id of the grant it acts on". Nothing writes it today, and nothing checks what it names beyond its being held.
+
+**Changes:** what a record holds, and what admission reads.
+
+### IS4: what a grant's envelope holds
+
+*From SW3, and items 7 and 20 of part five.*
+
+**Question.** Where is a grant's scope written?
+
+**Example, run today,** as an ordinary record:
+
+```
+$ loops emit grant --root --about sl:junior-example --about kind:note --about kind:task
+  about  kind:note, kind:task, sl:junior-example      payload {}
+```
+
+A spec that takes grants mentioning `kind:note` finds it, and finds it again after `loops erase`.
+
+| | Scope | Cost |
+| --- | --- | --- |
+| **A (recommended)** | The mentions are exactly one grantee and the kinds. The store comes from `under` (IS3). A right to grant is a record kind of its own, with the kinds it may pass on. | No scope finer than a set of kinds. A kind becomes a thing, `kind:<name>`. |
+| B | In the payload, in spec vocabulary. | A reader without the payload cannot judge a record, so admission gains a third answer. |
+
+**Changes:** what a grant holds. Permanent for each grant written.
+
+### IS5: ending a grant
+
+*From SW5, and items 2, 8, 18 and 21 of part five.*
+
+**Question.** When someone leaves, how does their grant end without taking their past decisions out of the canon?
+
+**Example.** A director is granted `decision` in March and leaves in October. Their decisions from March to October must still read as canonical in November. A record signed with their key in November must not.
+
+| | An end | Cost |
+| --- | --- | --- |
+| **A (recommended, before a team store is kept)** | A record of the grant it ends, by someone above that grant. It carries, as mentions, the topmost ids of a closed cut of what stands. It takes with it the grants made beneath the ended one, from then on. A record stands only if every end that counts covers it. | A law of the model changes: holding more can now stop a writer counting, outside a cover. The envelope is about as wide as the number of things the leaver wrote in. The verb refuses to sign unless its cut is closed. |
+| B | Nothing ends a grant yet. The host takes away the leaver's right to deliver. | The host is the boundary for this case, and only for stores it carries. |
+
+**Changes:** what a reader counts.
+
+### IS6: an explicit cut follows `under`
+
+*From item 23 of part five (Neon).*
+
+**Question.** Does a tick over a chosen set of records take in what those records stand on?
+
+**Example, run today.** A note under a grant under an anchor:
+
+```
+$ loops tick spec.json                 covers 3 ids   {"answer":"same","closure":"yes"}
+$ loops tick spec.json --cover <note>  covers 1 id    {"answer":"same","closure":"no"}
+```
+
+A bare tick follows `prev` and `under`. A cut by ids or by time follows `prev` only, as it is documented to.
+
+**Recommended.** A cut closes over `under` as well. IS5's end and IS8's continuing store are both explicit cuts.
+
+**Changes:** what such a tick covers. No record written today carries `under`, so no existing tick changes.
+
+### IS7: a second steward, and a person's seats
+
+*From SW6, and items 2, 16 and 25 of part five.*
+
+**Question.** A store starts with one steward. How is a second added, and who may end whom?
+
+**Example.** The team's lineage founds the store and gives the lead the right to grant. The lead gives it to a second lead. The two fall out, and each tries to end the other.
+
+| | Rule | Cost |
+| --- | --- | --- |
+| **A (recommended)** | A second steward is a grant that carries the right to grant. A grant is ended by whoever is above it in the chain of `under`, and by nobody else. The founder holds no grant and is never ended. People are granted by the team's lineage directly. A person's grant carries the right to grant its kinds to their own seats. | Ending a lead's grant ends what that lead granted. Hence people directly from the team. |
+| B | Stewards are equals who may end each other. | The example has two consistent readings and no rule between them. |
+
+Under A the second lead cannot end the first, and the first can end the second. Whether one of two founders may end a grant the other made is left open.
+
+**Changes:** what admission reads of a grant.
+
+### IS8: a store that continues another, or is raised from open
+
+*From items 19 and 24 of part five (margins, Neon).*
+
+**Question.** Under IS3 every record ends at one store's anchor. What happens to records written before that anchor existed, or under an anchor that has to be replaced?
+
+**Example.** A team's root key is taken in June. The remedy the walk first gave was a new store that takes the old records as history. Under IS3 none of the old records would count in it.
+
+**Recommended.** A store's anchor may name a tick, and an earlier anchor. Records inside that tick's cover count as they did: records with no `under` from a store that was open, or records chained to the earlier anchor. For a root that was taken, the cover stops before the theft.
+
+**Changes:** what a store's anchor holds, and what admission counts beneath it.
+
+### IS9: a record that is to count in a second store
+
+*From items 13, 15 and 24 of part five (Astra, Neon).*
+
+**Question.** The design has a record promoted from one store to another as the same record, so that one erasure covers every copy. Under IS3 a record counts in one store only. What replaces promotion?
+
+**Example, run today.** A junior's proposal set `chosen=daily` and cleared `day`. The lead accepted it by restating the value alone, and the canon read `chosen daily; day warm`. Restating the clearing as well gave `chosen daily; day —`.
+
+| | A record counts elsewhere, or a proposal is accepted, by | Cost |
+| --- | --- | --- |
+| A | Restating it: a new record with the same edit. | A new id, so an erasure of the original does not reach it. The example: a restatement by hand loses part of the edit, and two stacked proposals need their combined edit. |
+| **B (recommended)** | An affirm stance by someone with standing there, after which the record counts as it is, under its own id. Built with the first kept store. Restating stays as a verb for the trial, and it copies the edit exactly. | A kind that admission reads before anything else. |
+| C | Ordinary records are not bound to a store, so a verbatim copy counts wherever its writer is granted. | IS3's example comes back for ordinary records. |
+
+**Changes:** B adds a kind that admission reads.
+
+### IS10: who gets a lineage
+
+*From ID1. Not challenged in the review.*
+
+**Question.** What does an observer name?
+
+**Example.** One person has a laptop from an employer and a machine at home, an agent harness on each, and writes in an employer's stores and in a public repository.
+
+| | Lineages | Cost |
+| --- | --- | --- |
+| **A (recommended)** | One for each person in each realm (work, own). One for each harness of each person in each realm. A session and a worker are things a seat writes about, and get none. | Four lineages in the example. "The same person" across realms is a claim they may make and need not. |
+| B | One for each person, everywhere. | Every store that person writes in is linked by an id that no erasure removes. |
+| C | One for each session. | No continuity for an agent. |
+
+**Changes:** the observer in every record written afterwards.
+
+### IS11: the trial, on keys or on lineages
+
+*From items 10 and 22 of part five. Argued both ways in the review, and left to you.*
+
+**Question.** The trial is on stores declared disposable. Either way it has a store anchor and grants as records. Is an observer in it a key, as today, or a lineage?
+
+**Example.** One person in the trial writes from a laptop, a workbench and an agent.
+
+| | Observers in the trial | Cost |
+| --- | --- | --- |
+| **A (recommended by the coordinator)** | Keys, as today. Standing is built first, on what exists. | The person in the example is three observers, with three grants. The plain views show keys. |
+| B (Neon's leaning) | Lineages declared disposable. One person is one observer from the first day, and the model of who speaks runs from the first day. | IS2's reading for an unattributed record, and IS10, have to be ruled and built before the trial starts. |
+
+**Changes:** only the order of the work.
+
 ## Being prepared
 
 Nothing here needs you yet. It is listed so that you know what is coming.
 
 **Numbers stored as text**, with the import ([W1](notes/2026-11-21-order-of-work.md#w1-an-adoption-step-before-standing-and-sharing)). [TK6](notes/2026-11-21-tick-record.md#tk6-what-a-spec-reads-of-a-tick) shows one use for it.
-
-**Identity, standing, sharing and stewardship.** [The walk](notes/2026-11-24-identity-walk.md) has four parts and twenty-one draft entries. None is put. Part three walks stewardship, taking as given your agreement that the steward is a lineage for the team with grants from it (SW1 to SW5). Part four takes the case of two stewards from your point that a second is always added by the first (SW6 and SW7). **Part five is what margins, Neon and Astra broke when the walk was put to them, and what replaces it: read it beside the rest.** Its section 20 lists the entries that would come to you as they now read. Part one walks identity through three scenes (ID1 to ID8). Part two walks the thinnest slice through standing and sharing, on your direction that anybody can emit, that records travel as git objects without pull requests, and that standing decides what is canonical (SL1 to SL6). The ones that decide what a fold answers would come here first: what "more standing" means (SL1), a record that does not count (SL2), and a record whose key does not speak for its observer (ID4). Who gets a lineage (ID1) and recovery (ID6) come before the first store that is kept.
 
 ## Deferred by you
 

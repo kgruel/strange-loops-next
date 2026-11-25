@@ -1,6 +1,6 @@
 # Identity, standing and sharing: a walk before anything is anchored
 
-**Written on 2026-11-24 at Kyle's request. Nothing here is put to him or ruled.** It is a walk in the manner of [the trust walk](../design/rethink/sections/11-trust.html): three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries are what the walk found to decide. They are drafts: none is in `DECISIONS.md` yet.
+**Written on 2026-11-24 at Kyle's request. Nothing here is ruled. Eleven entries from it, IS1 to IS11, were put to him in [`DECISIONS.md`](../DECISIONS.md#identity-and-standing-is1-to-is11) the same night, as they read after part five.** It is a walk in the manner of [the trust walk](../design/rethink/sections/11-trust.html): three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries (ID, SL and SW) are what the walk found to decide, as they were first drafted.
 
 The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so [part two](#part-two-the-thinnest-slice-through-standing-and-sharing), sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5). Kyle then said that this raises how stewardship is managed, for the description file and everything else that defines a store as much as for the list, so [part three](#part-three-stewardship), sections 14 to 16, walks that. [Part four](#part-four-two-stewards), sections 17 and 18, takes the case part three had set aside.
 
@@ -278,7 +278,7 @@ None of these is put. Each says what it would change, so that the ones that reac
 - Git is where sharing starts, and this walk presumes it. It "will not be the only storage method of which we can control access", which makes standing more important.
 - "Anybody can emit into a continual stream of records", and strictness is progressive.
 - For git: records travel as git objects, without pull requests.
-- What is canonical in a view of the store is decided by standing: "my director or myself would have more standing than our junior devs".
+- What is canonical in a view of the store is decided by standing: a director or a lead has more of it than a junior developer.
 
 None of that is a ruling. It is what this part takes as given.
 
