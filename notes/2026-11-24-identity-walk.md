@@ -675,7 +675,7 @@ heads  2
 
 # Part five: what the council broke
 
-**Added on 2026-11-24, the same night.** At Kyle's word the walk was put to margins, Neon and Astra in a room, `#identity-and-standing`, with one request: say where it is wrong. Neon and margins have answered. Astra has not yet. What could be run was run again here on main (`c483cb9`) before it was accepted.
+**Added on 2026-11-24, the same night.** At Kyle's word the walk was put to margins, Neon and Astra in a room, `#identity-and-standing`, with one request: say where it is wrong. All three answered. What could be run was run again here on main (`c483cb9`) before it was accepted.
 
 ## 19. What broke, and what replaces it
 
@@ -739,6 +739,19 @@ Section 9's third row did not show this, because there the canonical value was t
 
 **14. `emit grant` beside a description (section 15). Found by Neon.** ST1 stops it, since the description does not name the kind. The example in section 15 ran in a store with no description. Standing kinds get their own verbs, or go through `emit -`.
 
+**15. Restating a proposal that clears a field (section 11, SL3). Found by Astra, run again here.** The lead had `chosen=weekly` and `day=warm`. The junior's proposal set `chosen=daily` and cleared `day`. With the proposal setting nothing:
+
+| The lead restates | The canon reads |
+| --- | --- |
+| `chosen=daily` | `chosen daily`, `day warm` |
+| `chosen=daily`, and the unset of `day` | `chosen daily`, `day —` |
+
+*Replaced by:* accepting restates the proposal's `sets` exactly, cleared keys included. That is a verb's work and not a person's. Two proposals stacked on one thing would need their combined edit restated, where an affirm stance makes each count where it is. So the affirm stance is worth more, and sooner, than SL3 had it.
+
+**16. Two paths to one writer (section 17, SW6). Found by Astra.** Two stewards each grant the potter the same kind. If the potter then grants someone, which steward is above that grant?
+
+*Replaced by:* with the tree over grant records, a grant names the one grant it acts under, and a record the one grant it counts by. A second valid path does not sustain either. When the cited grant ends, the writer cites the other from then on.
+
 ## 20. What stands, and what goes to Kyle now
 
 **Unbroken so far:** "more standing" as being counted for more kinds and not as a rank (SL1); standing as a clause of admission; the team's lineage as the founder; removal running one way, now over grant records; grants and ends that only grow.
@@ -754,6 +767,7 @@ Section 9's third row did not show this, because there the canonical value was t
 | SW3 | A grant's mentions are the one granted and the kinds. Its store comes from `under`. A right to grant is a separate kind. |
 | SW5 | An end names the grant, carries the topmost ids of what stands, and takes the grants beneath it. |
 | SW6 | A second steward holds a right to grant. The tree is over grant records. |
+| SL3 | Accepting is a verb that restates the proposal's `sets` exactly. The affirm stance comes sooner. |
 
 ## 21. An order, if the leanings hold
 
@@ -769,7 +783,6 @@ Section 9's third row did not show this, because there the canonical value was t
 - It did not test a git host. What a host does with refs outside branches and tags, and who may move them, is argued and not run.
 - It did not walk a scope finer than a set of kinds, or who may erase.
 - It did not settle whether one founder may end another's grant (SW6), how an erasure reaches every outbox, or whether a definition is ever read through a union of stores.
-- Astra had not answered when part five was written.
 - It did not walk a company above its teams: who makes a team's lineage, and what a team is called outside itself.
 - It rests on one workbench and on a description of one team.
 - It takes the two tiers as settled. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which ID1 leans on, and costs the trap in ID6.
