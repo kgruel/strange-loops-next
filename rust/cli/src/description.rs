@@ -21,6 +21,7 @@ pub(crate) struct Kind {
     pub(crate) refs: Option<BTreeMap<String, Vec<String>>>,
     pub(crate) lifecycle: Option<Lifecycle>,
     preview: Option<Vec<String>>,
+    pub(crate) every_write: Vec<String>,
 }
 
 #[derive(Default)]
@@ -67,19 +68,28 @@ impl Description {
 
     fn parse(json: Json) -> Result<Self, String> {
         let mut desc = Self::default();
+        // JSON object member order does not determine the kind grammar.
+        let version_number =
+            if crate::values::member(&json, "version") == Some(&Json::Int(2_u64.into())) {
+                2
+            } else {
+                1
+            };
         let mut version = false;
         let mut kinds = false;
         members(json, "$", |key, at, val| {
             match key.as_str() {
-                "version" if val == Json::Int(1_u64.into()) => version = true,
-                "version" => return Err(format!("{at}: expected version 1")),
+                "version" if val == Json::Int(1_u64.into()) || val == Json::Int(2_u64.into()) => {
+                    version = true;
+                }
+                "version" => return Err(format!("{at}: expected version 1 or 2")),
                 "note" => desc.note = Some(string(val, at)?),
                 "kinds" => {
                     members(val, at, |name, at, val| {
                         if name.is_empty() {
                             return Err(format!("{at}: expected a nonempty kind name"));
                         }
-                        let kind = Kind::parse(val, at, &name)?;
+                        let kind = Kind::parse(val, at, &name, version_number)?;
                         desc.kinds.insert(name, kind);
                         Ok(())
                     })?;
@@ -138,7 +148,7 @@ impl Kind {
         }
     }
 
-    fn parse(json: Json, path: &str, name: &str) -> Result<Self, String> {
+    fn parse(json: Json, path: &str, name: &str, version: u8) -> Result<Self, String> {
         let mut kind = Self::default();
         members(json, path, |key, at, val| {
             match key.as_str() {
@@ -166,11 +176,26 @@ impl Kind {
                     kind.refs = Some(refs);
                 }
                 "lifecycle" => kind.lifecycle = Some(Lifecycle::parse(val, at)?),
+                "every_write" if version == 2 => {
+                    kind.every_write = list(val, at, payload_field)?;
+                    if kind.every_write.is_empty() {
+                        return Err(format!("{at}: expected at least one payload field"));
+                    }
+                }
                 "preview" => kind.preview = Some(list(val, at, nonempty)?),
                 _ => return Err(format!("{at}: unknown member")),
             }
             Ok(())
         })?;
+        if let Some(i) = kind
+            .every_write
+            .iter()
+            .position(|f| Some(f.as_str()) == kind.key_field())
+        {
+            return Err(format!(
+                "{path}.every_write[{i}]: also names the kind’s key"
+            ));
+        }
         Ok(kind)
     }
 }
@@ -252,6 +277,14 @@ fn nonempty(json: Json, path: &str) -> Result<String, String> {
         return Err(format!("{path}: expected nonempty text"));
     }
     Ok(s)
+}
+
+fn payload_field(json: Json, path: &str) -> Result<String, String> {
+    let field = nonempty(json, path)?;
+    if field.starts_with("env.") {
+        return Err(format!("{path}: expected a payload field name"));
+    }
+    Ok(field)
 }
 
 fn kind_prefix(json: Json, path: &str) -> Result<String, String> {

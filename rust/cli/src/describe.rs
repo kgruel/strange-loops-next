@@ -170,7 +170,14 @@ fn count_members(
 }
 
 #[derive(Default)]
+struct EveryWrite {
+    missing: usize,
+    not_read: usize,
+}
+
+#[derive(Default)]
 struct Fit {
+    every_write: BTreeMap<String, EveryWrite>,
     declared: bool,
     things: usize,
     key: Option<Keys>,
@@ -181,6 +188,11 @@ struct Fit {
 impl Fit {
     fn declared(kind: &Kind) -> Self {
         Self {
+            every_write: kind
+                .every_write
+                .iter()
+                .map(|f| (f.clone(), EveryWrite::default()))
+                .collect(),
             declared: true,
             things: 0,
             key: kind.key_field().map(|_| Keys::default()),
@@ -215,6 +227,23 @@ impl Fit {
 
     fn json(&self) -> Json {
         object(vec![
+            (
+                "every_write",
+                Json::Obj(
+                    self.every_write
+                        .iter()
+                        .map(|(field, n)| {
+                            (
+                                field.clone(),
+                                object(vec![
+                                    ("records_missing", count(n.missing)),
+                                    ("records_not_read", count(n.not_read)),
+                                ]),
+                            )
+                        })
+                        .collect(),
+                ),
+            ),
             ("things", count(self.things)),
             ("declared", Json::Bool(self.declared)),
             (
@@ -282,7 +311,12 @@ impl Site {
         match &self.description {
             None => out.push_str("description  none"),
             Some((_, raw)) => {
-                out.push_str("description  version 1");
+                write!(
+                    out,
+                    "description  version {}",
+                    member(raw, "version").expect("validated version").canon()
+                )
+                .expect("write string");
                 if let Some(note) = member(raw, "note") {
                     write!(out, "\nnote  {}", plain::value(note)).expect("write string");
                 }
@@ -354,6 +388,21 @@ impl Site {
                 )
                 .expect("write string");
             }
+            if !f.every_write.is_empty() {
+                let rows = ordered(&f.every_write).into_iter().map(|(field, n)| {
+                    vec![
+                        plain::label(field),
+                        n.missing.to_string(),
+                        n.not_read.to_string(),
+                    ]
+                });
+                write!(
+                    out,
+                    "\n{label} every write\n{}",
+                    table(&["FIELD", "RECORDS MISSING", "RECORDS NOT READ"], rows)
+                )
+                .expect("write string");
+            }
         }
         out
     }
@@ -386,14 +435,30 @@ fn measure(held: &Held, sites: &mut [Site], records: &[Record]) {
     let mut by_id = HashMap::new();
     for (name, rs) in &groups {
         for r in rs {
-            by_id.insert(id_text(&r.id), name.as_str());
+            by_id.insert(id_text(&r.id), (name.as_str(), *r));
         }
     }
     let mut locations = Locations::new();
-    for (index, site) in sites.iter().enumerate() {
+    for (index, site) in sites.iter_mut().enumerate() {
+        let mut counted = HashSet::new();
         for line in &held.lines()[site.lines.clone()] {
-            if let Some(&thing) = by_id.get(line.id()) {
-                locations.entry(thing).or_default().insert(index);
+            let Some(&(thing, record)) = by_id.get(line.id()) else {
+                continue;
+            };
+            locations.entry(thing).or_default().insert(index);
+            let Some(fit) = site.fit.get_mut(&record.kind) else {
+                continue;
+            };
+            if fit.every_write.is_empty() || !counted.insert(line.id()) {
+                continue;
+            }
+            let payload = crate::values::payload(held, record);
+            for (field, n) in &mut fit.every_write {
+                match payload {
+                    None => n.not_read += 1,
+                    Some(p) if member(p, field).is_none() => n.missing += 1,
+                    Some(_) => {}
+                }
             }
         }
     }

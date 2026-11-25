@@ -195,6 +195,12 @@ Every verb that reads the store says when either happened (choice 18).
     emit that sets no key. The two together are a usage error. `--sets ""`
     is the writer's `sets-not-keys`. Either flag states `sets` as given, and
     nothing is filled in over it; an emit with neither is choice 15's.
+    On shorthand emit, name every payload field in a stated `--sets`,
+    including `text` for a message. Give no fields or message with
+    `--sets-nothing`. A named key without a value still unsets that key.
+    For a revision where choice 15 would fill the keys and none is an
+    unset, dropping the flags lets the shorthand name the keys. Use
+    `emit -` to carry a payload member the record does not set.
     `emit -` takes `sets` as a line's envelope field, as written; a key that
     starts with `@` is a key, not a label.
 
@@ -1053,7 +1059,7 @@ Every verb that reads the store says when either happened (choice 18).
 
 34. **The working store's description.** The optional UTF-8
     file `.loops/store.json` holds one JSON object. It requires the number
-    `1` in `version` and an object in `kinds`. It may also have a text
+    `1` or `2` in `version` and an object in `kinds`. It may also have a text
     `note`. An empty `kinds` object is valid. Each nonempty kind name maps
     to an object with the following optional members. Fixed-member objects
     are closed and object member names must be unique at every depth.
@@ -1066,6 +1072,9 @@ Every verb that reads the store says when either happened (choice 18).
     | `refs` | An object mapping nonempty payload field names to arrays of distinct kind prefixes matching `[a-z][a-z0-9-]*` other than `r`. An empty array allows every prefix, including `r`. The spec reserves `env.`, so a reference field cannot start with it. |
     | `lifecycle` | An object with required nonempty text `field` and optional `active` and `closed` arrays of distinct strings. An omitted list defaults to empty. Together the lists must contain at least one value, and they must be disjoint. |
     | `preview` | An ordered array of distinct nonempty payload field names. |
+    | `every_write` (version 2 only) | A nonempty array of distinct nonempty payload field names. A name cannot start with `env.` or equal this kind's string `key`. |
+
+    Version 2 adds only `every_write`. Version 1 treats it as an unknown member.
 
     Plain `ls`, `of`, `read` and `fold` load the working store's description.
     Two `ls` flags also use descriptions in JSON output, `--active` and
@@ -1107,11 +1116,19 @@ Every verb that reads the store says when either happened (choice 18).
       prefix list is nonempty. An empty prefix list allows every prefix,
       including `r:`. The target may be absent. An empty payload list
       `[]` writes the reference field with zero targets.
+    - Each `every_write` field must be present in this write's own payload.
+      A field or a message for `text` supplies it. An empty string, an empty
+      list and null all count as present. Reference and lifecycle checks
+      still apply. First writes, revisions, roots, whole writes and moves
+      without fields all follow the rule. Only an explicit `--sets-nothing`
+      join is exempt. Raw changesets, filled changesets, ticks and erasures
+      do not read the description.
     - A comma in any reference, including a list member, stops the
       shorthand. Give multiple targets as separate list entries, for example
       `owners:='["yard:east","yard:west"]'`. Commas are legal in `--of`,
       `--about` and undeclared fields. Lifecycle and reference fields may
-      be omitted or unset with `--sets <field>` and no payload value.
+      be omitted or unset with `--sets <field>` and no payload value unless
+      `every_write` requires the field.
 
     With a file, each head kind must declare the same headline field. Use
     the kind's `headline` when present, otherwise its string `key`. If any
@@ -1178,6 +1195,15 @@ Every verb that reads the store says when either happened (choice 18).
     value outside both lists in a histogram of typed `{value,count}` rows,
     including readable values on competing setters. An inapplicable key or
     lifecycle is `null`.
+
+    Each kind's `every_write` object counts records over all history. For
+    each listed field, count the admitted records of that record kind held
+    among this store's lines, once each, with visibility as the union settles
+    it. A held payload without the member, including a non-object, counts
+    in `records_missing`. An erased or withheld payload counts in
+    `records_not_read`. This is literal presence: an empty list is present,
+    and even an exempt join counts as missing. A kind that lists no fields
+    gives `{}`. Plain output gives a table only for a kind that lists fields.
 
     For each declared reference field, count a scalar once or each immediate
     list member once per distinct live setter. Preserve repeats. A missing
@@ -1279,6 +1305,13 @@ a fork, a pure join, an unset and an erasure. It checks both flag positions
 and the plain live blocks. The describe walk checks `things_unset` in JSON
 and plain for a kind with zero things, an absent field, an explicit unset,
 an empty list and competing setters.
+
+The description and strict emit walks check both file versions, required
+fields on roots, revisions and joins, the destination store, and the repairs
+offered when stated sets leave fields out. They compare signed lines for
+covered fields and exercise tick's own sets flags. The describe walk checks
+historical counts by record kind and local residence with union visibility,
+including a non-object, an exempt join and a kind with no records.
 
 Not checked: nothing in the model says what a place is, so there is no law
 behind the layout, and no second implementation reads it yet.

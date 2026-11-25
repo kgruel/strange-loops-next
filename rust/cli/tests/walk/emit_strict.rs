@@ -13,7 +13,7 @@ fn described(name: &str) -> Store {
     s
 }
 
-fn stopped(s: &Store, args: &[&str], code: i32, words: &[&str]) {
+fn stopped(s: &Store, args: &[&str], code: i32, words: &[&str]) -> String {
     let before = s.ok(&["export"]);
     let segments = s.segments();
     let (status, stdout, stderr) = answer(s, &[&["emit"][..], args].concat(), "");
@@ -26,6 +26,7 @@ fn stopped(s: &Store, args: &[&str], code: i32, words: &[&str]) {
     }
     assert_eq!(s.segments(), segments, "{args:?}");
     assert_eq!(s.ok(&["export"]), before, "{args:?}");
+    stderr
 }
 
 #[test]
@@ -315,4 +316,208 @@ fn named_emits_validate_the_destination_description() {
     reject("stage=hot", "--root");
     fs::write(yard.dir.join(".loops/store.json"), "{").expect("broken destination");
     reject("name=east", "store.json: $");
+}
+
+#[test]
+fn every_write_requires_own_fields_even_on_revisions_and_moves() {
+    let s = fixed_store("kiln-every-write");
+    let rules = r#"{"version":2,"kinds":{"kiln":{"every_write":["evidence","text"],"refs":{"evidence":["firing"]}},"yard":{},"potter":{"every_write":["name"]}}}"#;
+    fs::write(s.dir.join(".loops/store.json"), rules).expect("description");
+    let absent = &[
+        "missing every_write",
+        r#"["evidence","text"]"#,
+        "State",
+        "--sets-nothing",
+        "emit -",
+    ];
+    stopped(&s, &["kiln", "--of", "kiln:east"], 2, absent);
+    s.ok(&[
+        "emit",
+        "kiln",
+        "--of",
+        "kiln:east",
+        "evidence=firing:one",
+        "first",
+    ]);
+    for flags in [
+        &[][..],
+        &["--whole"],
+        &["--add-about", "yard:b"],
+        &["--sets", "evidence"],
+    ] {
+        stopped(
+            &s,
+            &[&["kiln", "--of", "kiln:east"][..], flags].concat(),
+            2,
+            absent,
+        );
+    }
+    stopped(&s, &["kiln", "--root"], 2, absent);
+    stopped(
+        &s,
+        &["kiln", "--root", "evidence:=null", "first"],
+        2,
+        &["allowed reference"],
+    );
+    stopped(
+        &s,
+        &[
+            "kiln",
+            "--of",
+            "kiln:east",
+            "--sets",
+            "text",
+            "evidence:=[]",
+            "second",
+        ],
+        2,
+        &["Add --sets evidence"],
+    );
+    s.ok(&[
+        "emit",
+        "kiln",
+        "--of",
+        "kiln:east",
+        "evidence:=[]",
+        "second",
+    ]);
+    s.ok(&[
+        "emit",
+        "kiln",
+        "--of",
+        "kiln:east",
+        "--sets-nothing",
+        "--add-about",
+        "yard:b",
+    ]);
+    s.changeset(r#"{"kind":"kiln","of":"kiln:east","payload":{}}"#);
+    s.ok(&["emit", "yard"]);
+    for field in ["name=", "name:=null"] {
+        s.ok(&["emit", "potter", field]);
+    }
+    let origin = fixed_store("workshop-every-write");
+    let dest = format!("yard={}", s.dir.display());
+    let before = s.ok(&["export"]);
+    let (code, out, err) = answer(
+        &origin,
+        &["--store", &dest, "--in", "yard", "emit", "kiln", "--root"],
+        "",
+    );
+    assert_eq!((code, out.as_str()), (2, ""));
+    assert!(
+        err.contains("emit kiln --root") && err.contains("evidence"),
+        "{err}"
+    );
+    assert_eq!(s.ok(&["export"]), before);
+}
+
+#[test]
+fn stated_sets_cover_fields_and_offer_only_applicable_repairs() {
+    for (name, desc) in [
+        ("kiln-cover", None),
+        ("yard-cover", Some(r#"{"version":1,"kinds":{"kiln":{}}}"#)),
+    ] {
+        let s = fixed_store(name);
+        if let Some(d) = desc {
+            fs::write(s.dir.join(".loops/store.json"), d).expect("description");
+        }
+        let reject = |args: &[&str], words: &[&str], infer: bool| {
+            let args = [&["kiln", "--of", "kiln:east"][..], args].concat();
+            let err = stopped(&s, &args, 2, words);
+            assert_eq!(err.contains("drop --sets"), infer, "{err}");
+        };
+        reject(
+            &["cone=9", "--sets", "cone", "second"],
+            &["Add --sets text", "emit -"],
+            false,
+        );
+        s.ok(&[
+            "emit",
+            "kiln",
+            "--of",
+            "kiln:east",
+            "name=east",
+            "cone=6",
+            "shelf=2",
+            "first",
+        ]);
+        reject(
+            &["cone=9", "--sets", "cone", "second"],
+            &["Add --sets text"],
+            true,
+        );
+        reject(
+            &["cone=10", "shelf=5", "--sets", "cone"],
+            &["Add --sets shelf"],
+            true,
+        );
+        reject(
+            &["text=second", "shelf=5", "--sets", "cone"],
+            &[r#"["shelf","text"]"#, "Add --sets shelf --sets text"],
+            false,
+        );
+        reject(
+            &["--sets-nothing", "shelf=5"],
+            &[
+                "Replace --sets-nothing with --sets shelf",
+                "drop the fields",
+            ],
+            false,
+        );
+        let other = s.ok(&["emit", "kiln", "--of", "kiln:west"]);
+        reject(
+            &["--base-id", &other, "--sets", "cone", "cone=9", "second"],
+            &["Add --sets text"],
+            false,
+        );
+        let id = s.ok(&[
+            "emit",
+            "kiln",
+            "--of",
+            "kiln:east",
+            "--sets",
+            "cone",
+            "--sets",
+            "shelf",
+            "cone=9",
+        ]);
+        let line = s.json(&["get", &id]);
+        assert_eq!(strings(&line, &["env", "sets"]), ["cone", "shelf"]);
+        assert_eq!(at(&line, &["payload"]).canon(), r#"{"cone":"9"}"#);
+    }
+}
+
+#[test]
+fn covered_fields_sign_the_same_line_and_tick_keeps_its_envelope_options() {
+    let s = fixed_store("kiln-covered");
+    let raw = fixed_store("yard-covered");
+    let id = fixed_emit(
+        &s,
+        &[
+            "kiln",
+            "--of",
+            "kiln:east",
+            "--sets",
+            "cone",
+            "--sets",
+            "shelf",
+            "cone=6",
+        ],
+    );
+    let draft = format!(
+        r#"{{"kind":"kiln","of":"kiln:east","sets":["cone","shelf"],"payload":{{"cone":"6"}},"emitted":"{}","salt":"{}"}}"#,
+        super::WHEN,
+        super::SALT
+    );
+    assert_eq!(raw.changeset(&draft), [id]);
+    assert_eq!(raw.ok(&["export"]), s.ok(&["export"]));
+    fs::write(s.dir.join(".loops/store.json"), "{").expect("broken description");
+    let spec = r#"{"vertex":"kiln","from":[{"store":"."}]}"#;
+    for (flags, sets) in [
+        (&["--sets-nothing"][..], "[]"),
+        (&["--sets", "x"], r#"["x"]"#),
+    ] {
+        let id = s.ok_with(&[&["tick", "-"][..], flags].concat(), spec);
+        assert_eq!(at(&s.json(&["get", &id]), &["env", "sets"]).canon(), sets);
+    }
 }

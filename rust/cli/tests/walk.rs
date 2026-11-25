@@ -920,16 +920,15 @@ fn sets_is_stated_on_either_path_and_kept_without_the_payload() {
     let join = s.ok(&["emit", "task", "--prev", &root, "--sets-nothing"]);
     assert_eq!(at(&sets(&join), &["env", "sets"]), &Json::Arr(vec![]));
     assert_eq!(text(&sets(&join), &["env", "of"]), root);
-    // A declared key the payload lacks is written; nothing compares them.
-    let status = s.ok(&[
-        "emit",
-        "task",
-        "--prev",
-        &join,
-        "--sets",
-        "status",
-        "title=renamed",
-    ]);
+    // The changeset writer permits a carried field and a declared unset.
+    let status = s.changeset(&format!(
+        r#"{{"kind":"task","of":"{root}","prev":["{join}"],"sets":["status"],"payload":{{"title":"renamed"}}}}"#
+    )).remove(0);
+    assert_eq!(strings(&sets(&status), &["env", "sets"]), ["status"]);
+    assert_eq!(
+        at(&sets(&status), &["payload"]).canon(),
+        r#"{"title":"renamed"}"#
+    );
     assert_eq!(text(&sets(&status), &["env", "of"]), root);
     // `--whole` states no `sets`: the emit is read whole.
     let whole = s.ok(&["emit", "task", "--prev", &status, "--whole", "title=whole"]);
@@ -1951,18 +1950,7 @@ fn an_undeclared_key_is_not_shown_and_whole_replaces_everything() {
     ]);
     // The emit declares `status` and `title`: `colour` is in its payload and
     // not read, and `title`, declared and missing, is unset.
-    let stated = s.ok(&[
-        "emit",
-        "task",
-        "--of",
-        "task:1",
-        "--sets",
-        "status",
-        "--sets",
-        "title",
-        "status=done",
-        "colour=red",
-    ]);
+    let stated = filled(&s, r#"{"kind":"task","of":"task:1","sets":["status","title"],"payload":{"status":"done","colour":"red"}}"#).remove(0);
     let state = s.json(&["of", "task:1"]);
     assert_eq!(
         at(&state, &["values"]),
@@ -2230,21 +2218,7 @@ fn concurrent_route_lists_are_tested_per_setter_and_displayed_whole() {
         } else {
             r#"["svc:a"]"#
         };
-        let x = a.ok(&[
-            "emit",
-            "svc",
-            "--of",
-            "svc:fork",
-            "--sets",
-            "routes",
-            "--sets",
-            "notes",
-            "--sets",
-            "missing",
-            &format!("routes:={left}"),
-            "notes:=null",
-            "extra:=true",
-        ]);
+        let x = filled(&a, &format!(r#"{{"kind":"svc","of":"svc:fork","sets":["routes","notes","missing"],"payload":{{"routes":{left},"notes":null,"extra":true}}}}"#)).remove(0);
         let y = b.ok(&[
             "emit",
             "svc",
@@ -2492,7 +2466,16 @@ fn filled_fields_and_absences_match_the_single_flags() {
             ],
         );
         batch.ok_with(&["import"], &singles.ok(&["export"]));
-        let mut args = vec!["task", "--of", "task:1", "x:=2"];
+        let mut args = vec!["task", "--of", "task:1"];
+        let payload = if flags.contains(&"--sets-nothing") {
+            "{}"
+        } else if flags.contains(&"--sets") {
+            args.push("other:=2");
+            r#"{"other":2}"#
+        } else {
+            args.push("x:=2");
+            r#"{"x":2}"#
+        };
         let prev = if members.starts_with(r#""prev""#) {
             String::new()
         } else {
@@ -2504,7 +2487,7 @@ fn filled_fields_and_absences_match_the_single_flags() {
         assert_twins(
             &batch,
             &singles,
-            &format!(r#"{{"kind":"task","of":"task:1",{prev}{members},"payload":{{"x":2}}}}"#),
+            &format!(r#"{{"kind":"task","of":"task:1",{prev}{members},"payload":{payload}}}"#),
             &[id],
         );
     }

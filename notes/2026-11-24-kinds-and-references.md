@@ -346,6 +346,8 @@ $ loops fold kilns-is-a.json --plain              (where kilns is kiln:a, follow
 
 **Not taken, by agreement of the four:** required fields, a check that a target exists, refusing a payload field the description does not name, and a second list encoding for new writes. These belong to standing, or would burden an agent's ordinary write.
 
+*Amended on 2026-11-25:* a field that every shorthand write of a kind must state was taken, as `every_write`, once a store's owner asked for it. It is a stop in the shorthand and not standing. The record is in [the changelog](../CHANGELOG.md#kyle-rules-two-stops-in-the-shorthand-and-they-are-built).
+
 **A cost, stated.** A list is clumsy in the shorthand: `field:='["asset:a","asset:b"]'`, with the shell's quoting. A repeatable field, or a reference field declared to hold many, could come later; either would be explicit.
 
 **Left for another day** (found in the same look, and not part of this): imported records carry the old tool's `message` where a new write's trailing message goes to `text`; and a trailing message that holds `=` is taken as a field.

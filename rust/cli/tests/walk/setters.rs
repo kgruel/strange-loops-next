@@ -133,18 +133,7 @@ fn compact_bytes_and_all_live_setters() {
         live: &[(&first, &["cone", "name", "shelf", "text"])],
     };
     view.check(store);
-    let second = emit(
-        store,
-        later,
-        &[
-            "cone=9",
-            "--sets",
-            "cone",
-            "--about",
-            "firing:two",
-            "second",
-        ],
-    );
+    let second = store.changeset(&format!(r#"{{"kind":"kiln","of":"{NAME}","prev":["{first}"],"about":["firing:two"],"emitted":"{later}","sets":["cone"],"payload":{{"cone":"9","text":"second"}}}}"#)).remove(0);
     let second_row = row(&second, "here", Some("9"));
     let view = View {
         heads: &[&second],
