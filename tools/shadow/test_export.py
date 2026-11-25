@@ -149,8 +149,19 @@ class VertexTests(unittest.TestCase):
             ("store \"workshop.sqlite\"", 'store "yard" backend="unknown"'),
             ("thread {", 'thread "arg" {'),
             ('edge "tool" targets="tool"', 'unknown "tool"'),
-            ('items "by" "name"', 'size "by" "name"'),
             ('items "by" "name"', 'items "sum" "name"'),
+            ('items "by" "name"', 'items "median" "name"'),
+            ('items "by" "name"', 'items by "name"'),
+            ('items "by" "name"', 'items "by" "name"; size "by" "kind"'),
+            ('items "by" "name"', 'count "inc"; items "by" "name"'),
+            ('items "by" "name"', 'items "by" "name"; items "inc"'),
+            ('items "by" "name"', 'items "by" "name"; count "inc" "extra"'),
+            ('items "by" "name"', 'items "by" "name"; total "sum"'),
+            ('items "by" "name"', 'items "by" "name"; recent "window" "3" "name"'),
+            ('items "collect" 2', 'items "collect" 2; older "collect" 4'),
+            ('items "collect" 2', 'count "inc"; updated "latest"'),
+            ('items "collect" 2', 'count "inc"; items "collect" 2'),
+            ('items "collect" 2', 'count "count"; peak "max" "size"; items "collect" 2'),
             ('items "by" "name"', 'items "by"'),
             ('items "by" "name"', 'items "by" ""'),
             ('items "by" "name"', 'items "by" "name" { bogus }'),
@@ -166,6 +177,27 @@ class VertexTests(unittest.TestCase):
                 line = VERTEX[:VERTEX.index(old)].count("\n") + 1
                 with self.assertRaisesRegex(InvalidVertex, f"at line {line}:"):
                     parse_vertex(VERTEX.replace(old, new))
+
+    def test_folds_with_several_slots(self):
+        # The old tool reads items from the first slot: a first `by` keys the
+        # kind, a first `collect` collects it; later slots are left out.
+        cases = [
+            ('items "by" "name"', 'latest "by" "name"', {"by": "name"}),
+            ('items "by" "name"', 'items "by" "name"; count "inc"; seen "latest"', {"by": "name"}),
+            ('items "by" "name"', 'items "by" "name"; total "sum" "size"; recent "window" 3 "size"',
+             {"by": "name"}),
+            ('items "by" "name"', 'items "by" "name"; log "collect" 9', {"by": "name"}),
+            ('items "collect" 2', 'observations "collect" 500; count "inc"; updated "latest"',
+             {"collect": "500"}),
+            ('items "collect" 2', 'items "collect" 2; count "count"; peak "max" "size"',
+             {"collect": "2"}),
+        ]
+        for old, new, entry in cases:
+            with self.subTest(new=new):
+                kinds = parse_vertex(VERTEX.replace(old, new))["kinds"]
+                kind = "thread" if "by" in old else "change"
+                self.assertEqual(kinds[kind], entry)
+                self.assertEqual(len(kinds), 2)
 
     def test_skipped_top_level_blocks(self):
         blocks = '''observers {
