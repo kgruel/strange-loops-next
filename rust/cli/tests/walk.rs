@@ -4873,3 +4873,6 @@ mod emit_strict;
 
 #[path = "walk/about_flags.rs"]
 mod about_flags;
+
+#[path = "walk/setters.rs"]
+mod setters;

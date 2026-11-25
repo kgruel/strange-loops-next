@@ -7,6 +7,44 @@ Each date starts with a short list. Under it is the record as it was written at 
 Since Kyle's ruling of 2026-11-21 (W7), only a choice that changes a record's bytes or id, a result's bytes or hash, a refusal code, or what a spec answers comes to him, through [DECISIONS.md](DECISIONS.md). Every other implementer choice is written here and stands unless he objects.
 The record starts where the old roadmap's did. For anything earlier, and for every merge, see `git log`.
 
+## 2026-11-25
+
+In brief:
+- **Built: `loops of --setters`, and a `describe` count of things that leave a reference field unset.** Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The `emit` help now says what `about` is. Nothing changes for a command that does not use the flag.
+- Two stops asked for in the same issues wait on Kyle: a stated `--sets` that leaves out a key the command gives, and a field every write of a kind must state.
+
+### Built: a thing's setters, and a count of unset references
+
+Four issues came from an agent rebuilding a private group of stores from first principles, which is the use ST1 was ruled for. Each was rerun here on main (`369b100`) in scratch stores with invented names, and each is as reported.
+
+**What the four have in common.** The writers want to record two things about each record: what it rests on, and why it was written. `about`, the message and every payload field are read as facts about the thing: the heads' mentions are the thing's, and each key shows the value from its live setter. So a fact about one record, kept in any of them, reads as the latest one. It is then wrong for every key the latest record did not set. A reference field in place of a mention removes the silent copy and leaves this as it was: after a second record cites `firing:two` and sets only `cone`, the thing reads `evidence=firing:two` beside a `name` that the first record set under `firing:one`, and `ls --refers-to firing:one` no longer lists it. What answers "what backs this key" is the key's live setter, and what that record cites is in its own payload. Nothing showed the setter unless two competed.
+
+**Built** (Codex wrote it from a brief; the coordinator reviewed the diff, reran the gate and compared the binaries):
+
+- **`loops of <thing> --setters`** (issue 25). Under the flag `setters` is always written and holds every key that has a live setter, a key with one setter included; a key that a held record unset has a row with no `value`. A new member, `live`, lists each record in those rows once, newest first, as a shown line with one more member, `keys`: the keys it is a live setter of. So one read gives each key, the record that set it, and that record's own payload and mentions. A head that sets no key is in `heads` and not in `live`. The plain view adds one block for each live record after the heads. The flag is for `of` alone: `read --values` and `fold --values` are as they were.
+- **`describe` counts things that leave a declared reference field unset** (issue 24, its first part). Each reference field's row gains `things_unset`, and the plain table one last column. It counts things, where the row's other members count occurrences, and reads the field as the key and lifecycle counts do. An empty list is a value and is not counted; neither is a conflict or a setter that cannot be read.
+- **The `emit` help says what `about` is** (issue 23): the thing's mentions, which each revision carries on, and not what one record rests on. The copy of 2026-11-14 stays. Copying only under a flag would make every plain revision drop a thing's mentions, and a switch for each kind would give `about` two meanings that no reader could tell apart.
+- `rust/PLACE.md`, choices 12, 16 and 36, say the same.
+
+**What does not change.** No record's bytes or id, no refusal code, and no answer of `read`, `fold`, `tick`, `ls`, `get` or `export`. `loops of` without the flag is byte for byte as before, in JSON and plain. `describe` differs by the one member and the one column.
+
+**Implementer choices; they stand under W7 unless Kyle objects:**
+
+- The flag may come before or after the thing. Given twice, it is a usage error.
+- `live` follows the order of `heads`, and `keys` is in canonical order.
+- A live record read whole whose payload is erased or withheld is in `unheld`, as before, and is in `live` only when it is the setter of a key the view knows.
+- The plain block gives the id in full, then `emitted`, `keys`, `about` and `payload`; a payload that is not held shows `unknown`.
+- `things_unset` is the name, so that its unit is in it.
+
+**Checked here:** the five commands of the rust job (438 tests); the old and the new binary over three scratch stores, 30 reads byte for byte equal, and `describe` equal once the new member is taken out; by hand, the example of issue 25, a fork, an unset, a pure join, and a whole record erased while still live.
+
+**Found and not built.** `things_unset` finds a thing with no value at all. It does not find a record written without the field while the thing still shows an older one. A count of records would, and belongs with the second stop below.
+
+**Waiting on Kyle,** and being talked through with him:
+
+- **Issue 26.** `emit kiln --of kiln:east cone=9 --sets cone "second"` writes `text` into the payload and does not set it, so the thing keeps its earlier message. It is wider than the message: `cone=10 shelf=5 --sets cone` writes `shelf` unread, without a word. Recommended: the shorthand stops when a stated `--sets` leaves out a key the command gives, and names the way out. Adding `text` to a stated `--sets` would fill in over what was typed.
+- **Issue 24, its second and third parts.** A kind's description names fields that every shorthand write of that kind must state. ST1 left required fields out. Recommended now, as a rule about the write and named as one: it needs no read of the store, a revision is held to it too, and it is not standing, since nothing is refused at the store and `emit -` writes anything. Standing reads envelopes, and this field is in the payload, so the stop is not a first step toward enforcing it there.
+
 ## 2026-11-24
 
 In brief:

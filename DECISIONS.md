@@ -248,7 +248,9 @@ Under A the second lead cannot end the first, and the first can end the second. 
 
 ## Being prepared
 
-Nothing here needs you yet. It is listed so that you know what is coming.
+Listed so that you know what is coming. The first item wants a yes or a no; the second needs nothing yet.
+
+**Two stops in the shorthand,** asked for in GitHub issues 24 and 26 on 2026-11-25 and being talked through with you: a stated `--sets` that leaves out a key the command gives, and a field that every write of a kind must state. Neither changes a record's bytes, a refusal code or what a spec answers. The second reverses a line of ST1, so it waits for your yes. Both are set out in [the changelog](CHANGELOG.md#built-a-things-setters-and-a-count-of-unset-references) under that date.
 
 **Numbers stored as text**, with the import ([W1](notes/2026-11-21-order-of-work.md#w1-an-adoption-step-before-standing-and-sharing)). [TK6](notes/2026-11-21-tick-record.md#tk6-what-a-spec-reads-of-a-tick) shows one use for it.
 

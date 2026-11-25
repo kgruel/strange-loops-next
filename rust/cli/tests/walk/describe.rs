@@ -77,7 +77,7 @@ fn descriptions_preserve_declarations_and_measure_key_and_lifecycle_drift() {
         &["fit", "yard"],
         r#"{"declared":true,"things":0,"key":{"equal":0,"different":0,"unset":0,"conflict":0,"not_read":0,"keyless_roots":0},
         "lifecycle":{"outside":[],"unset":0,"conflict":0,"not_read":0},
-        "refs":{"kilns":{"held_here":0,"held_elsewhere_in_group":0,"not_in_group":0,"not_typed":0,"not_read":0,"without_mention":0,"unlisted_prefix":0}}}"#,
+        "refs":{"kilns":{"held_here":0,"held_elsewhere_in_group":0,"not_in_group":0,"not_typed":0,"not_read":0,"without_mention":0,"unlisted_prefix":0,"things_unset":0}}}"#,
     );
     let plain = s.ok(&["describe", "--plain"]);
     for part in [
@@ -189,12 +189,12 @@ fn union_reads_new_heads_but_reports_each_locations_own_declarations_and_targets
     expect(
         a,
         &["fit", "kiln", "refs", "owners"],
-        r#"{"held_here":4,"held_elsewhere_in_group":2,"not_in_group":2,"not_typed":6,"not_read":1,"without_mention":5,"unlisted_prefix":8}"#,
+        r#"{"held_here":4,"held_elsewhere_in_group":2,"not_in_group":2,"not_typed":6,"not_read":1,"without_mention":5,"unlisted_prefix":8,"things_unset":1}"#,
     );
     expect(
         b,
         &["fit", "kiln", "refs", "owners"],
-        r#"{"held_here":3,"held_elsewhere_in_group":3,"not_in_group":2,"not_typed":6,"not_read":0,"without_mention":5,"unlisted_prefix":0}"#,
+        r#"{"held_here":3,"held_elsewhere_in_group":3,"not_in_group":2,"not_typed":6,"not_read":0,"without_mention":5,"unlisted_prefix":0,"things_unset":0}"#,
     );
     expect(a, &["fit", "kiln", "refs", "spare", "not_read"], "1");
     assert!(!super::has(b, &["fit", "kiln", "refs"], "spare"));
@@ -328,7 +328,7 @@ fn target_residence_requires_union_admission_and_accepts_a_full_root_id() {
     expect(
         here,
         &["fit", "kiln", "refs", "owner"],
-        r#"{"held_here":0,"held_elsewhere_in_group":1,"not_in_group":1,"not_typed":0,"not_read":0,"without_mention":2,"unlisted_prefix":0}"#,
+        r#"{"held_here":0,"held_elsewhere_in_group":1,"not_in_group":1,"not_typed":0,"not_read":0,"without_mention":2,"unlisted_prefix":0,"things_unset":0}"#,
     );
 }
 
@@ -394,7 +394,7 @@ fn one_shared_setter_counts_once_even_with_different_local_visibility() {
             entry,
             &["fit", "kiln", "refs", "owners"],
             r#"{"held_here":0,"held_elsewhere_in_group":0,"not_in_group":2,
-            "not_typed":0,"not_read":0,"without_mention":2,"unlisted_prefix":0}"#,
+            "not_typed":0,"not_read":0,"without_mention":2,"unlisted_prefix":0,"things_unset":0}"#,
         );
     }
 }
@@ -420,4 +420,51 @@ fn two_working_directories_linking_the_same_data_count_once() {
         text(&sites(&both)[0], &["directory"]),
         alias.to_str().expect("first canonical directory")
     );
+}
+
+#[test]
+fn reference_fields_count_things_left_unset() {
+    let s = fixed_store("kiln-describe-unset");
+    put(
+        &s,
+        r#"{"version":1,"kinds":{"kiln":{"refs":{"evidence":["firing"]}}}}"#,
+    );
+    let check = |expected: usize| {
+        let report = s.json(&["describe"]);
+        expect(
+            site(&report, &s),
+            &["fit", "kiln", "refs", "evidence", "things_unset"],
+            &expected.to_string(),
+        );
+        let plain = s.ok(&["describe", "--plain"]);
+        let mut table = plain
+            .split("kiln references\n")
+            .nth(1)
+            .expect("references")
+            .lines();
+        assert!(
+            table
+                .next()
+                .expect("header")
+                .ends_with("UNLISTED PREFIX  THINGS UNSET")
+        );
+        let row = table.next().expect("evidence row");
+        assert_eq!(
+            row.split_whitespace().last(),
+            Some(expected.to_string().as_str())
+        );
+    };
+    check(0);
+    s.ok(&["emit", "kiln", "--of", "kiln:east"]);
+    check(1);
+    s.ok(&["emit", "kiln", "--of", "kiln:west", "evidence=firing:one"]);
+    s.ok(&["emit", "kiln", "--of", "kiln:west", "--sets", "evidence"]);
+    check(2);
+    s.ok(&["emit", "kiln", "--of", "kiln:north", "evidence:=[]"]);
+    check(2);
+    s.changeset(
+        r#"{"kind":"kiln","of":"kiln:south","sets":["evidence"],"payload":{}}
+{"kind":"kiln","of":"kiln:south","sets":["evidence"],"payload":{"evidence":"firing:two"}}"#,
+    );
+    check(2);
 }
