@@ -752,6 +752,24 @@ Section 9's third row did not show this, because there the canonical value was t
 
 *Replaced by:* with the tree over grant records, a grant names the one grant it acts under, and a record the one grant it counts by. A second valid path does not sustain either. When the cited grant ends, the writer cites the other from then on.
 
+**17. A proposal from someone with no grant (SL2). Found by Astra.** With every counted record bound to a store by `under`, a proposal from a writer who has no grant names no store at all. A potter proposes a new kiln for the yard: nothing says it is for the yard.
+
+*Replaced by:* every record in a store with standing names something in `under`: its grant, or the store's anchor itself when it has none. A record under the anchor from anyone but a founder is a proposal addressed to that store. It confers nothing.
+
+**18. A cover by its topmost ids needs a closed cut (item 8). Found and run by Astra.** Two stores held the same topmost record. One also held its parent and one did not. A tick over that record reported `closure: yes` in the first and `closure: no` in the second, with the same topmost id.
+
+*Replaced by:* the writer of an end establishes a closed cut before signing it. A reader that is missing an envelope in between answers "unknown" for what lies below it, until it arrives. A withheld payload alone changes nothing.
+
+**19. "A new store that takes the old records as history" (sections 15 and 17). Found by margins.** The walk gave this as the remedy for a root that is lost or taken, and for founders who part. Under the chain, every old record ends at the old anchor, so none of them counts in the new store.
+
+*Replaced by:* a store that continues another names the old anchor and a tick in its own anchor. Records chained to the old anchor count inside that tick's cover. For a root that was taken, the cover can stop before the theft.
+
+**20. What admission checks of `under` (item 3). Stated by margins.** Today nothing about an `under` target is checked beyond its being held when written. The clause checks four things: a record's observer is the one its grant names; the record's kind is one of that grant's kinds; a grant's observer is the one named by the grant above it; and that grant carries the right to grant what is granted. A grant names exactly one grantee, or counts for nobody.
+
+**21. What an end holds (items 2 and 8). Proposed by margins.** An end has three things to say: the grant it ends, the right it ends it by, and what stands. A grant is a root, so an end can be `of` it. Its right is in `under`, and its mentions hold only the cover.
+
+**Found to hold, by margins, run on main:** a tick already follows `under`, so its cover takes in a record's grants and its store's anchor with nothing built. And an `under` whose target is not held is refused only at the write, so outboxes can be read in any order.
+
 ## 20. What stands, and what goes to Kyle now
 
 **Unbroken so far:** "more standing" as being counted for more kinds and not as a rank (SL1); standing as a clause of admission; the team's lineage as the founder; removal running one way, now over grant records; grants and ends that only grow.
@@ -762,10 +780,11 @@ Section 9's third row did not show this, because there the canonical value was t
 | --- | --- |
 | SL1 | Unchanged. |
 | SL2 with ID4 | A record that does not count stays in the order and sets nothing. It is shown as proposed and counted beside the result. |
-| A new one | In a store with standing, every record names its grant in `under`, and every grant names the grant above it, down to the anchor. |
+| A new one | In a store with standing, every record names in `under` its grant, or the store's anchor when it has none; every grant names the grant above it, down to the anchor. Admission checks the four things in item 20. |
 | ID1 | Unchanged. |
 | SW3 | A grant's mentions are the one granted and the kinds. Its store comes from `under`. A right to grant is a separate kind. |
-| SW5 | An end names the grant, carries the topmost ids of what stands, and takes the grants beneath it. |
+| SW5 | An end is of the grant it ends. It carries the topmost ids of a closed cut of what stands, and takes the grants beneath it. |
+| Another new one | A store that continues another names the old anchor and a tick in its own anchor. |
 | SW6 | A second steward holds a right to grant. The tree is over grant records. |
 | SL3 | Accepting is a verb that restates the proposal's `sets` exactly. The affirm stance comes sooner. |
 
