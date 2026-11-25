@@ -23,6 +23,10 @@ Kyle asked for GitHub releases of the binary: a machine with no Rust toolchain c
 - **The crate's version is the release's name.** `loops-cli` goes from 0.1.0 to 0.1.1. Nothing reads the version but `--version`.
 - **The README says how to install** from a release or from source, and how a release is made.
 
+**The first release, the same day.** The workflow was run by hand first as `v0.1.1-dryrun`: four builds, eight files, a draft and no tag; the draft was then deleted. `v0.1.1` was tagged on main at `9fc418e` and published three minutes later. Checked here: the Linux x86-64 archive matches its SHA-256, is statically linked, prints `strange-loops-next 0.1.1`, and signs byte for byte the lines the local build signs for the same commands with a fixed clock and salt. The workflow itself runs the Linux arm64 and macOS arm64 binaries; the macOS x86-64 one is built and not run.
+
+**Kyle: a release after each merge that changes the CLI, without asking first,** and the way to make one kept in the repository. So `tools/release.sh` has three steps (`bump`, `tag`, `verify`), each refusing the usual slips: a version already released, a tag from a branch or from a commit one copy lacks, a release that is not published with all eight files. `.claude/skills/release/SKILL.md` says when to release and what to do when a run fails.
+
 **Implementer choices; they stand under W7 unless Kyle objects:** the tag is `v` and the crate version; releases are not marked as pre-releases, so that "latest" finds them, and the notes say the record format is not frozen; the Linux builds are static; a build between two releases still prints the earlier release's version, and a commit id in `--version` is the next small piece.
 
 ### Kyle rules two stops in the shorthand, and they are built
