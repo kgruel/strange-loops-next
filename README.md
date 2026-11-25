@@ -51,7 +51,7 @@ A release's name is the version `loops --version` prints. The record format is n
 
 **From source,** with the Rust release `rust/rust-toolchain.toml` names: `cargo install --locked --path rust/cli`.
 
-**Making a release.** Raise `version` in `rust/cli/Cargo.toml` (and its entry in `rust/Cargo.lock`) through a merge request, then push the tag `v<version>` on main to GitHub. `.github/workflows/release.yml` builds the four archives and publishes the release. Run by hand from the Actions page, the same workflow leaves a draft.
+**Making a release.** `tools/release.sh` does it in three steps and refuses the usual slips: `bump` raises the version in the merge request that changes the CLI, `tag` tags main and pushes the tag once both copies hold the merge, and `verify` waits for `.github/workflows/release.yml` and checks what it published. When to release, and what to do when a run fails, is in [`.claude/skills/release/SKILL.md`](.claude/skills/release/SKILL.md).
 
 ## Checking
 
