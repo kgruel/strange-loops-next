@@ -719,7 +719,7 @@ Section 9's third row did not show this, because there the canonical value was t
 
 **8. The cover of an end, withheld (section 17). Answered by margins.** The model proves that a withheld or erased payload never changes who speaks. An end whose cover is in a payload would break that.
 
-*Replaced by, as the leading answer:* a cover is closed downward over `prev` and `under`, so its topmost ids determine it. An end carries those ids as mentions in its envelope. The cost is an envelope about as wide as the number of things the leaver wrote in.
+*Replaced by, as the leading answer:* a cover that is closed in what exists is fixed by its topmost ids, and an end carries those ids as mentions in its envelope. Item 18 says what "closed in what exists" takes. The cost is an envelope about as wide as the number of things the leaver wrote in.
 
 **9. What a tick covers (ID4). Found by margins.** Anchors, bindings and grants are not enough. A cover also needs every held end that applies to them, or a tick records an answer in which a leaver still counts.
 
@@ -758,7 +758,7 @@ Section 9's third row did not show this, because there the canonical value was t
 
 **18. A cover by its topmost ids needs a closed cut (item 8). Found and run by Astra.** Two stores held the same topmost record. One also held its parent and one did not. A tick over that record reported `closure: yes` in the first and `closure: no` in the second, with the same topmost id.
 
-*Replaced by:* the writer of an end establishes a closed cut before signing it. A reader that is missing an envelope in between answers "unknown" for what lies below it, until it arrives. A withheld payload alone changes nothing.
+*Replaced by:* the verb that writes an end refuses to sign unless its tick checks `closure: yes`. A reader that is missing an envelope in between cannot show that a leaver's record lies under a topmost id, so that record does not count until the envelope arrives. The error is on one side only: nothing is counted that should not be, and it mends as a late binding does. So a withheld payload is fine, and a missing envelope is late (margins).
 
 **19. "A new store that takes the old records as history" (sections 15 and 17). Found by margins.** The walk gave this as the remedy for a root that is lost or taken, and for founders who part. Under the chain, every old record ends at the old anchor, so none of them counts in the new store.
 
