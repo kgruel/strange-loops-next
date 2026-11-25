@@ -2,7 +2,7 @@
 
 **Written on 2026-11-24 at Kyle's request. Nothing here is put to him or ruled.** It is a walk in the manner of [the trust walk](../design/rethink/sections/11-trust.html): three real scenes taken step by step, each step marked as holding, breaking or open. The draft entries are what the walk found to decide. They are drafts: none is in `DECISIONS.md` yet.
 
-The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so [part two](#part-two-the-thinnest-slice-through-standing-and-sharing), sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5). Kyle then said that this raises how stewardship is managed, for the description file and everything else that defines a store as much as for the list, so [part three](#part-three-stewardship), sections 14 to 16, walks that.
+The note has two parts. Part one, sections 1 to 8, walks identity. Kyle read it and said that identity cannot be settled alone, so [part two](#part-two-the-thinnest-slice-through-standing-and-sharing), sections 9 to 13, walks the thinnest slice through standing and sharing. Part two withdraws one leaning of part one (ID5). Kyle then said that this raises how stewardship is managed, for the description file and everything else that defines a store as much as for the list, so [part three](#part-three-stewardship), sections 14 to 16, walks that. [Part four](#part-four-two-stewards), sections 17 and 18, takes the case part three had set aside.
 
 It was prompted by a plan Kyle and Neon worked out the same evening, kept outside the repository, which puts identity and names first among the next steps: lineages with two tiers of key, a seat per agent, `name` records, and key profiles in the CLI. This walk asks what that step has to settle, and finds it is wider in one place and narrower in another.
 
@@ -569,6 +569,8 @@ A spec that takes grants mentioning `kind:note` finds it, and finds it again aft
 
 **Changes:** B adds a rule to admission. A adds none.
 
+**After part four.** A second steward is exactly B: a grant of the definition kinds that carries the right to grant. So B is needed as soon as a store has a second steward, and not before.
+
 ### SW5: ending a grant
 
 | | A leaver | Cost |
@@ -578,19 +580,105 @@ A spec that takes grants mentioning `kind:note` finds it, and finds it again aft
 
 **Changes:** B changes what a reader counts.
 
-## 17. An order, if the leanings hold
+# Part four: two stewards
+
+**Added on 2026-11-24, after part three.** Kyle: "I suppose the two stewards case needs to be tackled. A lineage on the store is always going to start with one - so a second has to be added, then."
+
+That second sentence is most of the answer. The walk follows it.
+
+## 17. Two stewards, walked
+
+**A second steward is added.** The store starts with the lineage its anchor names. Anyone else who is to change definitions gets that from someone who already can. Since a steward is whoever counts for the definition kinds (SW1), adding one is a grant of those kinds, with the right to grant.
+
+*Holds, and it needs nothing new.* "Steward" is not a second kind of standing. It is a grant with a wide scope. Everyone's standing in a store is then a chain of grants that starts at the anchor.
+
+**Who may end whom.** Every grant has a granter, so the grants form a tree with the founder at its root. A grant is ended by its granter, or by anyone above the granter in that tree.
+
+*Holds, and it is why two stewards cannot remove each other.* The second steward holds a grant from the first, or from someone the first granted. The first holds no grant from the second. So removal runs one way, down the tree, and there is no pair in which each may end the other. This is the one place the walk needs an order among writers, and the order is not a rank anyone assigns: it is who granted whom.
+
+**The founder.** The founder holds no grant. Nothing ends the founder's standing, because the anchor is the store.
+
+*Holds as the limit it is.* A store whose founder is lost or wrong is answered by a new store that takes the old records as history. For a team, the founder is the team's lineage, which is meant to outlast its people.
+
+**Two founders.** A store between two teams as equals has an anchor that names both. Neither granted the other.
+
+*Holds, by giving something up.* Equals cannot expel each other. They can disagree, visibly, and they can part: each makes a new store. What is left open is whether one founder may end a grant the other made ([SW6](#sw6-a-second-steward)).
+
+**Both act at once, adding.** One grants a junior `note`. The other grants a different junior `note`. Neither has seen the other's record.
+
+*Holds.* Each grant is its own thing. Run in two stores and read together in a third:
+
+```
+KIND        RECORDS
+grant       2
+grant-end   1
+```
+
+Two grants and one end, held side by side, in whatever order they arrived.
+
+**Both act at once, one ending.** The first ends a grant. The second, not having seen that, does nothing to it, because an end cannot be undone: giving the standing back is a new grant with a new id.
+
+*Holds.* Grants only grow and ends only grow. Who counts is what has been granted and not ended, and that is the same for every reader who holds the same records. There is no fork to settle in who counts.
+
+**The first ends the second's grant while the second is acting.** The second has just granted a third person, and the first has not seen that.
+
+*Holds, by the cover.* The end carries a tick that covers what stands. The grant to the third person is outside it and does not count, nor does anything that person wrote under it. If the first had seen that grant, it stands, and the first can end it too, being above it.
+
+**Both change one description apart.** Both set `headline` on the `note` kind, to different fields. Run:
+
+```
+$ loops of kind:note --plain
+thing  kind:note
+records  3
+heads  2
+  headline  conflict (2): text | title
+  key  name
+```
+
+*Holds as an ordinary conflict, and that is the only kind of fork two stewards can make.* The key they did not both touch is unharmed. What a reader does with the field in conflict is the choice: the design leans to the newer of the two by content order, with the fork shown. The stricter answer is that a field in conflict is not in effect until one of them settles it ([SW7](#sw7-a-definition-two-stewards-changed-apart)).
+
+**What a reader needs to judge all this.** Who granted whom and for which kinds is in envelopes. The cover of an end is a tick's list of ids, and that list is in a payload.
+
+*Open.* A reader without that payload cannot say which of a leaver's records stand. Either an end's cover is never withheld or erased, which is the second rule the trust walk hoped to avoid, or admission answers "unknown" for those records. The trust walk left this to be unpacked, and it still is.
+
+## 18. Draft entries for two stewards
+
+### SW6: a second steward
+
+**Leaning.** A second steward is a grant of the definition kinds, with the right to grant. A grant is ended by its granter or by anyone above the granter. A founder's standing is never ended.
+
+**Left open inside it.** With two founders, may one end a grant the other made?
+
+| | Between founders | Cost |
+| --- | --- | --- |
+| **A (leaning)** | Yes. Founders are equals over the whole store. | Two founders who disagree can grant and end in turn. It is visible, and the remedy is to part. |
+| B | No. Each ends only what is under their own grants. | One founder cannot remove the other's bad choice, only leave. |
+
+**Changes:** what admission reads of a grant. With one founder, which is where a team starts, the open part does not arise.
+
+### SW7: a definition two stewards changed apart
+
+| | The field in conflict | Cost |
+| --- | --- | --- |
+| A | The newer by content order is in effect, and the fork is shown. The design's leaning. | A change takes effect that one steward has not seen, on the strength of a time its writer states. |
+| **B (leaning)** | Not in effect until one of them settles it. `describe` shows both. | Until then the CLI behaves as if the field were not declared. |
+
+**Changes:** what the shorthand and the plain views do during a fork. B follows the principle Kyle gave for BP1: what was entered is taken as entered, and nothing is chosen for the writers.
+
+## 19. An order, if the leanings hold
 
 1. **SL1 and SL2 put to Kyle**, with ID4, since they decide what a fold answers.
 2. **The trial slice**, on stores declared disposable and with keys as they are: admission by a list in the model, vectors and Rust; delivery by one ref per writer; reads that show canon and proposals; the list as a reviewed file.
 3. **ID1, ID6, SW1 and SW3 put to Kyle.** Then anchors and bindings, a lineage for the team, the store's anchor, and grants as records in place of the file.
 4. **SW5, an end of grant,** before the first team store that is kept.
-5. **Afterwards:** the affirm stance, grants with `under`, a right to grant, strict.
+5. **A second steward, when a store wants one:** SW6 and SW7, and the right to grant.
+6. **Afterwards:** the affirm stance, grants with `under`, strict.
 
-## 18. What this walk did not do
+## 20. What this walk did not do
 
 - It did not test a git host. What a host does with refs outside branches and tags, and who may move them, is argued and not run.
 - It did not walk a scope finer than a set of kinds, or who may erase.
-- It did not walk more than one steward. Part three avoids the case by having one; a store between two teams would bring it back.
+- It did not settle what a reader does when the cover of an end is withheld (section 17), or whether one founder may end another's grant (SW6).
 - It did not walk a company above its teams: who makes a team's lineage, and what a team is called outside itself.
 - It rests on one workbench and on a description of one team.
 - It takes the two tiers as settled. One question it passed by: the lineage id is the hash of the anchor and not of the root key. That allows a root more than one lineage, which ID1 leans on, and costs the trap in ID6.
