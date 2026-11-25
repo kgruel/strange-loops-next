@@ -10,6 +10,7 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 ## 2026-11-24
 
 In brief:
+- **The first outside contribution:** the import's exporter reads an old kind whose fold has several named slots, as the old tool does. John Spann wrote it, from a pilot of his own.
 - Built: `--in <name>`, a store by name on every verb that takes one; `.loops/store.json` read and used by the plain views; `ls --active`; `loops describe` and `ls --refers-to`, with `--group`; and the import's recipe for a payload, with no change to what it writes.
 - **Kyle rules the strict shorthand:** with a description, `emit` stops on a kind, a status or a reference the description does not allow. He declines the mention in AD5's row 2 and defers the import's AD5 work; the homelab is not cut over a second time.
 - **Kyle rules BP1:** what was entered is accepted strictly; two rows go the other way from the recommendation.
@@ -17,6 +18,18 @@ In brief:
 - **Kyle rules SD1 to SD4 and AD5, each as recommended.** A store describes its kinds in a plain file that refuses nothing; `emit` stops on a key slip; reference fields are described and not copied into `about`; `ls --refers-to` reads them; the import writes a reference as `kind:key`, and the homelab will be imported afresh. Nothing is built yet.
 - SD1 to SD3 are put to Kyle: what a store says about its kinds. A plain `.loops/store.json` that describes each kind and refuses nothing (SD1); `emit` stopping before it signs a write that contradicts a declared key (SD2); and whether reference fields are copied into `about`, where an erasure does not reach them (SD3: recommended, describe them and copy nothing). Nothing is built.
 - SD4 and AD5 are put to Kyle, later the same day: a read of everything that refers to a thing, taken from the declared reference fields (SD4); and the import writing a reference field as `kind:key` where the old store proves it, which means importing the homelab afresh (AD5). Nothing is built.
+
+### The exporter reads a fold of several slots
+
+The first change from outside: John Spann's, as pull request 22 on the GitHub copy, from a pilot importing a store of his own. This session reviewed it and Kyle asked for one change before it went in.
+
+- **What was refused.** `tools/shadow/export.py` took a kind only when its fold was one slot named `items`. The old tool allows several slots with any names, such as `observations "collect" 500; count "inc"; updated "latest"`, and his vertex has one. He had exported from an edited copy, so the map's `vertex_sha256` named the copy.
+- **What it reads now.** Only `parse_vertex` in `tools/shadow/vertex.py` changed. The first slot decides, as the old tool reads a kind's items from its first slot alone: `by "<field>"` keys the kind and `collect N` collects it. Later slots are checked against the old tool's ten operations and their arguments, and left out of the map.
+- **What it refuses.** A first slot that is neither `by` nor `collect`, a later `by`, a second `collect`, a slot name used twice, an operation the old tool does not have, and wrong arguments for one. It is stricter than the old loader, which takes extra arguments.
+- **The one change asked for.** As first written, a `collect` slot counted in any position. Run on the old tool (0.11.0), `count "inc"; items "collect" 2` shows no items, so the map's limit would have described a read that does not happen, and `compare.py --old-json` left two of three roots unexplained. The second commit makes the first slot decide.
+- **What does not change.** The map format, the Rust import and `compare.py`. Every vertex the exporter took before gives the same map, so no journal pin moves and no record's bytes or id change.
+- **Checked here:** the 25 tests, and a scratch store written with the old tool, exported, imported and compared (7 of 7 things equal).
+- **Left open, found by the same pilot:** `compare.py --old-json` exits 1 whenever an export root is absent from the old read, also when the absence is counted as `missing_key_roots` or `outside_collect_limit`. That is how it was built, not this change.
 
 ### Kyle rules the strict shorthand, declines a mention, and defers the import's AD5 work
 
