@@ -266,7 +266,8 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 <ul>
 <li><p><strong>Now</strong> a run whose only differences from the old reading are those counted absences exits 0. The report is unchanged, so the counts still show. The old tool never shows these roots, so they are missing from its rows on both sides: <code>only_old</code> against the export and <code>only_new</code> against the shadow. Both are allowed up to the counted number, and the export is compared with the shadow one for one in the same run.</p></li>
 <li><p><strong>Still a failure:</strong> any other absence, any differing field or mention, and any record the id map does not account for.</p></li>
-<li><p>Reproduced first with the repo's fixtures, in a new test. An implementer's choice: it changes a tool's exit status and no record or answer.</p></li>
+<li><p>Reproduced first with the repo's fixtures, in a new test. The Rust walk's fixture, which runs the tool against a real import, had pinned exit 1 for exactly this case: one fact without its key and two collected items beyond the limit. It now expects 0. The first pipeline caught that the fixture had not been changed.</p></li>
+<li><p>An implementer's choice: it changes a tool's exit status and no record or answer.</p></li>
 </ul>
 <h3 id="a-guide-for-a-new-user">A guide for a new user</h3>
 <p>Kyle asked for a usage guide that is friendly in structure and prose, and that walks through how to think about the tool before how to use it. <a href="guide.html">GUIDE.md</a> has three parts: how to think about it, laying out your data, and using the command. It ends with what is built and what is not, a table for someone who used the old tool, and a list of words.</p>

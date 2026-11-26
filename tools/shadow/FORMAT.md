@@ -250,7 +250,9 @@ For `--old-json FILE`, supply the first selected source's
 
 Only supplied old rows participate. `old_json.missing_key_roots` and
 `old_json.outside_collect_limit` break down export roots absent from that
-reading. Both are subsets of `only_old`. Unnamed old rows count separately
+reading. Both are subsets of `only_old`. The old tool never shows these
+roots, so they are counted and do not fail the run: the same count of
+`old_json_shadow.only_new` passes with them. Unnamed old rows count separately
 in `old_json_unnamed_rows`. The old-row comparison excludes generated
 metadata. It resolves the row's accumulated `refs`, its current suffix and
 reviewed fields, and its latest observer, suppressing self mentions. The

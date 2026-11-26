@@ -48,7 +48,8 @@ Left open on 2026-11-24, when the exporter learned folds of several slots: `tool
 
 - **Now** a run whose only differences from the old reading are those counted absences exits 0. The report is unchanged, so the counts still show. The old tool never shows these roots, so they are missing from its rows on both sides: `only_old` against the export and `only_new` against the shadow. Both are allowed up to the counted number, and the export is compared with the shadow one for one in the same run.
 - **Still a failure:** any other absence, any differing field or mention, and any record the id map does not account for.
-- Reproduced first with the repo's fixtures, in a new test. An implementer's choice: it changes a tool's exit status and no record or answer.
+- Reproduced first with the repo's fixtures, in a new test. The Rust walk's fixture, which runs the tool against a real import, had pinned exit 1 for exactly this case: one fact without its key and two collected items beyond the limit. It now expects 0. The first pipeline caught that the fixture had not been changed.
+- An implementer's choice: it changes a tool's exit status and no record or answer.
 
 ### A guide for a new user
 
