@@ -206,6 +206,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <li><a href="#part-1-how-to-think-about-it">Part 1: How to think about it</a></li>
 <li><a href="#part-2-laying-out-your-data">Part 2: Laying out your data</a></li>
 <li><a href="#part-3-using-the-command">Part 3: Using the command</a></li>
+<li><a href="#a-second-walk-a-book-and-its-sources">A second walk: a book and its sources</a></li>
 <li><a href="#what-is-built-and-what-is-not">What is built, and what is not</a></li>
 <li><a href="#if-you-used-the-old-tool">If you used the old tool</a></li>
 <li><a href="#words">Words</a></li>
@@ -218,7 +219,13 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <li><p><strong>Laying out your data.</strong> The choices to make before the first write.</p></li>
 <li><p><strong>Using the command.</strong> Writing, reading, standing questions and ticks, with real output.</p></li>
 </ol>
+<p>A second walk then writes a short book from its sources, where the records are mostly words.</p>
 <p>It describes release 0.1.1, and one person's stores on one machine, which is what is built today. Every command on this page was run as written. The ids and times shown are from that run, and yours will differ. The examples are a pottery workshop: kilns, potters and firings.</p>
+<p>Two things are left out on purpose:</p>
+<ul>
+<li><p><strong>Sharing a store with other people.</strong> It waits on standing, the rules for who may write to a store, and neither is built.</p></li>
+<li><p><strong>How to work with it.</strong> When to write, what is worth keeping, and what you tell an agent about <code>loops</code> are habits of your own. This page is for a person to read and follow, and it shows what the command does.</p></li>
+</ul>
 <p>This page is a guide, not the rules. The rules are in <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/record.md">the record</a>, <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/spec.md">the spec</a>, <a href="https://github.com/kgruel/strange-loops-next/blob/main/protocol/tick.md">the tick</a> and <a href="https://github.com/kgruel/strange-loops-next/blob/main/rust/PLACE.md">the notes on the command</a>. Where this page and those disagree, they are right.</p>
 <h2 id="ten-minutes-a-first-store">Ten minutes: a first store</h2>
 <p>Install <code>loops</code> from a release (<a href="https://github.com/kgruel/strange-loops-next/blob/main/README.md#installing-loops">README</a>). Then make a signing key and a store:</p>
@@ -325,22 +332,24 @@ head  r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0
 <li><p><strong><code>.loops/vertices/&lt;name&gt;.json</code></strong> holds a question you ask often, as a fold.</p></li>
 </ul>
 <p>Neither is needed to read a record. A record states its thing in full, so a reader with only the stored lines can still fold them.</p>
+<p>A store is also cheap to throw away. It is a directory, with no server holding it open. When a layout turns out wrong, start another store and write what matters into it again, which is how Part 2 ends. Expect to do that more than once while you learn what your kinds are.</p>
 <h2 id="part-2-laying-out-your-data">Part 2: Laying out your data</h2>
 <p>Start from a blank page. Decide what the things and events in your work are before you look at an old schema.</p>
 <h3 id="where-one-store-ends-and-another-begins">Where one store ends and another begins</h3>
 <p>Do not make one store per kind. Draw the lines where the data really differs:</p>
 <ul>
-<li><p><strong>Who writes it and what travels together.</strong> A store is the unit that will be shared and synced.</p></li>
+<li><p><strong>Who writes it and what travels together.</strong></p></li>
 <li><p><strong>What is sensitive.</strong> Keep what few people may see apart from what many will.</p></li>
 <li><p><strong>Pace.</strong> Keep noisy, fast collectors apart from slow records such as decisions.</p></li>
 </ul>
+<p>The first two look ahead. Sharing is not built, and when it is, a store is the unit that will be shared and synced.</p>
 <p>A file named <code>stores.json</code> lists a group of stores by name, and one read can span them. So splitting costs little when you read. One limit to plan around: a tick is made from a single store, so records you want frozen together belong together.</p>
 <h3 id="three-shapes">Three shapes</h3>
 <p>Every concept is one of these.</p>
 <div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col">Shape</th><th scope="col">Use it for</th><th scope="col">How</th></tr></thead>
 <tbody>
 <tr><td>A thing with a key</td><td>Something that lasts, changes and is pointed at: a kiln, a potter, a decision</td><td>Give the kind a <code>key</code> field in the description. <code>loops emit kiln name=east</code> writes of <code>kiln:east</code>.</td></tr>
-<tr><td>An event</td><td>Something that happened once: a firing</td><td>Give the kind no key. Each write is a root, named by its id, and it points at things through its fields.</td></tr>
+<tr><td>An event</td><td>Something that happened once: a firing, a note of something seen</td><td>Give the kind no key. Each write is a root, named by its id, and it points at things through its fields.</td></tr>
 <tr><td>An edge thing</td><td>A link that several writers add to, or one with facts of its own</td><td>One thing per link, named <code>edge:&lt;relation&gt;:&lt;from&gt;:&lt;to&gt;</code>, with both ends in <code>about</code> and the fields <code>rel</code>, <code>from</code>, <code>to</code> and <code>state</code> in the payload.</td></tr>
 </tbody></table></div>
 <p>If a kind feels like both how something is now and what happened to it, it is two kinds. Make a keyed thing for the state (<code>kiln</code>) and an event for each happening (<code>firing</code>), and point from the event to the thing.</p>
@@ -369,11 +378,11 @@ head  r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0
 </ul>
 <h3 id="time">Time</h3>
 <p>Every record has <code>emitted</code>, the moment it was written, filled in for you. <code>occurred</code> is your claim about when the thing happened, and you state it with <code>--occurred</code>. It can be coarse: a year, a month, a day (<code>2026-11-24</code>), an instant, an interval (<code>2026-11-20/2026-11-24</code>), or a start with no end yet (<code>2026-11-20/..</code>).</p>
-<p>Records are put in order by <code>occurred</code> when it is stated and by <code>emitted</code> when it is not. So state <code>occurred</code> on events and on anything you write after the fact, and leave it off routine changes. A revision copies <code>occurred</code> from the heads when they agree. <code>--no-occurred</code> clears it.</p>
+<p>Records are put in order by <code>occurred</code> when it is stated and by <code>emitted</code> when it is not. So state <code>occurred</code> on events and on anything you write after the fact, and leave it off routine changes. A revision copies <code>occurred</code> from the heads when they agree. So a routine change to a thing whose last record stated <code>occurred</code> claims that earlier time too, unless you give it a time of its own or clear it with <code>--no-occurred</code>.</p>
 <h3 id="a-field-at-a-time-or-whole">A field at a time, or whole</h3>
 <ul>
 <li><p><strong>State that changes piece by piece</strong>, such as a kiln's status and keeper: write ordinary revisions, each setting what it states, and read by keys.</p></li>
-<li><p><strong>Prose that is revised as one piece</strong>, such as a decision's text: revise with <code>--whole</code> and read by heads. Two people who revise it at once leave two heads for a person to reconcile, which is what you want for prose.</p></li>
+<li><p><strong>Prose that is revised as one piece</strong>, such as a decision's text: revise with <code>--whole</code> and read by heads. Two people who revise it at once leave two heads for a person to reconcile, which is what you want for prose. Revise such a kind whole every time. <a href="#a-second-walk-a-book-and-its-sources">The second walk</a> shows why.</p></li>
 </ul>
 <h3 id="write-the-description-first">Write the description first</h3>
 <p>The description is your model of the store, in a file you can review. This is the workshop's <code>.loops/store.json</code>:</p>
@@ -444,7 +453,7 @@ head  r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0
 <h3 id="bringing-old-data-in">Bringing old data in</h3>
 <p>Keep the old store as a read-only archive. Pick the things and events worth keeping, and write them again through <code>loops emit</code> with <code>--occurred</code> set to when each happened. The shorthand's stops then act as a check on every line, and <code>loops describe</code> shows what does not fit when you are done. For a large batch, pipe lines into <code>emit -</code>, and review with <code>describe</code> afterwards, since a batch skips the stops.</p>
 <h2 id="part-3-using-the-command">Part 3: Using the command</h2>
-<p>Read commands print JSON, the same on a terminal and through a pipe. Add <code>--plain</code> for a view made for reading. The plain view may change between releases, so scripts use the JSON.</p>
+<p>Read commands print JSON, the same on a terminal and through a pipe. Add <code>--plain</code> for a view made for reading. The plain view may change between releases, so scripts use the JSON. Some examples pass the JSON through <code>jq</code>, a separate tool for picking values out of it.</p>
 <h3 id="naming-the-store">Naming the store</h3>
 <p>A command acts on the store in the current directory. To act on another:</p>
 <ul>
@@ -453,7 +462,7 @@ head  r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0
 <li><p><strong><code>--group</code></strong> picks every store in the list. <code>describe</code> and <code>ls --refers-to</code> take it.</p></li>
 <li><p><strong><code>--store &lt;name&gt;=&lt;dir&gt;</code></strong> gives a name for one command.</p></li>
 </ul>
-<p>These go before the verb: <code>loops --in yard ls</code>, <code>loops --group describe</code>. <code>init</code> and <code>whoami</code> take no <code>--in</code>.</p>
+<p>These go before the verb: <code>loops --in yard ls</code>, <code>loops --group describe</code>. <code>init</code>, <code>whoami</code> and <code>shadow-import</code> take no <code>--in</code>.</p>
 <p>A group list is a file named <code>stores.json</code> that maps names to directories. Make the yard a second store beside the workshop, and list both:</p>
 <pre><code class="language-sh">cd ..                    # into pottery/
 loops -C yard init
@@ -724,7 +733,7 @@ this_week
 <p><strong><code>where</code>.</strong> A map from a field to tests. Every test must hold. A payload field is named plainly. An envelope field starts <code>env.</code>: <code>env.kind</code>, <code>env.observer</code>, <code>env.of</code>, <code>env.about</code>, <code>env.prev</code>, <code>env.under</code>, <code>env.erases</code>, <code>env.emitted</code>, <code>env.occurred</code> and <code>env.when</code>.</p>
 <div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col">Test</th><th scope="col">Holds when</th></tr></thead>
 <tbody>
-<tr><td><code>{&quot;is&quot;: v}</code>, <code>{&quot;not&quot;: v}</code></td><td>the field equals <code>v</code>, or a list holds it. <code>not</code> is the opposite</td></tr>
+<tr><td><code>{&quot;is&quot;: v}</code>, <code>{&quot;not&quot;: v}</code></td><td>the field equals <code>v</code>, or a list holds it. <code>not</code> is the opposite, so it also holds when the field is absent</td></tr>
 <tr><td><code>{&quot;present&quot;: true}</code>, <code>{&quot;absent&quot;: true}</code></td><td>the payload has the field, or lacks it</td></tr>
 <tr><td><code>{&quot;at-least&quot;: n}</code>, <code>{&quot;below&quot;: n}</code></td><td>a whole number, or a time, is at or over <code>n</code>, or under it</td></tr>
 </tbody></table></div>
@@ -737,7 +746,7 @@ this_week
 <li><p><strong>On a <code>collect</code> that follows keys, <code>limit</code> counts things</strong>, each listed whole.</p></li>
 <li><p><strong>A key that is not known is refused.</strong> The source field is <code>kind</code>, and <code>kinds</code> is an error.</p></li>
 </ul>
-<p><code>--values</code> adds the records' payloads and envelopes to the JSON, which is what a script wants:</p>
+<p><code>--values</code> adds the records' payloads and envelopes to the JSON, which is what a script wants. A <code>collect</code> slot lists its records under <code>heads</code>:</p>
 <pre><code>$ loops --in workshop read overview --values \
     | jq -c '.this_week.heads[] | {when: .env.occurred, kiln: .payload.kiln, cone: .payload.cone}'
 {&quot;when&quot;:&quot;2026-11-25T09:00:00Z&quot;,&quot;kiln&quot;:&quot;kiln:east&quot;,&quot;cone&quot;:6}
@@ -773,15 +782,16 @@ $ loops --in workshop tick --check r:eikik4k8tgt20rjeu6dn7pjak0ebmevn7b40golo7mc
 <p>What a tick covers:</p>
 <div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col">Run</th><th scope="col">Covers</th></tr></thead>
 <tbody>
-<tr><td><code>loops tick &lt;vertex&gt;</code></td><td>the records the answer depends on, and what they replace</td></tr>
+<tr><td><code>loops tick &lt;vertex&gt;</code></td><td>the records the spec's sources take, and what they replace</td></tr>
 <tr><td><code>loops tick &lt;vertex&gt; --as-of 2026-12-01</code></td><td>what was emitted before the start of that day, or before an instant</td></tr>
 <tr><td><code>loops tick &lt;vertex&gt; --cover &lt;id&gt; --cover &lt;id&gt;</code></td><td>the records you pick, by id or the start of one</td></tr>
 <tr><td><code>loops tick &lt;vertex&gt; --all</code></td><td>everything the store holds</td></tr>
 </tbody></table></div>
-<p>Two things to know:</p>
+<p>Three things to know:</p>
 <ul>
 <li><p><strong>A tick reads its own store alone</strong>, whatever stores its spec names. A tick of <code>overview</code> made in the workshop counts no firings, though <code>read overview</code> counts them. Tick a vertex whose records live in the store you tick in.</p></li>
 <li><p><strong>A tick is an ordinary record</strong> of kind <code>tick</code>, so it is listed, exported and folded like any other. Its payload has <code>rules</code>, <code>spec</code>, <code>spec-hash</code>, <code>result</code>, <code>result-hash</code> and <code>covers</code>, and <code>withheld</code> when a covered record's payload was not held.</p></li>
+<li><p><strong>A tick covers what <code>from</code> takes, before any slot's <code>where</code>.</strong> A vertex that reads every kind and tests for one kind in its slots answers the same as one that names the kind in <code>from</code>, and covers far more. Name in <code>from</code> only what the slots read.</p></li>
 </ul>
 <h3 id="writing-from-what-you-read">Writing from what you read</h3>
 <p>By default a write claims to have read everything the store holds. A writer that decided from an older reading should say so, by naming the tick it read: <code>--base &lt;tick id&gt;</code>. Its <code>prev</code> is then filled from what that tick covered. Two writers who worked from the same tick, each without the other's change, then fork honestly instead of one silently replacing the other:</p>
@@ -834,7 +844,7 @@ head  r:ipse8r6aog7p271m3c6hikiivavj61m0h5rm8vfbfv8924ld6gqg
   emitted  now
   occurred  —
 </code></pre>
-<p>A pure join, <code>loops --in workshop emit kiln --of kiln:west --sets-nothing</code>, joins the heads and sets no field. It is right when the two sides changed different fields and both changes stand. It does not settle a field that has two live setters.</p>
+<p>A pure join, <code>loops --in workshop emit kiln --of kiln:west --sets-nothing</code>, joins the heads and sets no field. It is right when the two sides changed different fields and both changes stand. It does not settle a field that has two live setters. After shorthand writes the key field is one of those, and the next ordinary write of the thing clears it.</p>
 <p><code>--base-id &lt;id&gt;</code> names one record as read, and it can be repeated or given beside <code>--base</code>. With either flag, the writer claims to have read only what the flags name and what those records replace, not everything the store holds.</p>
 <h3 id="batches-and-exceptions">Batches and exceptions</h3>
 <p><code>emit -</code> reads a changeset from standard input: one JSON object per line, each a record to write. All of them are written, or none. The two files below are saved in <code>pottery/</code>.</p>
@@ -858,7 +868,7 @@ $ loops --in workshop emit - --fill &lt; revisions.jsonl
 <pre><code>$ loops --in yard erase r:cogi1h86ac7ka94q88igsm0ofmc9877vj43d86lnrn6vgi7ssc1g &quot;Logged against the wrong kiln&quot;
 {&quot;id&quot;:&quot;r:6ekpq7hp46p08eu8tg916c7jqojr6kb26ush2ndaj09bf7d4c7d0&quot;,&quot;openings-removed&quot;:1}
 </code></pre>
-<p>This writes a record of kind <code>erasure</code> that names the target and says why, and removes the target's payload from this store. <code>openings-removed</code> counts the payloads removed. The erased record keeps its id, its envelope and its place. Folds then tell you what they could not read. Of the four firings, one is now unreadable:</p>
+<p>This writes a record of kind <code>erasure</code> that names the target and says why, and removes the target's payload from this store. <code>openings-removed</code> counts the payloads removed, which the tool calls openings. The erased record keeps its id, its envelope and its place. An erasure reaches this store only: a copy of the directory or an export made before it still holds the payload. Folds then tell you what they could not read. Of the four firings, one is now unreadable:</p>
 <pre><code>$ echo '{&quot;vertex&quot;:&quot;firings&quot;,&quot;from&quot;:[{&quot;store&quot;:&quot;yard&quot;,&quot;kind&quot;:[&quot;firing&quot;]}],&quot;fold&quot;:{
     &quot;firings&quot;:{&quot;count&quot;:true},
     &quot;hottest&quot;:{&quot;max&quot;:&quot;cone&quot;},
@@ -892,7 +902,7 @@ kiln   0                1
 <li><p><strong>Is every kind described?</strong> <code>erasure</code> is not, which is fine: the description names the kinds you write by hand.</p></li>
 <li><p><strong>Where do the references lead?</strong> <code>HERE</code>, <code>ELSEWHERE IN SELECTED GROUP</code> and <code>OUTSIDE SELECTED GROUP</code> say where the things referred to are held. Three firings name a kiln held in another store of the group. One could not be read, the erased one.</p></li>
 <li><p><strong>Are the references well formed?</strong> <code>NOT TYPED</code> counts values not written <code>kind:key</code>, and <code>UNLISTED PREFIX</code> counts those naming a kind the field's <code>refs</code> list leaves out. Both are zero here.</p></li>
-<li><p><strong>Which things leave a reference unset?</strong> One firing names no potter: the batch left it out.</p></li>
+<li><p><strong>Which things leave a reference unset?</strong> The batch named no potter. One of its two firings shows here as unset, and the other is the erased one, counted under <code>NOT READ</code>.</p></li>
 <li><p><strong>Does every write state what it must?</strong> No record is missing <code>cone</code> or <code>kiln</code>, and one cannot be read.</p></li>
 </ul>
 <p><code>WITHOUT MENTION</code> counts references whose target the thing does not also mention in <code>about</code>. Nothing copies a reference into <code>about</code>, so this is usually every reference, and it is not a fault.</p>
@@ -918,6 +928,263 @@ kiln   0                1
 </ol>
 <p>A fold does not walk links for several hops. To draw a graph, read all the things and the active edge things in one <code>read --values</code> and walk them in your own code, or step with <code>ls --refers-to</code> and <code>of</code>.</p>
 <p>It is quick enough to call often. On a store of 9,000 records a fold takes about a quarter of a second, and <code>emit - --fill</code> writes 8,000 revisions in under a second (<a href="changelog.html">CHANGELOG</a>).</p>
+<h2 id="a-second-walk-a-book-and-its-sources">A second walk: a book and its sources</h2>
+<p>Kilns and firings are state and events. Much of what people keep is words, and the same shapes hold them. This walk writes a short history of the workshop. Each passage is a thing with a key, revised whole. Each source the book draws on is an event. The book itself is stored nowhere: it is a fold over the passages, and the same records answer other questions too.</p>
+<h3 id="a-store-for-the-book">A store for the book</h3>
+<p>The book has its own pace, so it gets its own store. From <code>pottery/</code>:</p>
+<pre><code class="language-sh">loops -C book init
+</code></pre>
+<p>Add it to <code>pottery/stores.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;workshop&quot;: &quot;workshop&quot;,
+  &quot;yard&quot;: &quot;yard&quot;,
+  &quot;book&quot;: &quot;book&quot;
+}
+</code></pre>
+<p>And save this as <code>book/.loops/store.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;version&quot;: 2,
+  &quot;note&quot;: &quot;A short history of the workshop, and what it was written from.&quot;,
+  &quot;kinds&quot;: {
+    &quot;passage&quot;: {
+      &quot;note&quot;: &quot;One passage of the book, revised whole.&quot;,
+      &quot;key&quot;: &quot;slug&quot;,
+      &quot;headline&quot;: &quot;title&quot;,
+      &quot;refs&quot;: { &quot;rests_on&quot;: [] },
+      &quot;lifecycle&quot;: { &quot;field&quot;: &quot;status&quot;, &quot;active&quot;: [&quot;draft&quot;, &quot;final&quot;], &quot;closed&quot;: [&quot;cut&quot;] },
+      &quot;preview&quot;: [&quot;chapter&quot;, &quot;seq&quot;, &quot;status&quot;, &quot;title&quot;],
+      &quot;every_write&quot;: [&quot;title&quot;, &quot;chapter&quot;, &quot;seq&quot;, &quot;status&quot;, &quot;text&quot;]
+    },
+    &quot;source&quot;: {
+      &quot;note&quot;: &quot;Something the book draws on: a memory, a letter, a record. An event: written once.&quot;,
+      &quot;headline&quot;: &quot;text&quot;
+    }
+  }
+}
+</code></pre>
+<p>Four choices here suit prose:</p>
+<ul>
+<li><p><strong>A short title to scan, and the words in <code>text</code>.</strong> <code>headline</code> names the title, which is what a list shows. The trailing message of a write goes to <code>text</code>. A field holds as much text as you give it, line breaks included: <code>text=&quot;$(cat passage.txt)&quot;</code> passes a file. The plain views show a line break as <code>\n</code>, and the JSON carries the text as written.</p></li>
+<li><p><strong>A status with a closed value.</strong> A passage that is cut is not removed. It is marked, and the fold leaves it out.</p></li>
+<li><p><strong>A field for what a passage rests on.</strong> The empty list under <code>rests_on</code> allows any target, record ids included, and an id is the only name a source has.</p></li>
+<li><p><strong>Every write says everything.</strong> <code>every_write</code> lists the fields, so the shorthand stops a write that leaves one out. The reason comes below.</p></li>
+</ul>
+<h3 id="the-sources-come-first">The sources come first</h3>
+<pre><code>$ loops --in book emit source --about kiln:east --about potter:ada --occurred 2019 \
+    &quot;Ada: the east kiln came second-hand from a school that was closing. We paid for the van and nothing else.&quot;
+r:jtuu78n767j4kobna2bg8gmo7mrm6h9fc6slkf1kqibe62d1ml10
+
+$ loops --in book emit source --about kiln:east --occurred 2019-11 \
+    &quot;The first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.&quot;
+r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og
+
+$ loops --in book emit source --about kiln:west --occurred 2023-04 \
+    &quot;The west kiln was built on site over one spring, to fire stoneware.&quot;
+r:jathpduf691r39o202posg8blpmhrga2fvo4e9rokom13hugl9ig
+</code></pre>
+<p>A source is said once and never revised. What it is about goes in <code>about</code>, and <code>occurred</code> is as coarse as what is known: a year, or a month.</p>
+<h3 id="passages">Passages</h3>
+<p>Each passage says where it sits in the book and which source it rests on:</p>
+<pre><code>$ loops --in book emit passage slug=a-kiln-from-a-school title=&quot;A kiln from a school&quot; \
+    chapter:=1 seq:=1 status=draft \
+    rests_on:='[&quot;r:jtuu78n767j4kobna2bg8gmo7mrm6h9fc6slkf1kqibe62d1ml10&quot;]' \
+    &quot;The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.&quot;
+r:22drglmlnmngikuuqahfcm8r6d2iqclrl5h4l96jtrisdhpjpkk0
+
+$ loops --in book emit passage slug=the-cracked-shelf title=&quot;The cracked shelf&quot; \
+    chapter:=1 seq:=2 status=draft \
+    rests_on:='[&quot;r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og&quot;]' \
+    &quot;Its first firing cracked a shelf at cone 6.&quot;
+r:v5vioj83ubi7gu3flo3f9gns8b8tges6g1e08d3cvtn4qp3280og
+
+$ loops --in book emit passage slug=building-west title=&quot;Building the west kiln&quot; \
+    chapter:=2 seq:=1 status=draft \
+    rests_on:='[&quot;r:jathpduf691r39o202posg8blpmhrga2fvo4e9rokom13hugl9ig&quot;]' \
+    &quot;The west kiln was built on site, over one spring, to fire stoneware.&quot;
+r:7r7sbct28geksrpc99lnjbbhcv3c094vv8so2585ok1va24s3v30
+</code></pre>
+<h3 id="the-book-is-a-fold">The book is a fold</h3>
+<p>Make <code>book/.loops/vertices/</code> with <code>mkdir -p book/.loops/vertices</code>, and save this in it as <code>manuscript.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;vertex&quot;: &quot;manuscript&quot;,
+  &quot;from&quot;: [{ &quot;store&quot;: &quot;.&quot;, &quot;kind&quot;: [&quot;passage&quot;] }],
+  &quot;fold&quot;: {
+    &quot;passages&quot;: {
+      &quot;latest-by&quot;: &quot;of&quot;,
+      &quot;follow&quot;: &quot;prev&quot;,
+      &quot;where&quot;: { &quot;status&quot;: { &quot;not&quot;: &quot;cut&quot; } }
+    },
+    &quot;by_status&quot;: { &quot;count&quot;: true, &quot;follow&quot;: &quot;prev&quot;, &quot;by&quot;: &quot;status&quot; }
+  }
+}
+</code></pre>
+<p>The fold gives each passage that is not cut, as it was last written. In the JSON, <code>passages.things</code> maps each passage's name to a list of its heads, and with <code>--values</code> each head carries its <code>id</code>, its <code>env</code> and its <code>payload</code>.</p>
+<p>The fold does not put the passages in order by a field of yours, and it does not lay them out. That part is a script's. Save these two lines as <code>pottery/print.jq</code>:</p>
+<pre><code>sort_by(.chapter, .seq)[]
+  | &quot;\(.chapter).\(.seq)  \(.title)\n     \(.text)&quot;
+</code></pre>
+<p>Then print the book:</p>
+<pre><code>$ loops --in book read manuscript --values \
+    | jq '[.passages.things[][].payload]' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     Its first firing cracked a shelf at cone 6.
+2.1  Building the west kiln
+     The west kiln was built on site, over one spring, to fire stoneware.
+</code></pre>
+<p>Freeze this first draft with a tick:</p>
+<pre><code>$ loops --in book tick manuscript
+r:khh57rpd7fjrvp330vsi7l3bufo7qasphust2mqbd2i09fesm7tg
+</code></pre>
+<h3 id="two-people-revise-a-passage-at-once">Two people revise a passage at once</h3>
+<p>Prose is revised with <code>--whole</code>. The record then has no <code>sets</code>: it is the full statement, and a field it leaves out is gone from the reading.</p>
+<p>Here two people each read the second passage and rewrote it. One machine has one key, so on this page one writer plays both. <code>--base-id</code> says what each had read:</p>
+<pre><code class="language-sh">loops --in book emit passage slug=the-cracked-shelf --whole \
+  --base-id r:v5vioj83ubi7gu3flo3f9gns8b8tges6g1e08d3cvtn4qp3280og \
+  title=&quot;The cracked shelf&quot; chapter:=1 seq:=2 status=draft \
+  rests_on:='[&quot;r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og&quot;]' \
+  &quot;Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.&quot;
+loops --in book emit passage slug=the-cracked-shelf --whole \
+  --base-id r:v5vioj83ubi7gu3flo3f9gns8b8tges6g1e08d3cvtn4qp3280og \
+  title=&quot;The cracked shelf&quot; chapter:=1 seq:=2 status=draft \
+  rests_on:='[&quot;r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og&quot;]' \
+  &quot;The first firing went badly: a shelf cracked at cone 6.&quot;
+</code></pre>
+<p>The passage now has two heads:</p>
+<pre><code>$ loops --in book read manuscript --plain
+passages
+  thing  passage:a-kiln-from-a-school
+    heads
+      r:22drglml
+  thing  passage:building-west
+    heads
+      r:7r7sbct2
+  thing  passage:the-cracked-shelf
+    heads
+      r:jfh669b4
+      r:knfkic8o
+by_status
+  group  draft  4
+  0 ungrouped
+  0 not read
+</code></pre>
+<p>A count that follows heads counts each head, so three passages count as four drafts until someone settles this one.</p>
+<p>Read by its keys, as <code>loops --in book of passage:the-cracked-shelf --plain</code> reads it, every field is in conflict, the title and the chapter included. That is true, and not much use. The manuscript reads by heads, so the book shows both versions, each as it was written:</p>
+<pre><code>$ loops --in book read manuscript --values \
+    | jq '[.passages.things[][].payload]' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     The first firing went badly: a shelf cracked at cone 6.
+1.2  The cracked shelf
+     Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.
+2.1  Building the west kiln
+     The west kiln was built on site, over one spring, to fire stoneware.
+</code></pre>
+<p>Nothing chose between them. A person reads both and writes the passage that stands, and that ordinary write replaces both heads:</p>
+<pre><code class="language-sh">loops --in book emit passage slug=the-cracked-shelf --whole \
+  title=&quot;The cracked shelf&quot; chapter:=1 seq:=2 status=draft \
+  rests_on:='[&quot;r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og&quot;]' \
+  &quot;The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash.&quot;
+</code></pre>
+<h3 id="whole-every-time">Whole, every time</h3>
+<p>The first passage is finished. The short way to say so is stopped:</p>
+<pre><code>$ loops --in book emit passage slug=a-kiln-from-a-school status=final
+emit passage slug=a-kiln-from-a-school status=final: missing every_write fields [&quot;title&quot;,&quot;chapter&quot;,&quot;seq&quot;,&quot;text&quot;]. State each field on this write, use --sets-nothing for a join with no payload fields, or use emit - for an exception.
+</code></pre>
+<p>This is why the description lists them. Read by heads, a record is the whole statement. A record that said only <code>status=final</code> would be a head with no title, no chapter and no text, and the book would print <code>null</code> where the passage was. So <strong>a kind you read by heads is revised whole, every time</strong>:</p>
+<pre><code class="language-sh">loops --in book emit passage slug=a-kiln-from-a-school --whole \
+  title=&quot;A kiln from a school&quot; chapter:=1 seq:=1 status=final \
+  rests_on:='[&quot;r:jtuu78n767j4kobna2bg8gmo7mrm6h9fc6slkf1kqibe62d1ml10&quot;]' \
+  &quot;The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.&quot;
+</code></pre>
+<p>For the same reason, do not take the first way out that the message offers. A join made with <code>--sets-nothing</code> is a record with nothing in it. Read by heads it is an empty passage, and since it has no status it is not cut, so it prints. Settle two heads of such a kind with a whole write, as above.</p>
+<p>The second chapter is cut, whole as well:</p>
+<pre><code class="language-sh">loops --in book emit passage slug=building-west --whole \
+  title=&quot;Building the west kiln&quot; chapter:=2 seq:=1 status=cut \
+  rests_on:='[&quot;r:jathpduf691r39o202posg8blpmhrga2fvo4e9rokom13hugl9ig&quot;]' \
+  &quot;The west kiln was built on site, over one spring, to fire stoneware.&quot;
+</code></pre>
+<p><code>ls passage:</code> shows every passage with the columns <code>preview</code> names, the cut one too, and the book leaves it out:</p>
+<pre><code>$ loops --in book ls passage: --plain
+THING                         HEAD KINDS  RECORDS  HEADS  chapter  seq  status  title
+passage:a-kiln-from-a-school  passage     2        1      1        1    final   A kiln from a school
+passage:building-west         passage     2        1      2        1    cut     Building the west kiln
+passage:the-cracked-shelf     passage     4        1      1        2    draft   The cracked shelf
+
+$ loops --in book read manuscript --values \
+    | jq '[.passages.things[][].payload]' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash.
+</code></pre>
+<h3 id="asking-the-same-records-something-else">Asking the same records something else</h3>
+<p>The book is one fold. The records under it can be folded other ways, by anyone who holds them.</p>
+<p><strong>The first draft, word for word.</strong> A tick's stored <code>result</code> names the heads by id alone, and each is still a record:</p>
+<pre><code>$ for id in $(loops --in book get r:khh57rpd7fjrvp330vsi7l3bufo7qasphust2mqbd2i09fesm7tg \
+      | jq -r '.payload.result.passages.things[][]'); do
+    loops --in book get $id
+  done | jq -s 'map(.payload)' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     Its first firing cracked a shelf at cone 6.
+2.1  Building the west kiln
+     The west kiln was built on site, over one spring, to fire stoneware.
+</code></pre>
+<p><strong>Every wording a passage has had.</strong></p>
+<pre><code>$ loops --in book export --of passage:the-cracked-shelf | jq -r '.payload.text'
+Its first firing cracked a shelf at cone 6.
+Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.
+The first firing went badly: a shelf cracked at cone 6.
+The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash.
+</code></pre>
+<p><strong>What was written from a source.</strong></p>
+<pre><code>$ loops --in book ls --refers-to r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og --plain
+target  r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og
+things  1
+  passage:the-cracked-shelf
+stores  1
+  ~/pottery/book
+KIND     FIELD     DESCRIPTION
+passage  rests_on  ~/pottery/book/.loops/store.json
+things_not_read  0
+values_not_typed  0
+fields_read  1
+</code></pre>
+<p>The other way round, <code>loops --in book of passage:the-cracked-shelf | jq -r '.values.rests_on[]'</code> prints the ids a passage rests on, and <code>get</code> shows each.</p>
+<p><strong>The sources by when things happened, newest first.</strong> A second vertex, saved as <code>book/.loops/vertices/sources.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;vertex&quot;: &quot;sources&quot;,
+  &quot;from&quot;: [{ &quot;store&quot;: &quot;.&quot;, &quot;kind&quot;: [&quot;source&quot;] }],
+  &quot;fold&quot;: {
+    &quot;per_kiln&quot;: { &quot;count&quot;: true, &quot;by&quot;: &quot;env.about:kiln&quot; },
+    &quot;newest_first&quot;: { &quot;collect&quot;: true, &quot;limit&quot;: 10 }
+  }
+}
+</code></pre>
+<pre><code>$ loops --in book read sources --plain
+per_kiln
+  group  east  2
+  group  west  1
+  0 ungrouped
+  0 not read
+newest_first
+  r:jathpduf
+  r:vbql5s2d
+  r:jtuu78n7
+
+$ loops --in book read sources --values \
+    | jq -r '.newest_first.heads[] | &quot;\(.env.occurred)  \(.payload.text)&quot;'
+2023-04  The west kiln was built on site over one spring, to fire stoneware.
+2019-11  The first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.
+2019  Ada: the east kiln came second-hand from a school that was closing. We paid for the van and nothing else.
+</code></pre>
+<p>None of these four questions was planned for when the passages were written. The records were enough.</p>
+<h3 id="the-same-shape-elsewhere">The same shape, elsewhere</h3>
+<p>A decision, a rule of thumb and a lesson learned are the same shape as a passage: a thing with a key, a line to scan, a status with a closed value, and words that are revised whole. Something noticed in passing is the same shape as a source: an event that mentions what it is about. What you call your kinds, and when a thing is worth writing down, are yours to decide.</p>
 <h2 id="what-is-built-and-what-is-not">What is built, and what is not</h2>
 <div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">State</th><th scope="col">Until then</th></tr></thead>
 <tbody>
@@ -928,7 +1195,7 @@ kiln   0                1
 <tr><td>Sharing: stores synced between machines and people</td><td>Not built</td><td>A store is a directory. Copy it, or <code>export</code> from one and <code>import</code> into another</td></tr>
 <tr><td>A search index, collectors, a command that edits records as text, a server</td><td>Not built</td><td>Fold the store directly, and keep search or ranking in a script that reads folds and writes its findings back</td></tr>
 </tbody></table></div>
-<p>The record format is not frozen yet. Read <a href="changelog.html">CHANGELOG</a> before moving a store to a newer release. What comes next is in <a href="roadmap.html">ROADMAP</a>.</p>
+<p>This release is for trying the rules in everyday use, by people and by agents. The command is the cheap part to change. The record, its envelope and the laws are not, though the record format is not frozen yet: read <a href="changelog.html">CHANGELOG</a> before moving a store to a newer release. What comes next is in <a href="roadmap.html">ROADMAP</a>.</p>
 <h2 id="if-you-used-the-old-tool">If you used the old tool</h2>
 <p>The Python <code>loops</code> kept facts in a table, and a <code>.vertex</code> file said how to read each kind. What changed:</p>
 <div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col">Then</th><th scope="col">Now</th></tr></thead>

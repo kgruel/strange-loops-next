@@ -226,6 +226,33 @@ class CompareTests(unittest.TestCase):
         self.assertEqual(report["sources"][0]["things"]["differing"], 0)
         self.assertEqual(report["examples"][0]["fields"], ["_user"])
 
+    def test_old_tool_absences_that_are_counted_do_not_fail(self):
+        # The old reader shows no fact that lacks its key, and only the last
+        # `collect` items. Those export roots are counted under their own
+        # names, and a run with no other difference passes.
+        rows = [{"kind": "thread", "key": "kiln", "payload": self.kiln},
+                {"kind": "change", "key": "b", "payload": self.changes}]
+        old = self.tmp / "old.json"
+        write_json(old, {"rows": rows})
+        mapping = json.loads(self.args[1].read_text())
+        mapping["kinds"]["change"] = {"collect": "1"}
+        write_json(self.args[1], mapping)
+        report = json.loads(self.run_compare("--old-json", old).stdout)["sources"][0]
+        change, thread = report["kinds"]  # in sorted kind order
+        self.assertEqual((thread["old_json"]["only_old"], thread["old_json"]["missing_key_roots"]), (1, 1))
+        self.assertEqual((change["old_json"]["only_old"], change["old_json"]["outside_collect_limit"]), (1, 1))
+        self.assertEqual((thread["old_json_shadow"]["only_new"], change["old_json_shadow"]["only_new"]), (1, 1))
+        # An absence with no such cause still fails.
+        write_json(old, {"rows": rows[1:]})
+        report = json.loads(self.run_compare("--old-json", old, code=1).stdout)["sources"][0]
+        thread = report["kinds"][1]["old_json"]
+        self.assertEqual((thread["only_old"], thread["missing_key_roots"]), (2, 1))
+        # Nor does a shadow root the old rows lack, when the export has no such root.
+        write_json(old, {"rows": rows})
+        self.things["r:extra"] = thing("change", self.changes)
+        self.reading()
+        self.run_compare("--old-json", old, code=1)
+
     def test_union_orders_by_time_then_numeric_coordinate(self):
         # workshop's later arrival was backdated; its first arrival at t=1
         # wins locally by time in the combined read, until yard's t=1 late tie.

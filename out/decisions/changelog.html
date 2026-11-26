@@ -224,10 +224,50 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 <h2 id="2026-11-25">2026-11-25</h2>
 <p>In brief:</p>
 <ul>
+<li><p><strong>The guide gains a second walk, and says what it leaves out.</strong> A first reader's feedback came back within the day, and Kyle answered it. Most of it asks for shared stores, teammates and stewardship, which wait on standing, or for habits of work, which are the reader's own. One point he took: the guide showed little of prose. <a href="guide.html">GUIDE.md</a> now writes a short book from its notes, where the manuscript is a fold, and it names at the top the two things it leaves out. A second reader, an Opus agent, followed the whole page before the merge.</p></li>
+<li><p><strong><code>compare.py --old-json</code> passes when the old reading differs only by counted absences:</strong> facts without their key, and collected items beyond the old tool's limit. Any other difference still fails. Asked for by the outside pilot.</p></li>
 <li><p><strong>A guide for a new user.</strong> <a href="guide.html">GUIDE.md</a> walks through how to think about records, things and folds, how to lay out stores and kinds, and how to use the command, with real output from release 0.1.1. Kyle asked for it, for someone starting out. The site renders it beside the working documents.</p></li>
 <li><p><strong>Releases begin.</strong> A tag <code>v&lt;version&gt;</code> on the GitHub copy builds <code>loops</code> for four machines and publishes the archives with their checksums. The first is <code>v0.1.1</code>, and <code>loops --version</code> now says so. Kyle asked for it after a machine with no Rust toolchain could not get the day's build.</p></li>
 <li><p><strong>Built: <code>loops of --setters</code>, and a <code>describe</code> count of things that leave a reference field unset.</strong> Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The <code>emit</code> help now says what <code>about</code> is. Nothing changes for a command that does not use the flag.</p></li>
 <li><p><strong>Kyle rules two stops in the shorthand, and they are built:</strong> a kind's description can list fields that every shorthand write must state (<code>every_write</code>, in version 2 of the file), and a stated <code>--sets</code> stops when it leaves out a key the command gives. <code>describe</code> counts the records that lack a listed field. Asked for in the same issues, put to margins, Neon and Astra in the room, and ruled the same day.</p></li>
+</ul>
+<h3 id="the-guide-gains-a-second-walk">The guide gains a second walk</h3>
+<p>The first reader's feedback on the guide came back within the day, and Kyle answered it point by point. Most of it asked for things that wait on standing (shared stores, teammates, names for writers, who looks after a shared store) or for habits of work (when to write, what is worth keeping, how an agent is told to use the tool). He kept both out of the guide: the first cannot be said until standing is settled, and the second is the reader's own. He took one point: the guide showed state and events, and little of prose.</p>
+<ul>
+<li><p><strong>A second walk: a book and its sources.</strong> A third invented store holds a short history of the workshop. Each passage is a keyed thing revised whole, each source it draws on is an event, and the manuscript is a fold that a two-line <code>jq</code> script prints. The guide is about the general model and not one team's use, so the walk is a piece of writing with its provenance, one of the <a href="../rethink/#cases">three cases</a> the model was first tested on, and not a decision log. Its last section says a decision or a rule of thumb is the same shape.</p></li>
+<li><p><strong>What it shows that the first walk did not:</strong></p>
+<ul>
+<li><p><code>&quot;follow&quot;: &quot;prev&quot;</code> in use. A passage with two heads appears in the book twice, each version as written, until a person writes the one that stands.</p></li>
+<li><p>A kind read by heads is revised whole every time. A write of the status alone would leave a head with no text, and the book would print <code>null</code> for it. Listing the fields under <code>every_write</code> makes the shorthand stop it.</p></li>
+<li><p>A pure join does not suit such a kind either, though the stop's message offers <code>--sets-nothing</code>: read by heads, the join is an empty statement.</p></li>
+<li><p>A count that follows heads counts a thing once for each head.</p></li>
+<li><p>A fold does not order by a payload field, so the script sorts.</p></li>
+<li><p>The first draft is printed again from a tick, word for word, after the passages changed.</p></li>
+<li><p><code>ls --refers-to</code> on a record id finds what was written from a source.</p></li>
+</ul></li>
+<li><p><strong>Scope, said at the top.</strong> The guide leaves out sharing a store with other people, and how to work with the tool. Part 2 now says that its first two tests for a store boundary look ahead to sharing. Part 1 says a store is cheap to throw away. The closing table says what this release is for: trying the rules in everyday use, with the command the cheap part to change.</p></li>
+<li><p><strong>Four statements corrected or added elsewhere,</strong> three of them from the same reader's notes on a pilot import:</p>
+<ul>
+<li><p>An erasure reaches one store only: a copy or an export made before it still holds the payload. Kyle agreed to the sentence.</p></li>
+<li><p>A routine change to a thing whose last record stated <code>occurred</code> claims that earlier time too, unless it is given a time of its own or <code>--no-occurred</code>. This is the ruling of 2026-11-20 as built. It bites hardest after an import, where every record states the old time.</p></li>
+<li><p>A plain tick covers what the spec's <code>from</code> takes, before any slot's <code>where</code>. The guide said &quot;the records the answer depends on&quot;. Measured on the walk's workshop: a vertex that reads every kind and tests for one covered 17 records, and one that names the kind in <code>from</code> covered 2, for the same answer.</p></li>
+<li><p><code>not</code> holds when a field is absent, and after shorthand writes a pure join leaves the key field in conflict.</p></li>
+</ul></li>
+<li><p><strong>Every command in the new section was run</strong> on release 0.1.1, and the section was then followed from the page's own text by a script: 23 commands, and only the one intended stop exits non-zero.</p></li>
+<li><p><strong>A second reader followed the whole page</strong> before the merge, an Opus agent with no part in writing it, as Kyle asked. All 87 commands ran as written and the 53 outputs shown matched. What it found is fixed:</p>
+<ul>
+<li><p>The way out the stop offers, <code>--sets-nothing</code>, put a cut passage back into the book as <code>null</code>. The walk now says not to join such a kind.</p></li>
+<li><p>The example for why every write is whole was a cut, the one case where a short write does no harm. It is now a passage marked final.</p></li>
+<li><p>A count was claimed and never shown, the kind was named <code>note</code> beside the description's own <code>note</code> member, &quot;in the order things happened&quot; listed newest first, and the last paragraph described fields a passage does not have.</p></li>
+</ul></li>
+</ul>
+<h3 id="the-comparison-passes-on-counted-absences">The comparison passes on counted absences</h3>
+<p>Left open on 2026-11-24, when the exporter learned folds of several slots: <code>tools/shadow/compare.py --old-json</code> exited 1 whenever an export root was absent from the old tool's reading, also when the tool had already counted the absence as <code>missing_key_roots</code> or <code>outside_collect_limit</code>. The same outside pilot asked about it again: its 22 differences were all facts without their key, which AD2's addition (c) makes roots.</p>
+<ul>
+<li><p><strong>Now</strong> a run whose only differences from the old reading are those counted absences exits 0. The report is unchanged, so the counts still show. The old tool never shows these roots, so they are missing from its rows on both sides: <code>only_old</code> against the export and <code>only_new</code> against the shadow. Both are allowed up to the counted number, and the export is compared with the shadow one for one in the same run.</p></li>
+<li><p><strong>Still a failure:</strong> any other absence, any differing field or mention, and any record the id map does not account for.</p></li>
+<li><p>Reproduced first with the repo's fixtures, in a new test. The Rust walk's fixture, which runs the tool against a real import, had pinned exit 1 for exactly this case: one fact without its key and two collected items beyond the limit. It now expects 0. The first pipeline caught that the fixture had not been changed.</p></li>
+<li><p>An implementer's choice: it changes a tool's exit status and no record or answer.</p></li>
 </ul>
 <h3 id="a-guide-for-a-new-user">A guide for a new user</h3>
 <p>Kyle asked for a usage guide that is friendly in structure and prose, and that walks through how to think about the tool before how to use it. <a href="guide.html">GUIDE.md</a> has three parts: how to think about it, laying out your data, and using the command. It ends with what is built and what is not, a table for someone who used the old tool, and a list of words.</p>

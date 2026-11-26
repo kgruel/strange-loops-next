@@ -409,6 +409,22 @@ def disagrees(counts):
     return any(counts[k] for k in ("only_old", "only_new", "differing"))
 
 
+def old_reading_disagrees(row):
+    """Whether a kind's reading by the old tool differs for a cause not counted.
+
+    The old reader shows no fact that lacks its key and only the last
+    `collect` items. Those export roots are counted as `missing_key_roots`
+    and `outside_collect_limit`. The same roots are absent from the old rows
+    in both comparisons: `only_old` against the export and `only_new`
+    against the shadow. The export and the shadow are compared one for one
+    in `things`, so equal counts here are the same roots.
+    """
+    export, shadow = row["old_json"], row["old_json_shadow"]
+    counted = export["missing_key_roots"] + export["outside_collect_limit"]
+    return bool(export["only_old"] - counted or export["only_new"] or export["differing"]
+                or shadow["only_new"] - counted or shadow["only_old"] or shadow["differing"])
+
+
 LEGACY_METADATA = {"_ts", "_observer", "_origin", "_id", "_n", "_refs"}
 
 
@@ -508,8 +524,7 @@ def source_report(cut, records, shadow, old_json, examples, source, refs):
         summary["unmapped_shadow_records"] = cut.unmapped_records
     if old_json:
         summary["old_json_unnamed_rows"] = excluded
-    differences = any(disagrees(r[name]) for r in rows
-                      for name in ("old_json", "old_json_shadow") if name in r)
+    differences = any(old_reading_disagrees(r) for r in rows if "old_json" in r)
     return summary, bool(mismatches or cut.unmapped_records or disagrees(total) or differences)
 
 

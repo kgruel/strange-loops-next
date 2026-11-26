@@ -89,7 +89,8 @@ def main():
                      for old, refs in [("cycle-b", ["cycle-a"]), ("external", ["middle", "cycle-a"]),
                                        ("local-yard", ["shared"])])
     ad4.save("old.json", {"rows": yard_rows})
-    report = compare(*operands(yard), "--old-json", "old.json", status=1)["sources"][0]
+    # Those absences are counted, so the run passes.
+    report = compare(*operands(yard), "--old-json", "old.json")["sources"][0]
     assert report["things"]["differing"] == 0
     counts = [k["old_json"] for k in report["kinds"]]
     for name, total in [("missing_key_roots", 1), ("outside_collect_limit", 2), ("only_old", 3),
