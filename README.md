@@ -11,6 +11,8 @@ The theorem files prove the listed model laws; fixture checks do not prove imple
 [ROADMAP.md](ROADMAP.md) gives what is next, [DECISIONS.md](DECISIONS.md) what waits on the human, and [CHANGELOG.md](CHANGELOG.md) what was built and ruled.
 The long design notes are in [notes/](notes/).
 
+**New to `loops`?** Start with [GUIDE.md](GUIDE.md): how to think about it, how to lay out your data, and how to use the command.
+
 ## Layout
 
 | Path | Holds |

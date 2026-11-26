@@ -24,7 +24,7 @@ Kyle's standing leave (2026-11-25): a release follows each merge that changes th
    tools/release.sh bump 0.2.0    # or name it
    ```
 
-   It edits `rust/cli/Cargo.toml` and the crate's entry in `rust/Cargo.lock`. Commit both with the change. Use a patch bump unless Kyle says otherwise. If a CLI change was merged without a bump, make a small merge request that only bumps.
+   It edits `rust/cli/Cargo.toml` and the crate's entry in `rust/Cargo.lock`. Commit both with the change. Use a patch bump unless Kyle says otherwise. If a CLI change was merged without a bump, make a small merge request that only bumps. If the change alters anything `GUIDE.md` shows (a command, a flag, an output, the wording of a stop), update the guide in the same merge request.
 
 2. **Merge as usual, and wait until the GitHub copy has the merge.** The tag must point at a commit both copies hold.
 
