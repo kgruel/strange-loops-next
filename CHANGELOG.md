@@ -10,9 +10,26 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 ## 2026-11-25
 
 In brief:
+- **A guide for a new user.** [GUIDE.md](GUIDE.md) walks through how to think about records, things and folds, how to lay out stores and kinds, and how to use the command, with real output from release 0.1.1. Kyle asked for it, for someone starting out. The site renders it beside the working documents.
 - **Releases begin.** A tag `v<version>` on the GitHub copy builds `loops` for four machines and publishes the archives with their checksums. The first is `v0.1.1`, and `loops --version` now says so. Kyle asked for it after a machine with no Rust toolchain could not get the day's build.
 - **Built: `loops of --setters`, and a `describe` count of things that leave a reference field unset.** Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The `emit` help now says what `about` is. Nothing changes for a command that does not use the flag.
 - **Kyle rules two stops in the shorthand, and they are built:** a kind's description can list fields that every shorthand write must state (`every_write`, in version 2 of the file), and a stated `--sets` stops when it leaves out a key the command gives. `describe` counts the records that lack a listed field. Asked for in the same issues, put to margins, Neon and Astra in the room, and ruled the same day.
+
+### A guide for a new user
+
+Kyle asked for a usage guide that is friendly in structure and prose, and that walks through how to think about the tool before how to use it. [GUIDE.md](GUIDE.md) has three parts: how to think about it, laying out your data, and using the command. It ends with what is built and what is not, a table for someone who used the old tool, and a list of words.
+
+- **Every command in it was run** on release 0.1.1, in a scratch group of two invented stores, and the output shown is from that run.
+- **A second reader followed it step by step** in a scratch directory before the merge: an agent with no part in writing it. It found a write the walk made that the page never showed, four reference commands that needed `--in`, an example placed a section too early, and output words left unexplained. Each is fixed, and the corrected page was followed once more, line for line.
+- **It is a guide and not the rules.** It links to the protocol pages and the notes on the command, and says they are right where the two differ.
+- **It states plainly what the walk showed a new user would trip on:**
+  - `--in` and `--group` go before the verb.
+  - A source's key is `kind`, and `kinds` is refused.
+  - A pure join names its thing with `--of`, since `--sets-nothing` carries no field.
+  - After a fork the key field is in conflict too, because each keyed write sets it. The next ordinary write clears that, and a pure join does not.
+  - A tick reads its working store alone, so a tick of a vertex that names two stores does not give what `read` gives.
+- **The site renders it** with the working documents, as `guide.html` (`design/decisions/render.mjs`).
+- **The release skill** now says to update the guide when a change alters what it shows.
 
 ### Releases begin
 

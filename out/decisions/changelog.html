@@ -189,6 +189,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <nav class="documents" aria-label="Documents"><a href="index.html">Decisions</a>
 <a href="roadmap.html">Roadmap</a>
 <a href="changelog.html" aria-current="page">Changelog</a>
+<a href="guide.html">A guide to loops</a>
 <a href="note-2026-11-11-declared-keys.html">D8c: declared keys, design note</a>
 <a href="note-2026-11-15-the-cut.html">Step 4: the cut, design note</a>
 <a href="note-2026-11-21-order-of-work.html">The order of work, and how we work: W1 to W6</a>
@@ -223,9 +224,27 @@ The record starts where the old roadmap's did. For anything earlier, and for eve
 <h2 id="2026-11-25">2026-11-25</h2>
 <p>In brief:</p>
 <ul>
+<li><p><strong>A guide for a new user.</strong> <a href="guide.html">GUIDE.md</a> walks through how to think about records, things and folds, how to lay out stores and kinds, and how to use the command, with real output from release 0.1.1. Kyle asked for it, for someone starting out. The site renders it beside the working documents.</p></li>
 <li><p><strong>Releases begin.</strong> A tag <code>v&lt;version&gt;</code> on the GitHub copy builds <code>loops</code> for four machines and publishes the archives with their checksums. The first is <code>v0.1.1</code>, and <code>loops --version</code> now says so. Kyle asked for it after a machine with no Rust toolchain could not get the day's build.</p></li>
 <li><p><strong>Built: <code>loops of --setters</code>, and a <code>describe</code> count of things that leave a reference field unset.</strong> Both come from the first issues filed from a group of stores being rebuilt with this tool (GitHub issues 23 to 26). The <code>emit</code> help now says what <code>about</code> is. Nothing changes for a command that does not use the flag.</p></li>
 <li><p><strong>Kyle rules two stops in the shorthand, and they are built:</strong> a kind's description can list fields that every shorthand write must state (<code>every_write</code>, in version 2 of the file), and a stated <code>--sets</code> stops when it leaves out a key the command gives. <code>describe</code> counts the records that lack a listed field. Asked for in the same issues, put to margins, Neon and Astra in the room, and ruled the same day.</p></li>
+</ul>
+<h3 id="a-guide-for-a-new-user">A guide for a new user</h3>
+<p>Kyle asked for a usage guide that is friendly in structure and prose, and that walks through how to think about the tool before how to use it. <a href="guide.html">GUIDE.md</a> has three parts: how to think about it, laying out your data, and using the command. It ends with what is built and what is not, a table for someone who used the old tool, and a list of words.</p>
+<ul>
+<li><p><strong>Every command in it was run</strong> on release 0.1.1, in a scratch group of two invented stores, and the output shown is from that run.</p></li>
+<li><p><strong>A second reader followed it step by step</strong> in a scratch directory before the merge: an agent with no part in writing it. It found a write the walk made that the page never showed, four reference commands that needed <code>--in</code>, an example placed a section too early, and output words left unexplained. Each is fixed, and the corrected page was followed once more, line for line.</p></li>
+<li><p><strong>It is a guide and not the rules.</strong> It links to the protocol pages and the notes on the command, and says they are right where the two differ.</p></li>
+<li><p><strong>It states plainly what the walk showed a new user would trip on:</strong></p>
+<ul>
+<li><p><code>--in</code> and <code>--group</code> go before the verb.</p></li>
+<li><p>A source's key is <code>kind</code>, and <code>kinds</code> is refused.</p></li>
+<li><p>A pure join names its thing with <code>--of</code>, since <code>--sets-nothing</code> carries no field.</p></li>
+<li><p>After a fork the key field is in conflict too, because each keyed write sets it. The next ordinary write clears that, and a pure join does not.</p></li>
+<li><p>A tick reads its working store alone, so a tick of a vertex that names two stores does not give what <code>read</code> gives.</p></li>
+</ul></li>
+<li><p><strong>The site renders it</strong> with the working documents, as <code>guide.html</code> (<code>design/decisions/render.mjs</code>).</p></li>
+<li><p><strong>The release skill</strong> now says to update the guide when a change alters what it shows.</p></li>
 </ul>
 <h3 id="releases-begin">Releases begin</h3>
 <p>Kyle asked for GitHub releases of the binary: a machine with no Rust toolchain could not get the day's build, and every build printed <code>strange-loops-next 0.1.0</code>, so nobody could tell which one a machine had.</p>

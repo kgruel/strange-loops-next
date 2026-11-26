@@ -5,7 +5,7 @@ import { rewriteLink } from "./links.mjs";
 import { escapeHtml, renderMarkdown } from "./markdown.mjs";
 
 export function renderDecisions(root) {
-  const documents = new Map([["DECISIONS.md", "index.html"], ["ROADMAP.md", "roadmap.html"], ["CHANGELOG.md", "changelog.html"]]);
+  const documents = new Map([["DECISIONS.md", "index.html"], ["ROADMAP.md", "roadmap.html"], ["CHANGELOG.md", "changelog.html"], ["GUIDE.md", "guide.html"]]);
   const notes = readdirSync(join(root, "notes"), { withFileTypes: true })
     .filter((e) => e.isFile() && e.name.endsWith(".md")).map((e) => e.name).sort();
   for (const note of notes) documents.set("notes/" + note, "note-" + note.slice(0, -3) + ".html");
