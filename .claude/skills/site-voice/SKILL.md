@@ -11,7 +11,7 @@ The front page of strangeloops.dev was designed in one pass, with Kyle, and test
 
 The page is built from the repository. Nothing a reader sees is typed into the page.
 
-- Before changing a sentence, find its source: `DECISIONS.md`, `CHANGELOG.md`, `GUIDE.md`, `design/laws/laws.json`, `design/grammar/words.json`, or a file under `design/front/`. Change it there and build.
+- Before changing a sentence, find its source: `DECISIONS.md`, `CHANGELOG.md`, `GUIDE.md` (the guide view is built from it; `<!-- guide:... -->` comments mark its interactive pieces), `design/laws/laws.json`, `design/front/grammar.json`, `design/front/walk.json`, or another file under `design/front/`. Change it there and build.
 - **A law's sentence is never written by hand.** It is composed from the law's parts (`change`, `stays`, and the rest) by its shape's template. To change how laws read, change a template, and expect every law of that shape to change.
 - **A decision entry that waits on a ruling was reviewed as it was put.** Reword its question, options or costs only with a review that it still asks the same thing. The page may add a short plain summary beside an entry; it may not replace the entry's words.
 - A count in a heading ("Thirteen nouns", "Forty-six rulings") is worked out from the data. Never type one.
@@ -91,7 +91,7 @@ The stylesheet, `design/front/styles.css`, is the reference. Use its custom prop
 - **Light and dark both.** Every colour comes from a custom property that has both values.
 - **One sheet deep.** Content sits on a white sheet with a hairline and a short shadow. No box inside a box: rows inside a sheet are split by hairlines, and a group of sheets lies on a grey tray.
 - **Lines of 65 to 75 characters** for running text. Tables sit inset in their sheet.
-- **A status is a mark and a word,** from `design/front/data/STATUS.json`, shown the same way everywhere. A dashed edge means not yet.
+- **A status is a mark and a word,** from the `status` key of `design/front/grammar.json`, shown the same way everywhere: proved, designed (decided in the design, not built, and not a ruling) and open. "Ruled" means an entry in the decisions log and nothing else. A dashed edge means not yet.
 - **Motion explains.** A figure moves to show a step of the model, and holds still under `prefers-reduced-motion`.
 - **Works at phone width.** A figure that cannot shrink gets a plain list in its place, as the decisions map does.
 
@@ -101,4 +101,4 @@ The stylesheet, `design/front/styles.css`, is the reference. Use its custom prop
 2. Each new sentence was read aloud, and the heading alone makes the section's point.
 3. Any claim that was simplified still holds, with its premise.
 4. The page was looked at in light and dark, and at phone width.
-5. `git diff --exit-code -- out` is clean after the build, and `node design/mutants.mjs` and the design tests pass.
+5. `node design/build.mjs` succeeds (it checks every link, including links to places the page's script creates), and `node design/mutants.mjs` and `node --test design/decisions/*.test.mjs design/front/*.test.mjs` pass. The pages under `out/` are not committed.
