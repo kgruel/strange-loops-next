@@ -11,9 +11,25 @@ import { inline, slug } from "../protocol.mjs";
 import { REPO, anchor, esc, joinLaws, sentence } from "../laws/join.mjs";
 import { layoutMap } from "./layout.mjs";
 
+export const theoremName = (name) => name.replace(/^Loops\./, "");
+export const theoremStatement = (proof) => proof.states.replace(/\bLoops\./g, "");
+
+// The two sides of the vector join, and any prose left in the row's Vectors cell.
+export function vectorEvidence(row, { cited, naming }) {
+  const listed = cited.get(row.key), named = naming.get(row.key);
+  const words = /[a-z]/i.test(row.vectors.replace(/`[^`]*`/g, ""));
+  return {
+    listed, named,
+    unnamed: listed.filter((p) => !named.includes(p)),
+    uncited: named.filter((p) => !listed.includes(p)),
+    note: words || !listed.length ? inline(row.vectors) : null,
+  };
+}
+
 export function renderEvidence(root) {
   const read = (...p) => readFileSync(join(root, "design", "evidence", ...p), "utf8");
-  const { data, rows, graph, layers, resolved, cited, naming, runBy, edges, restsOn, carries, via, tried, unpremised, scopeOf } = joinLaws(root);
+  const joined = joinLaws(root);
+  const { data, rows, graph, layers, resolved, cited, runBy, edges, restsOn, carries, via, tried, unpremised, scopeOf } = joined;
   const law = (k) => data.laws[k];
   const label = (r) => r.names.join(", ");
   const lawLink = (k) => `<a class="lawref" href="#${anchor(k)}"><code>${esc(k)}</code></a>`;
@@ -32,18 +48,15 @@ export function renderEvidence(root) {
     [data.implementations.length, "implementations", data.implementations.map((i) => i.name).join(" and ")],
   ].map(([n, k, what]) => `    <div class="tile"><p class="tile-n">${n}</p><p class="tile-k">${k}</p><p class="tile-w">${what}</p></div>\n`).join('    <div class="tile-arrow" aria-hidden="true">→</div>\n');
 
-  // A Vectors cell says more than its file names when words are left once the names are gone.
-  const words = (cell) => /[a-z]/i.test(cell.replace(/`[^`]*`/g, ""));
   const fileLinks = (ps) => ps.map((p) => `<a href="${REPO}/vectors/${p}.json"><code>${p}</code></a> (current main; may differ from this page's build)`).join(" ");
   const card = (r) => {
     const l = law(r.key);
     const ts = resolved.get(r.key);
-    const listed = cited.get(r.key);
-    const extra = naming.get(r.key).filter((p) => !listed.includes(p));
+    const { listed, uncited: extra, note } = vectorEvidence(r, joined);
     const impl = runBy([...listed, ...extra]);
     const theorems = ts.length
-      ? ts.map((t) => `<details class="thm"><summary><code>${esc(t.replace(/^Loops\./, ""))}</code></summary>` +
-        `<p class="thm-m">${graph[t].module}</p><pre>${esc(graph[t].states.replace(/\bLoops\./g, ""))}</pre></details>`).join("") +
+      ? ts.map((t) => `<details class="thm"><summary><code>${esc(theoremName(t))}</code></summary>` +
+        `<p class="thm-m">${graph[t].module}</p><pre>${esc(theoremStatement(graph[t]))}</pre></details>`).join("") +
         (r.theorems.filter((t) => data.notTheorems[t]).map((t) => ` <code class="not">${t}</code>`).join(""))
       : r.byConstruction ? "<span class=\"muted\">by construction: no theorem, pinned by vectors</span>" : "<span class=\"muted\">none named</span>";
     const many = listed.length > 6;
@@ -57,7 +70,7 @@ export function renderEvidence(root) {
       `      <p class="law-md"><span>laws.md</span> ${inline(r.says)}</p>\n` +
       `      <dl class="chain">\n` +
       `        <dt>proved by</dt><dd>${theorems}</dd>\n` +
-      `        <dt>pinned by</dt><dd>${words(r.vectors) || !listed.length ? `<span>${inline(r.vectors)}</span>` : ""}${listed.length ? (many ? `<details><summary>${listed.length} files</summary>${fileLinks(listed)}</details>` : `<span class="files">${fileLinks(listed)}</span>`) : ""}` +
+      `        <dt>pinned by</dt><dd>${note !== null ? `<span>${note}</span>` : ""}${listed.length ? (many ? `<details><summary>${listed.length} files</summary>${fileLinks(listed)}</details>` : `<span class="files">${fileLinks(listed)}</span>`) : ""}` +
       (extra.length ? `<span class="files also">also naming it: ${fileLinks(extra)}</span>` : "") + `</dd>\n` +
       (impl.length ? `        <dt>run by</dt><dd>${impl.map((i) => i.name).join(", ")}</dd>\n` : "") +
       (restsOn.get(r.key).length ? `        <dt>rests on</dt><dd>${restsOn.get(r.key).map((b) =>
@@ -83,8 +96,7 @@ export function renderEvidence(root) {
     const rs = rows.filter((r) => law(r.key).layer === layer);
     if (!rs.length) return "";
     return `        <tr class="cov-band"><th scope="rowgroup" colspan="9"><span>${layer}</span></th></tr>\n` + rs.map((r) => {
-      const listed = cited.get(r.key), named = naming.get(r.key);
-      const unnamed = listed.filter((x) => !named.includes(x)), uncited = named.filter((x) => !listed.includes(x));
+      const { listed, named, unnamed, uncited } = vectorEvidence(r, joined);
       const agree = !listed.length && !named.length ? dash
         : !unnamed.length && !uncited.length ? '<span class="ok" title="every cited vector names it, and every vector naming it is cited">✓</span>'
         : (disagree++, `<span class="off" title="${esc([unnamed.length ? `cited, not naming it: ${unnamed.join(", ")}` : "", uncited.length ? `naming it, not cited: ${uncited.join(", ")}` : ""].filter(Boolean).join("; "))}">${unnamed.length ? `−${unnamed.length}` : ""}${unnamed.length && uncited.length ? " " : ""}${uncited.length ? `+${uncited.length}` : ""}</span>`);
