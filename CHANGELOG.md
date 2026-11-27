@@ -13,6 +13,7 @@ In brief:
 - **The identity entries are read against one real store.** [A seat as a case](notes/2026-11-27-a-seat-as-a-case.md) takes what happened to the coordinator's own store over two days (a new key and a hand-over, a move to its own account, a countersigned tick, a worker started beside it) and reads IS1 to IS11 against it, with five runs. Nothing is ruled and no entry is added. It is written for Kyle's walk with Astra.
 - **IS6 and IS8 gain the alternative each was put without.** Both were recommendations with nothing argued against them. The recommendation in each is unchanged.
 - **A merged request's pipeline is routed by the project's new path.** The project moved on GitLab on 2026-11-26, and the rule that recognises a merge to main still matched the old path, so main ran every gate again after each merge. It ran once so.
+- **The built pages leave the repository.** `out/` held every page the build writes, committed beside its source, so each change to a document carried a second, larger change to its page. Kyle asked for the pages to be made when a merge is published. `out/` is now ignored; CI builds the pages twice and fails if the two builds differ, in place of comparing with committed files; and the pages are built from `main` before the site is synced. A hosted page is still the build of one commit.
 - **The coordinator works under its own name.** Since 2026-11-26 this seat is called Tally. Since 2026-11-27 it commits, opens merge requests and signs its own store from an account of its own.
 
 ## 2026-11-25

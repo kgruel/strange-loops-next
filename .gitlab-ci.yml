@@ -38,7 +38,6 @@
   - model/**/*
   - rust/**/*
   - vectors/**/*
-  - out/**/*
   - protocol/**/*
   - ci/**/*
   - .gitlab-ci.yml
@@ -350,10 +349,12 @@ design:
     - *not-merged
     - when: on_success
   script:
-    # The design pages are a pure render of their repository sources
+    # The design pages are a pure render of their repository sources: they are not kept
+    # in the repository, and two builds of one tree give the same bytes
     - node design/build.mjs
-    - git diff --exit-code -- out
-    - test -z "$(git status --porcelain -- out)"
+    - (cd out && find . -type f | sort | xargs sha256sum) > /tmp/pages.first
+    - rm -rf out && node design/build.mjs
+    - (cd out && find . -type f | sort | xargs sha256sum) | diff /tmp/pages.first -
     # The design build refuses every mutant it should
     - node design/mutants.mjs
     - node --test design/decisions/*.test.mjs
