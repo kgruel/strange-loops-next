@@ -36,7 +36,7 @@ export function renderFront(root) {
   });
   for (const name of data.keys()) if (!used.has(name)) throw new Error(`front: ${name} is provided and the script does not read it`);
   let body = read("shell.html");
-  body = fill(body, "styles", `<style>\n${read("styles.css")}</style>\n`);
+  body = fill(body, "styles", `<style>\n${read("fonts.css")}${read("styles.css")}</style>\n`);
   body = fill(body, "script", `<script>\n${script}</script>\n`);
   const base = readFileSync(join(root, "design", "rethink", "base.css"), "utf8").trimEnd();
   return `<!doctype html>

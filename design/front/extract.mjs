@@ -36,7 +36,13 @@ function one(re, what) {
 const style = one(/<style>\n?([\s\S]*?)<\/style>\n?/g, "stylesheet");
 const script = one(/<script>\n?([\s\S]*?)<\/script>\n?/g, "script");
 const css = style[1], js = script[1];
-const shell = page.replace(style[0], "<!-- build:styles -->\n").replace(script[0], "<!-- build:script -->\n");
+// The prototype loads its typefaces from a font host. The site serves them itself
+// (fonts.css and fonts/), so the three lines that reach out are dropped here.
+const hosted = [...page.matchAll(/<link rel="(?:preconnect|stylesheet)" href="https:\/\/fonts\.(?:googleapis|gstatic)\.com[^>]*>\n/g)];
+if (hosted.length !== 3) throw new Error(`expected three font host lines, found ${hosted.length}`);
+let shell = page.replace(style[0], "<!-- build:styles -->\n").replace(script[0], "<!-- build:script -->\n");
+for (const [line] of hosted) shell = shell.replace(line, "");
+if (/fonts\.(googleapis|gstatic)\.com/.test(shell + css + js)) throw new Error("the page still reaches a font host");
 
 // Where a literal that starts at i ends: brackets balanced, strings and templates skipped.
 function end(i) {
