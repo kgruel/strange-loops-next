@@ -87,8 +87,12 @@ export function renderFront(root) {
   const model = { ...decisions(root), guide: readGuide(root) };
   const data = frontData(root, model);
   const used = new Set();
+  // Inline the Node module at the original declaration in the page's classic script.
+  const parts = read("app.js").split("/*bench:LE*/\n");
+  if (parts.length !== 2) throw new Error("front: expected one bench engine placeholder");
+  const app = parts.join(read("bench.mjs").replace(/^export (?=const LE = )/, ""));
   // "<" is escaped so that no value can close the script element.
-  const script = read("app.js").replace(/\/\*data:([A-Za-z0-9_]+)\*\//g, (_, name) => {
+  const script = app.replace(/\/\*data:([A-Za-z0-9_]+)\*\//g, (_, name) => {
     if (!data.has(name)) throw new Error(`front: the script reads ${name} and nothing provides it`);
     if (used.has(name)) throw new Error(`front: the script defines ${name} twice`);
     used.add(name);
