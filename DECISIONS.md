@@ -8,7 +8,7 @@ Everything that waits on Kyle, in one place. Each entry has the question, an exa
 - "Today" in an example means the `loops` binary built from main on 2026-11-21. Every "today" answer below was run, not predicted.
 ## At a glance
 
-**Eleven entries wait on a ruling: [IS1 to IS11](#identity-and-standing-is1-to-is11), on identity and standing.** They were put on 2026-11-24, after a walk in five parts and a review by margins, Neon and Astra. One other question is [being prepared](#being-prepared).
+**Eleven entries wait on a ruling: [IS1 to IS11](#identity-and-standing-is1-to-is11), on identity and standing.** They were put on 2026-11-24, after a walk in five parts and a review by margins, Neon and Astra. One other question is [being prepared](#being-prepared). On 2026-11-27 [a note](notes/2026-11-27-a-seat-as-a-case.md) read the eleven against one real store, and IS6 and IS8 each gained the alternative they were put without.
 
 Every earlier entry is ruled.
 
@@ -167,7 +167,12 @@ $ loops tick spec.json --cover <note>  covers 1 id    {"answer":"same","closure"
 
 A bare tick follows `prev` and `under`. A cut by ids or by time follows `prev` only, as it is documented to.
 
-**Recommended.** A cut closes over `under` as well. IS5's end and IS8's continuing store are both explicit cuts.
+| | A cut by ids or by time | Cost |
+| --- | --- | --- |
+| **A (recommended)** | Closes over `under` as well as `prev`. IS5's end and IS8's continuing store are both explicit cuts. | A cut takes in records its maker did not name: each grant above what was named, down to the anchor. |
+| B | Follows `prev` only, as documented. A verb that needs the grants names their ids itself. | The example: the tick answers `closure no`. A store continued from such a tick holds a note and not the grant that makes it count, so under IS3 the note stops counting there. Each verb that cuts has to walk `under` in its own code. |
+
+*Option B was added on 2026-11-27; the entry was put without an alternative.*
 
 **Changes:** what such a tick covers. No record written today carries `under`, so no existing tick changes.
 
@@ -196,7 +201,12 @@ Under A the second lead cannot end the first, and the first can end the second. 
 
 **Example.** A team's root key is taken in June. The remedy the walk first gave was a new store that takes the old records as history. Under IS3 none of the old records would count in it.
 
-**Recommended.** A store's anchor may name a tick, and an earlier anchor. Records inside that tick's cover count as they did: records with no `under` from a store that was open, or records chained to the earlier anchor. For a root that was taken, the cover stops before the theft.
+| | The old records | Cost |
+| --- | --- | --- |
+| **A (recommended)** | A store's anchor may name a tick, and an earlier anchor. Records inside that tick's cover count as they did: records with no `under` from a store that was open, or records chained to the earlier anchor. For a root that was taken, the cover stops before the theft. | Admission has a second way for a record to count, by a cover and not by a chain. The tick named has to be one the new founder trusts. |
+| B | They are written again under the new anchor, each as a new record. | Every id changes. Anything that named an old id stops finding it: a reference field, a `prev` held elsewhere, a tick, and a countersign of that tick in another store. The new records say they were written on the day of the move, by whoever moved them. |
+
+*Option B was added on 2026-11-27; the entry was put without an alternative. [A seat as a case](notes/2026-11-27-a-seat-as-a-case.md) runs the countersign.*
 
 **Changes:** what a store's anchor holds, and what admission counts beneath it.
 

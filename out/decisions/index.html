@@ -199,6 +199,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <a href="note-2026-11-23-store-descriptions.html">Store descriptions: what the first two conversions asked for</a>
 <a href="note-2026-11-24-identity-walk.html">Identity, standing and sharing: a walk before anything is anchored</a>
 <a href="note-2026-11-24-kinds-and-references.html">What a store says about its kinds, and references after an import: SD1 to SD4, AD5, BP1 and ST1</a>
+<a href="note-2026-11-27-a-seat-as-a-case.html">A seat as a case: IS1 to IS11 read against one real store</a>
 <a href="note-retained-boundaries.html">Retained boundaries</a></nav>
 <p class="source">Rendered from <code>DECISIONS.md</code> in the repository.</p>
 <details class="contents"><summary>On this page</summary>
@@ -217,7 +218,7 @@ header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--g
 <li><p>&quot;Today&quot; in an example means the <code>loops</code> binary built from main on 2026-11-21. Every &quot;today&quot; answer below was run, not predicted.</p></li>
 </ul>
 <h2 id="at-a-glance">At a glance</h2>
-<p><strong>Eleven entries wait on a ruling: <a href="#identity-and-standing-is1-to-is11">IS1 to IS11</a>, on identity and standing.</strong> They were put on 2026-11-24, after a walk in five parts and a review by margins, Neon and Astra. One other question is <a href="#being-prepared">being prepared</a>.</p>
+<p><strong>Eleven entries wait on a ruling: <a href="#identity-and-standing-is1-to-is11">IS1 to IS11</a>, on identity and standing.</strong> They were put on 2026-11-24, after a walk in five parts and a review by margins, Neon and Astra. One other question is <a href="#being-prepared">being prepared</a>. On 2026-11-27 <a href="note-2026-11-27-a-seat-as-a-case.html">a note</a> read the eleven against one real store, and IS6 and IS8 each gained the alternative they were put without.</p>
 <p>Every earlier entry is ruled.</p>
 <ul>
 <li><p>The tick record, TK1 to TK13: ruled and built. Step 4 is closed. The questions as they were put are in <a href="note-2026-11-21-tick-record.html#10-the-questions-as-they-were-put">the tick record note</a>, sections 10 and 11.</p></li>
@@ -321,7 +322,12 @@ $ loops -C yard check
 $ loops tick spec.json --cover &lt;note&gt;  covers 1 id    {&quot;answer&quot;:&quot;same&quot;,&quot;closure&quot;:&quot;no&quot;}
 </code></pre>
 <p>A bare tick follows <code>prev</code> and <code>under</code>. A cut by ids or by time follows <code>prev</code> only, as it is documented to.</p>
-<p><strong>Recommended.</strong> A cut closes over <code>under</code> as well. IS5's end and IS8's continuing store are both explicit cuts.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">A cut by ids or by time</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>A (recommended)</strong></td><td>Closes over <code>under</code> as well as <code>prev</code>. IS5's end and IS8's continuing store are both explicit cuts.</td><td>A cut takes in records its maker did not name: each grant above what was named, down to the anchor.</td></tr>
+<tr><td>B</td><td>Follows <code>prev</code> only, as documented. A verb that needs the grants names their ids itself.</td><td>The example: the tick answers <code>closure no</code>. A store continued from such a tick holds a note and not the grant that makes it count, so under IS3 the note stops counting there. Each verb that cuts has to walk <code>under</code> in its own code.</td></tr>
+</tbody></table></div>
+<p><em>Option B was added on 2026-11-27; the entry was put without an alternative.</em></p>
 <p><strong>Changes:</strong> what such a tick covers. No record written today carries <code>under</code>, so no existing tick changes.</p>
 <h3 id="is7-a-second-steward-and-a-persons-seats">IS7: a second steward, and a person's seats</h3>
 <p><em>From SW6, and items 2, 16 and 25 of part five.</em></p>
@@ -338,7 +344,12 @@ $ loops tick spec.json --cover &lt;note&gt;  covers 1 id    {&quot;answer&quot;:
 <p><em>From items 19 and 24 of part five (margins, Neon).</em></p>
 <p><strong>Question.</strong> Under IS3 every record ends at one store's anchor. What happens to records written before that anchor existed, or under an anchor that has to be replaced?</p>
 <p><strong>Example.</strong> A team's root key is taken in June. The remedy the walk first gave was a new store that takes the old records as history. Under IS3 none of the old records would count in it.</p>
-<p><strong>Recommended.</strong> A store's anchor may name a tick, and an earlier anchor. Records inside that tick's cover count as they did: records with no <code>under</code> from a store that was open, or records chained to the earlier anchor. For a root that was taken, the cover stops before the theft.</p>
+<div class="table-scroll" tabindex="0"><table><thead><tr><th scope="col"></th><th scope="col">The old records</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>A (recommended)</strong></td><td>A store's anchor may name a tick, and an earlier anchor. Records inside that tick's cover count as they did: records with no <code>under</code> from a store that was open, or records chained to the earlier anchor. For a root that was taken, the cover stops before the theft.</td><td>Admission has a second way for a record to count, by a cover and not by a chain. The tick named has to be one the new founder trusts.</td></tr>
+<tr><td>B</td><td>They are written again under the new anchor, each as a new record.</td><td>Every id changes. Anything that named an old id stops finding it: a reference field, a <code>prev</code> held elsewhere, a tick, and a countersign of that tick in another store. The new records say they were written on the day of the move, by whoever moved them.</td></tr>
+</tbody></table></div>
+<p><em>Option B was added on 2026-11-27; the entry was put without an alternative. <a href="note-2026-11-27-a-seat-as-a-case.html">A seat as a case</a> runs the countersign.</em></p>
 <p><strong>Changes:</strong> what a store's anchor holds, and what admission counts beneath it.</p>
 <h3 id="is9-a-record-that-is-to-count-in-a-second-store">IS9: a record that is to count in a second store</h3>
 <p><em>From items 13, 15 and 24 of part five (Astra, Neon).</em></p>
