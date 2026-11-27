@@ -73,7 +73,7 @@ workflow:
     - if: >-
         $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
         && $CI_COMMIT_TITLE =~ /^Merge branch '.+' into 'main'$/
-        && $CI_COMMIT_MESSAGE =~ /\nSee merge request kaygee\/strange-loops-next!\d+\s*$/
+        && $CI_COMMIT_MESSAGE =~ /\nSee merge request strange-loops\/strange-loops-next!\d+\s*$/
       variables:
         MERGED_MR: "true"
         CACHE_POLICY: pull-push
