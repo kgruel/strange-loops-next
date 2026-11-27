@@ -1553,8 +1553,9 @@ newest_first
 <main id="v-laws" class="view" hidden>
   <section class="lhero" id="laws">
     <div class="wrap">
-      <h1 class="display">A law is one <em>sentence</em></h1>
-      <p class="lede">There are 124 of them. Each says what may change and what stays put when it does, or exactly where a promise stops. <a href="#break">Further down</a> you can rewrite five of the rules they rest on and watch which ones break.</p>
+      <h1 class="display">A law is a promise in one&nbsp;sentence.</h1>
+      <p class="lede">There are 124 of them. Each says what you may change without moving an answer, or <b>exactly where a promise stops</b>. Lean has checked a proof of all but three, and those three hold by how the code is built.</p>
+      <p class="tally">Below, you can <a href="#break">rewrite five of the rules they rest on</a> and watch laws break, <a href="#premises">take a premise away</a>, or <a href="#every-law">read all 124 by the question they answer</a>.</p>
       <div class="rn" data-note="laws"></div>
       <h2 class="lbl lshapes-h">Every law takes one of six shapes</h2>
       <ol class="lshapes" id="lshapes"></ol>
@@ -1564,8 +1565,8 @@ newest_first
   <section class="block" id="break" aria-labelledby="h-break">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-break">Change a rule and see what <em>breaks</em></h2>
-        <p class="secintro">The laws are promises about a handful of rules. Here are five of those rules, written out. Change one, and every law that rests on it is checked again against the model's own test records. When a law breaks, you see the case that broke it.</p>
+        <h2 class="sec" id="h-break">Five rules the laws rest&nbsp;on.</h2>
+        <p class="secintro">Each rule is written out below. Change a word, and every law resting on it is checked again against the model's own test vectors. A law that breaks shows you the case that broke it.</p>
       </header>
       <div class="bench sheet" id="bench">
         <div class="btabs" role="tablist" aria-label="Rules to change" id="btabs"></div>
@@ -1579,8 +1580,8 @@ newest_first
   <section class="block" id="premises" aria-labelledby="h-premises">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-premises">Take a premise <em>away</em></h2>
-        <p class="secintro">Some laws hold only when something is true of what goes in. These are the model's own answers, with the premise held and with it removed, as <code>lake exe boundaries</code> writes them. Nothing here is worked out in your browser.</p>
+        <h2 class="sec" id="h-premises">Seven laws hold only on a&nbsp;premise.</h2>
+        <p class="secintro">Each needs something to be true of what goes in. Below is the model's own answer with the premise held, and with it removed, as <code>lake exe boundaries</code> writes them. None of it is worked out in your browser.</p>
       </header>
       <ol class="prem" id="prem"></ol>
     </div>
@@ -1589,7 +1590,7 @@ newest_first
   <section class="block" id="every-law" aria-labelledby="h-every">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-every">Every law, by the question it <em>answers</em></h2>
+        <h2 class="sec" id="h-every">Every law, by the question it&nbsp;answers.</h2>
         <p class="secintro" id="lunless"></p>
       </header>
       <div class="lfilter" id="lfilter">
@@ -1606,8 +1607,8 @@ newest_first
   <section class="block" id="stop" aria-labelledby="h-stop">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-stop">Where the guarantees <em>stop</em></h2>
-        <p class="secintro">The laws about folds, views and specs are each about a given set of records. None says that set is complete, current, trusted or well dated. These are the edges, and the model's own simplifications, as <code>protocol/laws.md</code> writes them.</p>
+        <h2 class="sec" id="h-stop">Where the guarantees&nbsp;stop.</h2>
+        <p class="secintro">The laws about folds, views and specs each hold for a given set of records. None of them says that set is complete, current, trusted or well dated. These are the edges, with the model's own simplifications, as <code>protocol/laws.md</code> states them.</p>
       </header>
       <div class="lstop">
         <div><h3 class="lbl">What the laws don't promise</h3><dl class="lrows" id="lnopromise"></dl></div>
@@ -1621,8 +1622,8 @@ newest_first
 <main id="v-evidence" class="view" hidden>
   <section class="ehero" id="evidence">
     <div class="wrap">
-      <h1 class="display">What stands <em>behind</em> each law</h1>
-      <p class="lede">A law on the Laws page is one sentence. Behind it is a row of <code>protocol/laws.md</code>, theorems Lean has checked, and test vectors that every implementation runs. Follow any law down that chain, see which proofs lean on which, and find where the evidence is thin.</p>
+      <h1 class="display">What each law stands&nbsp;on.</h1>
+      <p class="lede">Each law is one sentence. Behind it are <b>a row in the protocol's laws file, theorems Lean has checked, and test vectors</b> that every implementation runs. Follow one law down that chain, see which proofs lean on which, and find where the evidence is thin.</p>
       <ol class="echain" id="echain" aria-label="From claim to code, counted"></ol>
       <p class="echain-cap">The build joins all four and fails when one doesn't meet the next: a row with no sentence, a theorem Lean can't find, a vector that isn't on disk.</p>
       <div class="rn" data-note="evidence"></div>
@@ -1632,8 +1633,8 @@ newest_first
   <section class="block" id="e-follow" aria-labelledby="h-efollow">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-efollow">Follow one law from <em>claim</em> to code</h2>
-        <p class="secintro">Pick a law. Each step below is checked against the next: the sentence says no more than the row, the row names the theorems that prove it, and the vectors pin the exact answers an implementation must give.</p>
+        <h2 class="sec" id="h-efollow">Follow one law from claim to&nbsp;code.</h2>
+        <p class="secintro">Pick a law. Each step below is checked against the next: the sentence says no more than its row, the row names the theorems that prove it, and the vectors pin the exact answers an implementation must give.</p>
       </header>
       <div class="efollow">
         <aside class="epick" aria-label="Choose a law">
@@ -1651,8 +1652,8 @@ newest_first
   <section class="block" id="e-map" aria-labelledby="h-emap">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-emap">What each proof <em>rests</em> on</h2>
-        <p class="secintro">A line from one law down to another means a proof of the first uses a theorem of the second. Lean recorded every one of them. The stack only rests downward: the build fails if a proof ever leans on a layer above its own.</p>
+        <h2 class="sec" id="h-emap">Which proofs lean on&nbsp;which.</h2>
+        <p class="secintro">A line from one law down to another means a proof of the first uses a theorem of the second, and Lean recorded every one. Proofs only lean downward: the build fails if one ever leans on a layer above its own.</p>
       </header>
       <div class="emap sheet">
         <p class="emap-hint" id="emap-hint">Point at a law to light what it rests on and what rests on it. Click or tap it to keep it lit, or a line to see the theorems that make it.</p>
@@ -1666,7 +1667,7 @@ newest_first
   <section class="block" id="e-thin" aria-labelledby="h-ethin">
     <div class="wrap">
       <header>
-        <h2 class="sec" id="h-ethin">Where the evidence is <em>thin</em></h2>
+        <h2 class="sec" id="h-ethin">Where the evidence is&nbsp;thin.</h2>
         <p class="secintro" id="ethin-sum"></p>
       </header>
       <div class="elens" role="group" aria-label="Show the laws missing one kind of evidence" id="elens"></div>

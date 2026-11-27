@@ -1867,7 +1867,7 @@ const LE = (() => {
       `<div class="bgrid"><div class="brule"><div class="brh"><h3>${m.title}</h3><p>${m.gist}</p></div>` +
       `<p class="lbl">${moved ? "The rule, as you've changed it" : "The rule, as the protocol writes it"}</p><ol class="cls">${m.clauses.map((c, i) => clauseHTML(m, c, i)).join("")}</ol>` +
       `<div class="bact"><button type="button" class="ibtn" id="breset"${moved ? "" : " disabled"}>Put the protocol's rule back</button></div>` +
-      `<p class="bsrc">Test records from ${m.files.filter((f, i, a) => a.indexOf(f) === i).map((f) => `<a href="${SRC(f)}">${esc(f.replace(/^vectors\//, ""))}</a>`).join(", ")}.</p></div>` +
+      `<p class="bsrc">Test vectors from ${m.files.filter((f, i, a) => a.indexOf(f) === i).map((f) => `<a href="${SRC(f)}">${esc(f.replace(/^vectors\//, ""))}</a>`).join(", ")}.</p></div>` +
       `<div class="blaws"><p class="bsum${broken ? " bad" : ""}" aria-live="polite">${sum}</p><ol class="bls-list">${ls.map(lawHTML).join("")}</ol>${m.own ? ownHTML() : ""}</div></div>`;
     for (const el of $$(".bl", $("#bpanel"))) if (prevVerdicts[el.dataset.law] && prevVerdicts[el.dataset.law] !== el.className) { el.classList.add("flip"); setTimeout(() => el.classList.remove("flip"), 900); }
     drawTabs();
@@ -1982,6 +1982,9 @@ const LE = (() => {
   draw();
 
   /* ---------- six shapes ---------- */
+  // The live notes are terse, and one is wrong ("Most laws are this one": Exactness has more). Said plainly here.
+  const GIST = /*data:GIST*/;
+  L_SHAPES.forEach((s) => { if (GIST[s.k]) s.gist = GIST[s.k]; });
   $("#lshapes").innerHTML = L_SHAPES.map((s) => `<li><button type="button" data-shape="${s.k}" aria-label="Show the ${s.n} ${s.name.toLowerCase()} laws"><span class="smk" aria-hidden="true">${s.mark}</span><span class="snm">${s.name}</span><span class="sct">${s.n}</span><span class="sgs">${s.gist}</span></button></li>`).join("");
   $("#lshapes").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-shape]");
@@ -2116,7 +2119,7 @@ const E_MAP = /*data:E_MAP*/;
   $("#echain").innerHTML = [
     [E_COUNTS.laws, "laws", "Sentences on the Laws page, each one a row of <code>protocol/laws.md</code>."],
     [E_COUNTS.theorems, "theorems", "Named by those rows, and every one found in the proofs Lean checked."],
-    [E_COUNTS.vectors, "vectors", "Test files the rows cite, each one an input and its exact answer."],
+    [E_COUNTS.vectors, "test vectors", "Files the rows cite, each one an input and its exact answer."],
     [E_COUNTS.impls, "implementations", "The model works out each answer. JavaScript and Rust check theirs against it."],
   ].map(([n, w, l], i) => `<li style="--i:${i}"><span class="ecn">${n}</span><span class="ecw">${w}</span><span class="ecl">${l}</span></li>`).join("");
 
@@ -2124,7 +2127,7 @@ const E_MAP = /*data:E_MAP*/;
   const LENS = /*data:LENS*/;
   LENS.forEach((x) => { x.n = LAWS.filter(x.has).length; });
   const proved = LAWS.filter((l) => l.th.length).length, built = LAWS.filter((l) => !l.th.length && l.bc).length;
-  $("#ethin-sum").innerHTML = `${proved} laws are theorems Lean checked, and ${built} hold by construction. Every law with vector files is run by the model and by Rust. A law in a gap here may well hold; it has less behind it, and that is where a maintainer would add evidence first.`;
+  $("#ethin-sum").innerHTML = `Lean has checked a proof of ${proved} laws, and ${built} hold by construction. The model and Rust run every one of these laws' vectors. A law in a gap here may well hold; it just has less behind it, and that is where to add evidence first.`;
   $("#elens").innerHTML = LENS.map((x) => `<button type="button" data-k="${x.k}" aria-pressed="${x.k === "all"}"><span class="eln">${x.n}</span><span class="elt">${x.t}</span></button>`).join("");
 
   const dash = '<span class="ez" aria-label="none">–</span>';

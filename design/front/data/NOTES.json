@@ -65,6 +65,11 @@
   "text": "The live page has a Try to break it card under most questions, which varies what a law lets vary (the arrival order, a repeat) and shows the model's answer. Those cases now sit under each law on the bench, and the premise cases have their own section."
  },
  {
+  "at": "laws",
+  "title": "The six shape notes are said plainly",
+  "text": "The live notes are terse (“Strict total orders and complements”), and Invariance's says “Most laws are this one.” Exactness has 54 laws to Invariance's 45, and neither is most. The prototype says each shape in plain words and drops that claim. The shape names and counts are the live ones."
+ },
+ {
   "at": "bench",
   "title": "The bench works things out in your browser",
   "text": "The live page says nothing is computed in your browser. The bench runs a small copy of five rules here so you can change them. With the protocol's choices it gives all 71 answers the model's vectors give, checked when the page is built. Every other choice is the prototype's own, with no model behind it. Is that acceptable on the live site, or should the bench stay a prototype?"

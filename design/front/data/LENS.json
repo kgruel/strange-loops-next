@@ -20,7 +20,7 @@
   "k": "nojs",
   "t": "Not run by JavaScript",
   "col": "js",
-  "say": "These laws have vectors, and JavaScript runs none of them. All of them are tick vectors, which JavaScript does not run (W3). The model and Rust run every one."
+  "say": "These laws have vectors, and JavaScript runs none of them. All of them are tick vectors, which JavaScript doesn't run (W3 on the Decisions page). The model and Rust run every one."
  },
  {
   "k": "differ",
