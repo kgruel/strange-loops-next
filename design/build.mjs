@@ -8,11 +8,11 @@
 // same on strangeloops.dev. The front page and working documents have no
 // artifact mirror. No dependencies.
 
-import { mkdirSync, readdirSync, readFileSync, rmdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderDecisions } from "./decisions/render.mjs";
-import { frontPage } from "./front/render.mjs";
+import { frontPage, SITE, VIEWS } from "./front/render.mjs";
 import { fill } from "./page.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -43,7 +43,9 @@ const nav = '  <div class="wrap" role="tablist">\n' + page.sections.map((s, k) =
 const sections = page.sections.map((s, k) => {
   const text = read("sections", `${String(k).padStart(2, "0")}-${s.id}.html`);
   if (!text.startsWith(`<section class="panel" id="${s.id}" `)) throw new Error(`section ${s.id}: wrong file`);
-  return s.id === "map" ? fill(text, "ledger", renderLedger(ledger)) : text;
+  if (s.id !== "map") return text;
+  // The map and ledger both cite the working documents.
+  return fill(text, "ledger", renderLedger(ledger)).replaceAll('href="../decisions/"', 'href="../decisions/decisions.html"');
 });
 
 const body = read("top.html") +
@@ -67,21 +69,70 @@ ${body}</body>
 </html>
 `;
 
+function sitemap(urls) {
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    [...new Set(urls)].map((url) => `  <url><loc>${url}</loc></url>\n`).join("") + '</urlset>\n';
+}
+
+function llms(root) {
+  const raw = "https://raw.githubusercontent.com/kgruel/strange-loops-next/main/";
+  const protocol = new Map([
+    ["protocol/record.md", "Layer 0, the record"],
+    ["protocol/spec.md", "How a spec chooses records and names its slots"],
+    ["protocol/tick.md", "The tick record and its payload"],
+    ["protocol/lens.md", "The lens contract for keyed sections"],
+    ["protocol/laws.md", "Theorems and guarantees supplied by construction"],
+  ]);
+  const markdown = readdirSync(join(root, "protocol"), { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+    .map((entry) => relative(root, join(entry.parentPath, entry.name))).sort();
+  for (const path of markdown) if (!protocol.has(path)) {
+    const heading = readFileSync(join(root, path), "utf8").match(/^# +(.+)$/m)?.[1];
+    protocol.set(path, heading ?? "Protocol notes");
+  }
+  const section = (name, files) => `## ${name}\n\n` + Array.from(files, ([path, description]) => {
+    if (!statSync(join(root, path), { throwIfNoEntry: false })?.isFile())
+      throw new Error(`llms.txt: repository file does not exist: ${path}`);
+    const url = raw + path.split("/").map(encodeURIComponent).join("/");
+    return `- [${path}](${url}): ${description}\n`;
+  }).join("") + "\n";
+  return `# ${SITE.name}\n\n` +
+    `> ${VIEWS.grammar.description}\n\n` +
+    section("Start here", [
+      ["GUIDE.md", "A guide to loops, from an empty folder to a working store"],
+      ["README.md", "Records in, folds and ticks out, lenses back to text"],
+    ]) +
+    section("Protocol", protocol) +
+    section("Design and working documents", [
+      ["DECISIONS.md", "Questions that wait on Kyle"],
+      ["CHANGELOG.md", "What was built and what Kyle ruled"],
+      ["ROADMAP.md", "What is next, in order"],
+      ["design/laws/laws.json", "Law wording, shapes and the questions they answer"],
+      ["design/front/grammar.json", "The nouns, verbs and layers of the grammar"],
+    ]) +
+    `## Releases\n\n- [Releases](${SITE.repository}/releases): Published versions and release notes\n`;
+}
+
 const args = process.argv.slice(2);
 const at = args.indexOf("--fragment");
-const frontFile = join(root, "out", "index.html");
-const front = at < 0 ? frontPage(root) : null;
-const outputs = at >= 0
-  ? [[args[at + 1], fragment]]
-  : [[frontFile, front.html],
-     [join(root, "out", "rethink", "index.html"), full],
-     ...renderDecisions(root)];
+const out = join(root, "out");
+const outputs = [];
+if (at >= 0) outputs.push([args[at + 1], fragment]);
 
 // Check the assembled pages before writing any of them. Rethink's own hash
 // routes can select nested tabs. Incoming links still land on real section ids.
 if (at < 0) {
+  const front = frontPage(root);
+  const fronts = new Map([[join(out, "index.html"), front]]);
+  for (const view of Object.keys(VIEWS))
+    fronts.set(join(out, view, "index.html"), frontPage(root, { view, depth: 1 }));
+  const rethink = join(out, "rethink", "index.html");
+  const documents = renderDecisions(root, SITE.url);
+  outputs.push(...Array.from(fronts, ([file, { html }]) => [file, html]), [rethink, full], ...documents);
+
+  const assets = new Map(Array.from(front.fontFiles, (path) => [join(out, path), join(root, "design", "front", path)]));
   const pages = new Map();
-  const rethink = join(root, "out", "rethink", "index.html");
   for (const [file, text] of outputs) {
     const markup = text.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
     const ids = [...markup.matchAll(/<[\w:-]+\b[^<>]*?\sid\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/gi)].map((m) => m[1] ?? m[2] ?? m[3]);
@@ -89,9 +140,10 @@ if (at < 0) {
       for (const [, sub] of markup.matchAll(/class="subpanel" id="([^"]+)"/g)) ids.push(`horizons/${sub}`);
     }
     const links = [...markup.matchAll(/<a\b[^<>]*?\shref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi)].map((m) => m[1] ?? m[2] ?? m[3]);
-    if (file === frontFile) {
-      ids.push(...front.ids);
-      links.push(...front.links);
+    const copy = fronts.get(file);
+    if (copy) {
+      ids.push(...copy.ids);
+      links.push(...copy.links);
     }
     pages.set(file, { ids: new Set(ids), links: new Set(links.map((href) => href.replaceAll("&quot;", '"').replaceAll("&amp;", "&"))) });
   }
@@ -106,12 +158,13 @@ if (at < 0) {
         id = decodeURIComponent(fragment ?? "");
       } catch { throw new Error(`${origin}: invalid URL encoding in ${href}`); }
       const target = pages.get(dest);
-      if (!target || (id && !target.ids.has(id))) throw new Error(`${origin}: no target for ${href}`);
+      if ((!target && !assets.has(dest)) || (id && !target?.ids.has(id))) throw new Error(`${origin}: no target for ${href}`);
     }
   }
   // Read every font before publishing anything, even if an older copy is in out/.
-  for (const path of front.fontFiles)
-    outputs.push([join(root, "out", path), readFileSync(join(root, "design", "front", path))]);
+  for (const [file, source] of assets) outputs.push([file, readFileSync(source)]);
+  const urls = [...Array.from(fronts.values(), ({ canonical }) => canonical), ...documents.map(([, , , canonical]) => canonical).filter(Boolean)];
+  outputs.push([join(out, "sitemap.xml"), sitemap(urls)], [join(out, "llms.txt"), llms(root)]);
 }
 for (const [file, text] of outputs) {
   if (!file) throw new Error("--fragment needs a path");
@@ -122,14 +175,6 @@ for (const [file, text] of outputs) {
 
 // A removed or renamed note must also disappear from the files the site syncs.
 if (at < 0) {
-  // An incremental build may still have the standalone pages from an older build.
-  const out = join(root, "out");
-  for (const entry of readdirSync(out, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !["grammar", "laws", "evidence"].includes(entry.name)) continue;
-    const retired = join(out, entry.name);
-    rmSync(join(retired, "index.html"), { force: true });
-    if (!readdirSync(retired).length) rmdirSync(retired);
-  }
   const dir = join(root, "out", "decisions");
   const built = new Set(outputs.map(([file]) => file));
   for (const name of readdirSync(dir)) {

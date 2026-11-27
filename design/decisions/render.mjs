@@ -1,14 +1,11 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { documentOf, header } from "../page.mjs";
-import { rewriteLink } from "./links.mjs";
+import { rewriteLink, workingDocuments } from "./links.mjs";
 import { escapeHtml, renderMarkdown } from "./markdown.mjs";
 
-export function renderDecisions(root) {
-  const documents = new Map([["DECISIONS.md", "index.html"], ["ROADMAP.md", "roadmap.html"], ["CHANGELOG.md", "changelog.html"], ["GUIDE.md", "guide.html"]]);
-  const notes = readdirSync(join(root, "notes"), { withFileTypes: true })
-    .filter((e) => e.isFile() && e.name.endsWith(".md")).map((e) => e.name).sort();
-  for (const note of notes) documents.set("notes/" + note, "note-" + note.slice(0, -3) + ".html");
+export function renderDecisions(root, siteUrl) {
+  const documents = workingDocuments(root);
 
   const pages = [...documents].map(([source, filename]) => {
     const links = new Map();
@@ -38,7 +35,9 @@ ${contents}
 ${html}
 </article>
 </main>`;
-    const text = documentOf(root, { head: `<title>${escapeHtml(title)} · Strange Loops</title>\n`, css, body, scripts: [] });
-    return [join(root, "out", "decisions", filename), text, links];
+    const canonical = source === "GUIDE.md" ? null : new URL(`decisions/${encodeURIComponent(filename)}`, siteUrl).href;
+    const head = `<title>${escapeHtml(title)} · Strange Loops</title>\n`;
+    const text = documentOf(root, { head, css, body, scripts: [], canonical });
+    return [join(root, "out", "decisions", filename), text, links, canonical];
   });
 }

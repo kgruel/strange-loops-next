@@ -130,7 +130,7 @@ const G_BOOK_NOTES = /*data:G_BOOK_NOTES*/;
   let current = null;
   function route() {
     const id = decodeURIComponent(location.hash.slice(1));
-    let v = "grammar";
+    let v = id ? "grammar" : document.documentElement.dataset.view;
     if (id === "decisions" || (id && views.decisions.querySelector("#" + CSS.escape(id)))) v = "decisions";
     else if (id === "guide" || (id && views.guide.querySelector("#" + CSS.escape(id)))) v = "guide";
     else if (id === "laws" || (id && views.laws.querySelector("#" + CSS.escape(id)))) v = "laws";

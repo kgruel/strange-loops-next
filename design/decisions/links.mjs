@@ -1,6 +1,14 @@
-import { statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
 import { REPO } from "../laws/join.mjs";
+
+export function workingDocuments(root) {
+  const documents = new Map([["DECISIONS.md", "decisions.html"], ["ROADMAP.md", "roadmap.html"], ["CHANGELOG.md", "changelog.html"], ["GUIDE.md", "guide.html"]]);
+  const notes = readdirSync(join(root, "notes"), { withFileTypes: true })
+    .filter((e) => e.isFile() && e.name.endsWith(".md")).map((e) => e.name).sort();
+  for (const note of notes) documents.set("notes/" + note, "note-" + note.slice(0, -3) + ".html");
+  return documents;
+}
 
 export function rewriteLink(root, documents, source, line, href) {
   const fail = (why) => { throw new Error(`${source}:${line}: link ${href}: ${why}`); };

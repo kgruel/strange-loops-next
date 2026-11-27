@@ -80,8 +80,8 @@ node interop/js/check.mjs vectors   # the JS implementation passes every vector
 
 ## The design pages
 
-The build writes the front page from `design/front/` to `out/index.html`, with its typefaces in `out/fonts/`.
-Its five views bring the grammar, decisions, guide, laws and evidence together at the site's root.
+The front page opens on the grammar at the site's root, and each view also opens at its own address under `/grammar/`, `/guide/`, `/laws/`, `/evidence/` or `/decisions/`.
+The build lists the public pages in `/sitemap.xml` and links to their repository sources in `/llms.txt`.
 
 The design walk ("Strange Loops Rethink") uses `design/rethink/`.
 Each tab has an HTML file under `sections/`; `ledger.json` holds decision records.
@@ -125,8 +125,8 @@ CI builds every page twice and fails if the two builds differ. The pages are bui
 
 * **The site:** in the `projects.gruel.world` repository, `npm run sync:strange-loops`
   snapshots the pages built from the checked-out commit (run `node design/build.mjs` first), then push its
-  `main`. The site is served unlisted, with `noindex`, at
-  `https://strangeloops.dev/`. The design walk is at `/rethink/`. Addresses under
+  `main`. The site is served at
+  `https://strangeloops.dev/`. The design walk at `/rethink/` keeps `noindex`. Addresses under
   `projects.gruel.world/strange-loops/` redirect to the walk.
 * **The claude.ai artifact** is a mirror.
   `node design/build.mjs --fragment <file>` writes the fragment without a document wrapper; the host adds one.

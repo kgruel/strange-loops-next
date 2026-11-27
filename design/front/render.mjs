@@ -7,7 +7,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
-import { rewriteLink } from "../decisions/links.mjs";
+import { rewriteLink, workingDocuments } from "../decisions/links.mjs";
 import { fill } from "../page.mjs";
 import { LE } from "./bench.mjs";
 import { decisionsView, frontRewrite, readAround, readDecisions } from "./decisions.mjs";
@@ -17,17 +17,9 @@ import { guideConstants, readGuide } from "./guide.mjs";
 import { readLaws } from "./laws.mjs";
 import { readWalk } from "./walk.mjs";
 
-// The working documents the decisions pages render, as design/decisions/render.mjs names them.
-function documents(root) {
-  const docs = new Map([["DECISIONS.md", "index.html"], ["ROADMAP.md", "roadmap.html"], ["CHANGELOG.md", "changelog.html"], ["GUIDE.md", "guide.html"]]);
-  for (const e of readdirSync(join(root, "notes"), { withFileTypes: true }))
-    if (e.isFile() && e.name.endsWith(".md")) docs.set("notes/" + e.name, "note-" + e.name.slice(0, -3) + ".html");
-  return docs;
-}
-
 // What the decisions and grammar views show, read once.
 function decisions(root) {
-  const rewrite = frontRewrite(root, documents(root), rewriteLink);
+  const rewrite = frontRewrite(root, workingDocuments(root), rewriteLink);
   const open = readDecisions(root, rewrite);
   const grammar = readGrammar(root, open.entries);
   return { open, around: readAround(root, rewrite), grammar };
@@ -129,7 +121,7 @@ export function frontData(root, model = decisions(root)) {
 export function frontIds(data) {
   const diagrams = data.get("G_DIAGRAMS");
   return [
-    "grammar", "guide", "laws", "evidence", "decisions",
+    ...Object.keys(VIEWS),
     ...data.get("DEC").map(({ id }) => id.toLowerCase()),
     ...data.get("NOUN_GROUPS").flatMap((_, i) =>
       data.get("NOUNS").filter(({ group }) => group === i).map(({ word }) => `n-${word}`)),
@@ -146,46 +138,68 @@ export function frontIds(data) {
   ];
 }
 
-// A constant can contain a whole SVG, a paragraph, or an array of link snippets.
-function* dataLinks(value) {
-  if (typeof value === "string") {
-    for (const m of value.matchAll(/(?:^|\s)href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi))
-      yield m[1] ?? m[2] ?? m[3];
-  } else if (value && typeof value === "object") {
-    for (const child of Object.values(value)) yield* dataLinks(child);
-  }
+// A constant can contain a whole SVG, a paragraph, or a link snippet.
+function mapLinks(text, map) {
+  return text.replace(/((?:^|\s)href\s*=\s*)(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi,
+    (_, attr, double, single, bare) => {
+      const quote = double !== undefined ? '"' : single !== undefined ? "'" : "";
+      return attr + quote + map(double ?? single ?? bare) + quote;
+    });
 }
 
-// What the page says of itself to a browser tab, a search engine and a link preview.
-// It is the site's public face, so it is open to indexing; the rethink page and the working
-// documents keep their noindex. The address is the one the site is served at, so a copy
-// reached by another address names this one as the original.
 export const SITE = {
   url: "https://strangeloops.dev/",
   name: "Strange Loops",
-  title: "Strange Loops: a system for focusing attention",
-  description: "Most software stores conclusions: a row that says the world is so, which nobody witnessed. Strange Loops stores the evidence, what each observer saw, signed, and works the conclusions out when someone looks. A system for focusing attention.",
   // The picture a link preview shows: design/front/og.png, drawn from card.html beside it.
   card: { path: "og.png", width: 1200, height: 630, alt: "Strange Loops: a system for focusing attention." },
   repository: "https://github.com/kgruel/strange-loops-next",
 };
+
+// What each view says of itself to a browser tab, a crawler and a link preview.
+export const VIEWS = {
+  // The root page, which opens on the grammar: what the site says of the whole project.
+  grammar: {
+    title: "Strange Loops: a system for focusing attention",
+    description: "Most software stores conclusions: a row that says the world is so, which nobody witnessed. Strange Loops stores the evidence, what each observer saw, signed, and works the conclusions out when someone looks. A system for focusing attention.",
+  },
+  guide: {
+    title: "A guide to loops · Strange Loops",
+    description: "A guide to the loops command: from an empty folder to a working store in ten minutes, how to think about records and standing questions, and a short book written with it. Every command was run as written.",
+  },
+  laws: {
+    title: "The laws · Strange Loops",
+    description: "The laws of Strange Loops, each in one sentence: what you may change without moving an answer, and exactly where a promise stops. Replay the test vectors, and change a rule to see what breaks.",
+  },
+  evidence: {
+    title: "The evidence behind each law · Strange Loops",
+    description: "What stands behind each law of Strange Loops: the theorems Lean has checked, the test vectors every implementation runs, and which proofs rest on which.",
+  },
+  decisions: {
+    title: "Open decisions · Strange Loops",
+    description: "The questions about Strange Loops that are still open, each with an example, the options and what each costs. Tell us where an entry is wrong.",
+  },
+};
+const canonicalFor = (view) => new URL(view === "grammar" ? "" : `${view}/`, SITE.url).href;
 const attr = (s) => s.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
 // The header's mark, as the tab's icon.
 const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1D1D1B" stroke-width="1.4"><rect width="24" height="24" rx="5" fill="#EBEAE6" stroke="none"/><path d="M12 3 21 8 12 13 3 8Z"/><path d="M3 12l9 5 9-5" opacity=".55"/><path d="M3 16l9 5 9-5" opacity=".3"/></svg>`;
-export function headOf() {
+export function headOf(view = "grammar") {
+  const { title, description } = VIEWS[view];
+  const canonical = canonicalFor(view);
   const ld = {
-    "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: SITE.url, description: SITE.description,
+    "@context": "https://schema.org", "@type": view === "grammar" ? "WebSite" : "WebPage",
+    name: view === "grammar" ? SITE.name : title, url: canonical, description,
     about: { "@type": "SoftwareSourceCode", name: "loops", codeRepository: SITE.repository, programmingLanguage: ["Rust", "Lean"] },
   };
-  return `<title>${attr(SITE.title)}</title>
-<meta name="description" content="${attr(SITE.description)}">
-<link rel="canonical" href="${SITE.url}">
+  return `<title>${attr(title)}</title>
+<meta name="description" content="${attr(description)}">
+<link rel="canonical" href="${canonical}">
 <link rel="icon" href="data:image/svg+xml,${encodeURIComponent(ICON)}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${attr(SITE.name)}">
-<meta property="og:title" content="${attr(SITE.title)}">
-<meta property="og:description" content="${attr(SITE.description)}">
-<meta property="og:url" content="${SITE.url}">
+<meta property="og:title" content="${attr(title)}">
+<meta property="og:description" content="${attr(description)}">
+<meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${SITE.url}${SITE.card.path}">
 <meta property="og:image:width" content="${SITE.card.width}">
 <meta property="og:image:height" content="${SITE.card.height}">
@@ -195,10 +209,18 @@ export function headOf() {
 `;
 }
 
-export function frontPage(root) {
+export function frontPage(root, { view = "grammar", depth = 0 } = {}) {
   const read = (f) => readFileSync(join(root, "design", "front", f), "utf8");
+  const prefix = "../".repeat(depth);
+  const atDepth = (href) => !href || /^(?:[#/]|[a-z][a-z\d+.-]*:)/i.test(href) ? href : prefix + href;
   const model = { ...decisions(root), guide: readGuide(root) };
   const data = frontData(root, model);
+  const links = [];
+  const linkAtDepth = (href) => {
+    const path = atDepth(href);
+    links.push(path);
+    return path;
+  };
   const used = new Set();
   // Inline the Node module at the original declaration in the page's classic script.
   const parts = read("app.js").split("/*bench:LE*/\n");
@@ -209,7 +231,8 @@ export function frontPage(root) {
     if (!data.has(name)) throw new Error(`front: the script reads ${name} and nothing provides it`);
     if (used.has(name)) throw new Error(`front: the script defines ${name} twice`);
     used.add(name);
-    return JSON.stringify(data.get(name)).replaceAll("<", "\\u003c");
+    return JSON.stringify(data.get(name), (_, value) => typeof value === "string" ? mapLinks(value, linkAtDepth) : value)
+      .replaceAll("<", "\\u003c");
   });
   for (const name of data.keys()) if (!used.has(name)) throw new Error(`front: ${name} is provided and the script does not read it`);
   let body = read("shell.html");
@@ -218,37 +241,37 @@ export function frontPage(root) {
   body = fill(body, "grammar-nouns", model.grammar.nounsHeading);
   body = fill(body, "grammar-verbs", model.grammar.verbsHeading);
   body = fill(body, "view-guide", model.guide.html);
-  const fonts = read("fonts.css");
+  body = body.replace(/<a\b[^<>]*>/gi, (tag) => mapLinks(tag, atDepth));
+  // Copy the typefaces, licence note and card beside the root page.
+  const fontFiles = new Set(["fonts/LICENSES.md", SITE.card.path]);
+  const fonts = read("fonts.css").replace(/(url\(\s*)(["']?)(.*?)\2(\s*\))/gi, (_, start, quote, path, end) => {
+    if (!/^fonts\/[^/\\]+\.woff2$/.test(path)) throw new Error(`front: expected a font file in fonts.css, got ${path}`);
+    fontFiles.add(path);
+    return start + quote + linkAtDepth(path) + quote + end;
+  });
   // The page's own styles go in the head, with what it tells a browser and a crawler of itself.
   const styles = `<style>\n${fonts}${read("styles.css")}</style>\n`;
   body = fill(body, "styles", "");
   body = fill(body, "script", `<script>\n${script}</script>\n`);
   const base = readFileSync(join(root, "design", "rethink", "base.css"), "utf8").trimEnd();
   const html = `<!doctype html>
-<html lang="en">
+<html lang="en" data-view="${view}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-${headOf()}<style>${base}</style>
+${headOf(view)}<style>${base}</style>
 ${styles}</head>
 <body>
 ${body}</body>
 </html>
 `;
-  const links = [...data.values()].flatMap((value) => [...dataLinks(value)]);
   // The law directory links every row to its evidence, including standalone
   // laws. Evidence in turn links back to each model-supplied premise case.
   for (const { rows } of data.get("L_QS")) for (const { id } of rows)
     links.push("#ev-" + id.replace(/^law-/, ""));
   for (const { pr } of data.get("E_LAWS")) if (pr)
     links.push("#prem-" + pr.replace(/[^a-z0-9]+/gi, "-").toLowerCase());
-  // Files copied beside the page as they are: the typefaces, their licence note and the card.
-  const fontFiles = new Set(["fonts/LICENSES.md", SITE.card.path]);
-  for (const [, , path] of fonts.matchAll(/url\(\s*(["']?)(.*?)\1\s*\)/gi)) {
-    if (!/^fonts\/[^/\\]+\.woff2$/.test(path)) throw new Error(`front: expected a font file in fonts.css, got ${path}`);
-    fontFiles.add(path);
-  }
-  return { html, ids: frontIds(data), links, fontFiles };
+  return { html, ids: frontIds(data), links, fontFiles, canonical: canonicalFor(view) };
 }
 
 export function renderFront(root) {
