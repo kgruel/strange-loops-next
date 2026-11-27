@@ -1,0 +1,326 @@
+<title>Strange Loops</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Strange Loops keeps what people said as signed records that never change, and works everything else out from them: the grammar, a guide, the laws, the evidence behind them and the open decisions.">
+<!-- build:styles -->
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#grammar" aria-label="Strange Loops grammar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 3 21 8 12 13 3 8Z"/><path d="M3 12l9 5 9-5" opacity=".55"/><path d="M3 16l9 5 9-5" opacity=".3"/></svg>
+      <span><span class="bt">Strange Loops</span></span>
+    </a>
+    <nav class="nav" aria-label="Pages">
+      <a href="#grammar" data-view="grammar">Grammar</a>
+      <a href="#guide" data-view="guide">Guide</a>
+      <a href="#laws" data-view="laws">Laws</a>
+      <a href="#evidence" data-view="evidence">Evidence</a>
+      <a href="#decisions" data-view="decisions">Decisions</a>
+    </nav>
+  </div>
+</header>
+
+<main id="v-grammar" class="view">
+  <section class="hero" id="grammar">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <h1 class="display">Records in. Folds and ticks out. Lenses back to&nbsp;text.</h1>
+          <p class="lede">Strange Loops keeps what people said as signed records that never change. <b>Everything else is worked out from them</b>: who is current, what was decided, the page you read. Any of it can be thrown away and worked out again.</p>
+<!-- build:grammar-intro -->
+        </div>
+        <figure class="sheet loopfig" style="margin:0">
+          <svg id="loop" role="img" aria-label="Six layers stacked from Record at the bottom to Text at the top. A record lands on the ground, a fold rises through the layers, a tick fixes the answer, a lens renders text, and an edit comes back down as a new record."></svg>
+          <figcaption class="figbar">
+            <span class="phase" id="phase"><span class="pn" id="phasen">1/7</span><span id="phaset">Rosa writes a record.</span></span>
+            <button class="ibtn ghost" id="loopbtn" aria-label="Pause the animation"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3" width="3" height="10" rx="1"/><rect x="9.5" y="3" width="3" height="10" rx="1"/></svg></button>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="key" id="key"></div>
+    </div>
+  </section>
+
+  <section class="block" id="record">
+    <div class="wrap">
+      <header>
+        <h2 class="sec">A record is one sentence, signed.</h2>
+        <p class="secintro">Every record says who saw something, when, about which thing, and what they saw. Point at any part of the sentence to find it in the record.</p>
+      </header>
+      <div class="anat">
+        <div class="sheet sentence" id="sentence"></div>
+        <div class="sheet json" id="json" aria-label="The same record as data"></div>
+      </div>
+
+      <div class="sheet lab" id="lab">
+        <div class="lab-grid">
+          <div>
+            <h3>Its id is what it says.</h3>
+            <p>A record's id is a hash of the record written one canonical way. Here is record M from the walk below. Make each change and watch which ones the id notices.</p>
+            <div class="labbtns">
+              <button class="ibtn" data-lab="swap">Swap the order of prev</button>
+              <button class="ibtn" data-lab="erase">Erase the payload</button>
+              <button class="ibtn" data-lab="word">Change one word</button>
+              <button class="ibtn ghost" data-lab="reset">Reset</button>
+            </div>
+            <div class="labsay" id="labsay">Each change is applied on top of the last. Reset to start over.</div>
+            <p class="toy">A toy: real records also carry a salt, a signature and more envelope fields, and are hashed with the protocol's own rules. The behaviour is the same.</p>
+          </div>
+          <div class="labrec" id="labrec"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="walk">
+    <div class="wrap">
+      <header>
+        <h2 class="sec">Watch a recipe get written, argued over, cleaned up and edited.</h2>
+        <p class="secintro">Rosa and Ben are writing down Grandma's chili, and Kim reads along with less. Each card is a record of <code>recipe:chili</code>. The strip under the cards is what the vertex <code>recipes</code> answers: the current recipe, and how many versions there are. Scroll, or use the arrows.</p>
+      </header>
+      <div class="walk">
+        <div class="steps" id="steps"></div>
+        <div class="stagewrap">
+          <div class="sheet stage" id="stage">
+            <div class="stagehead">
+              <span class="reader" id="reader">Reading as Rosa</span>
+              <span class="thing">store family · recipe:chili</span>
+              <span class="ctrl">
+                <button class="ibtn" id="wprev" aria-label="Previous step">←</button>
+                <span class="stepcount" id="wcount">1 / 9</span>
+                <button class="ibtn" id="wnext" aria-label="Next step">→</button>
+              </span>
+            </div>
+            <div class="dag" id="dag"><svg class="edges" id="edges" aria-hidden="true"></svg></div>
+            <div class="slots">
+              <div class="slot"><div class="sl"><code>current</code><span>latest-by of, following prev</span></div><div class="sv" id="scur"></div><div class="unread" id="sunread"></div></div>
+              <div class="slot count"><div class="sl"><code>versions</code><span>count</span></div><div class="sv" id="scount">0</div></div>
+            </div>
+            <div class="lanes hide" id="lanes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="layers">
+    <div class="wrap">
+      <header>
+        <h2 class="sec">Each layer is as high as it is temporary.</h2>
+        <p class="secintro">Only the ground is kept for good. Every layer above it can be thrown away and worked out again from the layer below. Pick a layer, then throw it away.</p>
+      </header>
+      <div class="layers">
+        <div class="sheet stackfig"><svg id="stack" role="img" aria-label="The six layers. Select one to read about it."></svg></div>
+        <div class="sheet laypanel" id="laypanel"></div>
+      </div>
+      <div class="sheet laytable"><table class="t" id="laytable"></table></div>
+    </div>
+  </section>
+
+  <section class="block" id="nouns">
+    <div class="wrap">
+      <header>
+<!-- build:grammar-nouns -->
+        <p class="secintro">Each entry gives the noun's purpose, how it behaves, and where you met it in the walk. Open one for its state and the laws that pin it.</p>
+      </header>
+      <div class="filters" id="nfilters"></div>
+      <div id="dict"></div>
+    </div>
+  </section>
+
+  <section class="block" id="verbs">
+    <div class="wrap">
+      <header>
+<!-- build:grammar-verbs -->
+        <p class="secintro">Reading runs in a fixed order, left to right. Pick a verb to read it.</p>
+      </header>
+      <div class="sheet pipe" id="pipe"></div>
+      <h3 class="sec" style="font:400 26px/1.2 var(--serif);margin-top:44px">Four constructions, and two states that are nobody's verb</h3>
+      <div class="cons" id="cons"></div>
+      <div class="sheet codebook" id="codebook">
+        <div class="cbhead">
+          <div>
+            <h3>Every refusal has a code</h3>
+            <p>A refusal names one code from a closed set and the path to what broke the rule. Within a group, codes are checked in the order shown.</p>
+          </div>
+          <label class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg><input id="cbq" type="search" placeholder="Find a code" autocomplete="off" spellcheck="false" aria-label="Find a refusal code"></label>
+        </div>
+        <div class="cbgrid" id="cbgrid"></div>
+        <div class="cbcount" id="cbcount"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="matrix">
+    <div class="wrap">
+      <header>
+        <h2 class="sec">Which verb acts on which noun.</h2>
+        <p class="secintro">Point at a cell to see its row and its column. The record is touched by more verbs than any other noun: nine of twelve.</p>
+      </header>
+      <div class="sheet mx"><table class="m" id="mx"></table></div>
+    </div>
+  </section>
+
+  <section class="block" id="board">
+    <div class="wrap">
+      <header>
+        <h2 class="sec">What is proved, designed, open and planned.</h2>
+        <p class="secintro">One place for every status on this page, so a reader doesn't have to collect them from the entries.</p>
+      </header>
+      <div class="board" id="boardcols"></div>
+    </div>
+  </section>
+
+  <section class="block" id="provenance">
+    <div class="wrap">
+      <header>
+        <h2 class="sec">Borrowed, with thanks.</h2>
+      </header>
+      <div class="prov" id="prov"></div>
+    </div>
+  </section>
+
+  <footer class="end"><div class="wrap"><span>Built from the repository's sources.</span></div></footer>
+</main>
+
+<!-- build:view-decisions -->
+
+<!-- build:view-guide -->
+
+<main id="v-laws" class="view" hidden>
+  <section class="lhero" id="laws">
+    <div class="wrap">
+      <h1 class="display">A law is a promise in one&nbsp;sentence.</h1>
+      <p class="lede">There are 124 of them. Each says what you may change without moving an answer, or <b>exactly where a promise stops</b>. Lean has checked a proof of all but three, and those three hold by how the code is built.</p>
+      <p class="tally">Below, you can <a href="#break">rewrite five of the rules they rest on</a> and watch laws break, <a href="#premises">take a premise away</a>, or <a href="#every-law">read all 124 by the question they answer</a>.</p>
+      <h2 class="lbl lshapes-h">Every law takes one of six shapes</h2>
+      <ol class="lshapes" id="lshapes"></ol>
+    </div>
+  </section>
+
+  <section class="block" id="break" aria-labelledby="h-break">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-break">Five rules the laws rest&nbsp;on.</h2>
+        <p class="secintro">Each rule is written out below. Change a word, and every law resting on it is checked again against the model's own test vectors. A law that breaks shows you the case that broke it.</p>
+      </header>
+      <div class="bench sheet" id="bench">
+        <div class="btabs" role="tablist" aria-label="Rules to change" id="btabs"></div>
+        <div class="bpanel" id="bpanel" role="tabpanel"></div>
+        <p class="bfoot">Worked out here, in your browser, by a small copy of these five rules. With the protocol's choices it gives every answer the model's vectors give; the other choices have no model behind them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="premises" aria-labelledby="h-premises">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-premises">Seven laws hold only on a&nbsp;premise.</h2>
+        <p class="secintro">Each needs something to be true of what goes in. Below is the model's own answer with the premise held, and with it removed, as <code>lake exe boundaries</code> writes them. None of it is worked out in your browser.</p>
+      </header>
+      <ol class="prem" id="prem"></ol>
+    </div>
+  </section>
+
+  <section class="block" id="every-law" aria-labelledby="h-every">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-every">Every law, by the question it&nbsp;answers.</h2>
+        <p class="secintro" id="lunless"></p>
+      </header>
+      <div class="lfilter" id="lfilter">
+        <label class="lsearch"><span class="sro">Find a law</span><input type="search" id="lq" placeholder="Find a law: erasure, prev, a winner" autocomplete="off" spellcheck="false"></label>
+        <div class="lchips" role="group" aria-label="Show laws of one shape" id="lchips"></div>
+        <p class="lcount" id="lcount" aria-live="polite"></p>
+      </div>
+      <ol class="lqidx" id="lqidx" aria-label="The eight questions"></ol>
+      <div id="lqs"></div>
+      <p class="lnone" id="lnone" hidden>No law matches. Try a shorter word, or show every shape.</p>
+    </div>
+  </section>
+
+  <section class="block" id="stop" aria-labelledby="h-stop">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-stop">Where the guarantees&nbsp;stop.</h2>
+        <p class="secintro">The laws about folds, views and specs each hold for a given set of records. None of them says that set is complete, current, trusted or well dated. These are the edges, with the model's own simplifications, as <code>protocol/laws.md</code> states them.</p>
+      </header>
+      <div class="lstop">
+        <div><h3 class="lbl">What the laws don't promise</h3><dl class="lrows" id="lnopromise"></dl></div>
+        <div><h3 class="lbl">Simplifications in the model</h3><ul class="lsimpl" id="lsimpl"></ul></div>
+      </div>
+    </div>
+  </section>
+  <footer class="end"><div class="wrap"><span>Built from <code>design/laws</code> and <code>protocol/laws.md</code>.</span></div></footer>
+</main>
+
+<main id="v-evidence" class="view" hidden>
+  <section class="ehero" id="evidence">
+    <div class="wrap">
+      <h1 class="display">What each law stands&nbsp;on.</h1>
+      <p class="lede">Each law is one sentence. Behind it are <b>a row in the protocol's laws file, theorems Lean has checked, and test vectors</b> that every implementation runs. Follow one law down that chain, see which proofs lean on which, and find where the evidence is thin.</p>
+      <ol class="echain" id="echain" aria-label="From claim to code, counted"></ol>
+      <p class="echain-cap">The build joins all four and fails when one doesn't meet the next: a row with no sentence, a theorem Lean can't find, a vector that isn't on disk.</p>
+    </div>
+  </section>
+
+  <section class="block" id="e-follow" aria-labelledby="h-efollow">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-efollow">Follow one law from claim to&nbsp;code.</h2>
+        <p class="secintro">Pick a law. Each step below is checked against the next: the sentence says no more than its row, the row names the theorems that prove it, and the vectors pin the exact answers an implementation must give.</p>
+      </header>
+      <div class="efollow">
+        <aside class="epick" aria-label="Choose a law">
+          <label class="esearch"><span class="sro">Find a law</span><input type="search" id="eq" placeholder="Find a law: refuse, heads, tick" autocomplete="off" spellcheck="false"></label>
+          <p class="etry" id="etry"></p>
+          <ol class="eidx" id="eidx" aria-label="Every law, from the ground up"></ol>
+          <p class="enone" id="enone" hidden>No law matches that.</p>
+        </aside>
+        <article class="etrace sheet" id="etrace" aria-live="polite"></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="e-map" aria-labelledby="h-emap">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-emap">Which proofs lean on&nbsp;which.</h2>
+        <p class="secintro">A line from one law down to another means a proof of the first uses a theorem of the second, and Lean recorded every one. Proofs only lean downward: the build fails if one ever leans on a layer above its own.</p>
+      </header>
+      <div class="emap sheet">
+        <p class="emap-hint" id="emap-hint">Point at a law to light what it rests on and what rests on it. Click or tap it to keep it lit, or a line to see the theorems that make it.</p>
+        <div class="emap-pan" id="emap" tabindex="-1"></div>
+        <div class="emap-note" id="emap-note" aria-live="polite"></div>
+      </div>
+      <p class="ealone" id="ealone"></p>
+    </div>
+  </section>
+
+  <section class="block" id="e-thin" aria-labelledby="h-ethin">
+    <div class="wrap">
+      <header>
+        <h2 class="sec" id="h-ethin">Where the evidence is&nbsp;thin.</h2>
+        <p class="secintro" id="ethin-sum"></p>
+      </header>
+      <div class="elens" role="group" aria-label="Show the laws missing one kind of evidence" id="elens"></div>
+      <p class="elens-say" id="elens-say" aria-live="polite"></p>
+      <div class="ecov sheet"><div class="ecov-scroll"><table class="ecov-t" id="ecov">
+        <thead><tr>
+          <th scope="col">Law</th><th scope="col">Shape</th><th scope="col">Theorems</th><th scope="col">Vectors</th>
+          <th scope="col">Lists agree</th><th scope="col">JavaScript</th><th scope="col">Rests on</th><th scope="col">Carries</th>
+        </tr></thead>
+        <tbody id="ecov-b"></tbody>
+      </table></div></div>
+    </div>
+  </section>
+  <footer class="end"><div class="wrap"><span>Built from <code>design/evidence</code>, <code>design/laws</code> and <code>protocol/laws.md</code>.</span></div></footer>
+</main>
+
+<div class="pop" id="pop" hidden role="dialog" aria-label="Law"></div>
+<div class="tray" id="tray" aria-live="polite">
+  <span class="tt" id="traytxt"></span>
+  <button class="ibtn" id="traycopy">Copy as text</button>
+  <button class="ibtn ghost" id="trayclear">Clear</button>
+</div>
+
+<!-- build:script -->
+

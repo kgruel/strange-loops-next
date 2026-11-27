@@ -13,8 +13,22 @@ In brief:
 - **The identity entries are read against one real store.** [A seat as a case](notes/2026-11-27-a-seat-as-a-case.md) takes what happened to the coordinator's own store over two days (a new key and a hand-over, a move to its own account, a countersigned tick, a worker started beside it) and reads IS1 to IS11 against it, with five runs. Nothing is ruled and no entry is added. It is written for Kyle's walk with Astra.
 - **IS6 and IS8 gain the alternative each was put without.** Both were recommendations with nothing argued against them. The recommendation in each is unchanged.
 - **A merged request's pipeline is routed by the project's new path.** The project moved on GitLab on 2026-11-26, and the rule that recognises a merge to main still matched the old path, so main ran every gate again after each merge. It ran once so.
+- **The site has a front page, built from the repository.** Kyle had the grammar, guide, laws, evidence and decisions pages redesigned as one page, tested it on readers who do not know the project, and asked for it as the site's front, built the way the other pages are. `design/front/` holds it and the build writes it to `out/index.html`. Nothing a reader sees on it is typed into the page: the decisions view is `DECISIONS.md` in its own words, the laws and evidence views come through the joins the old pages used, the grammar's words and the recipe walk each have one checked source, and the guide view is built from `GUIDE.md`. The standalone grammar, laws and evidence pages are retired. [What changed](#the-front-page)
 - **The built pages leave the repository.** `out/` held every page the build writes, committed beside its source, so each change to a document carried a second, larger change to its page. Kyle asked for the pages to be made when a merge is published. `out/` is now ignored; CI builds the pages twice and fails if the two builds differ, in place of comparing with committed files; and the pages are built from `main` before the site is synced. A hosted page is still the build of one commit.
 - **The coordinator works under its own name.** Since 2026-11-26 this seat is called Tally. Since 2026-11-27 it commits, opens merge requests and signs its own store from an account of its own.
+
+### The front page
+
+Kyle worked with a design model on a single page for the site, in a plainer voice, and showed it to readers new to the project. He chose it as the front of strangeloops.dev and asked that it be built from the repository with its presentation kept. The prototype was one document that held its content as data beside the code that draws it; it was taken apart, and each part was replaced by something generated from a source, most of them by Codex workers to briefs, each checked against the prototype's copy before that copy was deleted.
+
+- **Decisions.** The open entries, the rulings, the deferred items and every count in a heading come from `DECISIONS.md`. Kyle chose the file's own words for this view. It speaks to any reader, says the questions are open, and asks where an entry is wrong, by an issue or by mail to Kyle or to Tally. The file's direct addresses to Kyle are in the third person.
+- **Laws and evidence.** Generated through the joins the old pages used, and equal to the prototype's copies, the proof map included. The laws view's bench has an engine ported from the JavaScript implementation; a test now requires it to give every bench vector's answer, which nothing checked before.
+- **Grammar.** The redesign's wording, with seven sentences amended where the plainer wording had dropped a condition its law needs. A status that read "settled" is "designed": decided in the design and not built, and not a ruling. The recipe walk is checked against the test vector the old walk used. The build refuses a link from the grammar to a decision entry that is no longer open.
+- **Guide.** `GUIDE.md` is rewritten in the redesign's prose and the view is built from it, so there is one guide. Every code block is part of a recorded run. A reader who followed the file alone, typing every command, found each one right.
+- **The typefaces** are served with the page, so reading it tells no third party.
+- **Retired:** the standalone grammar, laws and evidence pages. Links to them from the rethink page and the working documents go to the front page.
+
+`.claude/skills/site-voice/SKILL.md` records the voice and the look, and what a plainer sentence must not drop.
 
 ## 2026-11-25
 

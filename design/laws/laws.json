@@ -204,19 +204,5 @@
     {"name": "the model", "what": "<code>lake exe gen</code> computes protocol-vector answers. The theorem files separately prove the listed laws.", "dirs": "*"},
     {"name": "the JS implementation", "what": "<code>interop/js/check.mjs</code> checks the earlier fixtures and standards. JavaScript does not run tick (W3).", "dirs": "*", "except": ["tick"], "checker": "interop/js/check.mjs"},
     {"name": "the Rust implementation", "what": "The Rust workspace checks the earlier fixture families, the external standards, and all tick vectors, including making a claim and checking it against a local holding.", "dirs": "*", "ops": {"tick": ["hash", "domains", "window", "write-payload", "payload", "payload-text", "members", "read-ticks", "fields", "make-and-check", "check-tick"]}}
-  ],
-  "demos": [
-    {"law": "count.perm", "vector": "fold/count/02-three", "kind": "orders", "change": "Deliver them in another order", "stays": "count"},
-    {"law": "latest-by.set", "vector": "fold/latest-by/02-fork", "kind": "orders", "change": "Deliver them in another order", "stays": "heads and winner"},
-    {"law": "view.no-resurrection", "vector": "fold/view/01-withheld-head-still-supersedes", "kind": "orders", "change": "Deliver them in another order, the head's payload withheld", "stays": "heads",
-     "done": "Same heads, by id, for {n} orders the vector holds, the head's payload withheld in each. Max and unread are the model's answer too; they are not what this card compares. The vector's README says: “With consistent forms, these are the same heads as the full reader's.”",
-     "quote": {"file": "vectors/README.md", "text": "With consistent forms, these are the same heads as the full reader's."},
-     "note": "The vector varies arrival order and withholds the head's payload in every variant. It holds no variant in which the reader holds every payload."},
-    {"law": "record.sets", "vector": "record/03-sets-are-sets", "kind": "envs", "change": "Spell <code>about</code> another way", "stays": "id"},
-    {"law": "record.erasure", "vector": "record/08-erasure", "kind": "lines", "change": "Forget the payload's opening", "stays": "id"},
-    {"law": "occurred.qualifier", "vector": "occurred/03-qualifiers", "kind": "spans", "pick": [0, 1, 2, 3], "change": "Qualify the date", "stays": "span"},
-    {"law": "lens.round-trip", "vector": "lens/section/01-round-trip", "kind": "lens", "change": "Render it, then parse the text", "stays": "sections"},
-    {"law": "lens.absence-not-edit", "vector": "lens/section/06-dropped-section", "kind": "lens", "change": "Drop a section from the text", "stays": "sections"},
-    {"law": "count.repeats", "vector": "fold/count/03-repeats-counted", "against": "fold/count/02-three", "kind": "repeats", "change": "Deliver the same records twice", "stays": "count"}
   ]
 }

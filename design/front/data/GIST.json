@@ -1,0 +1,7 @@
+{
+ "invariance": "What you may change without moving the answer.",
+ "round-trip": "Out to text and back loses nothing. Text read in and written out again comes back in its normal form.",
+ "refinement": "What a reader without every payload is still promised, and how it learns what it couldn't read.",
+ "order": "Two different things never tie, and where a test answers, it and its opposite leave no gap.",
+ "exactness": "Exactly where a law holds: both ways, one way, or refused with a reason it names."
+}

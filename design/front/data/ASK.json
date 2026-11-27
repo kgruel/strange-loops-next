@@ -1,0 +1,12 @@
+{
+ "add": "When the count goes up",
+ "supersede": "When a record stops being a head",
+ "winner": "Which head wins",
+ "hidden": "What a record without its payload does",
+ "unread": "What the max does with a head it can't read",
+ "sets": "How the lists are written before hashing",
+ "members": "How an object's members are ordered",
+ "covers": "What the id is a hash of",
+ "escape": "Which body lines get a backslash",
+ "absent": "What happens to a section the text leaves out"
+}

@@ -357,7 +357,7 @@ design:
     - (cd out && find . -type f | sort | xargs sha256sum) | diff /tmp/pages.first -
     # The design build refuses every mutant it should
     - node design/mutants.mjs
-    - node --test design/decisions/*.test.mjs
+    - node --test design/decisions/*.test.mjs design/front/*.test.mjs
 
 # A tested merge's pipeline on main: check the claim, then only keep main's
 # image and caches current. These jobs are not interruptible, so a quick second

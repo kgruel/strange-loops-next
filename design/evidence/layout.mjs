@@ -8,12 +8,17 @@
 // toward the laws it is joined to. An edge runs from the bottom of the law whose proof uses
 // a theorem to the top of the law that owns it.
 
-const CHAR = 6.6, PAD = 20, H = 26, GAP = 12, ROW = 30, BAND = 20, LEFT = 96, MAXW = 760;
+const GAP = 12, ROW = 30;
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-export function layoutMap({ layers, nodes, edges }) {
-  const byId = new Map(nodes.map((n) => [n.id, { ...n, w: Math.round(n.label.length * CHAR) + PAD, band: layers.indexOf(n.layer) }]));
+export function layoutMap({ layers, nodes, edges }, {
+  characterWidth = 6.6, nodePadding = 20, nodeHeight = 26, bandGap = 20,
+  leftGutter = 96, maxRowWidth = 760, labelX = 10, labelY = 17,
+} = {}) {
+  const byId = new Map(nodes.map((n) => [n.id, {
+    ...n, w: Math.round(n.label.length * characterWidth) + nodePadding, band: layers.indexOf(n.layer),
+  }]));
   const down = new Map([...byId.keys()].map((k) => [k, []])), up = new Map([...byId.keys()].map((k) => [k, []]));
   for (const [a, b] of edges) { down.get(a).push(b); up.get(b).push(a); }
 
@@ -62,11 +67,11 @@ export function layoutMap({ layers, nodes, edges }) {
   // Wrap a row too wide for the column into rows of its band, keeping its order.
   const width = (ks) => ks.reduce((s, k) => s + byId.get(k).w, 0) + GAP * (ks.length - 1);
   rows = rows.flatMap((r) => {
-    if (width(r.ids) <= MAXW) return [r];
+    if (width(r.ids) <= maxRowWidth) return [r];
     const out = [];
     let cur = [];
     for (const k of r.ids) {
-      if (cur.length && width([...cur, k]) > MAXW) { out.push({ band: r.band, ids: cur }); cur = []; }
+      if (cur.length && width([...cur, k]) > maxRowWidth) { out.push({ band: r.band, ids: cur }); cur = []; }
       cur.push(k);
     }
     out.push({ band: r.band, ids: cur });
@@ -103,20 +108,20 @@ export function layoutMap({ layers, nodes, edges }) {
   const y = new Map(), bands = [];
   let at = 16;
   rows.forEach((r, i) => {
-    if (i && rows[i - 1].band !== r.band) at += BAND;
+    if (i && rows[i - 1].band !== r.band) at += bandGap;
     for (const k of r.ids) y.set(k, at);
     const band = bands.find((b) => b.band === r.band);
-    if (band) band.y1 = at + H; else bands.push({ band: r.band, y0: at, y1: at + H });
-    at += H + ROW;
+    if (band) band.y1 = at + nodeHeight; else bands.push({ band: r.band, y0: at, y1: at + nodeHeight });
+    at += nodeHeight + ROW;
   });
   const height = at - ROW + 16;
-  const total = W + LEFT + 16;
+  const total = W + leftGutter + 16;
 
   // The drawing.
   const px = (v) => Math.round(v * 10) / 10;
   const paths = edges.map(([a, b, via]) => {
     const A = byId.get(a), B = byId.get(b);
-    const x1 = LEFT + centre(a), y1 = y.get(a) + H, x2 = LEFT + centre(b), y2 = y.get(b);
+    const x1 = leftGutter + centre(a), y1 = y.get(a) + nodeHeight, x2 = leftGutter + centre(b), y2 = y.get(b);
     const dy = (y2 - y1) / 2;
     const d = `M${px(x1)} ${px(y1)} C${px(x1)} ${px(y1 + dy)},${px(x2)} ${px(y2 - dy)},${px(x2)} ${px(y2)}`;
     const v = esc(via.map((t) => t.replace(/^Loops\./, "")).join(" → "));
@@ -127,8 +132,8 @@ export function layoutMap({ layers, nodes, edges }) {
     `<text class="band-l" x="14" y="${px((b.y0 + b.y1) / 2 + 4)}">${esc(layers[b.band])}</text>`);
   const nodeEls = ids.map((k) => {
     const n = byId.get(k);
-    return `<a class="node${n.shape === "limit" ? " limit" : ""}" href="#${k}" data-id="${k}" transform="translate(${px(LEFT + x.get(k))} ${px(y.get(k))})">` +
-      `<title>${esc(n.label)}</title><rect width="${n.w}" height="${H}" rx="7"/><text x="10" y="17">${esc(n.label)}</text></a>`;
+    return `<a class="node${n.shape === "limit" ? " limit" : ""}" href="#${k}" data-id="${k}" transform="translate(${px(leftGutter + x.get(k))} ${px(y.get(k))})">` +
+      `<title>${esc(n.label)}</title><rect width="${n.w}" height="${nodeHeight}" rx="7"/><text x="${labelX}" y="${labelY}">${esc(n.label)}</text></a>`;
   });
   // Its natural width goes to the page's styles (--w), which say how far it may shrink.
   return `<svg viewBox="0 0 ${px(total)} ${px(height)}" width="100%" style="--w:${Math.round(total)}px" ` +

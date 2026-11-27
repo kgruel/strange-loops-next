@@ -15,6 +15,19 @@ export function rewriteLink(root, documents, source, line, href) {
   let path;
   try { path = posix.join(dirname(source), decodeURIComponent(raw)); }
   catch { fail("invalid path encoding"); }
+  // Published page addresses can occur in a document alongside repository paths.
+  // A link to design/laws/ itself still opens the proof and boundary data.
+  const retired = /^\.\.\/(grammar|laws|evidence)\/(?:index\.html)?$/.exec(raw)
+    ?? /^out\/(grammar|laws|evidence)\/(?:index\.html)?$/.exec(path);
+  if (retired) {
+    const view = retired[1];
+    if (!fragment || fragment === "#") return "../#" + view;
+    if (view === "grammar" && fragment.startsWith("#noun-")) return "../#n-" + fragment.slice(6);
+    if (view === "evidence" && fragment.startsWith("#law-")) return "../#ev-" + fragment.slice(5);
+    if (view === "laws" && /^#(?:law-|q-|h-q-)/.test(fragment)) return "../" + fragment;
+    if (view === "laws" && fragment.startsWith("#without-")) return "../#prem-" + fragment.slice(9);
+    fail("no matching front-page anchor for this retired page link");
+  }
   if (path === ".." || path.startsWith("../") || path.startsWith("/") || path.includes("\\")) fail("outside the repository");
   const target = statSync(join(root, path), { throwIfNoEntry: false });
   if (!target) fail("repository path does not exist");

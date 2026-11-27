@@ -6,6 +6,9 @@ export const escapeHtml = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt
 const heading = /^(#{1,6}) +(.+?) *(?: +#+ *)?$/;
 const fence = /^(`{3,})([\w+-]*) *$/;
 const marker = /^([-+*]|\d{1,9}[.)])( +)(.*)$/;
+export const guideComponent = /^<!-- guide:(end|stepper|sets|shapes|envelope|more|questions|annotated (?:members|spec)|diagram (?:headsfig|judgefig|turnfig|wordings)|book (?:sources|draft|fork|settled|null|final)) -->$/;
+export const guideHint = /^<!-- guide:hint (append|replace)="([^"]+)" -->$/;
+const guideStart = /^<!-- guide:/;
 const table = /^\|/;
 // Recognize block starters even inside a paragraph or list. Only ordinary
 // prose reaches the paragraph fallback. Raw HTML goes through text escaping.
@@ -17,11 +20,11 @@ const unsupported = [
   /^:?-+:?\s*\||^#{1,6}$|^(?:[+*]|\d{1,9}[.)])$/,           // unsupported table, empty heading or item
 ];
 const unsupportedBlock = (s) => unsupported.some((start) => start.test(s));
-const beginsBlock = (s) => !s.trim() || heading.test(s) || marker.test(s) || table.test(s) || unsupportedBlock(s);
+const beginsBlock = (s) => !s.trim() || guideStart.test(s) || heading.test(s) || marker.test(s) || table.test(s) || unsupportedBlock(s);
 
 // Code is opaque, including stars and link-shaped text. Keep the visible text
 // alongside the HTML: titles, navigation labels and heading ids all use it.
-function inline(source, line, rewrite) {
+export function inline(source, line, rewrite) {
   let html = "", plain = "";
   function append(value, markup = escapeHtml(value)) {
     html += markup;
@@ -79,7 +82,8 @@ export function renderMarkdown(source, file, rewrite = (href) => href) {
     while (i < lines.length) {
       const line = firstLine + i;
       const s = lines[i++].trimEnd();
-      if (!s) continue;
+      if (!s || guideComponent.test(s) || guideHint.test(s)) continue;
+      if (guideStart.test(s)) fail(line, "unknown guide marker: " + s);
       const h = s.match(heading), f = s.match(fence), item = s.match(marker);
       if (h) {
         const { html, plain } = span(h[2], line);
