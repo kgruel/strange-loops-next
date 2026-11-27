@@ -84,7 +84,39 @@ export function frontData(root, model = decisions(root)) {
   return data;
 }
 
-export function renderFront(root) {
+// Ids the script installs at startup, plus the hashes its router handles.
+// Evidence routes select a card by slug, even for laws with no node on the map.
+export function frontIds(data) {
+  const diagrams = data.get("G_DIAGRAMS");
+  return [
+    "grammar", "guide", "laws", "evidence", "decisions",
+    ...data.get("DEC").map(({ id }) => id.toLowerCase()),
+    ...data.get("NOUN_GROUPS").flatMap((_, i) =>
+      data.get("NOUNS").filter(({ group }) => group === i).map(({ word }) => `n-${word}`)),
+    ...data.get("L_QS").flatMap(({ k, rows }) => [`q-${k}`, `h-q-${k}`, ...rows.map(({ id }) => id)]),
+    ...data.get("L_BOUND").map(({ law }) => "prem-" + law.replace(/[^a-z0-9]+/gi, "-").toLowerCase()),
+    ...data.get("E_LAWS").map(({ s }) => `ev-${s}`),
+    // The walk, stack, verb detail and five bench tabs are drawn at startup.
+    // The own-text editor only exists after switching to the text machine.
+    "wtip", "lens", "lensapply", "lensreset", "lensout", "toss", "rebuild", "vdetail",
+    "bt-count", "bt-current", "bt-withheld", "bt-id", "bt-text", "breset",
+    "loop-ar", "stack-ar", "dep-ar",
+    ...(diagrams.headsfig ? ["hfm0", "hfm1", "hfm2"] : []),
+    ...(diagrams.wordings ? ["wdm"] : []),
+  ];
+}
+
+// A constant can contain a whole SVG, a paragraph, or an array of link snippets.
+function* dataLinks(value) {
+  if (typeof value === "string") {
+    for (const m of value.matchAll(/(?:^|\s)href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi))
+      yield m[1] ?? m[2] ?? m[3];
+  } else if (value && typeof value === "object") {
+    for (const child of Object.values(value)) yield* dataLinks(child);
+  }
+}
+
+export function frontPage(root) {
   const read = (f) => readFileSync(join(root, "design", "front", f), "utf8");
   const model = { ...decisions(root), guide: readGuide(root) };
   const data = frontData(root, model);
@@ -107,10 +139,11 @@ export function renderFront(root) {
   body = fill(body, "grammar-nouns", model.grammar.nounsHeading);
   body = fill(body, "grammar-verbs", model.grammar.verbsHeading);
   body = fill(body, "view-guide", model.guide.html);
-  body = fill(body, "styles", `<style>\n${read("fonts.css")}${read("styles.css")}</style>\n`);
+  const fonts = read("fonts.css");
+  body = fill(body, "styles", `<style>\n${fonts}${read("styles.css")}</style>\n`);
   body = fill(body, "script", `<script>\n${script}</script>\n`);
   const base = readFileSync(join(root, "design", "rethink", "base.css"), "utf8").trimEnd();
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -122,4 +155,15 @@ export function renderFront(root) {
 ${body}</body>
 </html>
 `;
+  const links = [...data.values()].flatMap((value) => [...dataLinks(value)]);
+  const fontFiles = new Set(["fonts/LICENSES.md"]);
+  for (const [, , path] of fonts.matchAll(/url\(\s*(["']?)(.*?)\1\s*\)/gi)) {
+    if (!/^fonts\/[^/\\]+\.woff2$/.test(path)) throw new Error(`front: expected a font file in fonts.css, got ${path}`);
+    fontFiles.add(path);
+  }
+  return { html, ids: frontIds(data), links, fontFiles };
+}
+
+export function renderFront(root) {
+  return frontPage(root).html;
 }

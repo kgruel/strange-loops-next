@@ -89,6 +89,17 @@ const MUTANTS = [
   ["a document link to a missing heading", "ROADMAP.md", (s) => s + "\n[Decision](DECISIONS.md#missing-decision-heading)\n"],
   ["a document link to a missing repository path", "notes/retained-boundaries.md", (s) => s + "\n[Protocol](../protocol/missing-boundary.md)\n"],
   ["an unsupported document block", "CHANGELOG.md", (s) => s + "\n> A quoted ruling.\n"],
+  ["a front-page ruling linking to a missing section", "design/front/decisions.mjs",
+    swap("[Changelog](CHANGELOG.md)", "[Changelog](CHANGELOG.md#missing-ruling)")],
+  ["a board item naming a decision that is not open", "design/front/grammar.json",
+    json((g) => { g.board.open[0].decisions.push("IS999"); })],
+  ["an unclosed guide marker", "GUIDE.md", (s) => s + "\n<!-- guide:stepper -->\n"],
+  ["a stylesheet naming a missing font", "design/front/fonts.css",
+    swap("fonts/inter-normal-latin.woff2", "fonts/missing.woff2")],
+  ["a front-page tip linking to a missing card", "design/front/data/grammar-presentation.json",
+    swap("#is3", "#ev-no-such-law")],
+  ["an incoming link to a missing front-page noun", "design/rethink/top.html",
+    (s) => s + '<a href="../#n-no-such-noun">Noun</a>\n'],
 ];
 
 // What the build can't know, and why.

@@ -21,8 +21,8 @@ The long design notes are in [notes/](notes/).
 | `vectors/` | Model-written protocol fixtures and independent standards data. Every implementation checks all families. |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/lens.md`](protocol/lens.md) the lens contract, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | Independent JS writer (`loops.mjs`) and readers. Reader modules: `fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`. |
-| `design/` | Page sources. `rethink/` holds the design and ledger. `grammar/` holds words and the walk. `laws/` holds law metadata. `evidence/` shows evidence. `decisions/` renders the working documents. `build.mjs` renders all five. |
-| `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/`, `out/decisions/` | the pages, written by `node design/build.mjs`, never by hand. They are not kept in the repository: the build writes them when a merge is published |
+| `design/` | Page sources. `front/` holds the front page. `rethink/` holds the design and ledger. `grammar/` holds words and the walk. `laws/` holds law metadata. `evidence/` shows evidence. `decisions/` renders the working documents. |
+| `out/index.html`, `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/`, `out/decisions/` | the pages, written by `node design/build.mjs`, never by hand. They are not kept in the repository: the build writes them when a merge is published |
 
 `rust/` contains the implemented pure core and fixture evaluator; see [`rust/PORTING.md`](rust/PORTING.md).
 It also holds the first product slice: a directory place and the `loops` CLI, for one person; see [`rust/PLACE.md`](rust/PLACE.md).
@@ -79,6 +79,9 @@ node interop/js/check.mjs vectors   # the JS implementation passes every vector
 ```
 
 ## The design page
+
+The build writes the front page from `design/front/` to `out/index.html`, with its typefaces in `out/fonts/`.
+Its five views bring the grammar, decisions, guide, laws and evidence together at the site's root.
 
 The design walk ("Strange Loops Rethink") uses `design/rethink/`.
 Each tab has an HTML file under `sections/`; `ledger.json` holds decision records.

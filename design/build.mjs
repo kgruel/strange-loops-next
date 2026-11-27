@@ -13,6 +13,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderDecisions } from "./decisions/render.mjs";
 import { renderEvidence } from "./evidence/render.mjs";
+import { frontPage } from "./front/render.mjs";
 import { renderGrammar } from "./grammar/render.mjs";
 import { fill } from "./page.mjs";
 import { renderLaws } from "./laws/render.mjs";
@@ -71,9 +72,12 @@ ${body}</body>
 
 const args = process.argv.slice(2);
 const at = args.indexOf("--fragment");
+const frontFile = join(root, "out", "index.html");
+const front = at < 0 ? frontPage(root) : null;
 const outputs = at >= 0
   ? [[args[at + 1], fragment]]
-  : [[join(root, "out", "rethink", "index.html"), full],
+  : [[frontFile, front.html],
+     [join(root, "out", "rethink", "index.html"), full],
      [join(root, "out", "grammar", "index.html"), renderGrammar(root)],
      [join(root, "out", "laws", "index.html"), renderLaws(root)],
      [join(root, "out", "evidence", "index.html"), renderEvidence(root)],
@@ -86,18 +90,22 @@ if (at < 0) {
   const rethink = join(root, "out", "rethink", "index.html");
   for (const [file, text] of outputs) {
     const markup = text.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
-    const ids = [...markup.matchAll(/<[\w:-]+\b[^<>]*?\sid="([^"]+)"/g)].map((m) => m[1]);
+    const ids = [...markup.matchAll(/<[\w:-]+\b[^<>]*?\sid\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/gi)].map((m) => m[1] ?? m[2] ?? m[3]);
     if (file === rethink) {
       for (const [, sub] of markup.matchAll(/class="subpanel" id="([^"]+)"/g)) ids.push(`horizons/${sub}`);
     }
-    const links = [...markup.matchAll(/<a\b[^<>]*?\shref="([^"]*)"/g)].map((m) => m[1].replaceAll("&quot;", '"').replaceAll("&amp;", "&"));
+    const links = [...markup.matchAll(/<a\b[^<>]*?\shref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi)].map((m) => m[1] ?? m[2] ?? m[3]);
+    if (file === frontFile) {
+      ids.push(...front.ids);
+      links.push(...front.links);
+    }
     if (file === join(root, "out", "grammar", "index.html"))
       links.push(...[...text.matchAll(/"(law-[a-z0-9-]+)"/g)].map((m) => `../laws/#${m[1]}`));
-    pages.set(file, { ids: new Set(ids), links: new Set(links) });
+    pages.set(file, { ids: new Set(ids), links: new Set(links.map((href) => href.replaceAll("&quot;", '"').replaceAll("&amp;", "&"))) });
   }
   for (const [file, , sources] of outputs) {
     for (const href of pages.get(file).links) {
-      if (/^https?:\/\//i.test(href)) continue;
+      if (/^(?:https?:\/\/|mailto:)/i.test(href)) continue;
       const [, path, fragment] = href.match(/^([^#]*)(?:#(.*))?$/);
       const origin = sources?.get(href) ?? `${file}: link ${href}`;
       let dest, id;
@@ -109,6 +117,9 @@ if (at < 0) {
       if (!target || (id && !target.ids.has(id))) throw new Error(`${origin}: no target for ${href}`);
     }
   }
+  // Read every font before publishing anything, even if an older copy is in out/.
+  for (const path of front.fontFiles)
+    outputs.push([join(root, "out", path), readFileSync(join(root, "design", "front", path))]);
 }
 for (const [file, text] of outputs) {
   if (!file) throw new Error("--fragment needs a path");
