@@ -164,7 +164,7 @@ export const SITE = {
   url: "https://strangeloops.dev/",
   name: "Strange Loops",
   title: "Strange Loops: a system for focusing attention",
-  description: "Strange Loops is a system for focusing attention. People and programs write what they saw as signed records that never change. Standing questions fold those records into what matters now, and what you do with the answer becomes new records.",
+  description: "Most software stores conclusions: a row that says the world is so, which nobody witnessed. Strange Loops stores the evidence, what each observer saw, signed, and works the conclusions out when someone looks. A system for focusing attention.",
   // The picture a link preview shows: design/front/og.png, drawn from card.html beside it.
   card: { path: "og.png", width: 1200, height: 630, alt: "Strange Loops: a system for focusing attention." },
   repository: "https://github.com/kgruel/strange-loops-next",
