@@ -22,7 +22,7 @@ The long design notes are in [notes/](notes/).
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/lens.md`](protocol/lens.md) the lens contract, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | Independent JS writer (`loops.mjs`) and readers. Reader modules: `fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`. |
 | `design/` | Page sources. `rethink/` holds the design and ledger. `grammar/` holds words and the walk. `laws/` holds law metadata. `evidence/` shows evidence. `decisions/` renders the working documents. `build.mjs` renders all five. |
-| `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/`, `out/decisions/` | the pages, written by `node design/build.mjs`, never by hand |
+| `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/`, `out/decisions/` | the pages, written by `node design/build.mjs`, never by hand. They are not kept in the repository: the build writes them when a merge is published |
 
 `rust/` contains the implemented pure core and fixture evaluator; see [`rust/PORTING.md`](rust/PORTING.md).
 It also holds the first product slice: a directory place and the `loops` CLI, for one person; see [`rust/PLACE.md`](rust/PLACE.md).
@@ -85,7 +85,7 @@ Each tab has an HTML file under `sections/`; `ledger.json` holds decision record
 Shared files are `styles.css`, `app.js`, `head.html` and `top.html`. Edit those, then:
 
 ```sh
-node design/build.mjs       # writes out/rethink/index.html; commit it with the source
+node design/build.mjs       # writes the pages under out/, which git ignores
 ```
 
 Four more pages share a shell (`design/page.mjs`, `design/register.css`).
@@ -129,10 +129,10 @@ The grammar and laws pages load Motion, a pinned CDN library.
 They publish only at `https://strangeloops.dev/grammar/` and `/laws/`, without artifact mirrors.
 The site sync publishes evidence at `/evidence/` and the working documents at `/decisions/`.
 
-CI rebuilds every page and fails if `out/` differs, as with the vectors. To publish:
+CI builds every page twice and fails if the two builds differ. The pages are built again from `main` when a merge is published, so a hosted page is the build of a commit and can be made again from it. To publish:
 
 * **The site:** in the `projects.gruel.world` repository, `npm run sync:strange-loops`
-  snapshots the committed page (it refuses uncommitted output), then push its
+  snapshots the pages built from the checked-out commit (run `node design/build.mjs` first), then push its
   `main`. It is served unlisted, with `noindex`, at
   `https://strangeloops.dev/rethink/`. Addresses under
   `projects.gruel.world/strange-loops/` redirect there.
