@@ -163,8 +163,10 @@ function* dataLinks(value) {
 export const SITE = {
   url: "https://strangeloops.dev/",
   name: "Strange Loops",
-  title: "Strange Loops: signed records, and everything else worked out from them",
-  description: "Strange Loops keeps what people and programs said as signed records that never change, and works everything else out from them. The grammar, a guide to the loops command, the laws, the evidence behind them, and the decisions still open.",
+  title: "Strange Loops: a system for focusing attention",
+  description: "Strange Loops is a system for focusing attention. People and programs write what they saw as signed records that never change. Standing questions fold those records into what matters now, and what you do with the answer becomes new records.",
+  // The picture a link preview shows: design/front/og.png, drawn from card.html beside it.
+  card: { path: "og.png", width: 1200, height: 630, alt: "Strange Loops: a system for focusing attention." },
   repository: "https://github.com/kgruel/strange-loops-next",
 };
 const attr = (s) => s.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
@@ -184,7 +186,11 @@ export function headOf() {
 <meta property="og:title" content="${attr(SITE.title)}">
 <meta property="og:description" content="${attr(SITE.description)}">
 <meta property="og:url" content="${SITE.url}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="${SITE.url}${SITE.card.path}">
+<meta property="og:image:width" content="${SITE.card.width}">
+<meta property="og:image:height" content="${SITE.card.height}">
+<meta property="og:image:alt" content="${attr(SITE.card.alt)}">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">${JSON.stringify(ld).replaceAll("<", "\\u003c")}</script>
 `;
 }
@@ -236,7 +242,8 @@ ${body}</body>
     links.push("#ev-" + id.replace(/^law-/, ""));
   for (const { pr } of data.get("E_LAWS")) if (pr)
     links.push("#prem-" + pr.replace(/[^a-z0-9]+/gi, "-").toLowerCase());
-  const fontFiles = new Set(["fonts/LICENSES.md"]);
+  // Files copied beside the page as they are: the typefaces, their licence note and the card.
+  const fontFiles = new Set(["fonts/LICENSES.md", SITE.card.path]);
   for (const [, , path] of fonts.matchAll(/url\(\s*(["']?)(.*?)\1\s*\)/gi)) {
     if (!/^fonts\/[^/\\]+\.woff2$/.test(path)) throw new Error(`front: expected a font file in fonts.css, got ${path}`);
     fontFiles.add(path);
