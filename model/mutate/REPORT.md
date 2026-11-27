@@ -248,7 +248,7 @@ A shard exits 1 when an entry errors, so the CI jobs show as failed with their r
 Since then the CI job gives each command 600 seconds, or `MUTATION_TIMEOUT`.
 
 ```sh
-echo '{"ref":"main","variables":[{"key":"MUTATION_FULL","value":"1"}]}' | glab api -X POST projects/kaygee%2Fstrange-loops-next/pipeline --input - -H "Content-Type: application/json"
+echo '{"ref":"main","variables":[{"key":"MUTATION_FULL","value":"1"}]}' | glab api -X POST projects/strange-loops%2Fstrange-loops-next/pipeline --input - -H "Content-Type: application/json"
 python3 interop/fuzz/summarize.py mutation /tmp/joined-mutants.json mutations-d8c
 ```
 
