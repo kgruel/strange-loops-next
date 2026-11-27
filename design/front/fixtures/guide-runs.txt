@@ -1,0 +1,785 @@
+Commands and outputs of runs made with loops 0.1.1, as the guide recorded them (GUIDE.md at e778315).
+The guide test requires each of the guide's code blocks to be found here.
+
+GUIDE.md:24
+```sh
+loops whoami --init      # make this machine's signing key, once
+mkdir -p pottery/workshop && cd pottery/workshop
+loops init               # make .loops/ here
+```
+
+GUIDE.md:32
+```json
+{
+  "version": 2,
+  "kinds": {
+    "kiln": { "key": "name" }
+  }
+}
+```
+
+GUIDE.md:43
+```sh
+loops emit kiln name=east status=cold cone:=6
+loops emit kiln name=east status=firing
+```
+
+GUIDE.md:50
+```
+$ loops of kiln:east --plain
+thing  kiln:east  east
+records  2
+heads  1
+  cone  6
+  name  east
+  status  firing
+about  —
+head  r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0
+  emitted  now
+  occurred  —
+```
+
+GUIDE.md:66
+```json
+{
+  "env": {
+    "emitted": "2026-11-26T01:36:30.719Z",
+    "kind": "kiln",
+    "observer": "k:r6n9026n2at0toq9frtcpuffc02071iar6cioipipbolcb0qd4fg",
+    "of": "kiln:east",
+    "prev": ["r:29oqd4cm2eua2gg09kp2aqtvnt61tu3e0iuk91u8s8ev3l7qrl70"],
+    "sets": ["name", "status"]
+  },
+  "id": "r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0",
+  "payload": { "name": "east", "status": "firing" },
+  "salt": "kla6osph4bbsnt79v7frbj8ok8",
+  "sig": { "ed25519": "pf33fodm…", "key": "k:r6n9026n…" }
+}
+```
+
+GUIDE.md:242
+```json
+{
+  "version": 2,
+  "note": "The workshop: its kilns, its potters and what was decided.",
+  "kinds": {
+    "kiln": {
+      "note": "A kiln, keyed by where it stands.",
+      "key": "name",
+      "refs": { "keeper": ["potter"], "evidence": [] },
+      "lifecycle": {
+        "field": "status",
+        "active": ["cold", "firing", "cooling"],
+        "closed": ["retired"]
+      },
+      "preview": ["status", "cone", "keeper"]
+    },
+    "potter": {
+      "key": "name"
+    },
+    "decision": {
+      "note": "A decision, revised whole.",
+      "key": "slug",
+      "headline": "text",
+      "refs": { "governs": ["kiln"] }
+    },
+    "edge": {
+      "note": "One thing per link that has facts of its own.",
+      "refs": { "from": [], "to": [] },
+      "lifecycle": { "field": "state", "active": ["active"], "closed": ["removed"] }
+    }
+  }
+}
+```
+
+GUIDE.md:278
+```json
+{
+  "version": 2,
+  "note": "What happened in the yard.",
+  "kinds": {
+    "firing": {
+      "note": "One firing of one kiln. An event: written once, never revised.",
+      "headline": "text",
+      "refs": { "kiln": ["kiln"], "potter": ["potter"] },
+      "every_write": ["kiln", "cone"]
+    }
+  }
+}
+```
+
+GUIDE.md:333
+```sh
+cd ..                    # into pottery/
+loops -C yard init
+```
+
+GUIDE.md:338
+```json
+{
+  "workshop": "workshop",
+  "yard": "yard"
+}
+```
+
+GUIDE.md:351
+```sh
+loops --in workshop emit potter name=ada
+loops --in workshop emit kiln name=east keeper=potter:ada
+loops --in workshop emit kiln name=west status=cold cone:=10 keeper=potter:ada
+```
+
+GUIDE.md:359
+```
+$ loops --in yard emit firing kiln=kiln:east cone:=6 potter=potter:ada \
+    --occurred 2026-11-25T09:00:00Z "Glaze firing, slow cool"
+writing --in yard to ~/pottery/yard (bound by ~/pottery/stores.json)
+r:hnqjpebho38j42fs4indjt33e456srag15oq15dum8309ef15ab0
+```
+
+GUIDE.md:370
+```sh
+loops --in yard emit firing kiln=kiln:west cone:=10 potter=potter:ada \
+  --occurred 2026-11-24 "Stoneware, full load"
+```
+
+GUIDE.md:377
+```sh
+loops --in workshop emit kiln name=east status=cooling \
+  evidence=r:hnqjpebho38j42fs4indjt33e456srag15oq15dum8309ef15ab0
+```
+
+GUIDE.md:384
+```sh
+loops --in workshop emit decision slug=slow-cool governs=kiln:east \
+  "Cool the east kiln slowly after a glaze firing."
+loops --in workshop emit decision slug=slow-cool --whole \
+  governs:='["kiln:east","kiln:west"]' "Cool every kiln slowly after a glaze firing."
+```
+
+GUIDE.md:393
+```sh
+loops --in workshop emit edge --of edge:vents-into:east:west \
+  --about kiln:east --about kiln:west \
+  rel=vents-into from=kiln:east to=kiln:west state=active
+```
+
+GUIDE.md:401
+```sh
+loops --in workshop emit kiln name=east --add-about yard:north
+```
+
+GUIDE.md:446
+```
+$ loops --in workshop ls --plain
+KIND      RECORDS
+decision  2
+edge      1
+kiln      6
+potter    1
+
+$ loops --in workshop ls --things --plain
+THING                      HEAD KINDS  RECORDS  HEADS  HEADLINE
+decision:slow-cool         decision    2        1      Cool every kiln slowly after a glaze firing.
+edge:vents-into:east:west  edge        1        1      —
+kiln:east                  kiln        5        1      east
+kiln:west                  kiln        1        1      west
+potter:ada                 potter      1        1      ada
+```
+
+GUIDE.md:467
+```
+$ loops --in workshop ls kiln: --active --plain
+active  {"closed":["retired"],"field":"status","kind":"kiln"}
+THING      HEAD KINDS  RECORDS  HEADS  status   cone  keeper
+kiln:east  kiln        5        1      cooling  6     potter:ada
+kiln:west  kiln        1        1      cold     10    potter:ada
+
+$ loops --in workshop ls kiln: --fields status,cone --plain
+THING      HEAD KINDS  RECORDS  HEADS  status   cone
+kiln:east  kiln        5        1      cooling  6
+kiln:west  kiln        1        1      cold     10
+```
+
+GUIDE.md:482
+```
+$ loops --in workshop of kiln:east --plain
+thing  kiln:east  east
+records  5
+heads  1
+  cone  6
+  evidence  r:hnqjpebho38j42fs4indjt33e456srag15oq15dum8309ef15ab0
+  keeper  potter:ada
+  name  east
+  status  cooling
+about  yard:north
+head  r:ms1a8oju9jutpjlg9vvqejbnjgpukgov0mjg3s45c104emp3kl7g
+  emitted  now
+  occurred  —
+```
+
+GUIDE.md:500
+```
+live  r:ms1a8oju9jutpjlg9vvqejbnjgpukgov0mjg3s45c104emp3kl7g
+  emitted  now
+  keys  name
+  about  yard:north
+  payload
+    name  east
+live  r:1idg81qag4656daodnjcv534sh19g0ncth9oejlg037fr73aufvg
+  emitted  now
+  keys  evidence status
+  about  —
+  payload
+    evidence  r:hnqjpebho38j42fs4indjt33e456srag15oq15dum8309ef15ab0
+    name  east
+    status  cooling
+live  r:5qt0buogksmmlqc9j9v344vf2hpsbp1cl3vvjgo584gbcm1ph560
+  emitted  now
+  keys  keeper
+  about  —
+  payload
+    keeper  potter:ada
+    name  east
+live  r:29oqd4cm2eua2gg09kp2aqtvnt61tu3e0iuk91u8s8ev3l7qrl70
+  emitted  now
+  keys  cone
+  about  —
+  payload
+    cone  6
+    name  east
+    status  cold
+```
+
+GUIDE.md:534
+```
+$ loops --group ls --refers-to kiln:east --plain
+target  kiln:east
+things  3
+  decision:slow-cool
+  edge:vents-into:east:west
+  r:hnqjpebho38j42fs4indjt33e456srag15oq15dum8309ef15ab0
+stores  2
+  ~/pottery/workshop
+  ~/pottery/yard
+KIND      FIELD     DESCRIPTION
+decision  governs   ~/pottery/workshop/.loops/store.json
+edge      from      ~/pottery/workshop/.loops/store.json
+edge      to        ~/pottery/workshop/.loops/store.json
+firing    kiln      ~/pottery/yard/.loops/store.json
+firing    potter    ~/pottery/yard/.loops/store.json
+kiln      evidence  ~/pottery/workshop/.loops/store.json
+kiln      keeper    ~/pottery/workshop/.loops/store.json
+things_not_read  0
+values_not_typed  0
+fields_read  7
+```
+
+GUIDE.md:575
+```json
+{
+  "vertex": "overview",
+  "from": [
+    { "store": "workshop", "kind": ["kiln"] },
+    { "store": "yard", "kind": ["firing"] }
+  ],
+  "fold": {
+    "kilns": {
+      "latest-by": "of",
+      "follow": "keys",
+      "where": { "env.kind": { "is": "kiln" } }
+    },
+    "kilns_by_status": {
+      "count": true,
+      "follow": "keys",
+      "where": { "env.kind": { "is": "kiln" } },
+      "by": "status"
+    },
+    "firings": {
+      "count": true,
+      "where": { "env.kind": { "is": "firing" } }
+    },
+    "hottest": {
+      "max": "cone",
+      "where": { "env.kind": { "is": "firing" } }
+    },
+    "this_week": {
+      "collect": true,
+      "limit": 5,
+      "where": {
+        "env.kind": { "is": "firing" },
+        "env.when": { "at-least": "2026-11-23", "below": "2026-11-30" }
+      }
+    }
+  }
+}
+```
+
+GUIDE.md:614
+```
+$ loops --in workshop read overview --plain
+kilns
+  thing  kiln:east  east
+    heads
+      r:ms1a8oju
+    setters  evidence
+      r:1idg81qa
+    setters  keeper
+      r:5qt0buog
+    setters  name
+      r:ms1a8oju
+    setters  status
+      r:1idg81qa
+    whole
+      r:29oqd4cm
+  thing  kiln:west  west
+    heads
+      r:toj639q1
+    whole
+      r:toj639q1
+kilns_by_status
+  group  cold  1
+  group  cooling  1
+  0 ungrouped
+  0 not read
+firings  2
+hottest  10
+this_week
+  r:hnqjpebh
+  r:dvmeq3fl
+```
+
+GUIDE.md:683
+```
+$ loops --in workshop read overview --values \
+    | jq -c '.this_week.heads[] | {when: .env.occurred, kiln: .payload.kiln, cone: .payload.cone}'
+{"when":"2026-11-25T09:00:00Z","kiln":"kiln:east","cone":6}
+{"when":"2026-11-24","kiln":"kiln:west","cone":10}
+```
+
+GUIDE.md:692
+```
+$ echo '{"vertex":"cited","from":[{"store":"workshop","kind":["kiln"]}],
+    "fold":{"cited":{"collect":true,"where":{"evidence":{"present":true}}}}}' \
+    | loops --in workshop fold - --plain
+cited
+  r:1idg81qa
+```
+
+GUIDE.md:706
+```json
+{
+  "vertex": "kilns",
+  "from": [{ "store": ".", "kind": ["kiln"] }],
+  "fold": {
+    "kilns": { "latest-by": "of", "follow": "keys" }
+  }
+}
+```
+
+GUIDE.md:718
+```
+$ loops --in workshop tick kilns
+r:eikik4k8tgt20rjeu6dn7pjak0ebmevn7b40golo7mcv2vg9675g
+
+$ loops --in workshop tick --check r:eikik4k8tgt20rjeu6dn7pjak0ebmevn7b40golo7mcv2vg9675g
+{"answer":"same","closure":"yes","taken-not-covered":0}
+```
+
+GUIDE.md:749
+```
+$ loops --in workshop emit kiln name=west cone:=9 --base r:eikik4k8tgt20rjeu6dn7pjak0ebmevn7b40golo7mcv2vg9675g
+r:692j0e96fthh361m83oj5l2ld1dea1r0o42tjh8656ldo54iecvg
+
+$ loops --in workshop emit kiln name=west cone:=8 --base r:eikik4k8tgt20rjeu6dn7pjak0ebmevn7b40golo7mcv2vg9675g
+r:q5lh0mv1ne20a9nhtj42utdns2nkpj0vs6a46brma61cljkbcrk0
+
+$ loops --in workshop of kiln:west --plain
+thing  kiln:west  conflict (2): west | west
+records  3
+heads  2
+  cone  conflict (2): 8 | 9
+  keeper  potter:ada
+  name  conflict (2): west | west
+  status  cold
+about  —
+head  r:q5lh0mv1ne20a9nhtj42utdns2nkpj0vs6a46brma61cljkbcrk0
+  emitted  now
+  occurred  —
+head  r:692j0e96fthh361m83oj5l2ld1dea1r0o42tjh8656ldo54iecvg
+  emitted  now
+  occurred  —
+```
+
+GUIDE.md:775
+```
+$ echo '{"vertex":"cones","from":[{"store":"workshop","kind":["kiln"]}],"fold":{
+    "cone_8":{"count":true,"follow":"keys","where":{"cone":{"is":8}}},
+    "total":{"sum":"cone","follow":"keys"}}}' | loops --in workshop fold -
+{"cone_8":{"unread":1,"value":0},"total":{"unread":1,"value":6}}
+```
+
+GUIDE.md:784
+```
+$ loops --in workshop tick --check r:eikik4k8tgt20rjeu6dn7pjak0ebmevn7b40golo7mcv2vg9675g
+{"answer":"same","closure":"yes","taken-not-covered":2}
+```
+
+GUIDE.md:791
+```
+$ loops --in workshop emit kiln name=west cone:=8
+r:ipse8r6aog7p271m3c6hikiivavj61m0h5rm8vfbfv8924ld6gqg
+
+$ loops --in workshop of kiln:west --plain
+thing  kiln:west  west
+records  4
+heads  1
+  cone  8
+  keeper  potter:ada
+  name  west
+  status  cold
+about  —
+head  r:ipse8r6aog7p271m3c6hikiivavj61m0h5rm8vfbfv8924ld6gqg
+  emitted  now
+  occurred  —
+```
+
+GUIDE.md:817
+```
+$ cat firings.jsonl
+{"kind":"firing","occurred":"2026-11-20","payload":{"kiln":"kiln:east","cone":6,"text":"Bisque"}}
+{"kind":"firing","occurred":"2026-11-21","payload":{"kiln":"kiln:west","cone":10,"text":"Stoneware"}}
+
+$ loops --in yard emit - < firings.jsonl
+{"records":[{"id":"r:cogi1h86ac7ka94q88igsm0ofmc9877vj43d86lnrn6vgi7ssc1g"},{"id":"r:lhifir1k14afjh16nn90oald2epvj1nu1u24b8g3jemkpo0fuh30"}]}
+```
+
+GUIDE.md:828
+```
+$ cat revisions.jsonl
+{"kind":"kiln","of":"kiln:east","payload":{"status":"cold"}}
+{"kind":"kiln","of":"kiln:east","payload":{"cone":7}}
+
+$ loops --in workshop emit - --fill < revisions.jsonl
+{"records":[{"id":"r:rd892rg3cglcp0tsp0n9t8ipk7e2rvnlgpkccnjck9kpvoc32u80"},{"id":"r:i7ak43deiedtlb4hvt1mbeol18qbr2fksbje032v6f1dnbp59700"}]}
+```
+
+GUIDE.md:841
+```
+$ loops --in yard erase r:cogi1h86ac7ka94q88igsm0ofmc9877vj43d86lnrn6vgi7ssc1g "Logged against the wrong kiln"
+{"id":"r:6ekpq7hp46p08eu8tg916c7jqojr6kb26ush2ndaj09bf7d4c7d0","openings-removed":1}
+```
+
+GUIDE.md:848
+```
+$ echo '{"vertex":"firings","from":[{"store":"yard","kind":["firing"]}],"fold":{
+    "firings":{"count":true},
+    "hottest":{"max":"cone"},
+    "east":{"count":true,"where":{"kiln":{"is":"kiln:east"}}}}}' | loops --in yard fold -
+{"east":{"unread":1,"value":1},"firings":{"unread":0,"value":4},"hottest":{"unread":1,"value":10}}
+```
+
+GUIDE.md:862
+```
+$ loops --group describe --plain
+…
+store  ~/pottery/yard
+description  version 2
+note  What happened in the yard.
+…
+fit
+KIND     DECLARED  THINGS
+erasure  false     1
+firing   true      4
+firing references
+FIELD   HERE  ELSEWHERE IN SELECTED GROUP  OUTSIDE SELECTED GROUP  NOT TYPED  NOT READ  WITHOUT MENTION  UNLISTED PREFIX  THINGS UNSET
+kiln    0     3                            0                       0          1         3                0                0
+potter  0     2                            0                       0          1         2                0                1
+firing every write
+FIELD  RECORDS MISSING  RECORDS NOT READ
+cone   0                1
+kiln   0                1
+```
+
+GUIDE.md:899
+```
+$ loops --in workshop of kiln:east | jq -c .values
+{"cone":7,"evidence":"r:hnqjpebho38j42fs4indjt33e456srag15oq15dum8309ef15ab0","keeper":"potter:ada","name":"east","status":"cold"}
+```
+
+GUIDE.md:930
+```sh
+loops -C book init
+```
+
+GUIDE.md:936
+```json
+{
+  "workshop": "workshop",
+  "yard": "yard",
+  "book": "book"
+}
+```
+
+GUIDE.md:946
+```json
+{
+  "version": 2,
+  "note": "A short history of the workshop, and what it was written from.",
+  "kinds": {
+    "passage": {
+      "note": "One passage of the book, revised whole.",
+      "key": "slug",
+      "headline": "title",
+      "refs": { "rests_on": [] },
+      "lifecycle": { "field": "status", "active": ["draft", "final"], "closed": ["cut"] },
+      "preview": ["chapter", "seq", "status", "title"],
+      "every_write": ["title", "chapter", "seq", "status", "text"]
+    },
+    "source": {
+      "note": "Something the book draws on: a memory, a letter, a record. An event: written once.",
+      "headline": "text"
+    }
+  }
+}
+```
+
+GUIDE.md:977
+```
+$ loops --in book emit source --about kiln:east --about potter:ada --occurred 2019 \
+    "Ada: the east kiln came second-hand from a school that was closing. We paid for the van and nothing else."
+r:jtuu78n767j4kobna2bg8gmo7mrm6h9fc6slkf1kqibe62d1ml10
+
+$ loops --in book emit source --about kiln:east --occurred 2019-11 \
+    "The first firing cracked a shelf at cone 6. Nobody had checked the kiln wash."
+r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og
+
+$ loops --in book emit source --about kiln:west --occurred 2023-04 \
+    "The west kiln was built on site over one spring, to fire stoneware."
+r:jathpduf691r39o202posg8blpmhrga2fvo4e9rokom13hugl9ig
+```
+
+GUIDE.md:997
+```
+$ loops --in book emit passage slug=a-kiln-from-a-school title="A kiln from a school" \
+    chapter:=1 seq:=1 status=draft \
+    rests_on:='["r:jtuu78n767j4kobna2bg8gmo7mrm6h9fc6slkf1kqibe62d1ml10"]' \
+    "The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van."
+r:22drglmlnmngikuuqahfcm8r6d2iqclrl5h4l96jtrisdhpjpkk0
+
+$ loops --in book emit passage slug=the-cracked-shelf title="The cracked shelf" \
+    chapter:=1 seq:=2 status=draft \
+    rests_on:='["r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og"]' \
+    "Its first firing cracked a shelf at cone 6."
+r:v5vioj83ubi7gu3flo3f9gns8b8tges6g1e08d3cvtn4qp3280og
+
+$ loops --in book emit passage slug=building-west title="Building the west kiln" \
+    chapter:=2 seq:=1 status=draft \
+    rests_on:='["r:jathpduf691r39o202posg8blpmhrga2fvo4e9rokom13hugl9ig"]' \
+    "The west kiln was built on site, over one spring, to fire stoneware."
+r:7r7sbct28geksrpc99lnjbbhcv3c094vv8so2585ok1va24s3v30
+```
+
+GUIDE.md:1021
+```json
+{
+  "vertex": "manuscript",
+  "from": [{ "store": ".", "kind": ["passage"] }],
+  "fold": {
+    "passages": {
+      "latest-by": "of",
+      "follow": "prev",
+      "where": { "status": { "not": "cut" } }
+    },
+    "by_status": { "count": true, "follow": "prev", "by": "status" }
+  }
+}
+```
+
+GUIDE.md:1040
+```
+sort_by(.chapter, .seq)[]
+  | "\(.chapter).\(.seq)  \(.title)\n     \(.text)"
+```
+
+GUIDE.md:1047
+```
+$ loops --in book read manuscript --values \
+    | jq '[.passages.things[][].payload]' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     Its first firing cracked a shelf at cone 6.
+2.1  Building the west kiln
+     The west kiln was built on site, over one spring, to fire stoneware.
+```
+
+GUIDE.md:1060
+```
+$ loops --in book tick manuscript
+r:khh57rpd7fjrvp330vsi7l3bufo7qasphust2mqbd2i09fesm7tg
+```
+
+GUIDE.md:1071
+```sh
+loops --in book emit passage slug=the-cracked-shelf --whole \
+  --base-id r:v5vioj83ubi7gu3flo3f9gns8b8tges6g1e08d3cvtn4qp3280og \
+  title="The cracked shelf" chapter:=1 seq:=2 status=draft \
+  rests_on:='["r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og"]' \
+  "Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash."
+loops --in book emit passage slug=the-cracked-shelf --whole \
+  --base-id r:v5vioj83ubi7gu3flo3f9gns8b8tges6g1e08d3cvtn4qp3280og \
+  title="The cracked shelf" chapter:=1 seq:=2 status=draft \
+  rests_on:='["r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og"]' \
+  "The first firing went badly: a shelf cracked at cone 6."
+```
+
+GUIDE.md:1086
+```
+$ loops --in book read manuscript --plain
+passages
+  thing  passage:a-kiln-from-a-school
+    heads
+      r:22drglml
+  thing  passage:building-west
+    heads
+      r:7r7sbct2
+  thing  passage:the-cracked-shelf
+    heads
+      r:jfh669b4
+      r:knfkic8o
+by_status
+  group  draft  4
+  0 ungrouped
+  0 not read
+```
+
+GUIDE.md:1109
+```
+$ loops --in book read manuscript --values \
+    | jq '[.passages.things[][].payload]' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     The first firing went badly: a shelf cracked at cone 6.
+1.2  The cracked shelf
+     Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.
+2.1  Building the west kiln
+     The west kiln was built on site, over one spring, to fire stoneware.
+```
+
+GUIDE.md:1124
+```sh
+loops --in book emit passage slug=the-cracked-shelf --whole \
+  title="The cracked shelf" chapter:=1 seq:=2 status=draft \
+  rests_on:='["r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og"]' \
+  "The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash."
+```
+
+GUIDE.md:1135
+```
+$ loops --in book emit passage slug=a-kiln-from-a-school status=final
+emit passage slug=a-kiln-from-a-school status=final: missing every_write fields ["title","chapter","seq","text"]. State each field on this write, use --sets-nothing for a join with no payload fields, or use emit - for an exception.
+```
+
+GUIDE.md:1142
+```sh
+loops --in book emit passage slug=a-kiln-from-a-school --whole \
+  title="A kiln from a school" chapter:=1 seq:=1 status=final \
+  rests_on:='["r:jtuu78n767j4kobna2bg8gmo7mrm6h9fc6slkf1kqibe62d1ml10"]' \
+  "The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van."
+```
+
+GUIDE.md:1153
+```sh
+loops --in book emit passage slug=building-west --whole \
+  title="Building the west kiln" chapter:=2 seq:=1 status=cut \
+  rests_on:='["r:jathpduf691r39o202posg8blpmhrga2fvo4e9rokom13hugl9ig"]' \
+  "The west kiln was built on site, over one spring, to fire stoneware."
+```
+
+GUIDE.md:1162
+```
+$ loops --in book ls passage: --plain
+THING                         HEAD KINDS  RECORDS  HEADS  chapter  seq  status  title
+passage:a-kiln-from-a-school  passage     2        1      1        1    final   A kiln from a school
+passage:building-west         passage     2        1      2        1    cut     Building the west kiln
+passage:the-cracked-shelf     passage     4        1      1        2    draft   The cracked shelf
+
+$ loops --in book read manuscript --values \
+    | jq '[.passages.things[][].payload]' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash.
+```
+
+GUIDE.md:1183
+```
+$ for id in $(loops --in book get r:khh57rpd7fjrvp330vsi7l3bufo7qasphust2mqbd2i09fesm7tg \
+      | jq -r '.payload.result.passages.things[][]'); do
+    loops --in book get $id
+  done | jq -s 'map(.payload)' | jq -r -f print.jq
+1.1  A kiln from a school
+     The east kiln came second-hand, from a school that was closing in 2019. It cost the hire of a van.
+1.2  The cracked shelf
+     Its first firing cracked a shelf at cone 6.
+2.1  Building the west kiln
+     The west kiln was built on site, over one spring, to fire stoneware.
+```
+
+GUIDE.md:1198
+```
+$ loops --in book export --of passage:the-cracked-shelf | jq -r '.payload.text'
+Its first firing cracked a shelf at cone 6.
+Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.
+The first firing went badly: a shelf cracked at cone 6.
+The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash.
+```
+
+GUIDE.md:1208
+```
+$ loops --in book ls --refers-to r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og --plain
+target  r:vbql5s2dkpi9i5hisbcl5eq47qcend6idirrpp2jse3pu2jrm1og
+things  1
+  passage:the-cracked-shelf
+stores  1
+  ~/pottery/book
+KIND     FIELD     DESCRIPTION
+passage  rests_on  ~/pottery/book/.loops/store.json
+things_not_read  0
+values_not_typed  0
+fields_read  1
+```
+
+GUIDE.md:1226
+```json
+{
+  "vertex": "sources",
+  "from": [{ "store": ".", "kind": ["source"] }],
+  "fold": {
+    "per_kiln": { "count": true, "by": "env.about:kiln" },
+    "newest_first": { "collect": true, "limit": 10 }
+  }
+}
+```
+
+GUIDE.md:1237
+```
+$ loops --in book read sources --plain
+per_kiln
+  group  east  2
+  group  west  1
+  0 ungrouped
+  0 not read
+newest_first
+  r:jathpduf
+  r:vbql5s2d
+  r:jtuu78n7
+
+$ loops --in book read sources --values \
+    | jq -r '.newest_first.heads[] | "\(.env.occurred)  \(.payload.text)"'
+2023-04  The west kiln was built on site over one spring, to fire stoneware.
+2019-11  The first firing cracked a shelf at cone 6. Nobody had checked the kiln wash.
+2019  Ada: the east kiln came second-hand from a school that was closing. We paid for the van and nothing else.
+```

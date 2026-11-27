@@ -10,6 +10,7 @@ import { rewriteLink } from "../decisions/links.mjs";
 import { fill } from "../page.mjs";
 import { decisionsView, frontRewrite, readAround, readDecisions } from "./decisions.mjs";
 import { readEvidence } from "./evidence.mjs";
+import { guideConstants, readGuide } from "./guide.mjs";
 import { readLaws } from "./laws.mjs";
 
 // The working documents the decisions pages render, as design/decisions/render.mjs names them.
@@ -39,6 +40,7 @@ function onMap(root, name, model) {
 
 // name -> (root, model) => value.
 export const GENERATED = new Map([
+  ...guideConstants.map((name) => [name, (root, m) => m.guide.data[name]]),
   ["DEC", (root, m) => m.open.entries],
   ["DEC_AT", (root, m) => m.open.at],
   ["RULED", (root, m) => m.around.ruled],
@@ -62,18 +64,18 @@ export function frontData(root, model = decisions(root)) {
     if (GENERATED.has(name)) throw new Error(`front: ${name} is generated, so data/${f} must go`);
     data.set(name, JSON.parse(readFileSync(join(dir, f), "utf8")));
   }
-  const sources = { ...model, evidence: readEvidence(root), laws: readLaws(root) };
+  const sources = { ...model, guide: model.guide ?? readGuide(root), evidence: readEvidence(root), laws: readLaws(root) };
   for (const [name, make] of GENERATED) data.set(name, make(root, sources));
   return data;
 }
 
 export function renderFront(root) {
   const read = (f) => readFileSync(join(root, "design", "front", f), "utf8");
-  const model = decisions(root);
+  const model = { ...decisions(root), guide: readGuide(root) };
   const data = frontData(root, model);
   const used = new Set();
   // "<" is escaped so that no value can close the script element.
-  const script = read("app.js").replace(/\/\*data:([A-Z0-9_]+)\*\//g, (_, name) => {
+  const script = read("app.js").replace(/\/\*data:([A-Za-z0-9_]+)\*\//g, (_, name) => {
     if (!data.has(name)) throw new Error(`front: the script reads ${name} and nothing provides it`);
     if (used.has(name)) throw new Error(`front: the script defines ${name} twice`);
     used.add(name);
@@ -82,6 +84,7 @@ export function renderFront(root) {
   for (const name of data.keys()) if (!used.has(name)) throw new Error(`front: ${name} is provided and the script does not read it`);
   let body = read("shell.html");
   body = fill(body, "view-decisions", decisionsView(model.open, model.around));
+  body = fill(body, "view-guide", model.guide.html);
   body = fill(body, "styles", `<style>\n${read("fonts.css")}${read("styles.css")}</style>\n`);
   body = fill(body, "script", `<script>\n${script}</script>\n`);
   const base = readFileSync(join(root, "design", "rethink", "base.css"), "utf8").trimEnd();
