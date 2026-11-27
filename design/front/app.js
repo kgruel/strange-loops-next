@@ -47,35 +47,28 @@ const ISSHORT = /*data:ISSHORT*/;
 
 /* ---------- Guide data ---------- */
 const G_ANNOT = /*data:G_ANNOT*/;
+const G_DIAGRAMS = /*data:G_DIAGRAMS*/;
 
 // The ten minutes, as drawn. Ids and fields are the guide's own.
 const G_FIRST = /*data:G_FIRST*/;
+const G_STEP_NOTES = /*data:G_STEP_NOTES*/;
 
 // The three cases of sets. Drawn by hand to show the rule.
 const G_SETS = /*data:G_SETS*/;
 
 const G_SHAPES = /*data:G_SHAPES*/;
+const G_SHAPE_LABELS = /*data:G_SHAPE_LABELS*/;
 const G_SHAPE_KINDS = /*data:G_SHAPE_KINDS*/;
 
 // The book, as print.jq prints it at each step.
 const P11 = /*data:P11*/;
-const P12a = ["1.2", "The cracked shelf", "Its first firing cracked a shelf at cone 6."];
-const P12b = ["1.2", "The cracked shelf", "The first firing went badly: a shelf cracked at cone 6."];
-const P12c = ["1.2", "The cracked shelf", "Its first firing cracked a shelf at cone 6. Nobody had checked the kiln wash."];
-const P12s = ["1.2", "The cracked shelf", "The first firing went badly: a shelf cracked at cone 6. Nobody had checked the kiln wash."];
+const P12a = /*data:P12a*/;
+const P12b = /*data:P12b*/;
+const P12c = /*data:P12c*/;
+const P12s = /*data:P12s*/;
 const P21 = /*data:P21*/;
-const G_BOOK = {
-  sources: { title: "The sources", sources: [
-    ["2019", "Ada: the east kiln came second-hand from a school that was closing. We paid for the van and nothing else."],
-    ["2019-11", "The first firing cracked a shelf at cone 6. Nobody had checked the kiln wash."],
-    ["2023-04", "The west kiln was built on site over one spring, to fire stoneware."],
-  ], cap: "Three events, each said once. The book has no passages yet." },
-  draft: { title: "The first draft", pages: [[P11], [P12a], [P21]], cap: "Three passages, one head each. The tick freezes this." },
-  fork: { title: "Two heads", pages: [[P11], [P12b, P12c], [P21]], two: 1, note: "Both versions of 1.2, each as written", cap: "A count by heads now says four drafts." },
-  settled: { title: "Settled", pages: [[P11], [P12s], [P21]], cap: "One ordinary write replaced both heads." },
-  null: { title: "What a status-only write would print", pages: [[["null.null", "null", "null"]], [P12s], [P21]], nul: 0, cap: "Not written: a record with only status=final is a head with no title, chapter or text." },
-  final: { title: "The book now", pages: [[P11], [P12s], [P21]], cut: 2, finalAt: 0, cap: "1.1 is final. 2.1 is cut, so the book leaves it out." },
-};
+const G_BOOK = /*data:G_BOOK*/;
+const G_BOOK_NOTES = /*data:G_BOOK_NOTES*/;
 
 (() => {
   "use strict";
@@ -1041,13 +1034,13 @@ const G_BOOK = {
       prev.disabled = i === 0;
       next.textContent = i === steps.length - 1 ? "Start again" : "Next step";
       let h = "";
-      if (i === 0) h = '<div class="fempty"><code>loops init</code> made <code>.loops/</code> here. The store holds no records yet.</div>';
-      else h = '<div class="fdesc"><code>.loops/store.json</code>: a <code>kiln</code> is named by its <code>name</code> field.</div>';
-      if (i === 1) h += '<div class="fempty">Still no records. The description only says what the records will mean.</div>';
+      if (i === 0) h = `<div class="fempty">${G_STEP_NOTES[0][0]}</div>`;
+      else h = `<div class="fdesc">${G_STEP_NOTES[1][0]}</div>`;
+      if (i === 1) h += `<div class="fempty">${G_STEP_NOTES[1][1]}</div>`;
       (S.recs || []).slice().reverse().forEach((k) => {
         h += card(G_FIRST[k], { head: S.head === k, dead: (S.dead || {})[k] || [], tag: k });
       });
-      if (S.dead) h += '<div class="fdesc">The faint fields are no longer read. The second record set them again, and the cone is still read from the first.</div>';
+      if (S.dead) h += `<div class="fdesc">${G_STEP_NOTES[3][0]}</div>`;
       store.innerHTML = h;
       if (S.read) {
         read.hidden = false;
@@ -1067,9 +1060,9 @@ const G_BOOK = {
     const fig = $("#headsfig");
     if (!fig) return;
     const panels = [
-      { t: "One head", s: "The usual case", n: [[28, 60], [80, 60], [132, 60]], e: [[1, 0], [2, 1]], h: [2] },
-      { t: "A fork", s: "Two heads, both kept", n: [[28, 60], [118, 28], [118, 92]], e: [[1, 0], [2, 0]], h: [1, 2] },
-      { t: "A join", s: "One record names both", n: [[22, 60], [76, 28], [76, 92], [134, 60]], e: [[1, 0], [2, 0], [3, 1], [3, 2]], h: [3] },
+      { t: G_DIAGRAMS.headsfig.labels[0][0], s: G_DIAGRAMS.headsfig.labels[0][1], n: [[28, 60], [80, 60], [132, 60]], e: [[1, 0], [2, 1]], h: [2] },
+      { t: G_DIAGRAMS.headsfig.labels[1][0], s: G_DIAGRAMS.headsfig.labels[1][1], n: [[28, 60], [118, 28], [118, 92]], e: [[1, 0], [2, 0]], h: [1, 2] },
+      { t: G_DIAGRAMS.headsfig.labels[2][0], s: G_DIAGRAMS.headsfig.labels[2][1], n: [[22, 60], [76, 28], [76, 92], [134, 60]], e: [[1, 0], [2, 0], [3, 1], [3, 2]], h: [3] },
     ];
     panels.forEach((P, pi) => {
       const d = document.createElement("div"); d.className = "hf";
@@ -1087,7 +1080,7 @@ const G_BOOK = {
     });
     const cap = document.createElement("p");
     cap.style.cssText = "grid-column:1/-1;font:400 13px/1.45 var(--sans)!important;color:var(--faint);margin:0!important;text-align:center";
-    cap.textContent = "Each arrow is prev: a record points at what it replaces. Filled circles are heads.";
+    cap.textContent = G_DIAGRAMS.headsfig.caption;
     fig.appendChild(cap);
   })();
 
@@ -1124,16 +1117,16 @@ const G_BOOK = {
     el.innerHTML = `<div class="flow">${boxes.map((b, k) => `${k ? '<span class="fa" aria-hidden="true"></span>' : ""}<div class="fl${b.ink ? " ink" : ""}"><b>${b.t}</b><span>${b.s}</span></div>`).join("")}</div>${back ? `<div class="flback"><span aria-hidden="true">↺</span>${back}</div>` : ""}`;
   }
   flow($("#judgefig"), [
-    { t: "Records", s: "Signed statements in the store" },
-    { t: "A fold", s: "Counts, sums and latest states, exactly" },
-    { t: "A person, a script or an agent", s: "Reads the fold and decides", ink: true },
-  ], "The decision is written back as a new record, under its own name, and can be folded like any other.");
+    { t: G_DIAGRAMS.judgefig.labels[0][0], s: G_DIAGRAMS.judgefig.labels[0][1] },
+    { t: G_DIAGRAMS.judgefig.labels[1][0], s: G_DIAGRAMS.judgefig.labels[1][1] },
+    { t: G_DIAGRAMS.judgefig.labels[2][0], s: G_DIAGRAMS.judgefig.labels[2][1], ink: true },
+  ], G_DIAGRAMS.judgefig.caption);
   flow($("#turnfig"), [
-    { t: "Tick", s: "<code>loops tick &lt;vertex&gt;</code>" },
-    { t: "Read", s: "<code>loops read &lt;vertex&gt; --values</code>" },
-    { t: "Decide", s: "The agent's own work", ink: true },
-    { t: "Write back", s: "<code>--base &lt;tick id&gt;</code>" },
-  ], "The record says which tick it was decided from.");
+    { t: G_DIAGRAMS.turnfig.labels[0][0], s: G_DIAGRAMS.turnfig.labels[0][1] },
+    { t: G_DIAGRAMS.turnfig.labels[1][0], s: G_DIAGRAMS.turnfig.labels[1][1] },
+    { t: G_DIAGRAMS.turnfig.labels[2][0], s: G_DIAGRAMS.turnfig.labels[2][1], ink: true },
+    { t: G_DIAGRAMS.turnfig.labels[3][0], s: G_DIAGRAMS.turnfig.labels[3][1] },
+  ], G_DIAGRAMS.turnfig.caption);
 
   /* ---------- shapes ---------- */
   (() => {
@@ -1150,18 +1143,18 @@ const G_BOOK = {
           if (k) sv("line", { x1: a[k - 1][0] + 9, y1: y, x2: x - 9, y2: y, class: "fig-e" }, svg);
           sv("circle", { cx: x, cy: y, r: 8, class: "fig-n" + (k === 2 ? " hd" : "") }, svg);
         });
-        sv("text", { x: 75, y: 12, "text-anchor": "middle", class: "fig-tl" }, svg).textContent = "one name, many records";
+        sv("text", { x: 75, y: 12, "text-anchor": "middle", class: "fig-tl" }, svg).textContent = G_SHAPE_LABELS[0];
       } else if (kind === 1) {
         sv("circle", { cx: 75, cy: 50, r: 11, class: "fig-n hd" }, svg);
         sv("line", { x1: 86, y1: 50, x2: 134, y2: 50, class: "fig-e", "stroke-dasharray": "3 3" }, svg);
         sv("rect", { x: 118, y: 40, width: 28, height: 20, rx: 6, class: "fig-box" }, svg);
-        sv("text", { x: 75, y: 84, "text-anchor": "middle", class: "fig-tl" }, svg).textContent = "a root, named by its id";
+        sv("text", { x: 75, y: 84, "text-anchor": "middle", class: "fig-tl" }, svg).textContent = G_SHAPE_LABELS[1];
       } else {
         sv("circle", { cx: 22, cy: 50, r: 13, class: "fig-n" }, svg);
         sv("circle", { cx: 128, cy: 50, r: 13, class: "fig-n" }, svg);
         sv("line", { x1: 35, y1: 50, x2: 115, y2: 50, class: "fig-e" }, svg);
         sv("rect", { x: 61, y: 39, width: 28, height: 22, rx: 6, class: "fig-box ink" }, svg);
-        sv("text", { x: 75, y: 88, "text-anchor": "middle", class: "fig-tl" }, svg).textContent = "the link is a thing";
+        sv("text", { x: 75, y: 88, "text-anchor": "middle", class: "fig-tl" }, svg).textContent = G_SHAPE_LABELS[2];
       }
     }
     function show(k) {
@@ -1209,9 +1202,9 @@ const G_BOOK = {
         if (B.nul === gi) cls.push("nul");
         h += `<div class="${cls.join(" ")}"><div class="bk-h"><span>${esc(p[0])}</span>${esc(p[1])}</div><p>${esc(p[2])}</p>`;
         if (group.length > 1 && pj === group.length - 1) h += `<div class="bk-n alert">${esc(B.note)}</div>`;
-        if (B.cut === gi) h += '<div class="bk-n">status cut: left out of the book</div>';
-        if (B.finalAt === gi) h += '<div class="bk-n">status final</div>';
-        if (B.nul === gi) h += '<div class="bk-n alert">Every field null</div>';
+        if (B.cut === gi) h += `<div class="bk-n">${esc(G_BOOK_NOTES.cut)}</div>`;
+        if (B.finalAt === gi) h += `<div class="bk-n">${esc(G_BOOK_NOTES.final)}</div>`;
+        if (B.nul === gi) h += `<div class="bk-n alert">${esc(G_BOOK_NOTES.nul)}</div>`;
         h += "</div>";
       });
     });
@@ -1244,10 +1237,10 @@ const G_BOOK = {
   (() => {
     const fig = $("#wordings");
     if (!fig) return;
-    const svg = sv("svg", { viewBox: "0 0 520 150", role: "img", "aria-label": "One draft, two rewrites made at once, then one settled passage" }, fig);
+    const svg = sv("svg", { viewBox: "0 0 520 150", role: "img", "aria-label": G_DIAGRAMS.wordings.order }, fig);
     const mk = sv("marker", { id: "wdm", viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto" }, sv("defs", {}, svg));
     sv("path", { d: "M1 1 9 5 1 9", class: "fig-mk" }, mk);
-    const N = [[50, 60, "1", "First draft"], [250, 26, "2", "A rewrite"], [250, 94, "3", "A rewrite"], [450, 60, "4", "Settled"]];
+    const N = [[50, 60, ...G_DIAGRAMS.wordings.labels[0]], [250, 26, ...G_DIAGRAMS.wordings.labels[1]], [250, 94, ...G_DIAGRAMS.wordings.labels[2]], [450, 60, ...G_DIAGRAMS.wordings.labels[3]]];
     [[1, 0], [2, 0], [3, 1], [3, 2]].forEach(([a, b]) => {
       const [x1, y1] = N[a], [x2, y2] = N[b];
       const L = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / L, uy = (y2 - y1) / L;
@@ -1260,7 +1253,7 @@ const G_BOOK = {
     });
     const cap = document.createElement("p");
     cap.style.cssText = "font:400 13px/1.45 var(--sans)!important;color:var(--faint);margin:8px 0 0!important";
-    cap.textContent = "The four records of the passage, numbered in the order export prints their text above.";
+    cap.textContent = G_DIAGRAMS.wordings.caption;
     fig.appendChild(cap);
   })();
 })();
