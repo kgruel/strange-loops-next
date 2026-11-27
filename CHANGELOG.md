@@ -7,6 +7,14 @@ Each date starts with a short list. Under it is the record as it was written at 
 Since Kyle's ruling of 2026-11-21 (W7), only a choice that changes a record's bytes or id, a result's bytes or hash, a refusal code, or what a spec answers comes to him, through [DECISIONS.md](DECISIONS.md). Every other implementer choice is written here and stands unless he objects.
 The record starts where the old roadmap's did. For anything earlier, and for every merge, see `git log`.
 
+## 2026-11-27
+
+In brief:
+- **The identity entries are read against one real store.** [A seat as a case](notes/2026-11-27-a-seat-as-a-case.md) takes what happened to the coordinator's own store over two days (a new key and a hand-over, a move to its own account, a countersigned tick, a worker started beside it) and reads IS1 to IS11 against it, with five runs. Nothing is ruled and no entry is added. It is written for Kyle's walk with Astra.
+- **IS6 and IS8 gain the alternative each was put without.** Both were recommendations with nothing argued against them. The recommendation in each is unchanged.
+- **A merged request's pipeline is routed by the project's new path.** The project moved on GitLab on 2026-11-26, and the rule that recognises a merge to main still matched the old path, so main ran every gate again after each merge. It ran once so.
+- **The coordinator works under its own name.** Since 2026-11-26 this seat is called Tally. Since 2026-11-27 it commits, opens merge requests and signs its own store from an account of its own.
+
 ## 2026-11-25
 
 In brief:
