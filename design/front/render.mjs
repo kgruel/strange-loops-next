@@ -156,6 +156,39 @@ function* dataLinks(value) {
   }
 }
 
+// What the page says of itself to a browser tab, a search engine and a link preview.
+// It is the site's public face, so it is open to indexing; the rethink page and the working
+// documents keep their noindex. The address is the one the site is served at, so a copy
+// reached by another address names this one as the original.
+export const SITE = {
+  url: "https://strangeloops.dev/",
+  name: "Strange Loops",
+  title: "Strange Loops: signed records, and everything else worked out from them",
+  description: "Strange Loops keeps what people and programs said as signed records that never change, and works everything else out from them. The grammar, a guide to the loops command, the laws, the evidence behind them, and the decisions still open.",
+  repository: "https://github.com/kgruel/strange-loops-next",
+};
+const attr = (s) => s.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+// The header's mark, as the tab's icon.
+const ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1D1D1B" stroke-width="1.4"><rect width="24" height="24" rx="5" fill="#EBEAE6" stroke="none"/><path d="M12 3 21 8 12 13 3 8Z"/><path d="M3 12l9 5 9-5" opacity=".55"/><path d="M3 16l9 5 9-5" opacity=".3"/></svg>`;
+export function headOf() {
+  const ld = {
+    "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: SITE.url, description: SITE.description,
+    about: { "@type": "SoftwareSourceCode", name: "loops", codeRepository: SITE.repository, programmingLanguage: ["Rust", "Lean"] },
+  };
+  return `<title>${attr(SITE.title)}</title>
+<meta name="description" content="${attr(SITE.description)}">
+<link rel="canonical" href="${SITE.url}">
+<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(ICON)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${attr(SITE.name)}">
+<meta property="og:title" content="${attr(SITE.title)}">
+<meta property="og:description" content="${attr(SITE.description)}">
+<meta property="og:url" content="${SITE.url}">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">${JSON.stringify(ld).replaceAll("<", "\\u003c")}</script>
+`;
+}
+
 export function frontPage(root) {
   const read = (f) => readFileSync(join(root, "design", "front", f), "utf8");
   const model = { ...decisions(root), guide: readGuide(root) };
@@ -180,7 +213,9 @@ export function frontPage(root) {
   body = fill(body, "grammar-verbs", model.grammar.verbsHeading);
   body = fill(body, "view-guide", model.guide.html);
   const fonts = read("fonts.css");
-  body = fill(body, "styles", `<style>\n${fonts}${read("styles.css")}</style>\n`);
+  // The page's own styles go in the head, with what it tells a browser and a crawler of itself.
+  const styles = `<style>\n${fonts}${read("styles.css")}</style>\n`;
+  body = fill(body, "styles", "");
   body = fill(body, "script", `<script>\n${script}</script>\n`);
   const base = readFileSync(join(root, "design", "rethink", "base.css"), "utf8").trimEnd();
   const html = `<!doctype html>
@@ -188,9 +223,8 @@ export function frontPage(root) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
-<style>${base}</style>
-</head>
+${headOf()}<style>${base}</style>
+${styles}</head>
 <body>
 ${body}</body>
 </html>
