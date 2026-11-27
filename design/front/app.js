@@ -157,7 +157,7 @@ const G_BOOK = {
   window.addEventListener("hashchange", route);
 
   /* ---------- status key ---------- */
-  $("#key").innerHTML = ["proved", "settled", "open"].map((k) => `<span>${chip(k)}<span>${STATUS[k].says}</span></span>`).join("");
+  $("#key").innerHTML = ["proved", "designed", "open"].map((k) => `<span>${chip(k)}<span>${STATUS[k].says}</span></span>`).join("");
 
   /* ---------- isometric stack geometry ---------- */
   const G = { cx: 290, w: 330, d: 108, y0: 352, gap: 54 };
@@ -696,7 +696,7 @@ const G_BOOK = {
     const dict = $("#dict"), fl = $("#nfilters");
     const counts = { all: NOUNS.length };
     NOUNS.forEach((n) => (counts[n.status] = (counts[n.status] || 0) + 1));
-    fl.innerHTML = ["all", "proved", "settled", "open"].filter((k) => counts[k]).map((k) => `<button class="fbtn" data-f="${k}" aria-pressed="${k === "all"}">${k === "all" ? "All" : STATUS[k].mark + " " + k}<span class="c">${counts[k]}</span></button>`).join("");
+    fl.innerHTML = ["all", "proved", "designed", "open"].filter((k) => counts[k]).map((k) => `<button class="fbtn" data-f="${k}" aria-pressed="${k === "all"}">${k === "all" ? "All" : STATUS[k].mark + " " + k}<span class="c">${counts[k]}</span></button>`).join("");
     dict.innerHTML = NOUN_GROUPS.map((g, gi) => {
       const list = NOUNS.filter((n) => n.group === gi);
       return `<div class="dgroup"><div class="gh"><h3>${g.name}</h3><p>${g.gist}</p><span class="lbl">${g.layer}</span></div><div class="entries">` +
@@ -742,7 +742,8 @@ const G_BOOK = {
     const grid = $("#cbgrid"), q = $("#cbq"), cnt = $("#cbcount");
     const unique = new Set(REFUSALS.flatMap((g) => g.codes));
     grid.innerHTML = REFUSALS.map((g) => `<div class="cbg ${g.unpinned ? "unpinned" : ""}"><h4>${g.group}<span>${g.codes.length}</span></h4><p>${g.note}</p><ol>${g.codes.map((c) => `<li>${c}</li>`).join("")}</ol></div>`).join("");
-    const base = `${unique.size} codes in ${REFUSALS.length} groups. Two are named and not pinned by a vector yet.`;
+    const loose = REFUSALS.filter((g) => g.unpinned).flatMap((g) => g.codes).length;
+    const base = `${unique.size} codes in ${REFUSALS.length} groups.` + (loose ? ` ${loose} ${loose === 1 ? "is" : "are"} named and not pinned by a vector yet.` : "");
     cnt.textContent = base;
     q.addEventListener("input", () => {
       const v = q.value.trim().toLowerCase();
@@ -782,11 +783,11 @@ const G_BOOK = {
     const verbLink = (v) => `<a class="nv" href="#verbs">${v.word}</a>`;
     const cols = [
       { k: "proved", items: [`<b>Nouns</b>`, ...NOUNS.filter((n) => n.status === "proved").map(nounLink), `<b>Verbs</b>`, ...VERBS.filter((v) => v.status === "proved").map(verbLink)] },
-      { k: "settled", items: [...VERBS.filter((v) => v.status === "settled").map((v) => `${verbLink(v)}: edits become records`), `Naming a vertex by its spec's hash`, `When a vertex ticks`] },
+      { k: "designed", items: [...VERBS.filter((v) => v.status === "designed").map((v) => `${verbLink(v)}: edits become records`), `Naming a vertex by its spec's hash`, `When a vertex ticks`] },
       { k: "open", items: [...NOUNS.filter((n) => n.status === "open").map((n) => `${nounLink(n)}: <a href="#is3">IS3</a>, <a href="#is4">IS4</a>, <a href="#is5">IS5</a>, <a href="#is7">IS7</a>`), `What an observer names: <a href="#is10">IS10</a>, <a href="#is11">IS11</a>`] },
       { k: "planned", items: [`Emitting accepted edits (the lens)`, `Views shaped for an audience (render)`, `Tick boundaries, markers and the runner`, `Lineages, key bindings and standing, in step 3`, `Standing as part of admit, in step 3`] },
     ];
-    const SAY = { proved: STATUS.proved.says, settled: STATUS.settled.says, open: STATUS.open.says, planned: "Named in an entry, and neither decided as a design nor built." };
+    const SAY = { proved: STATUS.proved.says, designed: STATUS.designed.says, open: STATUS.open.says, planned: "Named in an entry, and neither designed nor built." };
     $("#boardcols").innerHTML = cols.map((c) => `<div class="col ${c.k}"><h3>${c.k === "planned" ? "Planned" : chip(c.k)}<span class="c">${c.items.filter((x) => !x.startsWith("<b>")).length}</span></h3><p>${SAY[c.k]}</p><ul>${c.items.map((x) => `<li${x.startsWith("<b>") ? ' class="hd"' : ""}>${x}</li>`).join("")}</ul></div>`).join("");
   })();
 

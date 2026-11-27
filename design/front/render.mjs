@@ -10,6 +10,7 @@ import { rewriteLink } from "../decisions/links.mjs";
 import { fill } from "../page.mjs";
 import { decisionsView, frontRewrite, readAround, readDecisions } from "./decisions.mjs";
 import { readEvidence } from "./evidence.mjs";
+import { readGrammar } from "./grammar.mjs";
 import { readLaws } from "./laws.mjs";
 
 // The working documents the decisions pages render, as design/decisions/render.mjs names them.
@@ -20,10 +21,10 @@ function documents(root) {
   return docs;
 }
 
-// Everything the decisions view shows, read once.
+// What the decisions and grammar views show, read once.
 function decisions(root) {
   const rewrite = frontRewrite(root, documents(root), rewriteLink);
-  return { open: readDecisions(root, rewrite), around: readAround(root, rewrite) };
+  return { open: readDecisions(root, rewrite), around: readAround(root, rewrite), grammar: readGrammar(root) };
 }
 
 // The map of which question depends on which is drawn by hand: a short name and a place
@@ -51,6 +52,8 @@ export const GENERATED = new Map([
   // E_MAP stays in data/; its nodes and edges are checked against E_LAWS.
   ...["E_REPO", "E_LAYERS", "E_SHAPES", "E_IMPL", "E_NOT", "E_COUNTS", "E_T", "E_LAWS"]
     .map((name) => [name, (root, m) => m.evidence[name]]),
+  ...["STATUS", "NOUN_GROUPS", "NOUNS", "VERBS", "CONSTRUCTIONS", "LAYERS", "MATRIX", "REFUSALS", "PROVENANCE"]
+    .map((name) => [name, (root, m) => m.grammar.constants[name]]),
 ]);
 
 export function frontData(root, model = decisions(root)) {
@@ -82,6 +85,9 @@ export function renderFront(root) {
   for (const name of data.keys()) if (!used.has(name)) throw new Error(`front: ${name} is provided and the script does not read it`);
   let body = read("shell.html");
   body = fill(body, "view-decisions", decisionsView(model.open, model.around));
+  body = fill(body, "grammar-intro", model.grammar.intro);
+  body = fill(body, "grammar-nouns", model.grammar.nounsHeading);
+  body = fill(body, "grammar-verbs", model.grammar.verbsHeading);
   body = fill(body, "styles", `<style>\n${read("fonts.css")}${read("styles.css")}</style>\n`);
   body = fill(body, "script", `<script>\n${script}</script>\n`);
   const base = readFileSync(join(root, "design", "rethink", "base.css"), "utf8").trimEnd();

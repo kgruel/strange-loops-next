@@ -1,0 +1,701 @@
+{
+ "status": {
+  "proved": {
+   "mark": "●",
+   "name": "proved",
+   "says": "A law in the Lean model holds it, pinned by test vectors. The listed laws hold under their premises; that is not a proof of every product surface."
+  },
+  "designed": {
+   "mark": "◐",
+   "name": "designed",
+   "says": "Decided in the design, and not built yet. It is not a ruling."
+  },
+  "open": {
+   "mark": "○",
+   "name": "open",
+   "says": "Waiting on a ruling. See Decisions."
+  }
+ },
+ "groups": [
+  {
+   "name": "The ground",
+   "layer": "Record",
+   "gist": "What was said, and by whom."
+  },
+  {
+   "name": "Holding",
+   "layer": "Store · View",
+   "gist": "Where records are kept, and what one reader has."
+  },
+  {
+   "name": "Asking",
+   "layer": "State",
+   "gist": "A standing question, and the answer worked out from records."
+  },
+  {
+   "name": "A moment",
+   "layer": "Tick",
+   "gist": "An answer fixed so others can cite it."
+  },
+  {
+   "name": "Text",
+   "layer": "Text",
+   "gist": "The answer as something people read and edit."
+  },
+  {
+   "name": "Standing",
+   "layer": "under every layer",
+   "gist": "Who counts, and for what."
+  }
+ ],
+ "nouns": [
+  {
+   "word": "record",
+   "group": 0,
+   "status": "proved",
+   "purpose": "One thing an observer saw, written so anyone can check it and nobody can change it.",
+   "principle": "Its id is a hash of what it says, written one canonical way. Spell a set in another order and the id stays. Erase the payload and the id, the signature and every record that cites it still hold.",
+   "eg": "Every card in the walk is a record.",
+   "state": "An envelope, a payload and a signature. A fold reads the top-level fields of a payload it holds: a list reads as a set, no field name is special, and nothing reads inside a nested object. The id is a hash of the envelope and of a commitment to the payload.",
+   "laws": [
+    "record.erasure",
+    "record.sets",
+    "write.checked",
+    "payload.read"
+   ]
+  },
+  {
+   "word": "observer",
+   "group": 0,
+   "status": "proved",
+   "purpose": "Says who saw it.",
+   "principle": "Nothing a record says is true. It is said, by its observer. Two observers who disagree leave two records, and both are kept.",
+   "eg": "Rosa, Ben and Kim in the walk.",
+   "state": "A typed reference on every record. Today it is the signing key, <code>k:…</code>.",
+   "note": "Lineages (<code>sl:…</code>), key bindings and standing come in step 3. What an observer names is open: <a href=\"#is10\">IS10</a> and <a href=\"#is11\">IS11</a>.",
+   "laws": [
+    "record.refuse"
+   ]
+  },
+  {
+   "word": "thing",
+   "group": 0,
+   "status": "proved",
+   "purpose": "Gives each subject its own state, within the records a reader has admitted.",
+   "principle": "Inside a thing, a record that nothing replaces is a head. Two records that replace the same one make a fork. A record that names both heads merges them.",
+   "eg": "<code>recipe:chili</code> in the walk.",
+   "state": "A typed name, <code>prefix:value</code>, in a record's <code>of</code>: a natural key or a record id. Every record is of exactly one thing. A record with no <code>of</code> and no <code>prev</code> is a root and starts a thing named by its own id. <code>about</code> only mentions other things.",
+   "laws": [
+    "thing.one",
+    "thing.local",
+    "admit.no-cross",
+    "thing.mentions"
+   ]
+  },
+  {
+   "word": "store",
+   "group": 1,
+   "status": "proved",
+   "purpose": "Holds records, and nothing else. It owns no meaning.",
+   "principle": "A store is a set. Where the copies of a record agree, read its places in any order and you keep the same records, once per id.",
+   "eg": "The store <code>family</code> in the walk.",
+   "state": "A set of records kept in places, each record one canonical line.",
+   "laws": [
+    "input.union",
+    "settle.set"
+   ]
+  },
+  {
+   "word": "view",
+   "group": 1,
+   "status": "proved",
+   "purpose": "Lets readers who hold different payloads still agree on what is current.",
+   "principle": "A reader who keeps every envelope keeps each thing's heads, whatever payloads are missing. A record that heads any thing stays among that reader's heads. Where a fold can't read a payload, it says how many it couldn't read.",
+   "eg": "Kim's copy, which holds E without its payload.",
+   "state": "What one reader holds: each record with its payload, withheld, or erased. Envelopes are always held.",
+   "laws": [
+    "view.no-resurrection",
+    "result.unread"
+   ]
+  },
+  {
+   "word": "spec",
+   "group": 2,
+   "status": "proved",
+   "purpose": "A standing question, written as data anyone can check.",
+   "principle": "An accepted spec parses back to itself. A refused one names the first rule it breaks, and where.",
+   "eg": "The walk's <code>recipes</code> spec.",
+   "state": "<code>vertex</code> names it, <code>from</code> lists its sources, <code>fold</code> lists its slots.",
+   "laws": [
+    "spec.parse"
+   ]
+  },
+  {
+   "word": "source",
+   "group": 2,
+   "status": "proved",
+   "purpose": "Chooses records by their envelopes alone.",
+   "principle": "A source takes a record when its kind is listed, it mentions the thing in <code>about</code>, and it is of the thing in <code>of</code>, each only when given. A reader with fewer payloads takes exactly the same records.",
+   "eg": "<code>{\"store\": \"family\", \"kind\": [\"recipe\"]}</code>",
+   "state": "A <code>store</code>, then optionally <code>kind</code>s, a thing it mentions (<code>about</code>) and the thing it is <code>of</code>.",
+   "laws": [
+    "spec.select",
+    "spec.from-thing"
+   ]
+  },
+  {
+   "word": "slot",
+   "group": 2,
+   "status": "proved",
+   "purpose": "Holds one answer.",
+   "principle": "Hand each record over once, and the same records give every slot the same value, whatever order they came in. A slot over heads returns only records that are still heads, and a count, sum, min or max over heads folds every current record and nothing else. A slot with <code>by</code> splits what it selects into groups and accounts for every record it selected.",
+   "eg": "<code>current</code> and <code>versions</code> in the walk.",
+   "state": "A name and one fold, optionally with <code>where</code>, <code>follow</code>, <code>limit</code> and <code>by</code>.",
+   "laws": [
+    "spec.set",
+    "spec.after-supersession",
+    "spec.follow",
+    "keyed.select",
+    "by.set",
+    "by.accounting"
+   ]
+  },
+  {
+   "word": "fold",
+   "group": 2,
+   "status": "proved",
+   "purpose": "Turns a set of records into state.",
+   "principle": "The read path hands each record over once. A fold whose steps can run in any order can take new records as they arrive and still reach the same state.",
+   "eg": "<code>latest-by</code> picks the current recipe; <code>count</code> counts its versions.",
+   "state": "One of six: <code>count</code>, <code>sum</code>, <code>min</code>, <code>max</code>, <code>latest-by</code>, <code>collect</code>. Following <code>prev</code>, a fold runs over each thing's heads. Following <code>keys</code>, it reads each thing by its live setters. Otherwise it runs over every selected record. The proofs over heads use cached latest-by state, not just a cached answer.",
+   "laws": [
+    "acc.set",
+    "heads.set",
+    "latest-by.converge"
+   ]
+  },
+  {
+   "word": "vertex",
+   "group": 2,
+   "status": "proved",
+   "purpose": "Asks a standing question over stores: select, fold, tick.",
+   "principle": "Run it over the same set and it gives the same slots, each with a count of the records it couldn't read.",
+   "eg": "The vertex <code>recipes</code>.",
+   "state": "A spec, run over what a reader holds.",
+   "note": "Designed and not built: naming a vertex by its spec's hash, and when it ticks.",
+   "laws": [
+    "spec.set",
+    "result.unread"
+   ]
+  },
+  {
+   "word": "tick",
+   "group": 3,
+   "status": "proved",
+   "purpose": "Fixes a vertex's result at a moment, so others can cite it.",
+   "principle": "Anyone who holds the covered records works out the same tick.",
+   "eg": "Step 8 of the walk: one tick covering five records.",
+   "state": "An ordinary record of kind <code>tick</code>: the vertex, the exact records it covers, and the result, with an id over all three. A tick folds a set named outright, a part closed downward over <code>prev</code>, or a slice of one.",
+   "note": "Built in the model with its laws and vectors, in Rust, and in the CLI: <code>loops tick</code> writes one, and <code>loops tick --check</code> answers same, differs or cannot check. A tick made on one machine checks the same on another, and can cover a cut by time or by ids. Not built yet: boundaries, markers and the runner. <a href=\"decisions/note-2026-11-21-tick-record.html\">The tick record note</a>.",
+   "laws": [
+    "keyed.cut",
+    "cut.prefix",
+    "result.canonical",
+    "tick.inputs",
+    "tick.made",
+    "tick.canonical"
+   ]
+  },
+  {
+   "word": "lens",
+   "group": 4,
+   "status": "proved",
+   "purpose": "Turns state into text people edit, and edits back into records.",
+   "principle": "With section ids that are nonempty and distinct, render, then parse, and you get the document back. Drop a section from the text and that section keeps its old body: leaving something out is never an edit.",
+   "eg": "Step 9 of the walk, where Ben edits a section.",
+   "state": "A render, a parse and a diff by ids, and the base the text came from.",
+   "note": "The edit round trip also keeps exactly the base's ordered list of ids. Emitting accepted edits is planned.",
+   "laws": [
+    "lens.round-trip",
+    "lens.absence-not-edit"
+   ]
+  },
+  {
+   "word": "grant",
+   "group": 5,
+   "status": "open",
+   "purpose": "Gives standing ahead of time, with a scope.",
+   "principle": "A record without standing stays visible, and has no effect.",
+   "eg": "Rosa's grant to Ben to write <code>recipe</code>s in the family store.",
+   "state": "A record. A record that acts on it names it in <code>under</code>.",
+   "note": "What a grant holds, how it ends and who may give one wait on <a href=\"#is3\">IS3</a>, <a href=\"#is4\">IS4</a>, <a href=\"#is5\">IS5</a> and <a href=\"#is7\">IS7</a>.",
+   "laws": []
+  }
+ ],
+ "verbs": [
+  {
+   "word": "emit",
+   "family": "write",
+   "status": "proved",
+   "says": "Check a record, sign it, and add it to a store. <code>loops emit</code> also fills in what a writer's tool may: the thing, the keys it sets, every live record of the thing, and the heads' <code>about</code> and <code>occurred</code>.",
+   "laws": [
+    "write.checked"
+   ]
+  },
+  {
+   "word": "tick",
+   "family": "write",
+   "status": "proved",
+   "says": "Fix a vertex's result at a boundary, as a value anyone can work out again.",
+   "laws": [
+    "tick.made",
+    "tick.inputs"
+   ]
+  },
+  {
+   "word": "refuse",
+   "family": "any",
+   "status": "proved",
+   "says": "Say no, with a code from a closed set and the path to what broke the rule. Never guess.",
+   "laws": [
+    "record.refuse",
+    "batch.refuse-order"
+   ]
+  },
+  {
+   "word": "settle",
+   "family": "read",
+   "status": "proved",
+   "says": "Where a record's forms agree, bring them together, one per id. Keep a payload any place holds, unless a held record erases it.",
+   "laws": [
+    "settle.keeps",
+    "settle.erased"
+   ]
+  },
+  {
+   "word": "admit",
+   "family": "read",
+   "status": "proved",
+   "says": "Refuse records that aren't entitled to their <code>prev</code>. Standing joins this check in step 3.",
+   "laws": [
+    "admit.set"
+   ]
+  },
+  {
+   "word": "take",
+   "family": "read",
+   "status": "proved",
+   "says": "A source takes the records its store, kinds, mention and thing choose.",
+   "laws": [
+    "spec.select"
+   ]
+  },
+  {
+   "word": "test",
+   "family": "read",
+   "status": "proved",
+   "says": "A <code>where</code> test answers yes, no, or unknown when the reader lacks the payload. <code>present</code> means the field was written. On a list, <code>is</code> asks whether a member equals the value, and no bound holds.",
+   "laws": [
+    "where.total",
+    "view.refines",
+    "where.fields"
+   ]
+  },
+  {
+   "word": "follow",
+   "family": "read",
+   "status": "proved",
+   "says": "Walk <code>prev</code> inside a thing to its heads, the records nothing replaces. Following <code>keys</code>, read a thing by its live setters: for each key, the setters nothing above replaces.",
+   "laws": [
+    "latest-by.order",
+    "thing.local",
+    "keyed.live",
+    "keyed.slots"
+   ]
+  },
+  {
+   "word": "group",
+   "family": "read",
+   "status": "proved",
+   "says": "Split what a slot selects by a key read from each record: its kind, its observer, what it mentions under a prefix, or a payload field. A payload list puts the record in one group per member. Always after settling, admission and the heads.",
+   "laws": [
+    "by.after-admission",
+    "by.accounting",
+    "by.partition",
+    "keyed.by"
+   ]
+  },
+  {
+   "word": "fold",
+   "family": "read",
+   "status": "proved",
+   "says": "Turn what was taken into a slot's value.",
+   "laws": [
+    "acc.set",
+    "heads.set"
+   ]
+  },
+  {
+   "word": "render",
+   "family": "text",
+   "status": "proved",
+   "says": "Write state as keyed sections, each with a nonempty, distinct id. Views shaped for an audience are planned.",
+   "laws": [
+    "lens.escaping"
+   ]
+  },
+  {
+   "word": "parse",
+   "family": "text",
+   "status": "proved",
+   "says": "Read edited text back, refusing what it can't read.",
+   "laws": [
+    "lens.round-trip",
+    "lens.refuse"
+   ]
+  },
+  {
+   "word": "apply",
+   "family": "text",
+   "status": "designed",
+   "says": "Turn the edits a parse found into records, emitted together.",
+   "laws": [
+    "lens.put-get"
+   ]
+  }
+ ],
+ "constructions": [
+  {
+   "word": "start",
+   "parts": [
+    "emit",
+    "no prev"
+   ],
+   "says": "A new chain. Without <code>of</code>, the record is a root and starts a thing named by its own id."
+  },
+  {
+   "word": "revise",
+   "parts": [
+    "emit",
+    "prev: [x]",
+    "of"
+   ],
+   "says": "Replaces x inside the thing both are of. Leave out <code>of</code> and it is refused, <code>of-missing</code>. Name a record of another thing and it is refused, <code>prev-unrelated</code>."
+  },
+  {
+   "word": "merge",
+   "parts": [
+    "emit",
+    "prev: [x, y]"
+   ],
+   "says": "Naming every head leaves one head, unless another concurrent head remains."
+  },
+  {
+   "word": "erase",
+   "parts": [
+    "emit",
+    "erases: [x]"
+   ],
+   "says": "Any kind may erase. x keeps its id, its signature and its place. Only its payload goes (the protocol calls it the opening)."
+  },
+  {
+   "word": "fork",
+   "parts": [
+    "two records",
+    "one prev"
+   ],
+   "says": "Nobody's verb: a state. The thing has two heads, both shown, and the newer by content order is listed first.",
+   "state": true
+  },
+  {
+   "word": "withhold",
+   "parts": [
+    "hold",
+    "no payload"
+   ],
+   "says": "Not a write at all: a view. The envelope still answers every test on it.",
+   "state": true
+  }
+ ],
+ "layers": [
+  {
+   "name": "Text",
+   "gist": "For an audience: what a lens renders, and what people edit.",
+   "made": "render",
+   "lasts": "until the next render",
+   "named": "its base: the tick, the lens and the audience",
+   "status": "proved",
+   "go": "nouns",
+   "word": "lens"
+  },
+  {
+   "name": "Tick",
+   "gist": "A result at a moment, covering exactly the records folded.",
+   "made": "tick",
+   "lasts": "kept when someone cites it",
+   "named": "an id over the vertex, what it covers and the result",
+   "status": "proved",
+   "word": "tick"
+  },
+  {
+   "name": "State",
+   "gist": "A vertex's slots, worked out from the set.",
+   "made": "fold",
+   "lasts": "a cache, worked out again at will",
+   "named": "its vertex and the set",
+   "status": "proved",
+   "word": "slot"
+  },
+  {
+   "name": "View",
+   "gist": "What one reader holds, settled and admitted.",
+   "made": "settle, admit",
+   "lasts": "until more arrives",
+   "named": "nothing: it is the reader's own",
+   "status": "proved",
+   "word": "view"
+  },
+  {
+   "name": "Store",
+   "gist": "A set of records in places. No order, no positions.",
+   "made": "holding",
+   "lasts": "as long as a place keeps it",
+   "named": "its anchor",
+   "status": "proved",
+   "word": "store"
+  },
+  {
+   "name": "Record",
+   "gist": "The ground. Added, never edited. Only a payload can go.",
+   "made": "emit",
+   "lasts": "for good",
+   "named": "<code>r:</code> and a content hash",
+   "status": "proved",
+   "word": "record"
+  }
+ ],
+ "matrix": {
+  "cols": [
+   "emit",
+   "refuse",
+   "settle",
+   "admit",
+   "take",
+   "test",
+   "fold",
+   "follow",
+   "tick",
+   "render",
+   "parse",
+   "apply"
+  ],
+  "rows": [
+   [
+    "record",
+    {
+     "emit": "written",
+     "refuse": "a bad envelope or payload",
+     "settle": "one per id",
+     "admit": "entitled to its prev",
+     "take": "by envelope",
+     "test": "env. or payload",
+     "fold": "into slots",
+     "follow": "via prev",
+     "apply": "what an edit becomes"
+    }
+   ],
+   [
+    "thing",
+    {
+     "follow": "its heads, or its live setters",
+     "fold": "latest-by of"
+    }
+   ],
+   [
+    "store",
+    {
+     "emit": "appended to",
+     "take": "named by a source",
+     "settle": "its places"
+    }
+   ],
+   [
+    "view",
+    {
+     "settle": "made by",
+     "admit": "made by",
+     "test": "unknown when withheld",
+     "fold": "same heads"
+    }
+   ],
+   [
+    "spec",
+    {
+     "refuse": "first broken rule",
+     "parse": "into its parsed form"
+    }
+   ],
+   [
+    "slot",
+    {
+     "fold": "holds the value",
+     "test": "its where"
+    }
+   ],
+   [
+    "tick",
+    {
+     "tick": "written",
+     "render": "a base"
+    }
+   ],
+   [
+    "lens",
+    {
+     "render": "state as text",
+     "parse": "text read back",
+     "refuse": "malformed text",
+     "apply": "edits as records"
+    }
+   ]
+  ]
+ },
+ "refusals": [
+  {
+   "group": "Envelope",
+   "note": "Checked in this order. A field left out, or of the wrong JSON type, gets its own code.",
+   "codes": [
+    "envelope-field-unknown",
+    "envelope-not-object",
+    "kind-empty",
+    "observer-not-typed",
+    "emitted-not-rfc3339",
+    "occurred-not-span",
+    "about-not-typed",
+    "of-not-typed",
+    "prev-not-record-id",
+    "under-not-record-id",
+    "erases-not-record-id",
+    "sets-not-keys",
+    "of-missing"
+   ]
+  },
+  {
+   "group": "Text",
+   "note": "Any string, anywhere in a record.",
+   "codes": [
+    "string-not-unicode"
+   ]
+  },
+  {
+   "group": "Writing",
+   "note": "While a record is written one canonical way.",
+   "codes": [
+    "salt-not-16-bytes",
+    "member-duplicate",
+    "number-out-of-range"
+   ]
+  },
+  {
+   "group": "Batch",
+   "note": "Shape, then labels, then writing, then prev-unknown, then under-unknown, then of-not-root, then prev-unrelated.",
+   "codes": [
+    "envelope-field-unknown",
+    "envelope-not-object",
+    "label-duplicate",
+    "label-unknown",
+    "label-cycle",
+    "prev-unknown",
+    "under-unknown",
+    "of-not-root",
+    "prev-unrelated"
+   ]
+  },
+  {
+   "group": "Tick check",
+   "note": "Before a tick's payload is read.",
+   "codes": [
+    "tick-kind",
+    "tick-withheld-erased"
+   ]
+  },
+  {
+   "group": "Tick payload",
+   "note": "What a tick record says.",
+   "codes": [
+    "tick-hash-invalid",
+    "tick-id-duplicate",
+    "tick-id-invalid",
+    "tick-ids-not-array",
+    "tick-ids-unsorted",
+    "tick-member-duplicate",
+    "tick-member-missing",
+    "tick-member-unknown",
+    "tick-not-object",
+    "tick-result-hash-mismatch",
+    "tick-result-invalid",
+    "tick-rules-invalid",
+    "tick-spec-hash-mismatch",
+    "tick-spec-noncanonical",
+    "tick-spec-not-object",
+    "tick-withheld-empty",
+    "tick-withheld-outside"
+   ]
+  },
+  {
+   "group": "Spec",
+   "note": "In the grammar's check order.",
+   "codes": [
+    "member-duplicate",
+    "spec-not-object",
+    "unknown-key",
+    "vertex-missing",
+    "vertex-invalid",
+    "from-missing",
+    "from-invalid",
+    "fold-invalid",
+    "fold-type",
+    "follow-missing",
+    "follow-invalid",
+    "limit-invalid",
+    "by-invalid",
+    "fold-argument",
+    "where-invalid"
+   ]
+  },
+  {
+   "group": "Lens",
+   "note": "Rendering a base.",
+   "codes": [
+    "base-id-duplicate"
+   ]
+  },
+  {
+   "group": "Not pinned yet",
+   "note": "Named, with no test vector yet.",
+   "codes": [
+    "prev-not-permitted",
+    "sum-overflow"
+   ],
+   "unpinned": true
+  }
+ ],
+ "provenance": [
+  {
+   "work": "Daniel Jackson, <a href=\"https://essenceofsoftware.com\"><i>The Essence of Software</i></a>",
+   "here": "Every noun has one purpose, its own state and an operating principle: the three lines of each entry."
+  },
+  {
+   "work": "Daniel Rosenberg, <i>UX Magic</i>",
+   "here": "The grammar comes first, as nouns and verbs, and the object–action matrix shows where they meet."
+  },
+  {
+   "work": "Johnson &amp; Henderson, <i>Conceptual Models</i>",
+   "here": "Objects and operations only: no file formats, commands or screens."
+  },
+  {
+   "work": "Maggie Appleton, <a href=\"https://x.com/Mappletons/status/2114779610596675824\">a grammar page</a>",
+   "here": "The form: nouns, verbs and layers, each layer as high as it is temporary, and a walk taken step by step."
+  }
+ ]
+}
