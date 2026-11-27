@@ -34,7 +34,7 @@ test("every fenced command or output in the guide is part of a recorded run", ()
 });
 
 test("every component refuses an unclosed marker and reports its source line", () => {
-  const names = new Set([...source.matchAll(/^<!-- guide:(.+?) -->$/gm)].map((m) => m[1]));
+  const names = new Set([...source.matchAll(/^<!-- guide:([a-z ]+) -->$/gm)].map((m) => m[1]));
   names.delete("end");
   for (const name of names) assert.throws(() => parseGuide("\n<!-- guide:" + name + " -->"),
     { message: "GUIDE.md:2: unclosed guide:" + name });
@@ -67,4 +67,12 @@ test("a component with its contents removed identifies the bad section", () => {
       `<!-- guide:${name} -->\n<!-- guide:end -->`;
     assert.throws(() => parseGuide(doc), /^Error: GUIDE\.md:9:/, name);
   }
+});
+
+test("paragraph hints reach the view and its step notes", () => {
+  const edited = parseGuide(source.replace('append="Pick one to see what it does to the kiln."', 'append="Try a case."'));
+  assert.match(edited.html, /different records\. Try a case\.<\/p>/);
+  assert.match(edited.html, /cone didn't\. Point at a field in the reading/);
+  assert.doesNotMatch(edited.html, /The reading lists the record/);
+  assert.match(edited.data.G_STEP_NOTES[3][0], /^The faint fields are no longer read\. The second record/);
 });

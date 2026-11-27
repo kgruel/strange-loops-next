@@ -32,7 +32,7 @@ Make a store, say two things about a kiln, and ask what the kiln is now. That is
 
 #### 1. Make a key and a store
 
-Install `loops` from a release first, as the README says. Then:
+Install `loops` from a release first, as [the README](README.md#installing-loops) says. Then:
 
 ```sh
 loops whoami --init      # make this machine's signing key, once
@@ -91,7 +91,9 @@ This doesn't change the first record. It adds a second one that says what it rep
 | --- | --- | --- |
 | `r:u0rjookv` | of kiln:east · prev r:29oqd4cm · sets name, status | `name: east`, `status: firing` |
 
-The faint fields are no longer read. The second record set them again, and the cone is still read from the first.
+The name and status from the first record are no longer read.
+<!-- guide:hint replace="The faint fields are no longer read." -->
+The second record set them again, and the cone is still read from the first.
 
 #### 5. Ask what the kiln is now
 
@@ -109,7 +111,9 @@ head  r:u0rjookveh5gecuk3drq96um1vj0l7jo7jbgka9avivvd6i12ns0
   occurred  —
 ```
 
-The status changed and the cone didn't. Point at a field in the reading to see which record it comes from.
+The status changed and the cone didn't.
+The reading lists the record each field comes from.
+<!-- guide:hint replace="Point at a field in the reading to see which record it comes from." -->
 
 **The reading, worked out now**
 
@@ -223,7 +227,8 @@ You rarely write `prev` yourself. `loops emit` fills it in with what you have re
 
 `sets` lists the payload fields a record sets. `loops emit kiln name=east status=firing` sets `name` and `status`, so `cone` keeps the value an earlier record gave it. Each field of a thing is read from its **live setter**: a record that set the field, where no record replacing it has set that field again.
 
-There are three cases, and they are different records. Pick one to see what it does to the kiln.
+There are three cases, and they are different records.
+<!-- guide:hint append="Pick one to see what it does to the kiln." -->
 
 <!-- guide:sets -->
 
@@ -338,7 +343,8 @@ A file named `stores.json` lists a group of stores by name, and one read can spa
 
 ### Three shapes
 
-Every concept is one of three shapes. Pick something from the workshop to see which.
+Every concept is one of three shapes.
+<!-- guide:hint append="Pick something from the workshop to see which." -->
 
 <!-- guide:shapes -->
 
@@ -436,7 +442,8 @@ One thing to watch: a revision copies `occurred` from the heads when they agree.
 
 ### Write the description first
 
-The description is your model of the store, in a file you can review. This is the workshop's `.loops/store.json`. Point at a member to see what it says.
+The description is your model of the store, in a file you can review. This is the workshop's `.loops/store.json`.
+<!-- guide:hint append="Point at a member to see what it says." -->
 
 <!-- guide:annotated members -->
 
@@ -476,7 +483,8 @@ The description is your model of the store, in a file you can review. This is th
 }
 ```
 
-Each member of the description has one job. Point at `key`, `refs`, `lifecycle` or any other member.
+Each member of the description has one job.
+<!-- guide:hint append="Point at `key`, `refs`, `lifecycle` or any other member." -->
 
 | Member | Says |
 | --- | --- |
@@ -541,7 +549,7 @@ For a large batch, pipe lines into `emit -`, and review with `describe` afterwar
 
 Read commands print JSON, the same on a terminal and through a pipe. Add `--plain` for a view made for reading. The plain view may change between releases, so scripts use the JSON.
 
-Some examples pass the JSON through `jq`, a separate tool for picking values out of it.
+Some examples pass the JSON through `jq`, a separate tool you install for picking values out of it.
 
 ### Naming the store
 
@@ -562,6 +570,8 @@ A group list is a file named `stores.json` that maps names to directories. Make 
 cd ..                    # into pottery/
 loops -C yard init
 ```
+
+Run every later command in this guide from `pottery/`.
 
 List both, and save it as `pottery/stores.json`:
 
@@ -818,7 +828,8 @@ A record is found in the store that holds it. `get` in the workshop doesn't find
 
 ### Standing questions
 
-A question you ask often is a **spec**, saved as a **vertex** in `.loops/vertices/`. Make that directory first, with `mkdir -p workshop/.loops/vertices`. Point at any part of this one to see what it does.
+A question you ask often is a **spec**, saved as a **vertex** in `.loops/vertices/`. Make that directory first, with `mkdir -p workshop/.loops/vertices`.
+<!-- guide:hint append="Point at any part of this one to see what it does." -->
 
 <!-- guide:annotated spec -->
 
@@ -1235,13 +1246,15 @@ The record says which tick it was decided from.
 
 A fold doesn't walk links for several hops. To draw a graph, read all the things and the active edge things in one `read --values` and walk them in your own code, or step with `ls --refers-to` and `of`.
 
-It is quick enough to call often. On a store of 9,000 records a fold takes about a quarter of a second, and `emit - --fill` writes 8,000 revisions in under a second, as the changelog records.
+It is quick enough to call often. On a store of 9,000 records a fold takes about a quarter of a second, and `emit - --fill` writes 8,000 revisions in under a second, as the [changelog](CHANGELOG.md) records.
 
 ## A second walk: a book and its sources
 
 Kilns and firings are state and events. Much of what people keep is words, and the same shapes hold them. This walk writes a short history of the workshop.
 
-Each passage is a thing with a key, revised whole. Each source the book draws on is an event. The book itself is stored nowhere: it is a fold over the passages, and the same records answer other questions too. The printed page beside each step shows the book as it stands.
+Each passage is a thing with a key, revised whole. Each source the book draws on is an event. The book itself is stored nowhere: it is a fold over the passages, and the same records answer other questions too.
+Each step shows the book as it stands.
+<!-- guide:hint replace="The printed page beside each step shows the book as it stands." -->
 
 ### A store for the book
 
@@ -1710,7 +1723,7 @@ A decision, a rule of thumb and a lesson learned are the same shape as a passage
 | Not built | **Sharing: stores synced between machines and people.** Until then, a store is a directory. Copy it, or `export` from one and `import` into another. |
 | Not built | **A search index, collectors, a command that edits records as text, a server.** Until then, fold the store directly, and keep search or ranking in a script that reads folds and writes its findings back. |
 
-This release is for trying the rules in everyday use, by people and by agents. The command is the cheap part to change. The record, its envelope and the laws are not, though the record format isn't frozen yet: read the changelog before moving a store to a newer release. What comes next is in the roadmap.
+This release is for trying the rules in everyday use, by people and by agents. The command is the cheap part to change. The record, its envelope and the laws are not, though the record format isn't frozen yet: read the [changelog](CHANGELOG.md) before moving a store to a newer release. What comes next is in the [roadmap](ROADMAP.md).
 
 ### If you used the old tool
 
@@ -1753,9 +1766,9 @@ The Python `loops` kept facts in a table, and a `.vertex` file said how to read 
 
 | Rule | Where |
 | --- | --- |
-| A record's bytes, its fields and `occurred` | `protocol/record.md` |
-| The spec, every test and every refusal | `protocol/spec.md` |
-| The tick and its check | `protocol/tick.md` |
-| What the command does, choice by choice | `rust/PLACE.md`. `loops` with no arguments prints the usage. |
-| The laws the model proves | `protocol/laws.md` |
-| What changed, by date | `CHANGELOG.md` |
+| A record's bytes, its fields and `occurred` | [`protocol/record.md`](protocol/record.md) |
+| The spec, every test and every refusal | [`protocol/spec.md`](protocol/spec.md) |
+| The tick and its check | [`protocol/tick.md`](protocol/tick.md) |
+| What the command does, choice by choice | [`rust/PLACE.md`](rust/PLACE.md). `loops` with no arguments prints the usage. |
+| The laws the model proves | [`protocol/laws.md`](protocol/laws.md) |
+| What changed, by date | [`CHANGELOG.md`](CHANGELOG.md) |

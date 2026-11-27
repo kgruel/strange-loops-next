@@ -54,8 +54,14 @@ test("unknown blocks inside prose or lists and malformed supported blocks name t
 });
 
 test("a guide marker takes its own line, and is literal inside code or prose", () => {
-  const { html } = render("Before\n<!-- guide:annotated spec -->\nAfter\n<!-- guide:end -->\n" +
+  const { html } = render("Before\n<!-- guide:annotated spec -->\nAfter\n<!-- guide:hint append=\"Try it.\" -->\n<!-- guide:hint replace=\"Look here.\" -->\n<!-- guide:end -->\n" +
     "\n```\n<!-- guide:end -->\n```\nInline <!-- guide:end --> stays.\n<!-- ordinary comment -->");
   assert.equal(html, "<p>Before</p>\n<p>After</p>\n<pre><code>&lt;!-- guide:end --&gt;\n</code></pre>\n" +
     "<p>Inline &lt;!-- guide:end --&gt; stays.\n&lt;!-- ordinary comment --&gt;</p>");
+});
+
+test("unknown standalone guide markers are refused", () => {
+  for (const marker of ['unknown', 'book missing', 'hint hover="Try it."']) {
+    assert.throws(() => render(`Before\n<!-- guide:${marker} -->`), /:2: unknown guide marker/);
+  }
 });

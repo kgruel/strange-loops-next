@@ -1,5 +1,7 @@
 // GUIDE.md uses ordinary headings, lists, tables and fenced examples. A standalone
 // <!-- guide:NAME --> opens a component; <!-- guide:end --> closes the innermost one.
+// Inside a paragraph, <!-- guide:hint append="..." --> adds a sentence in the view.
+// With replace="...", the hint takes the place of the preceding Markdown line.
 // stepper: numbered steps, their commands, record cards and final field reading.
 // sets: one heading, records table, reading and explanation per case.
 // shapes: one heading, description and examples table per shape.
@@ -11,7 +13,8 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { inline } from "../decisions/markdown.mjs";
+import { REPO } from "../laws/join.mjs";
+import { guideComponent, guideHint, inline } from "../decisions/markdown.mjs";
 
 export const guideConstants = [
   "G_FIRST", "G_STEP_NOTES", "G_SETS", "G_SHAPES", "G_SHAPE_KINDS", "G_SHAPE_LABELS",
@@ -69,14 +72,13 @@ const anchors = {
 };
 
 const diagrams = { headsfig: "headsfig sheet", judgefig: "loopmini", turnfig: "turn", wordings: "wordings" };
-const bookStates = ["sources", "draft", "fork", "settled", "null", "final"];
-const markers = new Set(["stepper", "sets", "shapes", "envelope", "more", "questions", "annotated members", "annotated spec",
-  ...Object.keys(diagrams).map((name) => "diagram " + name), ...bookStates.map((name) => "book " + name)]);
 const fail = (block, message) => { throw new Error(`GUIDE.md:${block.line}: ${message}`); };
 const text = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 const attribute = (s) => text(s).replaceAll('"', "&quot;");
 const rewrite = (href) => {
   if (href === "DECISIONS.md#identity-and-standing-is1-to-is11") return "#open";
+  if (href === "CHANGELOG.md" || href === "ROADMAP.md") return "decisions/" + href.toLowerCase().replace(".md", ".html");
+  if (/^[^:#]+\.md(?:#|$)/.test(href)) return REPO + "/" + href;
   return href.startsWith("#") && Object.hasOwn(anchors, href.slice(1)) ? "#" + anchors[href.slice(1)] : href;
 };
 const plain = (s) => inline(s, 1, rewrite).plain;
@@ -97,12 +99,12 @@ function parse(source) {
     if (!s.trim()) continue;
     const body = stack.at(-1).body;
     if (s.startsWith("<!-- guide:")) {
-      const name = s.match(/^<!-- guide:([a-z -]+) -->$/)?.[1];
+      const name = s.match(guideComponent)?.[1];
       if (name === "end") {
         if (stack.length === 1) fail({ line }, "guide:end has no opening marker");
         stack.pop();
       } else {
-        if (!markers.has(name)) fail({ line }, `unknown guide marker: ${s}`);
+        if (!name) fail({ line }, `unknown guide marker: ${s}`);
         const part = { type: "component", name, line, body: [] };
         body.push(part);
         stack.push(part);
@@ -139,7 +141,15 @@ function parse(source) {
       body.push({ type: "list", ordered, items, line });
     } else {
       const para = [s];
-      while (lines[i]?.trim() && !/^(?:<!-- guide:|`{3}|#|\||- |\d+\. )/.test(lines[i])) para.push(lines[i++]);
+      while (lines[i]?.trim()) {
+        const hint = lines[i].match(guideHint);
+        if (hint) {
+          if (hint[1] === "replace") para.pop();
+          para.push(hint[2]);
+          i++;
+        } else if (/^(?:<!-- guide:|`{3}|#|\||- |\d+\. )/.test(lines[i])) break;
+        else para.push(lines[i++]);
+      }
       body.push({ type: "p", value: para.join(" "), line });
     }
   }
