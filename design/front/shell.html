@@ -1,6 +1,6 @@
-<title>Strange Loops Grammar</title>
+<title>Strange Loops</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="A prototype redesign of the Strange Loops grammar, guide, laws, evidence and decisions pages.">
+<meta name="description" content="Strange Loops keeps what people said as signed records that never change, and works everything else out from them: the grammar, a guide, the laws, the evidence behind them and the open decisions.">
 <!-- build:styles -->
 <header class="top">
   <div class="wrap">
@@ -15,12 +15,6 @@
       <a href="#evidence" data-view="evidence">Evidence</a>
       <a href="#decisions" data-view="decisions">Decisions</a>
     </nav>
-    <div class="tools">
-      <span class="tag" title="A prototype for review. The live site is unchanged.">Prototype</span>
-      <button class="switch" id="rv" aria-pressed="false" title="Show where this prototype departs from the live page">
-        <span class="knob" aria-hidden="true"></span><span>Review<span class="lbl-long"> notes</span></span>
-      </button>
-    </div>
   </div>
 </header>
 
@@ -42,7 +36,6 @@
         </figure>
       </div>
       <div class="key" id="key"></div>
-      <div class="rn"><b>Status words</b>The live page marks tick settled, which its legend defines as decided and not built. The tick card on the same page says it is built, and Decisions says TK1 to TK13 are ruled and built. Grant is marked settled while IS3, IS4, IS5 and IS7 are open. This prototype marks tick proved and grant open. Turn on review notes anywhere to see each change like this one.</div>
     </div>
   </section>
 
@@ -56,7 +49,6 @@
         <div class="sheet sentence" id="sentence"></div>
         <div class="sheet json" id="json" aria-label="The same record as data"></div>
       </div>
-      <div class="rn" data-note="record"></div>
 
       <div class="sheet lab" id="lab">
         <div class="lab-grid">
@@ -84,7 +76,6 @@
         <h2 class="sec">Watch a recipe get written, argued over, cleaned up and edited.</h2>
         <p class="secintro">Rosa and Ben are writing down Grandma's chili, and Kim reads along with less. Each card is a record of <code>recipe:chili</code>. The strip under the cards is what the vertex <code>recipes</code> answers: the current recipe, and how many versions there are. Scroll, or use the arrows.</p>
       </header>
-      <div class="rn" data-note="walk"></div>
       <div class="walk">
         <div class="steps" id="steps"></div>
         <div class="stagewrap">
@@ -142,7 +133,6 @@
         <p class="secintro">Reading runs in a fixed order, left to right. Pick a verb to read it.</p>
       </header>
       <div class="sheet pipe" id="pipe"></div>
-      <div class="rn" data-note="verbs"></div>
       <h3 class="sec" style="font:400 26px/1.2 var(--serif);margin-top:44px">Four constructions, and two states that are nobody's verb</h3>
       <div class="cons" id="cons"></div>
       <div class="sheet codebook" id="codebook">
@@ -166,7 +156,6 @@
         <p class="secintro">Point at a cell to see its row and its column. The record is touched by more verbs than any other noun: nine of twelve.</p>
       </header>
       <div class="sheet mx"><table class="m" id="mx"></table></div>
-      <div class="rn" data-note="matrix"></div>
     </div>
   </section>
 
@@ -177,7 +166,6 @@
         <p class="secintro">One place for every status on this page, so a reader doesn't have to collect them from the entries.</p>
       </header>
       <div class="board" id="boardcols"></div>
-      <div class="rn" data-note="status"></div>
     </div>
   </section>
 
@@ -190,7 +178,7 @@
     </div>
   </section>
 
-  <footer class="end"><div class="wrap"><span>A prototype for review, built from strange-loops-next at bb1459e. The live site is unchanged.</span><a href="https://projects.gruel.world/strange-loops/grammar/">The live grammar page</a></div></footer>
+  <footer class="end"><div class="wrap"><span>Built from the repository's sources.</span></div></footer>
 </main>
 
 <!-- build:view-decisions -->
@@ -222,7 +210,6 @@
           <p>This is a guide, not the rules. They are in <a href="#g-rules">the record, the spec, the tick and the notes on the command</a>. Where this page and those disagree, they are right.</p>
         </div>
       </div>
-      <div class="rn" data-note="guide"></div>
     </div>
   </section>
 
@@ -1477,7 +1464,7 @@ newest_first
     </article>
   </div>
 
-  <footer class="end"><div class="wrap"><span>A prototype for review, built from GUIDE.md at bb1459e. Every command and output is copied from it. The live site is unchanged.</span></div></footer>
+  <footer class="end"><div class="wrap"><span>Built from <code>GUIDE.md</code>. Every command and output is copied from it.</span><a href="decisions/guide.html">The guide, as written</a></div></footer>
 </main>
 
 <main id="v-laws" class="view" hidden>
@@ -1486,7 +1473,6 @@ newest_first
       <h1 class="display">A law is a promise in one&nbsp;sentence.</h1>
       <p class="lede">There are 124 of them. Each says what you may change without moving an answer, or <b>exactly where a promise stops</b>. Lean has checked a proof of all but three, and those three hold by how the code is built.</p>
       <p class="tally">Below, you can <a href="#break">rewrite five of the rules they rest on</a> and watch laws break, <a href="#premises">take a premise away</a>, or <a href="#every-law">read all 124 by the question they answer</a>.</p>
-      <div class="rn" data-note="laws"></div>
       <h2 class="lbl lshapes-h">Every law takes one of six shapes</h2>
       <ol class="lshapes" id="lshapes"></ol>
     </div>
@@ -1503,7 +1489,6 @@ newest_first
         <div class="bpanel" id="bpanel" role="tabpanel"></div>
         <p class="bfoot">Worked out here, in your browser, by a small copy of these five rules. With the protocol's choices it gives every answer the model's vectors give; the other choices have no model behind them.</p>
       </div>
-      <div class="rn" data-note="bench"></div>
     </div>
   </section>
 
@@ -1546,7 +1531,7 @@ newest_first
       </div>
     </div>
   </section>
-  <footer class="end"><div class="wrap"><span>A prototype for review, built from design/laws and protocol/laws.md at bb1459e. The live site is unchanged.</span><a href="https://projects.gruel.world/strange-loops/laws/">The live Laws page</a></div></footer>
+  <footer class="end"><div class="wrap"><span>Built from <code>design/laws</code> and <code>protocol/laws.md</code>.</span></div></footer>
 </main>
 
 <main id="v-evidence" class="view" hidden>
@@ -1556,7 +1541,6 @@ newest_first
       <p class="lede">Each law is one sentence. Behind it are <b>a row in the protocol's laws file, theorems Lean has checked, and test vectors</b> that every implementation runs. Follow one law down that chain, see which proofs lean on which, and find where the evidence is thin.</p>
       <ol class="echain" id="echain" aria-label="From claim to code, counted"></ol>
       <p class="echain-cap">The build joins all four and fails when one doesn't meet the next: a row with no sentence, a theorem Lean can't find, a vector that isn't on disk.</p>
-      <div class="rn" data-note="evidence"></div>
     </div>
   </section>
 
@@ -1575,7 +1559,6 @@ newest_first
         </aside>
         <article class="etrace sheet" id="etrace" aria-live="polite"></article>
       </div>
-      <div class="rn" data-note="evidence-follow"></div>
     </div>
   </section>
 
@@ -1609,10 +1592,9 @@ newest_first
         </tr></thead>
         <tbody id="ecov-b"></tbody>
       </table></div></div>
-      <div class="rn" data-note="evidence-thin"></div>
     </div>
   </section>
-  <footer class="end"><div class="wrap"><span>A prototype for review, built from design/evidence, design/laws and protocol/laws.md at bb1459e. The live site is unchanged.</span><a href="https://projects.gruel.world/strange-loops/evidence/">The live Evidence page</a></div></footer>
+  <footer class="end"><div class="wrap"><span>Built from <code>design/evidence</code>, <code>design/laws</code> and <code>protocol/laws.md</code>.</span></div></footer>
 </main>
 
 <div class="pop" id="pop" hidden role="dialog" aria-label="Law"></div>

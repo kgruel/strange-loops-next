@@ -12,7 +12,6 @@
   "word": "tick",
   "family": "write",
   "status": "proved",
-  "was": "settled",
   "says": "Fix a vertex's result at a boundary, as a value anyone can work out again.",
   "laws": [
    "tick.made",

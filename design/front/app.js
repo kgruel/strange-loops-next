@@ -1,9 +1,7 @@
 const LAWS = /*data:LAWS*/;
 const RULED = /*data:RULED*/;
 
-// Hand-written words for the prototype. Faithful to design/grammar/words.json and walk.json in
-// kgruel/strange-loops-next (bb1459e), rewritten for plain reading. Where a status differs from
-// the live page, `was` holds the live one and a review note says why.
+// Hand-written words: the grammar's nouns, verbs, layers and walk, in the site's voice.
 
 const STATUS = /*data:STATUS*/;
 
@@ -34,9 +32,6 @@ const DEC_EDGES = /*data:DEC_EDGES*/;
 
 
 
-// Review notes: where the prototype departs from the live page, or the live page disagrees with itself.
-const NOTES = /*data:NOTES*/;
-
 // Copied from design/grammar/words.json and the built page's WALK (vectors/scenario/01-decision).
 
 const REFUSALS = /*data:REFUSALS*/;
@@ -51,12 +46,6 @@ const ISSHORT = /*data:ISSHORT*/;
 
 
 /* ---------- Guide data ---------- */
-NOTES.push(
-  { at: "guide", title: "The guide has a page of its own", text: "On the live site, <code>GUIDE.md</code> is rendered as one of the documents under Decisions, and the grammar page doesn't link to it. Here it is a page in the top bar, beside Grammar." },
-  { at: "guide", title: "Same facts, plainer sentences", text: "Every command and every output is copied from <code>GUIDE.md</code> at bb1459e. The prose is rewritten in shorter sentences, and no fact is dropped. Long outputs are folded away, and the reference tables are kept." },
-  { at: "guide", title: "What is new here", text: "The ten minutes are a stepper with the store drawn beside it. The three cases of <code>sets</code>, the three shapes and the two descriptions can be tried in place. The book walk shows the printed book at each step. The figures are drawn by hand from the guide's own examples." },
-);
-
 const G_ANNOT = /*data:G_ANNOT*/;
 
 // The ten minutes, as drawn. Ids and fields are the guide's own.
@@ -112,7 +101,7 @@ const G_BOOK = {
 
   /* ---------- shared bits ---------- */
   const SHAPE = /*data:SHAPE*/;
-  const chip = (st, was) => `<span class="st ${st}"><i aria-hidden="true">${STATUS[st].mark}</i>${STATUS[st].name}${was ? `<s class="rnin" title="On the live page">${was}</s>` : ""}</span>`;
+  const chip = (st) => `<span class="st ${st}"><i aria-hidden="true">${STATUS[st].mark}</i>${STATUS[st].name}</span>`;
   const lawChip = (name) => LAWS[name] ? `<button class="law" data-law="${name}" aria-expanded="false">${name}<span class="sh" aria-hidden="true">${SHAPE[LAWS[name][1]] || ""}</span></button>` : "";
   const lawRow = (names) => names && names.length ? `<div class="laws">${names.map(lawChip).join("")}</div>` : "";
 
@@ -141,24 +130,6 @@ const G_BOOK = {
     if (!e.target.closest("#pop")) closePop();
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePop(); });
-
-  // Review notes
-  const rv = $("#rv");
-  function setReview(on) {
-    document.documentElement.classList.toggle("review", on);
-    rv.setAttribute("aria-pressed", on ? "true" : "false");
-    local.set("sl-review", on);
-    requestAnimationFrame(() => { if (typeof drawEdges === "function") drawEdges(); });
-  }
-  rv.addEventListener("click", () => setReview(!document.documentElement.classList.contains("review")));
-  setReview(!!local.get("sl-review"));
-  $$("[data-note]").forEach((slot) => {
-    const notes = NOTES.filter((n) => n.at === slot.dataset.note);
-    if (!notes.length) { slot.remove(); return; }
-    const frag = document.createDocumentFragment();
-    notes.forEach((n) => { const d = document.createElement("div"); d.className = "rn"; d.innerHTML = `<b>${n.title}</b>${n.text}`; frag.appendChild(d); });
-    slot.replaceWith(frag);
-  });
 
   /* ---------- router ---------- */
   const views = { grammar: $("#v-grammar"), guide: $("#v-guide"), laws: $("#v-laws"), evidence: $("#v-evidence"), decisions: $("#v-decisions") };
@@ -688,7 +659,7 @@ const G_BOOK = {
       S.planes.forEach((p, k) => { p.face.classList.toggle("on", k === i); p.face.classList.toggle("sel", k === i); });
       $$("tr[data-i]", table).forEach((tr) => tr.classList.toggle("sel", +tr.dataset.i === i));
       panel.innerHTML = `<span class="lbl">Layer ${i + 1} of 6, from the ground up</span><h3>${L.name}</h3><p class="gist">${L.gist}</p>` +
-        `<dl><dt>Made by</dt><dd><code>${L.made}</code></dd><dt>Lasts</dt><dd>${L.lasts}</dd><dt>Named by</dt><dd>${L.named}</dd><dt>Status</dt><dd>${chip(L.status, L.was)}</dd></dl>` +
+        `<dl><dt>Made by</dt><dd><code>${L.made}</code></dd><dt>Lasts</dt><dd>${L.lasts}</dd><dt>Named by</dt><dd>${L.named}</dd><dt>Status</dt><dd>${chip(L.status)}</dd></dl>` +
         `<div class="acts"><button class="ibtn" id="toss" ${i === 0 ? "disabled" : ""}>Throw it away</button><a class="ibtn ghost" href="#n-${L.word}">Read <i style="font-family:var(--serif)">${L.word}</i></a></div>` +
         `<div class="rebuild" id="rebuild">${i === 0 ? "The ground can't be thrown away. A record can lose its payload, never its place." : ""}</div>`;
       $("#toss") && $("#toss").addEventListener("click", toss);
@@ -730,7 +701,7 @@ const G_BOOK = {
       const list = NOUNS.filter((n) => n.group === gi);
       return `<div class="dgroup"><div class="gh"><h3>${g.name}</h3><p>${g.gist}</p><span class="lbl">${g.layer}</span></div><div class="entries">` +
         list.map((n) => `<article class="entry" id="n-${n.word}" data-status="${n.status}">` +
-          `<div class="eh"><h4 class="hw">${n.word}</h4><span class="pos">n.</span>${chip(n.status, n.was)}</div>` +
+          `<div class="eh"><h4 class="hw">${n.word}</h4><span class="pos">n.</span>${chip(n.status)}</div>` +
           `<p class="purpose">${n.purpose}</p><p class="principle">${n.principle}</p>` +
           (n.note ? `<p class="note">${n.note}</p>` : "") +
           `<details><summary>State${n.laws.length ? " and laws" : ""}</summary><div><p>${n.state}</p>${lawRow(n.laws)}</div></details>` +
@@ -762,7 +733,7 @@ const G_BOOK = {
     const show = (w) => {
       const v = VERBS.find((x) => x.word === w);
       $$(".vchip", pipe).forEach((c) => c.setAttribute("aria-pressed", c.dataset.v === w));
-      $("#vdetail").innerHTML = `<div class="vh"><b>${v.word}</b><i>v.</i>${chip(v.status, v.was)}</div><p>${v.says}</p>${lawRow(v.laws)}`;
+      $("#vdetail").innerHTML = `<div class="vh"><b>${v.word}</b><i>v.</i>${chip(v.status)}</div><p>${v.says}</p>${lawRow(v.laws)}`;
     };
     pipe.addEventListener("click", (e) => { const c = e.target.closest(".vchip"); if (c) show(c.dataset.v); });
     show("emit");
@@ -807,8 +778,8 @@ const G_BOOK = {
 
   /* ---------- status board ---------- */
   (function board() {
-    const nounLink = (n) => `<a class="nv" href="#n-${n.word}">${n.word}</a>${n.was ? `<span class="mv">was ${n.was}</span>` : ""}`;
-    const verbLink = (v) => `<a class="nv" href="#verbs">${v.word}</a>${v.was ? `<span class="mv">was ${v.was}</span>` : ""}`;
+    const nounLink = (n) => `<a class="nv" href="#n-${n.word}">${n.word}</a>`;
+    const verbLink = (v) => `<a class="nv" href="#verbs">${v.word}</a>`;
     const cols = [
       { k: "proved", items: [`<b>Nouns</b>`, ...NOUNS.filter((n) => n.status === "proved").map(nounLink), `<b>Verbs</b>`, ...VERBS.filter((v) => v.status === "proved").map(verbLink)] },
       { k: "settled", items: [...VERBS.filter((v) => v.status === "settled").map((v) => `${verbLink(v)}: edits become records`), `Naming a vertex by its spec's hash`, `When a vertex ticks`] },
