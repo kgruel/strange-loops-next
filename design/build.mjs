@@ -5,7 +5,7 @@
 //
 // The fragment is what the artifact host wraps in its own document; the full
 // document carries that wrapper's reset (base.css) so the page renders the
-// same on projects.gruel.world. The other pages are built on
+// same on strangeloops.dev. The other pages are built on
 // design/page.mjs and have no artifact mirror. No dependencies.
 
 import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";

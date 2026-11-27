@@ -126,15 +126,16 @@ It requires build refusal except for an explicit, shrink-only survivor list with
 it.
 
 The grammar and laws pages load Motion, a pinned CDN library.
-They publish only at `/strange-loops/grammar/` and `/strange-loops/laws/`, without artifact mirrors.
-The site sync publishes evidence at `/strange-loops/evidence/` and the working documents at `/strange-loops/decisions/`.
+They publish only at `https://strangeloops.dev/grammar/` and `/laws/`, without artifact mirrors.
+The site sync publishes evidence at `/evidence/` and the working documents at `/decisions/`.
 
 CI rebuilds every page and fails if `out/` differs, as with the vectors. To publish:
 
-* **The site:** in `projects.gruel.world`, `npm run sync:strange-loops`
+* **The site:** in the `projects.gruel.world` repository, `npm run sync:strange-loops`
   snapshots the committed page (it refuses uncommitted output), then push its
   `main`. It is served unlisted, with `noindex`, at
-  `https://projects.gruel.world/strange-loops/rethink/`.
+  `https://strangeloops.dev/rethink/`. Addresses under
+  `projects.gruel.world/strange-loops/` redirect there.
 * **The claude.ai artifact** is a mirror.
   `node design/build.mjs --fragment <file>` writes the fragment without a document wrapper; the host adds one.
   Republish that file to the same artifact URL.

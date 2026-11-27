@@ -1,6 +1,6 @@
 // The shell the site's pages share: one placeholder per generated block, the header
 // that links the pages, and the document around them. Pages built on this one are
-// served only on projects.gruel.world, so they may load pinned libraries from a CDN.
+// served only on strangeloops.dev, so they may load pinned libraries from a CDN.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

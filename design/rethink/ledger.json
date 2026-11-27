@@ -466,7 +466,7 @@
     "group": "Building",
     "status": "settled",
     "claim": "The design page is built from the repo.",
-    "why": "Its sections are HTML and its ledger is these records, in <code>design/rethink/</code>. <code>node design/build.mjs</code> renders the page, CI checks the render, projects.gruel.world serves it unlisted, and the claude.ai artifact is a mirror. <code>.loops/</code> exists since step 2; the ledger still builds from <code>ledger.json</code>, and <code>ledger-drafts.mjs</code> turns it into drafts for <code>loops emit -</code>. Version 35."
+    "why": "Its sections are HTML and its ledger is these records, in <code>design/rethink/</code>. <code>node design/build.mjs</code> renders the page, CI checks the render, strangeloops.dev serves it unlisted, and the claude.ai artifact is a mirror. <code>.loops/</code> exists since step 2; the ledger still builds from <code>ledger.json</code>, and <code>ledger-drafts.mjs</code> turns it into drafts for <code>loops emit -</code>. Version 35."
   },
   {
     "kind": "decision",
