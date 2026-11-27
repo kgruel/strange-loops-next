@@ -1,0 +1,58 @@
+[
+ {
+  "name": "Text",
+  "gist": "For an audience: what a lens renders, and what people edit.",
+  "made": "render",
+  "lasts": "until the next render",
+  "named": "its base: the tick, the lens and the audience",
+  "status": "proved",
+  "go": "nouns",
+  "word": "lens"
+ },
+ {
+  "name": "Tick",
+  "gist": "A result at a moment, covering exactly the records folded.",
+  "made": "tick",
+  "lasts": "kept when someone cites it",
+  "named": "an id over the vertex, what it covers and the result",
+  "status": "proved",
+  "was": "settled",
+  "word": "tick"
+ },
+ {
+  "name": "State",
+  "gist": "A vertex's slots, worked out from the set.",
+  "made": "fold",
+  "lasts": "a cache, worked out again at will",
+  "named": "its vertex and the set",
+  "status": "proved",
+  "word": "slot"
+ },
+ {
+  "name": "View",
+  "gist": "What one reader holds, settled and admitted.",
+  "made": "settle, admit",
+  "lasts": "until more arrives",
+  "named": "nothing: it is the reader's own",
+  "status": "proved",
+  "word": "view"
+ },
+ {
+  "name": "Store",
+  "gist": "A set of records in places. No order, no positions.",
+  "made": "holding",
+  "lasts": "as long as a place keeps it",
+  "named": "its anchor",
+  "status": "proved",
+  "word": "store"
+ },
+ {
+  "name": "Record",
+  "gist": "The ground. Added, never edited. Only a payload can go.",
+  "made": "emit",
+  "lasts": "for good",
+  "named": "<code>r:</code> and a content hash",
+  "status": "proved",
+  "word": "record"
+ }
+]

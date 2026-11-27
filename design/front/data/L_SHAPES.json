@@ -1,0 +1,50 @@
+[
+ {
+  "k": "invariance",
+  "mark": "=",
+  "name": "Invariance",
+  "template": "Change <i>this</i>, and <i>that</i> stays.",
+  "gist": "What you may vary without moving the answer. Most laws are this one.",
+  "n": 45
+ },
+ {
+  "k": "round-trip",
+  "mark": "↺",
+  "name": "Round trip",
+  "template": "Render, then parse, and you get the form back. Parse, then render, and you get its normal form.",
+  "gist": "Render then parse is exact; parse then render is exact up to normal form. Nothing is lost on the way out and back.",
+  "n": 10
+ },
+ {
+  "k": "refinement",
+  "mark": "?",
+  "name": "Refinement",
+  "template": "With less in, an answer stays, becomes unknown, or says how much it could not read.",
+  "gist": "What a reader missing payloads is promised, and how it is told.",
+  "n": 4
+ },
+ {
+  "k": "order",
+  "mark": "<",
+  "name": "Order",
+  "template": "Any two distinct things compare one way. With a held safe whole value and a numeric bound, exactly one of at-least and below holds. Present times obey the corresponding time law.",
+  "gist": "Strict total orders and complements: no ties between distinct things, no gaps where the test answers.",
+  "n": 7
+ },
+ {
+  "k": "exactness",
+  "mark": "⇔",
+  "name": "Exactness",
+  "template": "Where the line is: an if and only if where the law states one, otherwise a guarantee on one side of it. Where the law refuses, it says what it refuses with.",
+  "gist": "Each law states its exact boundary: an equivalence, a one-way guarantee or a named refusal.",
+  "n": 54
+ },
+ {
+  "k": "limit",
+  "mark": "!",
+  "name": "Limit",
+  "template": "This one moves, or can't be done here, and here is who accounts for it.",
+  "gist": "What doesn't hold, said as plainly as what does.",
+  "n": 4
+ }
+]

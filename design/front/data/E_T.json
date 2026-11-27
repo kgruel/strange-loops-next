@@ -1,0 +1,1638 @@
+{
+ "idDigest_length": [
+  "Laws.Id",
+  "∀ (n : RecordId), (idDigest n).length = 32"
+ ],
+ "idDigest_byte": [
+  "Laws.Id",
+  "∀ (n : RecordId) (d : Nat), d ∈ idDigest n → d < 256"
+ ],
+ "idDigest_roundtrip": [
+  "Laws.Id",
+  "∀ (n : RecordId), List.foldl (fun a d => 256 * a + d) 0 (idDigest n) = ↑n"
+ ],
+ "idDigest_bytes_roundtrip": [
+  "Laws.Id",
+  "∀ (n : RecordId), List.foldl (fun a b => 256 * a + b.toNat) 0 (List.map Nat.toUInt8 (idDigest n)) = ↑n"
+ ],
+ "idText_injective": [
+  "Laws.IdText",
+  "∀ {a b : RecordId}, idText a = idText b → a = b"
+ ],
+ "bytes_bounded": [
+  "Loops.Id",
+  "∀ (bs : List UInt8), bs.length = 32 → List.foldl (fun a b => 256 * a + b.toNat) 0 bs < 256 ^ 32"
+ ],
+ "bytes_idDigest": [
+  "Laws.Id",
+  "∀ (bs : List UInt8) (h : bs.length = 32), List.map Nat.toUInt8 (idDigest ⟨List.foldl (fun a b => 256 * a + b.toNat) 0 bs, ⋯⟩) = bs"
+ ],
+ "idOf_eq_idText": [
+  "Laws.IdText",
+  "∀ (H : Hash) (env : Env) (commit : String) (h : (H (utf8 (idPreimage env commit))).length = 32), idOf H env commit = idText ⟨List.foldl (fun a b => 256 * a + b.toNat) 0 (H (utf8 (idPreimage env commit))), ⋯⟩"
+ ],
+ "Gen.sha256_length": [
+  "Laws.IdSource",
+  "∀ (msg : List UInt8), (Gen.sha256 msg).length = 32"
+ ],
+ "Gen.sha256_bounded": [
+  "Laws.IdSource",
+  "∀ (msg : List UInt8), List.foldl (fun a b => 256 * a + b.toNat) 0 (Gen.sha256 msg) < 256 ^ 32"
+ ],
+ "Gen.sha256_idOf_eq_idText": [
+  "Laws.IdSource",
+  "∀ (env : Env) (commit : String), idOf Gen.sha256 env commit = idText ⟨List.foldl (fun a b => 256 * a + b.toNat) 0 (Gen.sha256 (utf8 (idPreimage env commit))), ⋯⟩"
+ ],
+ "Gen.Read.recordId_bounded": [
+  "Laws.IdSource",
+  "∀ {path : String} {j : Json} {n : RecordId}, Gen.Read.recordId path j = Except.ok n → ↑n < 256 ^ 32"
+ ],
+ "base32_injective": [
+  "Laws.Base32",
+  "∀ (a b : List UInt8), base32 a = base32 b → a = b"
+ ],
+ "unbase32_base32": [
+  "Laws.Base32",
+  "∀ (bs : List UInt8), unbase32 (base32 bs) = some bs"
+ ],
+ "unbase32_eq_some_iff": [
+  "Laws.Base32",
+  "∀ (s : String) (bs : List UInt8), unbase32 s = some bs ↔ base32 bs = s"
+ ],
+ "byteText_eq_true_iff": [
+  "Laws.Base32",
+  "∀ (n : Nat) (s : String), byteText n s = true ↔ ∃ bs, bs.length = n ∧ base32 bs = s"
+ ],
+ "idText_order": [
+  "Laws.IdText",
+  "∀ (a b : RecordId), idText a < idText b ↔ a < b"
+ ],
+ "instant_moment_unique": [
+  "Laws.Instant",
+  "∀ {a b : String} {m : Moment}, instant? a.toList = some m → instant? b.toList = some m → a = b"
+ ],
+ "instantParts_render": [
+  "Laws.Instant",
+  "∀ {cs : List Char} {t : Instant}, instantParts? cs = some t → t.text.toList = cs"
+ ],
+ "instant_parse_render": [
+  "Laws.Instant",
+  "∀ {s : String} {t : Instant}, instantParts? s.toList = some t → t.text = s"
+ ],
+ "Count.batch": [
+  "Laws.Fold",
+  "∀ (n : Nat) (xs ys : List Record), Count.fold (Count.fold n xs) ys = Count.fold n (xs ++ ys)"
+ ],
+ "LatestBy.batch": [
+  "Laws.Fold",
+  "∀ (s : LatestBy) (xs ys : List Record), (s.fold xs).fold ys = s.fold (xs ++ ys)"
+ ],
+ "Count.perm": [
+  "Laws.Fold",
+  "∀ {xs ys : List Record}, xs.Perm ys → ∀ (n : Nat), Count.fold n xs = Count.fold n ys"
+ ],
+ "Count.repeats": [
+  "Laws.Fold",
+  "∀ (xs : List Record), Count.fold 0 (xs ++ xs) = 2 * Count.fold 0 xs"
+ ],
+ "LatestBy.set_decides": [
+  "Laws.Fold",
+  "∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → LatestBy.empty.fold xs = LatestBy.empty.fold ys"
+ ],
+ "LatestBy.winner_newer": [
+  "Laws.Families",
+  "∀ {xs : List Record}, Addressed xs → ∀ {w : Record}, (LatestBy.empty.fold xs).winner = some w → (w ∈ xs ∧ ¬∃ r, r ∈ xs ∧ w.id ∈ r.prev) ∧ ∀ (o : Record), o ∈ (LatestBy.empty.fold xs).others → Newer w o"
+ ],
+ "Newer.irrefl": [
+  "Laws.Order",
+  "∀ (a : Record), ¬Newer a a"
+ ],
+ "Newer.trans": [
+  "Laws.Order",
+  "∀ {a b c : Record}, Newer a b → Newer b c → Newer a c"
+ ],
+ "Newer.total": [
+  "Laws.Order",
+  "∀ (a b : Record), Newer a b ∨ Newer b a ∨ a.id = b.id"
+ ],
+ "Newer.congr": [
+  "Laws.Order",
+  "∀ {a a' b b' : Record}, a.span = a'.span → a.emitted.moment = a'.emitted.moment → a.id = a'.id → b.span = b'.span → b.emitted.moment = b'.emitted.moment → b.id = b'.id → (Newer a b ↔ Newer a' b')"
+ ],
+ "id_order": [
+  "Laws.Order",
+  "∀ (a b : RecordId), idDigest a < idDigest b ↔ a < b"
+ ],
+ "LatestBy.repeats": [
+  "Laws.Fold",
+  "∀ {xs : List Record}, Addressed xs → LatestBy.empty.fold (xs ++ xs) = LatestBy.empty.fold xs"
+ ],
+ "LatestBy.converge": [
+  "Laws.Fold",
+  "∀ {xs ys : List Record}, Addressed (xs ++ ys) → (LatestBy.empty.fold xs).fold ys = (LatestBy.empty.fold ys).fold xs"
+ ],
+ "Latest.set_decides": [
+  "Laws.Things",
+  "∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → Latest.fold xs = Latest.fold ys"
+ ],
+ "Latest.perm": [
+  "Laws.Things",
+  "∀ {xs ys : List Record}, Addressed xs → xs.Perm ys → Latest.fold xs = Latest.fold ys"
+ ],
+ "Latest.repeats": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → Latest.fold (xs ++ xs) = Latest.fold xs"
+ ],
+ "mem_wholeHeads": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → ∀ {r : Record}, r ∈ wholeHeads xs ↔ ∃ t, t ∈ thingsOf xs ∧ r ∈ (stateIn t xs).heads"
+ ],
+ "wholeHeads_sorted": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → List.Pairwise Newer (wholeHeads xs)"
+ ],
+ "wholeHeads_distinct": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → Distinct (wholeHeads xs)"
+ ],
+ "Latest.winner_newest": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → ∀ {w : Record}, Latest.winner (Latest.fold xs) = some w → (∃ t, t ∈ thingsOf xs ∧ w ∈ (stateIn t xs).heads) ∧ ∀ (o : Record), o ∈ wholeHeads xs → o = w ∨ Newer w o"
+ ],
+ "Latest.others_ordered": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → List.Pairwise Newer (Latest.others (Latest.fold xs))"
+ ],
+ "Latest.oneThing": [
+  "Laws.Things",
+  "∀ {t : String} {xs : List Record}, Addressed xs → OneThing t xs → Latest.fold xs = LatestBy.empty.fold xs"
+ ],
+ "Stored.read_opening": [
+  "Laws.Payload",
+  "∀ (env : Env) (salt : List UInt8) (p : Json) (r : Record), (make env salt p).readInto r = { id := r.id, kind := r.kind, observer := r.observer, about := r.about, of := r.of, prev := r.prev, under := r.under, occurred := r.occurred, emitted := r.emitted, erases := r.erases, sets := r.sets, fields := payloadFields p }"
+ ],
+ "Stored.fields_payload_only": [
+  "Laws.Payload",
+  "∀ (e e' : Env) (s s' : List UInt8) (p : Json) (r r' : Record), ((make e s p).readInto r).fields = ((make e' s' p).readInto r').fields"
+ ],
+ "Stored.read_erased": [
+  "Laws.Payload",
+  "∀ (e : Env) (commit : String) (r : Record), { env := e, body := Body.erased commit }.readInto r = r.erase"
+ ],
+ "payloadFields_nonobject": [
+  "Laws.Payload",
+  "∀ (p : Json), (∀ (kvs : List (String × Json)), p ≠ Json.obj kvs) → payloadFields p = []"
+ ],
+ "payloadFields_lookup": [
+  "Laws.Payload",
+  "∀ (kvs : List (String × Json)) (f : String), List.lookup f (payloadFields (Json.obj kvs)) = Option.map readHeld (List.lookup f kvs)"
+ ],
+ "readHeld_members_nameable": [
+  "Laws.Payload",
+  "∀ (xs : List Json) (vs : List Val), readHeld (Json.arr xs) = HeldField.many vs → ∀ (v : Val), v ∈ vs → v.nameable = true"
+ ],
+ "Record.num_safe": [
+  "Laws.Numeric",
+  "∀ {r : Record} {field : String} {i : Int}, r.num field = some i → -(2 ^ 53 - 1) ≤ i ∧ i ≤ 2 ^ 53 - 1"
+ ],
+ "Record.num_number": [
+  "Laws.Numeric",
+  "∀ {r : Record} {field : String} {n : Number}, r.get field = some (HeldField.one (Val.number n)) → r.num field = none"
+ ],
+ "Record.num_hidden": [
+  "Laws.Numeric",
+  "∀ {r : Record} (field : String), r.shown ≠ Shown.here → r.num field = none"
+ ],
+ "Record.num_many": [
+  "Laws.Payload",
+  "∀ (r : Record) (f : String) (vs : List Val), r.get f = some (HeldField.many vs) → r.num f = none"
+ ],
+ "Sum.on_step_missing": [
+  "Laws.Families",
+  "∀ {field : String} {r : Record} (s : Int), r.num field = none → (Sum.on field).step s r = s"
+ ],
+ "Max.acc_readable": [
+  "Laws.Families",
+  "∀ (r : Record), Max.acc.readable r = (r.num \"n\").isSome"
+ ],
+ "Min.acc_readable": [
+  "Laws.Families",
+  "∀ (r : Record), Min.acc.readable r = (r.num \"n\").isSome"
+ ],
+ "Sum.perm": [
+  "Laws.Numeric",
+  "∀ (p : Record → Option Int) {xs ys : List Record}, xs.Perm ys → ∀ (s : Int), Sum.fold p s xs = Sum.fold p s ys"
+ ],
+ "Sum.repeats": [
+  "Laws.Numeric",
+  "∀ (p : Record → Option Int) (xs : List Record), Sum.fold p 0 (xs ++ xs) = 2 * Sum.fold p 0 xs"
+ ],
+ "Max.set_decides": [
+  "Laws.Numeric",
+  "∀ (p : Record → Option Int) {xs ys : List Record}, (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → Max.fold p none xs = Max.fold p none ys"
+ ],
+ "Min.set_decides": [
+  "Laws.Numeric",
+  "∀ (p : Record → Option Int) {xs ys : List Record}, (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → Min.fold p none xs = Min.fold p none ys"
+ ],
+ "Distinct.addressed": [
+  "Laws.Families",
+  "∀ {xs : List Record}, Distinct xs → Addressed xs"
+ ],
+ "distinct_dedup": [
+  "Laws.Families",
+  "∀ (xs : List Record), Distinct (dedup xs)"
+ ],
+ "mem_dedup": [
+  "Laws.Families",
+  "∀ {xs : List Record}, Addressed xs → ∀ {r : Record}, r ∈ dedup xs ↔ r ∈ xs"
+ ],
+ "dedup_union": [
+  "Laws.Families",
+  "∀ {xs ys : List Record}, Addressed (xs ++ ys) → (dedup (xs ++ ys)).Perm (dedup (ys ++ xs))"
+ ],
+ "Acc.set_decides": [
+  "Laws.Families",
+  "∀ {σ : Type} (f : Acc σ) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → f.fold xs = f.fold ys"
+ ],
+ "Acc.late": [
+  "Laws.Families",
+  "∀ {σ : Type} (f : Acc σ) {xs ys : List Record} (r : Record), Distinct (xs ++ [r]) → Distinct ys → (∀ (q : Record), q ∈ ys ↔ q ∈ xs ∨ q = r) → f.step (f.fold xs) r = f.fold ys"
+ ],
+ "OverHeads.set_decides": [
+  "Laws.Families",
+  "∀ {σ : Sort u_1} (answer : LatestBy → σ) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → OverHeads.fold answer xs = OverHeads.fold answer ys"
+ ],
+ "OverHeads.late": [
+  "Laws.Families",
+  "∀ {σ : Sort u_1} (answer : LatestBy → σ) {xs ys : List Record} (r : Record), Addressed (xs ++ [r]) → Addressed ys → (∀ (q : Record), q ∈ ys ↔ q ∈ xs ∨ q = r) → answer ((LatestBy.empty.fold xs).step r) = OverHeads.fold answer ys"
+ ],
+ "Max.cannot_follow_prev": [
+  "Laws.Families",
+  "¬∃ g, ∀ (xs : List Record) (r : Record), Distinct (xs ++ [r]) → g (Max.fold (fun x => x.num \"n\") none xs) r = (OverHeads.fold LatestBy.maxHeads (xs ++ [r])).value"
+ ],
+ "LatestBy.view": [
+  "Laws.Families",
+  "∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → LatestBy.empty.fold (List.map f xs) = { named := (LatestBy.empty.fold xs).named, heads := List.map f (LatestBy.empty.fold xs).heads }"
+ ],
+ "LatestBy.map_fold": [
+  "Laws.Families",
+  "∀ {f : Record → Record}, (∀ (r : Record), (f r).id = r.id) → (∀ (r : Record), (f r).prev = r.prev) → (∀ (a b : Record), Newer (f a) (f b) ↔ Newer a b) → ∀ {xs : List Record}, Addressed xs → LatestBy.empty.fold (List.map f xs) = { named := (LatestBy.empty.fold xs).named, heads := List.map f (LatestBy.empty.fold xs).heads }"
+ ],
+ "LatestBy.view_head_ids": [
+  "Laws.Families",
+  "∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → List.map (fun x => x.id) (LatestBy.empty.fold (List.map f xs)).heads = List.map (fun x => x.id) (LatestBy.empty.fold xs).heads"
+ ],
+ "LatestBy.no_false_resurrection": [
+  "Laws.Families",
+  "∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → ∀ {r q : Record}, q ∈ xs → r.id ∈ q.prev → ∀ (h : Record), h ∈ (LatestBy.empty.fold (List.map f xs)).heads → h.id ≠ r.id"
+ ],
+ "Where.eval_view": [
+  "Laws.Families",
+  "∀ {f : Record → Record}, View f → ∀ (w : Where) (r : Record), (w.eval (f r)).Refines (w.eval r)"
+ ],
+ "LatestBy.maxHeads_view": [
+  "Laws.Families",
+  "∀ {f : Record → Record}, View f → ∀ {xs : List Record}, Addressed xs → (OverHeads.fold LatestBy.maxHeads (List.map f xs)).unread = (List.filter (fun h => ((f h).num \"n\").isNone) (LatestBy.empty.fold xs).heads).length"
+ ],
+ "Acc.select_unread": [
+  "Laws.Families",
+  "∀ {σ : Type} (f : Acc σ) (ev : Record → Tri) (xs : List Record), (f.select ev xs).unread = (List.filter (fun r => ev r == Tri.unknown || ev r == Tri.yes && !f.readable r) xs).length"
+ ],
+ "Count.select_unread": [
+  "Laws.Families",
+  "∀ (ev : Record → Tri) (xs : List Record), (Count.acc.select ev xs).unread = (List.filter (fun x => ev x == Tri.unknown) xs).length"
+ ],
+ "latestOf_unread": [
+  "Laws.Spec",
+  "∀ (sel : Record → Bool) (cs : List Cond) (xs : List Record) {ts : List (String × List (RecordId × Shown))} {u : Nat}, latestOf sel cs xs = SlotValue.things ts u → u = (idsOf (List.filter (fun r => chosen sel cs r && payTest cs r == Tri.unknown) (List.flatMap (fun x => x.snd.heads) (perThing xs)))).length"
+ ],
+ "collectOf_unread": [
+  "Laws.Spec",
+  "∀ (sel : Record → Bool) (cs : List Cond) (follow : Bool) (limit : Option Nat) {xs : List Record}, Addressed xs → ∀ {hs : List (RecordId × Shown)} {u : Nat}, collectOf sel cs follow limit xs = SlotValue.heads hs u → u = (idsOf (List.filter (fun r => chosen sel cs r && payTest cs r == Tri.unknown) (if follow = true then List.flatMap (fun x => x.snd.heads) (perThing xs) else xs))).length"
+ ],
+ "Count.followed_unread": [
+  "Laws.Spec",
+  "∀ (sel : Record → Bool) (cs : List Cond) {xs : List Record}, Addressed xs → (Count.acc.select (fun r => if sel r = true then Cond.all cs r else Tri.no) (accPool (some Follow.prev) xs)).unread = (idsOf (List.filter (fun r => chosen sel cs r && payTest cs r == Tri.unknown) (wholeHeads xs))).length"
+ ],
+ "Acc.select_full": [
+  "Laws.Families",
+  "∀ {σ : Type} (f : Acc σ) (ev : Record → Tri) {xs : List Record}, (∀ (r : Record), r ∈ xs → ev r ≠ Tri.unknown) → (∀ (r : Record), r ∈ xs → f.readable r = true) → f.select ev xs = { value := f.fold (List.filter (fun x => ev x == Tri.yes) xs), unread := 0 }"
+ ],
+ "Acc.select_set_decides": [
+  "Laws.Families",
+  "∀ {σ : Type} (f : Acc σ) (ev : Record → Tri) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → f.select ev xs = f.select ev ys"
+ ],
+ "settle_eq": [
+  "Laws.Things",
+  "∀ {xs ys : List Record}, Forms xs → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → settle xs = settle ys"
+ ],
+ "settle_distinct": [
+  "Laws.Things",
+  "∀ (xs : List Record), Distinct (settle xs)"
+ ],
+ "settle_keeps": [
+  "Laws.Things",
+  "∀ {xs : List Record} {a : Record}, a ∈ xs → a.shown = Shown.here → erasedIn xs a.id = false → ∃ r, r ∈ settle xs ∧ r.id = a.id ∧ r.shown = Shown.here"
+ ],
+ "settle_erased": [
+  "Laws.Things",
+  "∀ {xs : List Record} {i : RecordId}, erasedIn xs i = true → ∀ {r : Record}, r ∈ settle xs → r.id = i → r.shown = Shown.erased"
+ ],
+ "admit_same": [
+  "Laws.Things",
+  "∀ (may : Record → Record → Bool) {xs ys : List Record}, (∀ (q : Record), q ∈ xs ↔ q ∈ ys) → ∀ (r : Record), r ∈ admit may xs ↔ r ∈ admit may ys"
+ ],
+ "refusalOf_none": [
+  "Laws.Things",
+  "∀ (may : Record → Record → Bool) (xs : List Record) (r : Record), refusalOf may xs r = none ↔ entitled may xs r = true"
+ ],
+ "admit_no_cross": [
+  "Laws.Things",
+  "∀ {may : Record → Record → Bool} {xs : List Record} {r q : Record}, r ∈ admit may xs → q ∈ xs → q.id ∈ r.prev → shares r q = true ∧ may r q = true"
+ ],
+ "admit_same_thing": [
+  "Laws.Things",
+  "∀ {may : Record → Record → Bool} {xs : List Record} {r q : Record}, r ∈ admit may xs → q ∈ xs → q.id ∈ r.prev → q.thing = r.thing"
+ ],
+ "perThing_cannot_follow_admit": [
+  "Laws.Things",
+  "¬∃ g, ∀ (xs : List Record) (r : Record), Distinct (xs ++ [r]) → g (perThing (admit (fun x x_1 => true) xs)) r = perThing (admit (fun x x_1 => true) (xs ++ [r]))"
+ ],
+ "admit_append_unnamed": [
+  "Laws.Things",
+  "∀ (may : Record → Record → Bool) {xs : List Record} {r : Record}, (∀ (q : Record), q ∈ xs → ¬r.id ∈ q.prev) → admit may (xs ++ [r]) = admit may xs ++ if entitled may (xs ++ [r]) r = true then [r] else []"
+ ],
+ "stateIn_late_unnamed": [
+  "Laws.Things",
+  "∀ (may : Record → Record → Bool) {xs : List Record} {r : Record} (t : String), (∀ (q : Record), q ∈ xs → ¬r.id ∈ q.prev) → stateIn t (admit may (xs ++ [r])) = if (entitled may (xs ++ [r]) r && r.isOf t) = true then (stateIn t (admit may xs)).step r else stateIn t (admit may xs)"
+ ],
+ "isOf_iff": [
+  "Laws.Things",
+  "∀ {r : Record} {t : String}, r.isOf t = true ↔ r.thing = t"
+ ],
+ "isOf_unique": [
+  "Laws.Things",
+  "∀ {r : Record} {t u : String}, r.isOf t = true → r.isOf u = true → t = u"
+ ],
+ "stateIn_heads_thing": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → ∀ {t : String} {r : Record}, r ∈ (stateIn t xs).heads → r.thing = t"
+ ],
+ "heads_one_thing": [
+  "Laws.Things",
+  "∀ {xs : List Record}, Addressed xs → ∀ {t u : String} {r : Record}, r ∈ (stateIn t xs).heads → r ∈ (stateIn u xs).heads → t = u"
+ ],
+ "stateIn_local": [
+  "Laws.Things",
+  "∀ {t : String} {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ∧ r.isOf t = true ↔ r ∈ ys ∧ r.isOf t = true) → stateIn t xs = stateIn t ys"
+ ],
+ "perThing_set_decides": [
+  "Laws.Things",
+  "∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → perThing xs = perThing ys"
+ ],
+ "stateIn_about": [
+  "Laws.Things",
+  "∀ (m : Record → List String) (t : String) {xs : List Record}, Addressed xs → stateIn t (List.map (mentioning m) xs) = { named := (stateIn t xs).named, heads := List.map (mentioning m) (stateIn t xs).heads }"
+ ],
+ "thingsOf_about": [
+  "Laws.Things",
+  "∀ (m : Record → List String) (xs : List Record), thingsOf (List.map (mentioning m) xs) = thingsOf xs"
+ ],
+ "stateIn_slice": [
+  "Laws.Slice",
+  "∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {t : String} {S W : List Record}, Forms W → Slice t S W → stateIn t (realm may S) = stateIn t (realm may W)"
+ ],
+ "slice_needs_erasers": [
+  "Laws.Slice",
+  "stateIn \"k1\" (realm (fun x x_1 => true) [sl.x]) ≠ stateIn \"k1\" (realm (fun x x_1 => true) [sl.x, sl.e])"
+ ],
+ "slice_needs_targets": [
+  "Laws.Slice",
+  "stateIn \"k1\" (realm (fun x x_1 => true) [sl.s]) ≠ stateIn \"k1\" (realm (fun x x_1 => true) [sl.s, sl.p])"
+ ],
+ "witnessed_iff": [
+  "Laws.LiveSlice",
+  "∀ {U W : List Record}, (∀ (q : Record), q ∈ U → q ∈ W) → ∀ (o : Option String), Witnessed U W o ↔ ∀ (a : Record), a ∈ U → liveK U o a = liveK W o a"
+ ],
+ "keyedIn_part": [
+  "Laws.LiveSlice",
+  "∀ {t : String} {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ recordsOf t ys → r ∈ recordsOf t xs) → (∀ (r : Record), r ∈ recordsOf t xs → live (recordsOf t xs) r = true → r ∈ recordsOf t ys) → (∀ (o : Option String), Witnessed (recordsOf t ys) (recordsOf t xs) o) → keyedIn t ys = keyedIn t xs"
+ ],
+ "liveK_part": [
+  "Laws.LiveSlice",
+  "∀ {U W : List Record}, (∀ (q : Record), q ∈ U → q ∈ W) → ∀ {o : Option String} {r : Record}, liveK W o r = true → liveK U o r = true"
+ ],
+ "witnessed_of_convex": [
+  "Laws.LiveSlice",
+  "∀ {U W : List Record}, NoCycle W → Convex U W → ∀ (o : Option String), (∀ (a : Record), a ∈ W → liveK W o a = true → a ∈ U) → Witnessed U W o"
+ ],
+ "keyedIn_convex": [
+  "Laws.LiveSlice",
+  "∀ {t : String} {xs ys : List Record}, Addressed xs → Addressed ys → NoCycle (recordsOf t xs) → (∀ (r : Record), r ∈ recordsOf t ys → r ∈ recordsOf t xs) → (∀ (r : Record), r ∈ recordsOf t xs → live (recordsOf t xs) r = true → r ∈ recordsOf t ys) → Convex (recordsOf t ys) (recordsOf t xs) → keyedIn t ys = keyedIn t xs"
+ ],
+ "convex_not_needed": [
+  "Laws.LiveSlice",
+  "Witnessed [lv.a, lv.c] [lv.a, lv.b, lv.c] (some \"status\") ∧ Witnessed [lv.a, lv.c] [lv.a, lv.b, lv.c] none ∧ ¬Convex [lv.a, lv.c] [lv.a, lv.b, lv.c]"
+ ],
+ "anchored_slice": [
+  "Laws.LiveSlice",
+  "∀ {W : List Record}, NoCycle W → Anchored W → ∀ (o : Option String) {a : Record}, a ∈ W → (live W a = true ∧ liveK (liveOf W) o a = true ↔ liveK W o a = true)"
+ ],
+ "anchoredKeys_slice": [
+  "Laws.LiveSlice",
+  "∀ {W : List Record}, NoCycle W → AnchoredKeys W → ∀ (k : String) {a : Record}, a ∈ W → (live W a = true ∧ liveFor (liveOf W) k a = true ↔ liveFor W k a = true)"
+ ],
+ "keyedIn_live": [
+  "Laws.LiveSlice",
+  "∀ {t : String} {xs : List Record}, Addressed xs → NoCycle (recordsOf t xs) → Anchored (recordsOf t xs) → keyedIn t (liveOf (recordsOf t xs)) = keyedIn t xs"
+ ],
+ "anchored_of_written": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {W : List Record}, Addressed W → Anchoring saw W → ClosedOver saw W → Anchored W"
+ ],
+ "closed_needed": [
+  "Laws.LiveSlice",
+  "Anchoring cl.saw [cl.x, cl.y, cl.y2] ∧ ¬ClosedOver cl.saw [cl.x, cl.y, cl.y2] ∧ liveFor (liveOf [cl.x, cl.y, cl.y2]) \"a\" cl.x = true ∧ liveFor [cl.x, cl.y, cl.y2] \"a\" cl.x = false"
+ ],
+ "heads_slice": [
+  "Laws.LiveSlice",
+  "∀ {W : List Record}, NoCycle W → Anchored W → ∀ {a : Record}, a ∈ W → (live W a = true ∧ liveEnv (liveOf W) a = true ↔ liveEnv W a = true)"
+ ],
+ "live_named_by_head": [
+  "Laws.LiveSlice",
+  "∀ {W : List Record}, NoCycle W → Anchored W → ∀ {a : Record}, a ∈ W → live W a = true → liveEnv W a = true ∨ ∃ b, b ∈ W ∧ liveEnv W b = true ∧ a.id ∈ b.prev"
+ ],
+ "heads_need_env": [
+  "Laws.LiveSlice",
+  "AnchoredKeys [hd.t, hd.s1, hd.s2] ∧ liveOf [hd.t, hd.s1, hd.s2] = [hd.t, hd.s2] ∧ liveEnv [hd.t, hd.s2] hd.t = true ∧ liveEnv [hd.t, hd.s1, hd.s2] hd.t = false"
+ ],
+ "down_reads": [
+  "Laws.LiveSlice",
+  "∀ {S W : List Record}, Down S W → ∀ (o : Option String) (r : Record), liveK S o r = true ↔ setsK o r = true ∧ ∀ (q : Record), q ∈ S → q ∈ above W r → setsK o q = false"
+ ],
+ "closedOver_of_down": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {S W : List Record}, NoCycle W → Anchoring saw W → ClosedOver saw W → Down S W → ClosedOver saw S"
+ ],
+ "anchored_of_down": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {S W : List Record}, Addressed W → NoCycle W → Anchoring saw W → ClosedOver saw W → Down S W → Anchored S"
+ ],
+ "KeyedPart.of_down": [
+  "Laws.KeyedSpecSlice",
+  "∀ {may : Record → Record → Bool} {S W : List Record}, EnvOnly may → ∀ {t : String}, Forms W → Down S W → (∀ (a : Record), a ∈ S → a.isOf t = true → ∀ (b : Record), b ∈ W → b.id = a.id → b ∈ S) → (∀ (a : Record), a ∈ S → a.isOf t = true → ∀ (e : Record), e ∈ W → e.erases.contains a.id = true → e ∈ S) → KeyedPart may t S W"
+ ],
+ "Anchoring.emit": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {W B : List Record} {y : Record}, Anchoring saw W → ClosedOver saw W → ¬y ∈ W → (∀ (x : Record), x ∈ B → x ∈ W) → ClosedOver saw B → (∀ (p : RecordId), p ∈ y.prev → ∃ x, x ∈ B ∧ x.id = p) → (∀ (x : Record), x ∈ B → live B x = true → x.id ∈ y.prev) → Anchoring (sawWith saw y B) (y :: W)"
+ ],
+ "anchored_emit": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {W B : List Record} {y : Record}, Addressed (y :: W) → Anchoring saw W → ClosedOver saw W → ¬y ∈ W → (∀ (x : Record), x ∈ B → x ∈ W) → ClosedOver saw B → (∀ (p : RecordId), p ∈ y.prev → ∃ x, x ∈ B ∧ x.id = p) → (∀ (x : Record), x ∈ B → live B x = true → x.id ∈ y.prev) → Anchored (y :: W)"
+ ],
+ "anchored_emit_down": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {W B : List Record} {y : Record}, Addressed (y :: W) → NoCycle W → Anchoring saw W → ClosedOver saw W → ¬y ∈ W → Down B W → (∀ (p : RecordId), p ∈ y.prev → ∃ x, x ∈ B ∧ x.id = p) → (∀ (x : Record), x ∈ B → live B x = true → x.id ∈ y.prev) → Anchored (y :: W)"
+ ],
+ "anchored_emit_live": [
+  "Laws.LiveSlice",
+  "∀ {saw : Record → List Record} {W B D : List Record} {y : Record}, Addressed (y :: W) → NoCycle W → Anchoring saw W → ClosedOver saw W → ¬y ∈ W → Down D W → (∀ (x : Record), x ∈ B → x ∈ D) → (∀ (x : Record), x ∈ D → live D x = true → x ∈ B) → (∀ (p : RecordId), p ∈ y.prev → ∃ x, x ∈ B ∧ x.id = p) → (∀ (x : Record), x ∈ B → live B x = true → x.id ∈ y.prev) → Anchored (y :: W)"
+ ],
+ "liveK_emit_more": [
+  "Laws.LiveSlice",
+  "∀ {W : List Record} {y y' : Record}, Fresh y W → Fresh y' W → (∀ (p : RecordId), p ∈ y.prev → p ∈ y'.prev) → (∀ (p' : RecordId), p' ∈ y'.prev → ∃ p, p ∈ y.prev ∧ ∃ x, x.id = p' ∧ Reach W [x.id] p) → ∀ (o : Option String), setsK o y = setsK o y' → ∀ {r : Record}, liveK (y :: W) o r = liveK (y' :: W) o r"
+ ],
+ "base_closed_needed": [
+  "Laws.LiveSlice",
+  "Anchoring cl.saw [cl.x, cl.y] ∧ ClosedOver cl.saw [cl.x, cl.y] ∧ ¬ClosedOver cl.saw [cl.y] ∧ bs.w.prev = List.map (fun x => x.id) (liveOf [cl.y]) ∧ ¬Anchored [bs.w, cl.x, cl.y] ∧ liveFor (liveOf [bs.w, cl.x, cl.y]) \"a\" cl.x = true ∧ liveFor [bs.w, cl.x, cl.y] \"a\" cl.x = false"
+ ],
+ "prefix_down_iff": [
+  "Laws.Cut",
+  "∀ {W : List Record}, (∀ (T : Moment), Down (upTo W T) W) ↔ NamesEarlier W"
+ ],
+ "downOf_down": [
+  "Laws.Cut",
+  "∀ (W P : List Record), Down (downOf W P) W"
+ ],
+ "downOf_least": [
+  "Laws.Cut",
+  "∀ {W P U : List Record}, Down U W → (∀ (r : Record), r ∈ P → r ∈ U) → ∀ (r : Record), r ∈ downOf W P → r ∈ U"
+ ],
+ "heldOf_down": [
+  "Laws.Cut",
+  "∀ {W P : List Record}, (∀ (r : Record), r ∈ P → r ∈ W) → Down (heldOf W P) W"
+ ],
+ "heldOf_greatest": [
+  "Laws.Cut",
+  "∀ {W P U : List Record}, Down U W → (∀ (r : Record), r ∈ U → r ∈ P) → ∀ (r : Record), r ∈ U → r ∈ heldOf W P"
+ ],
+ "heldOf_prefix": [
+  "Laws.Cut",
+  "∀ {W : List Record} {T : Moment} {a : Record}, a ∈ heldOf W (upTo W T) ↔ a ∈ W ∧ a.emitted.moment < T ∧ ∀ (c : Record), c ∈ W → a ∈ above W c → c.emitted.moment < T"
+ ],
+ "prefix_reads_wrongly": [
+  "Laws.Cut",
+  "upTo sk.all [2] = [sk.a, sk.c] ∧ ¬Down (upTo sk.all [2]) sk.all ∧ liveFor (upTo sk.all [2]) \"status\" sk.a = true ∧ liveFor sk.all \"status\" sk.a = false ∧ downOf sk.all (upTo sk.all [2]) = sk.all"
+ ],
+ "keyedIn_slice": [
+  "Laws.LiveSlice",
+  "∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {t : String} {S W : List Record}, Forms W → KeyedPart may t S W → (∀ (r : Record), r ∈ recordsOf t (realm may W) → live (recordsOf t (realm may W)) r = true → ∃ a, a ∈ S ∧ a.id = r.id) → (∀ (o : Option String), Witnessed (recordsOf t (realm may S)) (recordsOf t (realm may W)) o) → keyedIn t (realm may S) = keyedIn t (realm may W)"
+ ],
+ "keyedIn_live_slice": [
+  "Laws.LiveSlice",
+  "∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {t : String} {S W : List Record}, Forms W → KeyedPart may t S W → NoCycle (recordsOf t (realm may W)) → Anchored (recordsOf t (realm may W)) → (∀ (r : Record), r ∈ recordsOf t (realm may W) → live (recordsOf t (realm may W)) r = true → ∃ a, a ∈ S ∧ a.id = r.id) → (∀ (r : Record), r ∈ recordsOf t (realm may W) → (∃ a, a ∈ S ∧ a.id = r.id) → live (recordsOf t (realm may W)) r = true) → keyedIn t (realm may S) = keyedIn t (realm may W)"
+ ],
+ "entitled_fewer": [
+  "Laws.LiveSlice",
+  "∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {S W : List Record}, Forms W → (∀ (r : Record), r ∈ S → r ∈ W) → ∀ {r : Record}, entitled may (settle W) r = true → entitled may (settle S) r = true"
+ ],
+ "keyedIn_thing_slice": [
+  "Laws.LiveSlice",
+  "∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {t : String} {S W : List Record}, Forms W → Slice t S W → keyedIn t (realm may S) = keyedIn t (realm may W)"
+ ],
+ "target_needs_witness": [
+  "Laws.LiveSlice",
+  "Anchored tg.all ∧ liveOf tg.all = [tg.x, tg.y3] ∧ keyedIn \"k1\" [tg.x, tg.y3] = keyedIn \"k1\" tg.all ∧ keyedIn \"k1\" [tg.d, tg.x, tg.y2, tg.y3] ≠ keyedIn \"k1\" tg.all"
+ ],
+ "keyed_slice_needs_erasers": [
+  "Laws.LiveSlice",
+  "keyedIn \"k1\" (realm (fun x x_1 => true) [er.x]) ≠ keyedIn \"k1\" (realm (fun x x_1 => true) [er.x, er.e])"
+ ],
+ "admit_view": [
+  "Laws.Things",
+  "∀ {f : Record → Record}, View f → ∀ {may : Record → Record → Bool}, EnvOnly may → ∀ (xs : List Record), admit may (List.map f xs) = List.map f (admit may xs)"
+ ],
+ "stateIn_view": [
+  "Laws.Things",
+  "∀ {f : Record → Record}, View f → ∀ (t : String) {xs : List Record}, Addressed xs → stateIn t (List.map f xs) = { named := (stateIn t xs).named, heads := List.map f (stateIn t xs).heads }"
+ ],
+ "stateIn_no_false_resurrection": [
+  "Laws.Things",
+  "∀ {f : Record → Record}, View f → ∀ {t : String} {xs : List Record}, Addressed xs → ∀ {r q : Record}, q ∈ xs → q.isOf t = true → r.id ∈ q.prev → ∀ (h : Record), h ∈ (stateIn t (List.map f xs)).heads → h.id ≠ r.id"
+ ],
+ "Op.not_is": [
+  "Laws.Spec",
+  "∀ (a : Arg) (xs : List Item), (Op.not a).test xs = !(Op.is a).test xs"
+ ],
+ "Op.absent_present": [
+  "Laws.Spec",
+  "∀ (xs : List Item), Op.absent.test xs = !Op.present.test xs"
+ ],
+ "Op.atLeast_below": [
+  "Laws.Spec",
+  "∀ (i j : Int), (Op.atLeast (Arg.val (Val.int i))).test [Item.val (Val.int j)] = !(Op.below (Arg.val (Val.int i))).test [Item.val (Val.int j)]"
+ ],
+ "Op.atLeast_below_time": [
+  "Laws.Spec",
+  "∀ (c : Claim) (s : Span), (Op.atLeast (Arg.time c)).test [Item.time s] = !(Op.below (Arg.time c)).test [Item.time s]"
+ ],
+ "HeldField.list_bounds": [
+  "Laws.Payload",
+  "∀ (vs : List Val) (a : Arg), (Op.atLeast a).test [(HeldField.many vs).item] = false ∧ (Op.below a).test [(HeldField.many vs).item] = false"
+ ],
+ "Op.ordered_like_only": [
+  "Laws.Spec",
+  "∀ (a : Arg) {xs : List Item}, (∀ (x : Item), x ∈ xs → Item.like a x = false) → (Op.atLeast a).test xs = false ∧ (Op.below a).test xs = false"
+ ],
+ "parseOp_ok_iff": [
+  "Laws.Parse",
+  "∀ (ty : FieldType) (path : String) (kv : String × Json) (op : Op), parseOp ty path kv = Except.ok op ↔ Op.Fits ty op ∧ op.toJson = kv"
+ ],
+ "parseArg_ok_iff": [
+  "Laws.Parse",
+  "∀ (ty : FieldType) (path : String) (j : Json) (a : Arg), parseArg ty path j = Except.ok a ↔ Arg.Fits ty a ∧ a.toJson = j"
+ ],
+ "parseBound_ok_iff": [
+  "Laws.Parse",
+  "∀ (ty : FieldType) (path : String) (j : Json) (a : Arg), parseBound ty path j = Except.ok a ↔ Arg.Bounds ty a ∧ a.toJson = j"
+ ],
+ "Cond.payload_present": [
+  "Laws.Payload",
+  "∀ (r : Record) (f : String), r.shown = Shown.here → { field := Field.payload f, op := Op.present }.eval r = Tri.ofBool (r.get f).isSome"
+ ],
+ "HeldField.list_is": [
+  "Laws.Payload",
+  "∀ (vs : List Val) (a : Val), (Op.is (Arg.val a)).test [(HeldField.many vs).item] = vs.contains a"
+ ],
+ "HeldField.empty_item": [
+  "Laws.Payload",
+  "(HeldField.many []).item = Item.other"
+ ],
+ "Cond.text_is": [
+  "Laws.Spec",
+  "∀ (t : String) (r : Record), { field := Field.env EnvField.kind, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (t == r.kind) ∧ { field := Field.env EnvField.observer, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (t == r.observer)"
+ ],
+ "Cond.about_is": [
+  "Laws.Spec",
+  "∀ (t : String) (r : Record), { field := Field.env EnvField.about, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (r.about.contains t)"
+ ],
+ "Cond.of_is": [
+  "Laws.Spec",
+  "∀ (t : String) (r : Record), { field := Field.env EnvField.of, op := Op.is (Arg.val (Val.str t)) }.eval r = Tri.ofBool (r.of.toList.contains t) ∧ { field := Field.env EnvField.of, op := Op.present }.eval r = Tri.ofBool r.of.isSome"
+ ],
+ "Cond.id_is": [
+  "Laws.Spec",
+  "∀ (i : String) (r : Record), { field := Field.env EnvField.prev, op := Op.is (Arg.val (Val.str i)) }.eval r = Tri.ofBool ((List.map idText r.prev).contains i) ∧ { field := Field.env EnvField.under, op := Op.is (Arg.val (Val.str i)) }.eval r = Tri.ofBool ((List.map idText r.under.toList).contains i) ∧ { field := Field.env EnvField.erases, op := Op.is (Arg.val (Val.str i)) }.eval r = Tri.ofBool ((List.map idText r.erases).contains i)"
+ ],
+ "Cond.set_present": [
+  "Laws.Spec",
+  "∀ (r : Record), { field := Field.env EnvField.about, op := Op.present }.eval r = Tri.ofBool !r.about.isEmpty ∧ { field := Field.env EnvField.prev, op := Op.present }.eval r = Tri.ofBool !r.prev.isEmpty ∧ { field := Field.env EnvField.under, op := Op.present }.eval r = Tri.ofBool r.under.isSome ∧ { field := Field.env EnvField.erases, op := Op.present }.eval r = Tri.ofBool !r.erases.isEmpty"
+ ],
+ "Cond.emitted_is": [
+  "Laws.Spec",
+  "∀ (c : Claim) (r : Record), { field := Field.env EnvField.emitted, op := Op.is (Arg.time c) }.eval r = Tri.ofBool (c.span == Span.point r.emitted.moment)"
+ ],
+ "Cond.emitted_atLeast": [
+  "Laws.Spec",
+  "∀ (c : Claim) (r : Record), { field := Field.env EnvField.emitted, op := Op.atLeast (Arg.time c) }.eval r = Tri.ofBool (decide (c.span.start ≤ r.emitted.moment))"
+ ],
+ "Cond.emitted_below": [
+  "Laws.Spec",
+  "∀ (c : Claim) (r : Record), { field := Field.env EnvField.emitted, op := Op.below (Arg.time c) }.eval r = Tri.ofBool (decide (r.emitted.moment < c.span.start))"
+ ],
+ "Cond.occurred_is": [
+  "Laws.Spec",
+  "∀ (c : Claim) (r : Record), { field := Field.env EnvField.occurred, op := Op.is (Arg.time c) }.eval r = Tri.yes ↔ ∃ k, r.occurred = some k ∧ k.span = c.span"
+ ],
+ "Cond.occurred_atLeast": [
+  "Laws.Spec",
+  "∀ (c : Claim) (r : Record), { field := Field.env EnvField.occurred, op := Op.atLeast (Arg.time c) }.eval r = Tri.yes ↔ ∃ k, r.occurred = some k ∧ c.span.start ≤ k.span.start"
+ ],
+ "Cond.occurred_below": [
+  "Laws.Spec",
+  "∀ (c : Claim) (r : Record), { field := Field.env EnvField.occurred, op := Op.below (Arg.time c) }.eval r = Tri.yes ↔ ∃ k, r.occurred = some k ∧ k.span.start < c.span.start"
+ ],
+ "Cond.occurred_missing": [
+  "Laws.Spec",
+  "∀ (a : Arg) {r : Record}, r.occurred = none → { field := Field.env EnvField.occurred, op := Op.atLeast a }.eval r = Tri.no ∧ { field := Field.env EnvField.occurred, op := Op.below a }.eval r = Tri.no"
+ ],
+ "Cond.time_meaning": [
+  "Laws.Spec",
+  "∀ {f : EnvField}, f.type = FieldType.time → ∀ (op : Op) {r r' : Record}, Option.map (fun x => x.span) r.occurred = Option.map (fun x => x.span) r'.occurred → r.emitted.moment = r'.emitted.moment → { field := Field.env f, op := op }.eval r = { field := Field.env f, op := op }.eval r'"
+ ],
+ "Op.time_arg_meaning": [
+  "Laws.Spec",
+  "∀ {c₁ c₂ : Claim}, c₁.span = c₂.span → ∀ (xs : List Item), (Op.is (Arg.time c₁)).test xs = (Op.is (Arg.time c₂)).test xs ∧ (Op.not (Arg.time c₁)).test xs = (Op.not (Arg.time c₂)).test xs ∧ (Op.atLeast (Arg.time c₁)).test xs = (Op.atLeast (Arg.time c₂)).test xs ∧ (Op.below (Arg.time c₁)).test xs = (Op.below (Arg.time c₂)).test xs"
+ ],
+ "Cond.eval_here": [
+  "Laws.Spec",
+  "∀ (c : Cond) {r : Record}, r.shown = Shown.here → c.eval r ≠ Tri.unknown"
+ ],
+ "Cond.eval_envelope": [
+  "Laws.Spec",
+  "∀ (c : Cond), c.field.onEnvelope = true → ∀ (r : Record), c.eval r ≠ Tri.unknown"
+ ],
+ "Cond.all_perm": [
+  "Laws.Spec",
+  "∀ {cs ds : List Cond}, cs.Perm ds → ∀ (r : Record), Cond.all cs r = Cond.all ds r"
+ ],
+ "Cond.eval_view": [
+  "Laws.Spec",
+  "∀ {f : Record → Record}, View f → ∀ (c : Cond) (r : Record), (c.eval (f r)).Refines (c.eval r)"
+ ],
+ "Cond.all_view": [
+  "Laws.Spec",
+  "∀ {f : Record → Record}, View f → ∀ (cs : List Cond) (r : Record), (Cond.all cs (f r)).Refines (Cond.all cs r)"
+ ],
+ "Tri.and_refines": [
+  "Laws.Spec",
+  "∀ {a a' b b' : Tri}, a.Refines a' → b.Refines b' → (a.and b).Refines (a'.and b')"
+ ],
+ "Spec.select_view": [
+  "Laws.Spec",
+  "∀ {f : Record → Record}, View f → ∀ (sp : Spec) (xs : List Record), sp.select (List.map f xs) = List.map f (sp.select xs)"
+ ],
+ "Source.takes_view": [
+  "Laws.Spec",
+  "∀ {f : Record → Record}, View f → ∀ (s : Source) (r : Record), s.takes (f r) = s.takes r"
+ ],
+ "Spec.mem_select": [
+  "Laws.Spec",
+  "∀ (sp : Spec) (xs : List Record) (r : Record), r ∈ sp.select xs ↔ r ∈ xs ∧ sp.takes r = true"
+ ],
+ "Source.takes_of": [
+  "Laws.Spec",
+  "∀ (store t : String) (r : Record), { store := store, of := some t }.takes r = (r.thing == t)"
+ ],
+ "Source.takes_about": [
+  "Laws.Spec",
+  "∀ (store t : String) (r : Record), { store := store, about := some t }.takes r = r.about.contains t"
+ ],
+ "Slot.set_decides": [
+  "Laws.Spec",
+  "∀ (s : Slot) (sel : Record → Bool) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → s.run sel xs = s.run sel ys"
+ ],
+ "Spec.set_decides": [
+  "Laws.Spec",
+  "∀ (sp : Spec) (may : Record → Record → Bool) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → sp.run xs may = sp.run ys may"
+ ],
+ "keyedValue_set_decides": [
+  "Laws.Spec",
+  "∀ (ty : FoldType) (ev : String → Tri) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → keyedValue ty xs ev = keyedValue ty ys ev"
+ ],
+ "Slot.keyedGrouped_set_decides": [
+  "Laws.Spec",
+  "∀ (s : Slot) (b : By) (sel : Record → Bool) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → s.keyedGrouped b sel xs = s.keyedGrouped b sel ys"
+ ],
+ "wholeHeads_overHeads": [
+  "Laws.Spec",
+  "∀ (xs : List Record), wholeHeads xs = orderHeads (List.flatMap (fun t => OverHeads.fold LatestBy.heads (List.filter (fun x => x.isOf t) xs)) (thingsOf xs))"
+ ],
+ "wholeHeads_set_decides": [
+  "Laws.Spec",
+  "∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → wholeHeads xs = wholeHeads ys"
+ ],
+ "wholeHeads_answer_set_decides": [
+  "Laws.Spec",
+  "∀ {α : Sort u_1} (answer : List Record → α) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → answer (wholeHeads xs) = answer (wholeHeads ys)"
+ ],
+ "Acc.followed_set_decides": [
+  "Laws.Spec",
+  "∀ {σ : Type} (f : Acc σ) (ev : Record → Tri) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → f.select ev (wholeHeads xs) = f.select ev (wholeHeads ys)"
+ ],
+ "mem_accPool_follow": [
+  "Laws.Spec",
+  "∀ {xs : List Record}, Addressed xs → ∀ {r : Record}, r ∈ accPool (some Follow.prev) xs → ∃ t, HeadOf xs t r"
+ ],
+ "accPool_follow_heads": [
+  "Laws.Spec",
+  "∀ {xs : List Record}, Addressed xs → Distinct (accPool (some Follow.prev) xs) ∧ ∀ (t : String), t ∈ thingsOf xs → ∀ (r : Record), r ∈ (stateIn t xs).heads → r ∈ accPool (some Follow.prev) xs"
+ ],
+ "select_as_latest": [
+  "Laws.Spec",
+  "∀ (sel : Record → Bool) (cs : List Cond) (r : Record), ((if sel r = true then Cond.all cs r else Tri.no) = Tri.yes ↔ chosen sel cs r = true ∧ payTest cs r = Tri.yes) ∧ ((if sel r = true then Cond.all cs r else Tri.no) = Tri.unknown ↔ chosen sel cs r = true ∧ payTest cs r = Tri.unknown)"
+ ],
+ "mem_upward": [
+  "Laws.Live",
+  "∀ {rs : List Record} {ids : List RecordId} {i : RecordId}, i ∈ upward rs ids ↔ Reach rs ids i"
+ ],
+ "mem_above": [
+  "Laws.Live",
+  "∀ {rs : List Record} {r q : Record}, q ∈ above rs r ↔ q ∈ rs ∧ ∃ p, p ∈ q.prev ∧ Reach rs [r.id] p"
+ ],
+ "above_congr": [
+  "Laws.Live",
+  "∀ {rs rs' : List Record}, (∀ (q : Record), q ∈ rs ↔ q ∈ rs') → ∀ (r q : Record), q ∈ above rs r ↔ q ∈ above rs' r"
+ ],
+ "liveFor_iff": [
+  "Laws.Live",
+  "∀ {rs : List Record} {k : String} {r : Record}, liveFor rs k r = true ↔ r.setsKey k = true ∧ ∀ (q : Record), q ∈ above rs r → q.setsKey k = false"
+ ],
+ "liveEnv_iff": [
+  "Laws.Live",
+  "∀ {rs : List Record} {r : Record}, liveEnv rs r = true ↔ ¬∃ q, q ∈ rs ∧ r.id ∈ q.prev"
+ ],
+ "live_iff": [
+  "Laws.Live",
+  "∀ {rs : List Record} {r : Record}, live rs r = true ↔ liveEnv rs r = true ∨ ∃ k, liveFor rs k r = true"
+ ],
+ "mem_stateIn_heads_iff": [
+  "Laws.Live",
+  "∀ {xs : List Record}, Addressed xs → ∀ {t : String} {r : Record}, r ∈ (stateIn t xs).heads ↔ r ∈ recordsOf t xs ∧ liveEnv (recordsOf t xs) r = true"
+ ],
+ "head_live": [
+  "Laws.Live",
+  "∀ {xs : List Record}, Addressed xs → ∀ {t : String} {r : Record}, r ∈ (keyedIn t xs).heads → live (recordsOf t xs) r = true"
+ ],
+ "keyedIn_keys": [
+  "Laws.Live",
+  "∀ {t : String} {xs : List Record} {k : String}, k ∈ List.map (fun x => x.fst) (keyedIn t xs).keys ↔ ∃ r, r ∈ recordsOf t xs ∧ live (recordsOf t xs) r = true ∧ k ∈ r.declares"
+ ],
+ "keyedIn_setters": [
+  "Laws.Live",
+  "∀ {t : String} {xs : List Record}, Addressed xs → ∀ {k : String} {ss : List Record}, (k, ss) ∈ (keyedIn t xs).keys → ∀ {r : Record}, r ∈ ss ↔ r ∈ recordsOf t xs ∧ liveFor (recordsOf t xs) k r = true"
+ ],
+ "keyedIn_whole": [
+  "Laws.Live",
+  "∀ {t : String} {xs : List Record}, Addressed xs → ∀ {r : Record}, r ∈ (keyedIn t xs).whole ↔ r ∈ recordsOf t xs ∧ r.whole = true ∧ live (recordsOf t xs) r = true"
+ ],
+ "keyedIn_heads": [
+  "Laws.Live",
+  "∀ (t : String) (xs : List Record), (keyedIn t xs).heads = (stateIn t xs).heads"
+ ],
+ "pureJoin_only_heads": [
+  "Laws.Live",
+  "∀ {t : String} {xs : List Record}, Addressed xs → ∀ {r : Record}, r.sets = some [] → (∀ (e : String × List Record), e ∈ (keyedIn t xs).keys → ¬r ∈ e.snd) ∧ ¬r ∈ (keyedIn t xs).whole"
+ ],
+ "keyedIn_whole_read": [
+  "Laws.Live",
+  "∀ {t : String} {xs : List Record}, Addressed xs → (∀ (r : Record), r ∈ recordsOf t xs → r.sets = none) → (keyedIn t xs).keys = [] ∧ (keyedIn t xs).whole = (stateIn t xs).heads ∧ (keyedIn t xs).heads = (stateIn t xs).heads"
+ ],
+ "keyedIn_set_decides": [
+  "Laws.Live",
+  "∀ {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → ∀ (t : String), keyedIn t xs = keyedIn t ys"
+ ],
+ "keyedOf_set_decides": [
+  "Laws.Live",
+  "∀ (sel : Record → Bool) (cs : List Cond) {xs ys : List Record}, Addressed xs → Addressed ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → keyedOf sel cs xs = keyedOf sel cs ys"
+ ],
+ "thingEv_yes": [
+  "Laws.KeyedSlots",
+  "∀ {sel : Record → Bool} {cs : List Cond} {xs : List Record} {t : String}, thingEv sel cs xs t = Tri.yes ↔ (∃ h, h ∈ (stateIn t xs).heads ∧ chosen sel cs h = true) ∧ thingTest cs (recordsOf t xs) = Tri.yes"
+ ],
+ "thingEv_unchosen": [
+  "Laws.KeyedSlots",
+  "∀ {sel : Record → Bool} {cs : List Cond} {xs : List Record} {t : String}, (∀ (hd : Record), hd ∈ (stateIn t xs).heads → chosen sel cs hd = false) → thingEv sel cs xs t = Tri.no"
+ ],
+ "keyedValue_count": [
+  "Laws.KeyedSlots",
+  "∀ (f : Option Follow) (xs : List Record) (ev : String → Tri), keyedValue (FoldType.count f) xs ev = SlotValue.nat { value := (List.filter (fun x => ev x == Tri.yes) (thingsOf xs)).length, unread := (List.filter (fun x => ev x == Tri.unknown) (thingsOf xs)).length }"
+ ],
+ "Slot.keys_count": [
+  "Laws.KeyedSlots",
+  "∀ {s : Slot}, s.type = FoldType.count (some Follow.keys) → s.group = none → ∀ (sel : Record → Bool) (xs : List Record), s.run sel xs = SlotValue.nat { value := (List.filter (fun x => thingEv sel s.tests.conds xs x == Tri.yes) (thingsOf xs)).length, unread := (List.filter (fun x => thingEv sel s.tests.conds xs x == Tri.unknown) (thingsOf xs)).length } ∧ (thingsOf xs).Nodup"
+ ],
+ "soleSetter_eq": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {f t : String} {r : Record}, soleSetter xs f t = some r ↔ setters (recordsOf t xs) f = [r]"
+ ],
+ "soleSetter_two": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {f t : String}, 2 ≤ (setters (recordsOf t xs) f).length → soleSetter xs f t = none"
+ ],
+ "soleSetter_unset": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {f t : String}, setters (recordsOf t xs) f = [] → soleSetter xs f t = none"
+ ],
+ "Acc.overThings_value": [
+  "Laws.KeyedSlots",
+  "∀ {σ : Type} (f : Acc σ) (pick : String → Option Record) (ev : String → Tri) (ts : List String), (f.overThings pick ev ts).value = f.fold (List.filter f.readable (List.filterMap pick (List.filter (fun x => ev x == Tri.yes) ts)))"
+ ],
+ "Acc.overThings_unread": [
+  "Laws.KeyedSlots",
+  "∀ {σ : Type} (f : Acc σ) (pick : String → Option Record) (ev : String → Tri) (ts : List String), (f.overThings pick ev ts).unread = (List.filter (fun t => ev t == Tri.unknown || ev t == Tri.yes && !Option.any f.readable (pick t)) ts).length"
+ ],
+ "keyedValue_collect": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record}, Addressed xs → ∀ (f : Option Follow) (ev : String → Tri) {hs : List (RecordId × Shown)} {u : Nat}, keyedValue (FoldType.collect f none) xs ev = SlotValue.heads hs u → ∀ {p : RecordId × Shown}, p ∈ hs ↔ ∃ t, t ∈ thingsOf xs ∧ ev t = Tri.yes ∧ ∃ r, r ∈ liveIn xs t ∧ (r.id, r.shown) = p"
+ ],
+ "keyedValue_collect_unread": [
+  "Laws.KeyedSlots",
+  "∀ (f : Option Follow) (limit : Option Nat) (xs : List Record) (ev : String → Tri), ∃ hs, keyedValue (FoldType.collect f limit) xs ev = SlotValue.heads hs (List.filter (fun x => ev x == Tri.unknown) (thingsOf xs)).length"
+ ],
+ "keyedValue_collect_limit": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record}, Addressed xs → ∀ (f : Option Follow) (ev : String → Tri) (k : Nat) {hs : List (RecordId × Shown)} {u : Nat}, keyedValue (FoldType.collect f (some k)) xs ev = SlotValue.heads hs u → ∃ T, T.Nodup ∧ T.length ≤ k ∧ (∀ (t : String), t ∈ T → t ∈ thingsOf xs ∧ ev t = Tri.yes) ∧ (∀ (t : String), t ∈ thingsOf xs → ev t = Tri.yes → liveIn xs t ≠ [] → ¬t ∈ T → T.length = k) ∧ ∀ (p : RecordId × Shown), p ∈ hs ↔ ∃ t, t ∈ T ∧ ∃ r, r ∈ liveIn xs t ∧ (r.id, r.shown) = p"
+ ],
+ "keyedValue_collect_newest": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record}, Addressed xs → ∀ (f : Option Follow) (ev : String → Tri) (k : Nat) {hs : List (RecordId × Shown)} {u : Nat}, keyedValue (FoldType.collect f (some k)) xs ev = SlotValue.heads hs u → ∀ {t t' : String} {r q : Record}, r ∈ liveIn xs t → (r.id, r.shown) ∈ hs → t' ∈ thingsOf xs → ev t' = Tri.yes → q ∈ liveIn xs t' → ¬(q.id, q.shown) ∈ hs → ∃ p, p ∈ liveIn xs t ∧ Newer p q"
+ ],
+ "wholeThings_whole": [
+  "Laws.KeyedSlots",
+  "∀ {l : Option Nat} {rs : List Record} {r q : Record}, r ∈ wholeThings l rs → q ∈ rs → q.thing = r.thing → q ∈ wholeThings l rs"
+ ],
+ "wholeThings_newest": [
+  "Laws.KeyedSlots",
+  "∀ {k : Nat} {rs : List Record}, List.Pairwise Newer rs → ∀ {r q : Record}, r ∈ wholeThings (some k) rs → q ∈ rs → ¬q ∈ wholeThings (some k) rs → ∃ p, p ∈ rs ∧ p.thing = r.thing ∧ Newer p q"
+ ],
+ "wholeThings_distinct": [
+  "Laws.KeyedSlots",
+  "∀ {l : Option Nat} {rs : List Record}, (List.map Record.thing rs).Nodup → wholeThings l rs = limitTo l rs"
+ ],
+ "By.thingKeys_payload": [
+  "Laws.KeyedSlots",
+  "∀ {f : String} (sel : Record → Bool) (cs : List Cond) (xs : List Record) (t : String), (By.payload f).thingKeys sel cs xs t = if ((setters (recordsOf t xs) f).all fun x => ((By.payload f).keys x).isSome) = true then some (canonSet (List.flatMap (fun r => ((By.payload f).keys r).getD []) (setters (recordsOf t xs) f))) else none"
+ ],
+ "By.thingKeys_envelope": [
+  "Laws.KeyedSlots",
+  "∀ {b : By}, (∀ (f : String), b ≠ By.payload f) → ∀ (sel : Record → Bool) (cs : List Cond) (xs : List Record) (t : String), b.thingKeys sel cs xs t = some (canonSet (List.flatMap (fun h => (b.keys h).getD []) (List.filter (chosen sel cs) (stateIn t xs).heads)))"
+ ],
+ "By.thingKeys_unheld": [
+  "Laws.KeyedSlots",
+  "∀ {f : String} {sel : Record → Bool} {cs : List Cond} {xs : List Record} {t : String} {r : Record}, r ∈ setters (recordsOf t xs) f → r.shown ≠ Shown.here → (By.payload f).thingKeys sel cs xs t = none"
+ ],
+ "By.thingKeys_unset": [
+  "Laws.KeyedSlots",
+  "∀ {f : String} {sel : Record → Bool} {cs : List Cond} {xs : List Record} {t : String}, setters (recordsOf t xs) f = [] → (By.payload f).thingKeys sel cs xs t = some []"
+ ],
+ "Slot.keyedGrouped_eq": [
+  "Laws.KeyedSlots",
+  "∀ (s : Slot) (b : By) (sel : Record → Bool) (xs : List Record), s.keyedGrouped b sel xs = SlotValue.groups (List.map (fun g => (g, (keyedValue s.type xs fun t => if (thingEv sel s.tests.conds xs t == Tri.yes && ((b.thingKeys sel s.tests.conds xs t).getD []).contains g) = true then Tri.yes else Tri.no).group)) (canonSet (List.flatMap (fun t => (b.thingKeys sel s.tests.conds xs t).getD []) (List.filter (fun x => thingEv sel s.tests.conds xs x == Tri.yes) (thingsOf xs))))) ((List.filter (fun x => thingEv sel s.tests.conds xs x == Tri.unknown) (thingsOf xs)).length + (List.filter (fun t => thingEv sel s.tests.conds xs t == Tri.yes && (b.thingKeys sel s.tests.conds xs t).isNone) (thingsOf xs)).length) (List.filter (fun t => thingEv sel s.tests.conds xs t == Tri.yes && b.thingKeys sel s.tests.conds xs t == some []) (thingsOf xs)).length"
+ ],
+ "Slot.keyedGrouped_envelope_unread": [
+  "Laws.KeyedSlots",
+  "∀ {b : By}, (∀ (f : String), b ≠ By.payload f) → ∀ (s : Slot) (sel : Record → Bool) (xs : List Record), ∃ gs m, s.keyedGrouped b sel xs = SlotValue.groups gs (List.filter (fun x => thingEv sel s.tests.conds xs x == Tri.unknown) (thingsOf xs)).length m"
+ ],
+ "By.keyedAccounting": [
+  "Laws.KeyedSlots",
+  "∀ (keys : String → Option (List String)) (ev : String → Tri) (ts : List String), (List.filter (fun x => ev x != Tri.no) ts).length = (List.filter (fun t => ev t == Tri.yes && (keys t).getD [] != []) ts).length + (List.filter (fun t => ev t == Tri.yes && keys t == some []) ts).length + ((List.filter (fun x => ev x == Tri.unknown) ts).length + (List.filter (fun t => ev t == Tri.yes && (keys t).isNone) ts).length)"
+ ],
+ "Slot.keys_as_prev": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → ∃ h, (stateIn t xs).heads = [h]) → ∀ (s : Slot), (∀ (f : Follow), s.type ≠ FoldType.latestBy f) → ∀ (sel : Record → Bool), { name := s.name, type := FoldType.following Follow.keys s.type, tests := s.tests, group := s.group }.run sel xs = { name := s.name, type := FoldType.following Follow.prev s.type, tests := s.tests, group := s.group }.run sel xs"
+ ],
+ "keyedValue_as_prev": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ (s : Slot), (∀ (f : Follow), s.type ≠ FoldType.latestBy f) → ∀ (sel : Record → Bool) (e : String → Tri), (∀ (t : String), t ∈ thingsOf xs → e t = if chosen sel s.tests.conds (hd t) = true then payTest s.tests.conds (hd t) else Tri.no) → keyedValue (FoldType.following Follow.keys s.type) xs e = { name := s.name, type := FoldType.following Follow.prev s.type, tests := s.tests, group := s.group }.plain sel xs"
+ ],
+ "Acc.select_as_things": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record} {σ : Type} (f : Acc σ) (ev : Record → Tri), Addressed xs → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ (pick : String → Option Record) (e : String → Tri), (∀ (t : String), t ∈ thingsOf xs → pick t = some (hd t)) → (∀ (t : String), t ∈ thingsOf xs → ev (hd t) = e t) → f.select ev (wholeHeads xs) = f.overThings pick e (thingsOf xs)"
+ ],
+ "collectOf_as_things": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ (sel : Record → Bool) (cs : List Cond) (limit : Option Nat) (fl : Option Follow) (e : String → Tri), (∀ (t : String), t ∈ thingsOf xs → e t = if chosen sel cs (hd t) = true then payTest cs (hd t) else Tri.no) → collectOf sel cs true limit xs = keyedValue (FoldType.collect fl limit) xs e"
+ ],
+ "whole_liveFor_iff": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ {t : String}, t ∈ thingsOf xs → ∀ {r : Record}, r ∈ recordsOf t xs → ∀ (k : String), liveFor (recordsOf t xs) k r = true ↔ r = hd t"
+ ],
+ "whole_live_iff": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ {t : String}, t ∈ thingsOf xs → ∀ {r : Record}, r ∈ recordsOf t xs → (live (recordsOf t xs) r = true ↔ r = hd t)"
+ ],
+ "whole_setters": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ {t : String}, t ∈ thingsOf xs → ∀ (k : String), setters (recordsOf t xs) k = [hd t]"
+ ],
+ "whole_thingTest": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ {t : String}, t ∈ thingsOf xs → ∀ (cs : List Cond), thingTest cs (recordsOf t xs) = payTest cs (hd t)"
+ ],
+ "whole_thingEv": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ {t : String}, t ∈ thingsOf xs → ∀ (sel : Record → Bool) (cs : List Cond), thingEv sel cs xs t = if chosen sel cs (hd t) = true then payTest cs (hd t) else Tri.no"
+ ],
+ "whole_thingKeys": [
+  "Laws.KeyedSlots",
+  "∀ {xs : List Record} {hd : String → Record}, Addressed xs → (∀ (r : Record), r ∈ xs → r.sets = none) → (∀ (t : String), t ∈ thingsOf xs → (stateIn t xs).heads = [hd t]) → ∀ {t : String}, t ∈ thingsOf xs → ∀ (b : By) (sel : Record → Bool) (cs : List Cond), chosen sel cs (hd t) = true → b.thingKeys sel cs xs t = Option.map canonSet (b.keys (hd t))"
+ ],
+ "keyedOf_things": [
+  "Laws.Live",
+  "∀ {sel : Record → Bool} {cs : List Cond} {xs : List Record} {ts : List (String × KeyedView)} {u : Nat}, keyedOf sel cs xs = SlotValue.keyed ts u → ∀ {t : String} {v : KeyedView}, (t, v) ∈ ts ↔ t ∈ thingsOf xs ∧ (∃ hd, hd ∈ (keyedIn t xs).heads ∧ chosen sel cs hd = true) ∧ thingTest cs (recordsOf t xs) = Tri.yes ∧ v = (keyedIn t xs).view"
+ ],
+ "keyedOf_unread": [
+  "Laws.Live",
+  "∀ {sel : Record → Bool} {cs : List Cond} {xs : List Record} {ts : List (String × KeyedView)} {u : Nat}, keyedOf sel cs xs = SlotValue.keyed ts u → u = (List.filter (fun t => (keyedIn t xs).heads.any (chosen sel cs) && thingTest cs (recordsOf t xs) == Tri.unknown) (thingsOf xs)).length"
+ ],
+ "Cond.onThing_agree": [
+  "Laws.Live",
+  "∀ {c : Cond} {f : String}, c.field = Field.payload f → ∀ {rs : List Record} {r : Record}, r ∈ rs → liveFor rs f r = true → ∀ {a : Tri}, (∀ (q : Record), q ∈ rs → liveFor rs f q = true → c.eval q = a) → c.onThing rs = a"
+ ],
+ "Cond.onThing_differ": [
+  "Laws.Live",
+  "∀ {c : Cond} {f : String}, c.field = Field.payload f → ∀ {rs : List Record} {q r : Record}, q ∈ rs → liveFor rs f q = true → r ∈ rs → liveFor rs f r = true → c.eval q ≠ c.eval r → c.onThing rs = Tri.unknown"
+ ],
+ "Cond.onThing_unheld": [
+  "Laws.Live",
+  "∀ {c : Cond} {f : String}, c.field = Field.payload f → ∀ {rs : List Record} {r : Record}, r ∈ rs → liveFor rs f r = true → r.shown ≠ Shown.here → c.onThing rs = Tri.unknown"
+ ],
+ "Cond.onThing_unset": [
+  "Laws.Live",
+  "∀ {c : Cond} {f : String}, c.field = Field.payload f → ∀ {rs : List Record}, (∀ (r : Record), r ∈ rs → liveFor rs f r = false) → c.onThing rs = Tri.ofBool (c.op.test [])"
+ ],
+ "liveFor_undeclared": [
+  "Laws.Live",
+  "∀ {rs : List Record} {r : Record} {ks : List String} {f : String}, r.sets = some ks → ¬f ∈ ks → liveFor rs f r = false"
+ ],
+ "Slot.grouped_set_decides": [
+  "Laws.Spec",
+  "∀ (s : Slot) (b : By) (sel : Record → Bool) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → s.grouped b sel xs = s.grouped b sel ys"
+ ],
+ "Slot.plain_set_decides": [
+  "Laws.Spec",
+  "∀ (s : Slot) (sel : Record → Bool) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → s.plain sel xs = s.plain sel ys"
+ ],
+ "groupKeys_same": [
+  "Laws.Spec",
+  "∀ (b : By) (ev : Record → Tri) {xs ys : List Record}, (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → groupKeys b ev xs = groupKeys b ev ys"
+ ],
+ "Slot.pool_set_decides": [
+  "Laws.Spec",
+  "∀ (s : Slot) {xs ys : List Record}, Distinct xs → Distinct ys → (∀ (r : Record), r ∈ xs ↔ r ∈ ys) → ∀ (r : Record), r ∈ s.pool xs ↔ r ∈ s.pool ys"
+ ],
+ "Slot.grouped_eq": [
+  "Laws.By",
+  "∀ (s : Slot) (b : By) (sel : Record → Bool) (xs : List Record), s.grouped b sel xs = SlotValue.groups (List.map (fun g => (g, ({ name := s.name, type := s.type }.plain (inGroup b (s.ev sel) g) xs).group)) (groupKeys b (s.ev sel) (s.pool xs))) ((List.filter (fun x => s.ev sel x == Tri.unknown) (s.pool xs)).length + (List.filter (fun r => s.ev sel r == Tri.yes && (b.keys r).isNone) (s.pool xs)).length) (List.filter (fun r => s.ev sel r == Tri.yes && b.keys r == some []) (s.pool xs)).length"
+ ],
+ "By.accounting": [
+  "Laws.By",
+  "∀ (b : By) (ev : Record → Tri) (pool : List Record), (List.filter (fun x => ev x != Tri.no) pool).length = (List.filter (fun r => ev r == Tri.yes && (b.keys r).getD [] != []) pool).length + (List.filter (fun r => ev r == Tri.yes && b.keys r == some []) pool).length + ((List.filter (fun x => ev x == Tri.unknown) pool).length + (List.filter (fun r => ev r == Tri.yes && (b.keys r).isNone) pool).length)"
+ ],
+ "By.memberships": [
+  "Laws.By",
+  "∀ (b : By) (ev : Record → Tri) (pool : List Record), (List.map (fun g => (List.filter (inGroup b ev g) pool).length) (groupKeys b ev pool)).sum = (List.map (fun r => ((b.keys r).getD []).length) (List.filter (fun x => ev x == Tri.yes) pool)).sum"
+ ],
+ "By.accounting_single": [
+  "Laws.By",
+  "∀ {b : By} {ev : Record → Tri} {pool : List Record}, b.OneKey ev pool → (List.map (fun g => (List.filter (inGroup b ev g) pool).length) (groupKeys b ev pool)).sum + (List.filter (fun r => ev r == Tri.yes && b.keys r == some []) pool).length + ((List.filter (fun x => ev x == Tri.unknown) pool).length + (List.filter (fun r => ev r == Tri.yes && (b.keys r).isNone) pool).length) = (List.filter (fun x => ev x != Tri.no) pool).length"
+ ],
+ "By.accounting_single_form": [
+  "Laws.By",
+  "∀ {b : By}, b.Single → ∀ (ev : Record → Tri) (pool : List Record), (List.map (fun g => (List.filter (inGroup b ev g) pool).length) (groupKeys b ev pool)).sum + (List.filter (fun r => ev r == Tri.yes && b.keys r == some []) pool).length + ((List.filter (fun x => ev x == Tri.unknown) pool).length + (List.filter (fun r => ev r == Tri.yes && (b.keys r).isNone) pool).length) = (List.filter (fun x => ev x != Tri.no) pool).length"
+ ],
+ "By.keys_single": [
+  "Laws.By",
+  "∀ {b : By}, b.Single → ∀ (r : Record), ((b.keys r).getD []).length ≤ 1"
+ ],
+ "By.OneKey.of_single": [
+  "Laws.By",
+  "∀ {b : By}, b.Single → ∀ (ev : Record → Tri) (pool : List Record), b.OneKey ev pool"
+ ],
+ "groupKeys_nonempty": [
+  "Laws.By",
+  "∀ {b : By} {ev : Record → Tri} {pool : List Record} {g : String}, g ∈ groupKeys b ev pool → ∃ r, r ∈ pool ∧ inGroup b ev g r = true"
+ ],
+ "HeldField.list_key": [
+  "Laws.Payload",
+  "∀ (vs : List Val) (k : String), k ∈ (HeldField.many vs).keys ↔ ∃ v, v ∈ vs ∧ v.key = some k"
+ ],
+ "By.keys_single_nonlist": [
+  "Laws.By",
+  "∀ (r : Record) (f : String), (∀ (vs : List Val), r.get f ≠ some (HeldField.many vs)) → (((By.payload f).keys r).getD []).length ≤ 1"
+ ],
+ "By.count_partition": [
+  "Laws.By",
+  "∀ {f : Option Follow}, f ≠ some Follow.keys → ∀ {s : Slot} {b : By} {sel : Record → Bool} {xs : List Record}, b.OneKey (s.ev sel) (s.pool xs) → s.type = FoldType.count f → ∃ gs u m r, s.grouped b sel xs = SlotValue.groups gs u m ∧ { name := s.name, type := s.type, tests := s.tests }.run sel xs = SlotValue.nat r ∧ (List.map (fun x => x.snd.count) gs).sum + m + u = r.value + r.unread"
+ ],
+ "By.count_partition_form": [
+  "Laws.By",
+  "∀ {f : Option Follow}, f ≠ some Follow.keys → ∀ {s : Slot} {b : By}, b.Single → ∀ (sel : Record → Bool) (xs : List Record), s.type = FoldType.count f → ∃ gs u m r, s.grouped b sel xs = SlotValue.groups gs u m ∧ { name := s.name, type := s.type, tests := s.tests }.run sel xs = SlotValue.nat r ∧ (List.map (fun x => x.snd.count) gs).sum + m + u = r.value + r.unread"
+ ],
+ "By.count_memberships": [
+  "Laws.By",
+  "∀ {f : Option Follow}, f ≠ some Follow.keys → ∀ {s : Slot} {b : By} (sel : Record → Bool) (xs : List Record), s.type = FoldType.count f → ∃ gs u m, s.grouped b sel xs = SlotValue.groups gs u m ∧ (List.map (fun x => x.snd.count) gs).sum = (List.map (fun r => ((b.keys r).getD []).length) (List.filter (fun x => s.ev sel x == Tri.yes) (s.pool xs))).sum"
+ ],
+ "latestOf_heads": [
+  "Laws.Spec",
+  "∀ (sel : Record → Bool) (cs : List Cond) {xs : List Record}, Addressed xs → ∀ {ts : List (String × List (RecordId × Shown))} {u : Nat}, latestOf sel cs xs = SlotValue.things ts u → ∀ {t : String} {ps : List (RecordId × Shown)}, (t, ps) ∈ ts → ∀ {p : RecordId × Shown}, p ∈ ps → ∃ r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = Tri.yes ∧ (r.id, r.shown) = p"
+ ],
+ "collectOf_heads": [
+  "Laws.Spec",
+  "∀ (sel : Record → Bool) (cs : List Cond) (limit : Option Nat) {xs : List Record}, Addressed xs → ∀ {hs : List (RecordId × Shown)} {u : Nat}, collectOf sel cs true limit xs = SlotValue.heads hs u → ∀ {p : RecordId × Shown}, p ∈ hs → ∃ t r, HeadOf xs t r ∧ sel r = true ∧ Cond.all cs r = Tri.yes ∧ (r.id, r.shown) = p"
+ ],
+ "Spec.view_state": [
+  "Laws.Spec",
+  "∀ {f : Record → Record}, View f → ∀ {may : Record → Record → Bool}, EnvOnly may → ∀ {xs : List Record}, Distinct xs → perThing (admit may (List.map f xs)) = List.map (fun p => (p.fst, { named := p.snd.named, heads := List.map f p.snd.heads })) (perThing (admit may xs))"
+ ],
+ "Spec.run_slice": [
+  "Laws.SpecSlice",
+  "∀ {sp : Spec} {S W : List Record} {may : Record → Record → Bool}, EnvOnly may → Forms W → SpecSlice sp S W → (∀ (s : Slot), s ∈ sp.slots → s.type.follow ≠ some Follow.keys) → sp.run (settle S) may = sp.run (settle W) may"
+ ],
+ "followed_slice": [
+  "Laws.SpecSlice",
+  "∀ {sp : Spec} {S W : List Record} {may : Record → Record → Bool}, EnvOnly may → Forms W → SpecSlice sp S W → ∀ {sel : Record → Bool}, (∀ (r : Record), sel r = true → sp.takes r = true) → ∀ {σ : Type} (f : Acc σ) (cs : List Cond), f.select (fun r => if sel r = true then Cond.all cs r else Tri.no) (wholeHeads (realm may S)) = f.select (fun r => if sel r = true then Cond.all cs r else Tri.no) (wholeHeads (realm may W))"
+ ],
+ "Slot.grouped_slice": [
+  "Laws.SpecSlice",
+  "∀ {sp : Spec} {S W : List Record} {may : Record → Record → Bool}, EnvOnly may → Forms W → SpecSlice sp S W → ∀ (s : Slot), s.type.follow ≠ some Follow.keys → ∀ (b : By), s.grouped b sp.takes (realm may S) = s.grouped b sp.takes (realm may W)"
+ ],
+ "spec_slice_needs_successors": [
+  "Laws.SpecSlice",
+  "ss.spec.run (settle [ss.a]) ≠ ss.spec.run (settle [ss.a, ss.d])"
+ ],
+ "spec_slice_needs_their_targets": [
+  "Laws.SpecSlice",
+  "ss.spec.run (settle [ss.a, ss.c]) ≠ ss.spec.run (settle [ss.a, ss.b, ss.c])"
+ ],
+ "Spec.run_slice_keyed": [
+  "Laws.KeyedSpecSlice",
+  "∀ {may : Record → Record → Bool} {S W : List Record} {sp : Spec}, EnvOnly may → Forms W → SpecSlice sp S W → KeyedCover sp.takes (realm may S) (realm may W) → sp.run (settle S) may = sp.run (settle W) may"
+ ],
+ "Spec.run_keyed": [
+  "Laws.KeyedSpecSlice",
+  "∀ {may : Record → Record → Bool} {S W : List Record} (sp : Spec), (∀ (s : Slot), s ∈ sp.slots → s.type.follow = some Follow.keys) → KeyedCover sp.takes (realm may S) (realm may W) → sp.run (settle S) may = sp.run (settle W) may"
+ ],
+ "Slot.keyed_cover": [
+  "Laws.KeyedSpecSlice",
+  "∀ {ys xs : List Record} {sel : Record → Bool}, Addressed xs → Addressed ys → KeyedCover sel ys xs → ∀ (s : Slot), s.type.follow = some Follow.keys → s.run sel ys = s.run sel xs"
+ ],
+ "keyedValue_part": [
+  "Laws.KeyedSpecSlice",
+  "∀ {ys xs : List Record} {evy evx : String → Tri}, Addressed xs → Addressed ys → ∀ (ty : FoldType), (∀ (t : String), Covers t ys xs ∨ evy t = Tri.no ∧ evx t = Tri.no) → (∀ (t : String), Covers t ys xs → evy t = evx t) → (∀ (t : String), Covers t ys xs → evx t ≠ Tri.no → t ∈ thingsOf ys) → keyedValue ty ys evy = keyedValue ty xs evx"
+ ],
+ "Covers.thingEv": [
+  "Laws.KeyedSpecSlice",
+  "∀ {t : String} {ys xs : List Record}, Covers t ys xs → Addressed xs → Addressed ys → ∀ (sel : Record → Bool) (cs : List Cond), thingEv sel cs ys t = thingEv sel cs xs t"
+ ],
+ "covers_of_keyedPart": [
+  "Laws.KeyedSpecSlice",
+  "∀ {may : Record → Record → Bool} {S W : List Record}, EnvOnly may → ∀ {t : String}, Forms W → KeyedPart may t S W → (∀ (r : Record), r ∈ recordsOf t (realm may W) → live (recordsOf t (realm may W)) r = true → ∃ a, a ∈ S ∧ a.id = r.id) → (∀ (o : Option String), Witnessed (recordsOf t (realm may S)) (recordsOf t (realm may W)) o) → Covers t (realm may S) (realm may W)"
+ ],
+ "covers_of_live": [
+  "Laws.KeyedSpecSlice",
+  "∀ {may : Record → Record → Bool} {S W : List Record}, EnvOnly may → ∀ {t : String}, Forms W → KeyedPart may t S W → NoCycle (recordsOf t (realm may W)) → Anchored (recordsOf t (realm may W)) → (∀ (r : Record), r ∈ recordsOf t (realm may W) → live (recordsOf t (realm may W)) r = true → ∃ a, a ∈ S ∧ a.id = r.id) → (∀ (r : Record), r ∈ recordsOf t (realm may W) → (∃ a, a ∈ S ∧ a.id = r.id) → live (recordsOf t (realm may W)) r = true) → Covers t (realm may S) (realm may W)"
+ ],
+ "KeyedPart.of_targets": [
+  "Laws.KeyedSpecSlice",
+  "∀ {may : Record → Record → Bool} {S W : List Record}, EnvOnly may → ∀ {t : String}, Forms W → (∀ (r : Record), r ∈ S → r ∈ W) → (∀ (a : Record), a ∈ S → a.isOf t = true → ∀ (b : Record), b ∈ W → b.id = a.id → b ∈ S) → (∀ (a : Record), a ∈ S → a.isOf t = true → ∀ (e : Record), e ∈ W → e.erases.contains a.id = true → e ∈ S) → (∀ (r : Record), r ∈ settle W → r.isOf t = true → (∃ a, a ∈ S ∧ a.id = r.id) → entitled may (settle W) r = true ∨ ∀ (q : Record), q ∈ W → q.id ∈ r.prev → q ∈ S) → KeyedPart may t S W"
+ ],
+ "keyed_slot_needs_live": [
+  "Laws.KeyedSpecSlice",
+  "SpecSlice ks.spec [ks.n, ks.h] [ks.m, ks.n, ks.h] ∧ ks.spec.run (settle [ks.n, ks.h]) ≠ ks.spec.run (settle [ks.m, ks.n, ks.h])"
+ ],
+ "refused_needs_targets": [
+  "Laws.KeyedSpecSlice",
+  "SpecSlice ks.spec [rf.f, rf.g] [rf.y, rf.f, rf.g] ∧ ks.spec.run (settle [rf.f, rf.g]) ≠ ks.spec.run (settle [rf.y, rf.f, rf.g])"
+ ],
+ "Spec.ofJson_fits": [
+  "Laws.Parse",
+  "∀ {j : Json} {sp : Spec}, Spec.ofJson j = Except.ok sp → sp.Fits"
+ ],
+ "Spec.ofJson_toJson": [
+  "Laws.Parse",
+  "∀ {sp : Spec}, sp.Fits → Spec.ofJson sp.toJson = Except.ok sp"
+ ],
+ "Spec.reparse": [
+  "Laws.Parse",
+  "∀ {j : Json} {sp : Spec}, Spec.ofJson j = Except.ok sp → Spec.ofJson sp.toJson = Except.ok sp"
+ ],
+ "Spec.parsed_iff": [
+  "Laws.Parse",
+  "∀ (sp : Spec), (∃ j, Spec.ofJson j = Except.ok sp) ↔ sp.Fits"
+ ],
+ "Spec.ofJson_repeat": [
+  "Laws.Parse",
+  "∀ {j : Json}, j.keysDistinct = false → ∃ p, Json.repeatAt none j = some p ∧ Spec.ofJson j = refuse \"member-duplicate\" p"
+ ],
+ "Json.repeatAt_none": [
+  "Laws.Parse",
+  "∀ (path : Option String) (j : Json), Json.repeatAt path j = none ↔ j.keysDistinct = true"
+ ],
+ "Json.repeatIn_first": [
+  "Laws.Parse",
+  "∀ (path : Option String) {pre : List Json} {x : Json} (rest : List Json) {p : String}, (∀ (y : Json), y ∈ pre → Json.repeatAt path y = none) → Json.repeatAt path x = some p → Json.repeatIn path (pre ++ x :: rest) = some p"
+ ],
+ "Field.when_occurred": [
+  "Laws.Spec",
+  "∀ {r : Record} {c : Claim}, r.occurred = some c → (Field.env EnvField.when).read r = some [Item.time c.span]"
+ ],
+ "Field.when_emitted": [
+  "Laws.Spec",
+  "∀ {r : Record}, r.occurred = none → (Field.env EnvField.when).read r = some [Item.time (Span.point r.emitted.moment)]"
+ ],
+ "window_filter_heads": [
+  "Laws.Spec",
+  "∀ (t : String) (xs : List Record) (sel : Record → Bool) (op : Op) (cs : List Cond), List.filter (chosen sel ({ field := Field.env EnvField.when, op := op } :: cs)) (stateIn t xs).heads = List.filter (fun r => op.test [Item.time r.span] && chosen sel cs r) (stateIn t xs).heads"
+ ],
+ "window_count_heads": [
+  "Laws.Spec",
+  "∀ (name : String) (ops : List Op) (other : Tests) (sel : Record → Bool) (xs : List Record), { name := name, type := FoldType.count (some Follow.prev), tests := (Field.env EnvField.when, ops) :: other }.run sel xs = SlotValue.nat (Count.acc.select (fun r => if sel r = true then Cond.all (Tests.conds ((Field.env EnvField.when, ops) :: other)) r else Tri.no) (wholeHeads xs))"
+ ],
+ "Rules.ofJson?_eq_some_iff": [
+  "Laws.SpecHash",
+  "∀ {j : Json} {v : Rules}, Rules.ofJson? j = some v ↔ j = Json.str v.text"
+ ],
+ "specPreimageOf_eq_iff": [
+  "Laws.SpecHash",
+  "∀ {v w : Rules} {j k : Json}, specPreimageOf v j = specPreimageOf w k ↔ v = w ∧ j.canon = k.canon"
+ ],
+ "Spec.preimage_eq_iff": [
+  "Laws.SpecHash",
+  "∀ {a b : Spec}, a.Fits → b.Fits → ∀ {v w : Rules}, specPreimageOf v a.toJson = specPreimageOf w b.toJson ↔ v = w ∧ a.MemberEq b"
+ ],
+ "Spec.memberEq_preimage": [
+  "Laws.SpecHash",
+  "∀ {a b : Spec}, a.Fits → b.Fits → a.MemberEq b → ∀ (v : Rules), specPreimageOf v a.toJson = specPreimageOf v b.toJson"
+ ],
+ "Spec.memberEq_hash": [
+  "Laws.SpecHash",
+  "∀ {a b : Spec}, a.Fits → b.Fits → a.MemberEq b → ∀ (H : Hash) (v : Rules), Spec.hash H v a = Spec.hash H v b"
+ ],
+ "Spec.memberEq_resultBytes": [
+  "Laws.SpecHash",
+  "∀ {a b : Spec}, a.MemberEq b → (List.map (fun x => x.name) a.slots).Nodup → (List.map (fun x => x.name) b.slots).Nodup → ∀ (xs : List Record) (may : Record → Record → Bool), resultBytes (a.run xs may) = resultBytes (b.run xs may)"
+ ],
+ "specPreimage_ne_commit": [
+  "Laws.SpecHash",
+  "∀ (v : Rules) (j p : Json) {salt : List UInt8}, salt.length = 16 → specPreimageOf v j ≠ salt ++ utf8 p.canon"
+ ],
+ "specPreimage_ne_result": [
+  "Laws.SpecHash",
+  "∀ (v : Rules) (j : Json) (r : List (String × SlotValue)), specPreimageOf v j ≠ resultPreimage r"
+ ],
+ "TickPayload.read_members": [
+  "Laws.Tick",
+  "∀ (p : TickPayload) (H : Hash) (current : Rules), p.spec.toJson.keysDistinct = true → (resultJson p.result).keysDistinct = true → (H (specPreimageOf p.rules p.spec.toJson)).length = 32 → (H (resultPreimage p.result)).length = 32 → List.Pairwise (fun x1 x2 => x1 < x2) p.covers → List.Pairwise (fun x1 x2 => x1 < x2) p.withheld → (∀ (i : RecordId), i ∈ p.withheld → i ∈ p.covers) → readTickMembers H current (p.toJson H) = Except.ok { rules := p.rules, spec := p.spec.toJson, covers := p.covers, withheld := p.withheld, result := resultJson p.result }"
+ ],
+ "TickPayload.read_written": [
+  "Laws.Tick",
+  "∀ (H : Hash) (v : Rules) (s : Spec), s.Fits → ∀ (covers withheld : List RecordId), List.Pairwise (fun x1 x2 => x1 < x2) covers → List.Pairwise (fun x1 x2 => x1 < x2) withheld → (∀ (i : RecordId), i ∈ withheld → i ∈ covers) → ∀ (values : Slot → SlotValue), (∀ (a : Slot), a ∈ s.slots → (values a).FitsSlot a) → (H (specPreimageOf v s.toJson)).length = 32 → (H (resultPreimage (List.map (fun a => (a.name, values a)) s.slots))).length = 32 → have r := List.map (fun a => (a.name, values a)) s.slots; have p := { rules := v, spec := s, covers := covers, withheld := withheld, result := r }; readTickPayload H v (p.toJson H) = Except.ok { rules := p.rules, spec := p.spec, covers := p.covers, withheld := p.withheld, result := unshownResult r }"
+ ],
+ "readTickMembers_distinct": [
+  "Laws.TickRead",
+  "∀ {H : Hash} {current : Rules} {j : Json} {m : TickMembers}, readTickMembers H current j = Except.ok m → j.keysDistinct = true"
+ ],
+ "readTickMembers_same_value": [
+  "Laws.TickRead",
+  "∀ {H : Hash} {current : Rules} {a b : Json} {ma mb : TickMembers}, readTickMembers H current a = Except.ok ma → readTickMembers H current b = Except.ok mb → a.Finite → b.Finite → a.canon = b.canon → a.wireValue = b.wireValue"
+ ],
+ "Written.payload_wireValue": [
+  "Laws.JsonValue",
+  "∀ (a b : Written), a.payload.canon = b.payload.canon → a.payload.wireValue = b.payload.wireValue"
+ ],
+ "readTickMembers_text": [
+  "Laws.TickRead",
+  "∀ {H : Hash} {current : Rules} {j : Json} {m : TickMembers}, readTickMembers H current j = Except.ok m → m.rules.number ≤ current.number → j.canon = (m.toJson H).canon"
+ ],
+ "readTickPayload_text": [
+  "Laws.TickRead",
+  "∀ {H : Hash} {current : Rules} {j : Json} {p : TickPayload}, readTickPayload H current j = Except.ok p → j.canon = (p.toJson H).canon"
+ ],
+ "readResult_written": [
+  "Laws.Tick",
+  "∀ (s : Spec) (values : Slot → SlotValue), (List.map Slot.name s.slots).Nodup → (∀ (a : Slot), a ∈ s.slots → (values a).FitsSlot a) → have r := List.map (fun a => (a.name, values a)) s.slots; readResult s (resultJson r) = Except.ok (unshownResult r)"
+ ],
+ "readResult_text": [
+  "Laws.TickRead",
+  "∀ {s : Spec} {j : Json} {r : List (String × SlotValue)}, (List.map Slot.name s.slots).Nodup → readResult s j = Except.ok r → j.canon = resultText r"
+ ],
+ "TickPayload.record_fields": [
+  "Laws.Tick",
+  "∀ (p : TickPayload) (H : Hash) (env : Env) (salt : List UInt8) (r : Record), ((make env salt (p.toJson H)).readInto r).fields = [(\"rules\", HeldField.one (Val.str p.rules.text)), (\"spec\", HeldField.other), (\"spec-hash\", HeldField.one (Val.str (Spec.hash H p.rules p.spec))), (\"covers\", HeldField.many (List.map (Val.str ∘ idText) p.covers)), (\"result\", HeldField.other), (\"result-hash\", HeldField.one (Val.str (resultHash H p.result)))] ++ if p.withheld.isEmpty = true then [] else [(\"withheld\", HeldField.many (List.map (Val.str ∘ idText) p.withheld))]"
+ ],
+ "tick_inputs": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec) (C W : List RecordId) (xs ys : List Record), Forms (xs ++ ys) → tickMissing C W xs = { records := 0, openings := 0 } → tickMissing C W ys = { records := 0, openings := 0 } → resultBytes (tickRun sp C W xs) = resultBytes (tickRun sp C W ys)"
+ ],
+ "tick_withheld": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec) (C W : List RecordId) (before after : List Record) {a b : Record}, SameEnvelope a b → a.id ∈ W → tickRun sp C W (before ++ a :: after) = tickRun sp C W (before ++ b :: after)"
+ ],
+ "tick_withheld_copy": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec) (C W : List RecordId) (xs : List Record) (a b : Record), Forms xs → a ∈ xs → SameEnvelope a b → a.id ∈ W → tickRun sp C W xs = tickRun sp C W (b :: xs)"
+ ],
+ "checkTick_made": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec), sp.Fits → ∀ (xs : List Record), (checkTick Gen.sha256 Rules.current { kind := \"tick\", payload := some ((makeTick sp xs).toJson Gen.sha256) } xs).answer = TickAnswer.same"
+ ],
+ "checkTick_made_late": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec), sp.Fits → ∀ (xs extra : List Record), (∀ (r : Record), r ∈ extra → ¬r.id ∈ idsOf xs) → (∀ (r : Record), r ∈ extra → ∀ (i : RecordId), i ∈ idsOf xs → ¬i ∈ r.erases) → (checkTick Gen.sha256 Rules.current { kind := \"tick\", payload := some ((makeTick sp xs).toJson Gen.sha256) } (xs ++ extra)).answer = TickAnswer.same"
+ ],
+ "checkTick_made_of_width": [
+  "Laws.TickCheck",
+  "∀ (H : Hash) (sp : Spec), sp.Fits → ∀ (xs extra : List Record), (H (specPreimageOf Rules.current sp.toJson)).length = 32 → (H (resultPreimage (makeTick sp xs).result)).length = 32 → (∀ (r : Record), r ∈ extra → ¬r.id ∈ idsOf xs) → (∀ (r : Record), r ∈ extra → ∀ (i : RecordId), i ∈ idsOf xs → ¬i ∈ r.erases) → (checkTick H Rules.current { kind := \"tick\", payload := some ((makeTick sp xs).toJson H) } (xs ++ extra)).answer = TickAnswer.same"
+ ],
+ "tick_level": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec) (C W : List RecordId) (xs ys : List Record), coveredForms C xs = coveredForms C ys → tickRun sp C W xs = tickRun sp C W ys"
+ ],
+ "tick_level_append": [
+  "Laws.TickCheck",
+  "∀ (sp : Spec) (C W : List RecordId) (xs extra : List Record), (∀ (r : Record), r ∈ extra → ¬r.id ∈ C) → tickRun sp C W (xs ++ extra) = tickRun sp C W xs"
+ ],
+ "intOf?_eq_some_iff": [
+  "Laws.Result",
+  "∀ {s : String} {i : Int}, intOf? s = some i ↔ s = intText i"
+ ],
+ "intOf?_intText": [
+  "Laws.Result",
+  "∀ (i : Int), intOf? (intText i) = some i"
+ ],
+ "intText_injective": [
+  "Laws.Result",
+  "∀ {a b : Int}, intText a = intText b → a = b"
+ ],
+ "SlotValue.result_unshown": [
+  "Laws.Result",
+  "∀ (v : SlotValue), v.unshown.result = v.result"
+ ],
+ "resultText_unshown": [
+  "Laws.Result",
+  "∀ (r : List (String × SlotValue)), resultText (unshownResult r) = resultText r"
+ ],
+ "resultHash_of_unshown": [
+  "Laws.Result",
+  "∀ (H : Hash) {r q : List (String × SlotValue)}, unshownResult r = unshownResult q → resultText r = resultText q ∧ resultBytes r = resultBytes q ∧ resultPreimage r = resultPreimage q ∧ resultHash H r = resultHash H q"
+ ],
+ "Spec.resultText_run_iff": [
+  "Laws.Result",
+  "∀ {sp : Spec}, (List.map (fun x => x.name) sp.slots).Nodup → ∀ (xs ys : List Record) (may may' : Record → Record → Bool), resultText (sp.run xs may) = resultText (sp.run ys may') ↔ unshownResult (sp.run xs may) = unshownResult (sp.run ys may')"
+ ],
+ "Spec.resultBytes_run_iff": [
+  "Laws.Result",
+  "∀ {sp : Spec}, (List.map (fun x => x.name) sp.slots).Nodup → ∀ (xs ys : List Record) (may may' : Record → Record → Bool), resultBytes (sp.run xs may) = resultBytes (sp.run ys may') ↔ unshownResult (sp.run xs may) = unshownResult (sp.run ys may')"
+ ],
+ "Spec.resultPreimage_run_iff": [
+  "Laws.Result",
+  "∀ {sp : Spec}, (List.map (fun x => x.name) sp.slots).Nodup → ∀ (xs ys : List Record) (may may' : Record → Record → Bool), resultPreimage (sp.run xs may) = resultPreimage (sp.run ys may') ↔ unshownResult (sp.run xs may) = unshownResult (sp.run ys may')"
+ ],
+ "Spec.resultPreimage_parsed_iff": [
+  "Laws.Result",
+  "∀ {j : Json} {sp : Spec}, Spec.ofJson j = Except.ok sp → ∀ (xs ys : List Record) (may may' : Record → Record → Bool), resultPreimage (sp.run xs may) = resultPreimage (sp.run ys may') ↔ unshownResult (sp.run xs may) = unshownResult (sp.run ys may')"
+ ],
+ "resultText_eq_iff": [
+  "Laws.Result",
+  "∀ {r q : List (String × SlotValue)}, (List.map (fun x => x.fst) r).Nodup → (List.map (fun x => x.fst) q).Nodup → (∀ (p : String × SlotValue), p ∈ r → p.snd.Ordered) → (∀ (p : String × SlotValue), p ∈ q → p.snd.Ordered) → (resultText r = resultText q ↔ ∀ (m : String × Json), m ∈ resultMembers r ↔ m ∈ resultMembers q)"
+ ],
+ "SlotValue.result_inj": [
+  "Laws.Result",
+  "∀ {v w : SlotValue}, v.Like w → v.result = w.result → v.unshown = w.unshown"
+ ],
+ "Slot.run_ordered": [
+  "Laws.Result",
+  "∀ (s : Slot) (sel : Record → Bool) (xs : List Record), (s.run sel xs).Ordered"
+ ],
+ "Slot.run_like": [
+  "Laws.Result",
+  "∀ (s : Slot) (sel sel' : Record → Bool) (xs ys : List Record), (s.run sel xs).Like (s.run sel' ys)"
+ ],
+ "Json.canon_injective": [
+  "Laws.Result",
+  "∀ {a b : Json}, a.Plain → b.Plain → a.canon = b.canon → a = b"
+ ],
+ "Json.canon_prefix": [
+  "Laws.Result",
+  "∀ (a b : Json), a.Plain → b.Plain → ∀ {X Y : List Char}, a.canon.toList ++ X = b.canon.toList ++ Y → a = b ∧ X = Y"
+ ],
+ "utf8_injective": [
+  "Laws.Result",
+  "∀ {a b : String}, utf8 a = utf8 b → a = b"
+ ],
+ "resultPreimage_ne_commit": [
+  "Laws.Result",
+  "∀ (r : List (String × SlotValue)) {salt : List UInt8}, salt.length = 16 → ∀ (payload : Json), resultPreimage r ≠ salt ++ utf8 payload.canon"
+ ],
+ "Json.canon_head": [
+  "Laws.Result",
+  "∀ (j : Json), ∃ c cs, j.canon.toList = c :: cs ∧ jsonHead c"
+ ],
+ "Number.canon_head": [
+  "Laws.Result",
+  "∀ (n : Number), ∃ c cs, n.canon.toList = c :: cs ∧ jsonHead c"
+ ],
+ "Meaning.unique": [
+  "Laws.Batch",
+  "∀ {H : Hash} {ds : List Draft} {rank : String → Nat}, Acyclic ds rank → ∀ {σ τ : String → Option String}, Meaning H ds σ → Meaning H ds τ → ∀ (l : String), σ l = τ l"
+ ],
+ "envelopeKeysProblem_set": [
+  "Laws.Write",
+  "∀ {xs ys : List (String × Json)}, (∀ (k : String), k ∈ List.map Prod.fst xs ↔ k ∈ List.map Prod.fst ys) → envelopeKeysProblem xs = envelopeKeysProblem ys"
+ ],
+ "draftsShapeProblem_perm": [
+  "Laws.Write",
+  "∀ {xs ys : List Json}, xs.Perm ys → draftsShapeProblem xs = draftsShapeProblem ys"
+ ],
+ "firstRefusal_set": [
+  "Laws.Write",
+  "∀ {cs ds : List String}, (∀ (c : String), c ∈ cs ↔ c ∈ ds) → (∀ (c : String), c ∈ cs → c ∈ writeCodes) → firstRefusal cs = firstRefusal ds"
+ ],
+ "writeProblem_codes": [
+  "Laws.Write",
+  "∀ {env : Env} {salt : List UInt8} {payload : Json} {c : String}, writeProblem env salt payload = some c → c ∈ writeCodes"
+ ],
+ "Lens.escaping": [
+  "Laws.Lens",
+  "∀ (id : Lens.Line) (body : List Lens.Line), id ≠ [] → Lens.parse (Lens.render [{ id := id, body := body }]) = some [{ id := id, body := body }]"
+ ],
+ "Lens.unescape_keeps": [
+  "Laws.Lens",
+  "∀ (l : Lens.Line), Lens.unescape l = l ∨ l = '\\\\' :: Lens.unescape l ∧ Lens.reserved (Lens.unescape l) = true"
+ ],
+ "Lens.parse_render": [
+  "Laws.Lens",
+  "∀ (d : List Lens.Section), Lens.Valid d → Lens.parse (Lens.render d) = some d"
+ ],
+ "Lens.parse_render_iff": [
+  "Laws.Lens",
+  "∀ (d : List Lens.Section), Lens.parse (Lens.render d) = some d ↔ Lens.Valid d"
+ ],
+ "Lens.no_op": [
+  "Laws.Lens",
+  "∀ {base : List Lens.Section}, Lens.Valid base → Lens.edit base (Lens.render base) = some []"
+ ],
+ "Lens.put_get": [
+  "Laws.Lens",
+  "∀ {base edited : List Lens.Section}, (Lens.ids base).Nodup → Lens.ids edited = Lens.ids base → Lens.apply base (Lens.diff base edited) = edited"
+ ],
+ "Lens.put_get_text": [
+  "Laws.Lens",
+  "∀ {base edited : List Lens.Section} {text : List Lens.Line}, (Lens.ids base).Nodup → Lens.parse text = some edited → Lens.ids edited = Lens.ids base → Option.map (fun os => Lens.render (Lens.apply base os)) (Lens.edit base text) = Lens.normalize text"
+ ],
+ "Lens.nothing_dropped": [
+  "Laws.Lens",
+  "∀ {base edited : List Lens.Section} {e : Lens.Section}, e ∈ edited → Lens.lookup e.id base = some e.body ∨ Lens.Outcome.accepted e.id e.body ∈ Lens.diff base edited ∨ Lens.Outcome.unknown e.id ∈ Lens.diff base edited"
+ ],
+ "Lens.absence_reported": [
+  "Laws.Lens",
+  "∀ {base edited : List Lens.Section} {s : Lens.Section}, s ∈ base → ¬s.id ∈ Lens.ids edited → Lens.Outcome.absent s.id ∈ Lens.diff base edited"
+ ],
+ "Lens.absence_not_edit": [
+  "Laws.Lens",
+  "∀ (base : List Lens.Section) (id : Lens.Line), Lens.apply base [Lens.Outcome.absent id] = base"
+ ],
+ "Lens.normalize_idem": [
+  "Laws.Lens",
+  "∀ {text out : List Lens.Line}, Lens.normalize text = some out → Lens.normalize out = some out"
+ ],
+ "Lens.parse_valid": [
+  "Laws.Lens",
+  "∀ {text : List Lens.Line} {d : List Lens.Section}, Lens.parse text = some d → Lens.Valid d"
+ ],
+ "Lens.baseProblem_none": [
+  "Laws.Lens",
+  "∀ (base : List Lens.Section), Lens.baseProblem base = none ↔ (Lens.ids base).Nodup"
+ ],
+ "Lens.read_base_first": [
+  "Laws.Lens",
+  "∀ {base : List Lens.Section}, ¬(Lens.ids base).Nodup → ∀ (text : List Lens.Line), Lens.read base text = Except.error \"base-id-duplicate\""
+ ],
+ "Lens.read_ok": [
+  "Laws.Lens",
+  "∀ {base : List Lens.Section} {text : List Lens.Line} {r : Option (List Lens.Outcome)}, Lens.read base text = Except.ok r → (Lens.ids base).Nodup ∧ r = Lens.edit base text"
+ ],
+ "Lens.read_put_get": [
+  "Laws.Lens",
+  "∀ {base edited : List Lens.Section} {text : List Lens.Line} {r : Option (List Lens.Outcome)}, Lens.read base text = Except.ok r → Lens.parse text = some edited → Lens.ids edited = Lens.ids base → Option.map (fun os => Lens.render (Lens.apply base os)) r = Lens.normalize text"
+ ],
+ "erase_keeps_id": [
+  "Laws.Record",
+  "∀ (H : Hash) (r : Stored), Stored.id H (erase H r) = Stored.id H r"
+ ],
+ "erase_idem": [
+  "Laws.Record",
+  "∀ (H : Hash) (r : Stored), erase H (erase H r) = erase H r"
+ ],
+ "opening_checks": [
+  "Laws.Record",
+  "∀ (H : Hash) (env : Env) (salt : List UInt8) (payload : Json), opens H (Stored.commit H (make env salt payload)) salt payload = true"
+ ],
+ "id_sets": [
+  "Laws.Record",
+  "∀ (H : Hash) {e e' : Env} (commit : String), e.kind = e'.kind → e.observer = e'.observer → e.emitted = e'.emitted → e.occurred = e'.occurred → e.under = e'.under → e.of = e'.of → (∀ (s : String), s ∈ e.about ↔ s ∈ e'.about) → (∀ (s : String), s ∈ e.prev ↔ s ∈ e'.prev) → (∀ (s : String), s ∈ e.erases ↔ s ∈ e'.erases) → (e.sets.isSome = e'.sets.isSome ∧ ∀ (s : String), s ∈ e.sets.getD [] ↔ s ∈ e'.sets.getD []) → idOf H e commit = idOf H e' commit"
+ ],
+ "canonSet_eq": [
+  "Laws.Record",
+  "∀ {xs ys : List String}, (∀ (s : String), s ∈ xs ↔ s ∈ ys) → canonSet xs = canonSet ys"
+ ],
+ "setsJson_eq": [
+  "Laws.Record",
+  "∀ {a b : Option (List String)}, (a.isSome = b.isSome ∧ ∀ (s : String), s ∈ a.getD [] ↔ s ∈ b.getD []) → Env.setsJson a = Env.setsJson b"
+ ],
+ "Env.problem_sets": [
+  "Laws.Write",
+  "∀ {e : Env}, e.problem = none → e.keysNamed = true"
+ ],
+ "Env.problem_sets_not_keys": [
+  "Laws.Write",
+  "∀ {e : Env}, e.problem = some \"sets-not-keys\" → e.erases.all recordId = true ∧ e.keysNamed = false"
+ ],
+ "Env.problem_of_missing_sets": [
+  "Laws.Write",
+  "∀ {e : Env}, e.problem = some \"of-missing\" → e.keysNamed = true"
+ ],
+ "toJson_sets": [
+  "Laws.Record",
+  "∀ (e : Env) (s : Option (List String)), { kind := e.kind, observer := e.observer, emitted := e.emitted, occurred := e.occurred, about := e.about, of := e.of, prev := e.prev, under := e.under, erases := e.erases, sets := s }.toJson = Json.obj (e.baseJson ++ Env.setsJson s)"
+ ],
+ "sets_empty_ne_absent": [
+  "Laws.Record",
+  "∀ (e : Env), { kind := e.kind, observer := e.observer, emitted := e.emitted, occurred := e.occurred, about := e.about, of := e.of, prev := e.prev, under := e.under, erases := e.erases, sets := some [] }.toJson ≠ { kind := e.kind, observer := e.observer, emitted := e.emitted, occurred := e.occurred, about := e.about, of := e.of, prev := e.prev, under := e.under, erases := e.erases }.toJson"
+ ],
+ "Read.envOf_sets_mistyped": [
+  "Laws.Read",
+  "∀ {kvs : List (String × Json)} {j : Json}, List.lookup \"sets\" kvs = some j → ((∀ (xs : List Json), j ≠ Json.arr xs) ∨ ∃ xs x, j = Json.arr xs ∧ x ∈ xs ∧ ∀ (s : String), x ≠ Json.str s) → (Read.envOf kvs).problem ≠ none"
+ ],
+ "Env.problem_of": [
+  "Laws.Write",
+  "∀ {e : Env}, e.problem = none → e.prev ≠ [] → e.of.isSome = true"
+ ],
+ "unreadable_refused": [
+  "Laws.Write",
+  "unreadable.isEmpty = true ∧ typedRef unreadable = false ∧ validEmitted unreadable = false ∧ occurredSpan? unreadable = none ∧ recordId unreadable = false ∧ keyName unreadable = false"
+ ],
+ "Env.problem_unreadable": [
+  "Laws.Read",
+  "∀ {e : Env}, (e.kind = unreadable ∨ e.observer = unreadable ∨ e.emitted = unreadable ∨ e.occurred = some unreadable ∨ unreadable ∈ e.about ∨ e.of = some unreadable ∨ unreadable ∈ e.prev ∨ e.under = some unreadable ∨ unreadable ∈ e.erases ∨ ∃ xs, e.sets = some xs ∧ unreadable ∈ xs) → e.problem ≠ none"
+ ],
+ "Written.no_unreadable": [
+  "Laws.Read",
+  "∀ (w : Written), ¬(w.env.kind = unreadable ∨ w.env.observer = unreadable ∨ w.env.emitted = unreadable ∨ w.env.occurred = some unreadable ∨ unreadable ∈ w.env.about ∨ w.env.of = some unreadable ∨ unreadable ∈ w.env.prev ∨ w.env.under = some unreadable ∨ unreadable ∈ w.env.erases ∨ ∃ xs, w.env.sets = some xs ∧ unreadable ∈ xs)"
+ ],
+ "Read.envOf_missing": [
+  "Laws.Read",
+  "∀ {kvs : List (String × Json)}, List.lookup \"kind\" kvs = none ∨ List.lookup \"observer\" kvs = none ∨ List.lookup \"emitted\" kvs = none → (Read.envOf kvs).problem ≠ none"
+ ],
+ "Read.envOf_mistyped": [
+  "Laws.Read",
+  "∀ {kvs : List (String × Json)} {k : String} {j : Json}, k ∈ [\"kind\", \"observer\", \"emitted\", \"occurred\", \"of\", \"under\"] → List.lookup k kvs = some j → (∀ (s : String), j ≠ Json.str s) → (Read.envOf kvs).problem ≠ none"
+ ],
+ "Read.envOf_set_mistyped": [
+  "Laws.Read",
+  "∀ {kvs : List (String × Json)} {k : String} {j : Json}, k ∈ [\"about\", \"prev\", \"erases\"] → List.lookup k kvs = some j → ((∀ (xs : List Json), j ≠ Json.arr xs) ∨ ∃ xs x, j = Json.arr xs ∧ x ∈ xs ∧ ∀ (s : String), x ≠ Json.str s) → (Read.envOf kvs).problem ≠ none"
+ ],
+ "Read.salt_length": [
+  "Laws.Read",
+  "∀ {j : Option Json}, (Read.salt j).length = 16 → ∃ s bs, j = some (Json.str s) ∧ unbase32 s = some bs ∧ bs.length = 16"
+ ],
+ "writeProblem_salt": [
+  "Laws.Read",
+  "∀ {env : Env} {salt : List UInt8} {payload : Json}, env.problem = none → salt.length ≠ 16 → writeProblem env salt payload = some \"salt-not-16-bytes\""
+ ],
+ "envelopesShapeProblem_perm": [
+  "Laws.Write",
+  "∀ {xs ys : List Json}, xs.Perm ys → envelopesShapeProblem xs = envelopesShapeProblem ys"
+ ],
+ "canon_member_order": [
+  "Laws.Record",
+  "∀ {kvs kvs' : List (String × Json)}, kvs.Perm kvs' → (List.map (fun x => x.fst) kvs).Nodup → (Json.obj kvs).canon = (Json.obj kvs').canon"
+ ],
+ "lexLt_trans": [
+  "Laws.Record",
+  "∀ {a b c : List Nat}, lexLt a b = true → lexLt b c = true → lexLt a c = true"
+ ],
+ "lexLt_total": [
+  "Laws.Record",
+  "∀ {a b : List Nat}, a ≠ b → lexLt a b = true ∨ lexLt b a = true"
+ ],
+ "utf16_inj": [
+  "Laws.Record",
+  "∀ {a b : String}, utf16 a = utf16 b → a = b"
+ ],
+ "ofUtf16?_eq_some_iff": [
+  "Laws.Record",
+  "∀ {us : List Nat} {cs : List Char}, ofUtf16? us = some cs ↔ List.flatMap utf16Char cs = us"
+ ],
+ "ofUtf16?_utf16": [
+  "Laws.Record",
+  "∀ (s : String), ofUtf16? (utf16 s) = some s.toList"
+ ],
+ "ofUtf16?_lone_high": [
+  "Laws.Record",
+  "∀ {u l : Nat} (us : List Nat), highSurrogate u = true → lowSurrogate l = false → ofUtf16? (u :: l :: us) = none"
+ ],
+ "ofUtf16?_lone_high_end": [
+  "Laws.Record",
+  "∀ {u : Nat}, highSurrogate u = true → ofUtf16? [u] = none"
+ ],
+ "ofUtf16?_lone_low": [
+  "Laws.Record",
+  "∀ {u : Nat} (us : List Nat), lowSurrogate u = true → ofUtf16? (u :: us) = none"
+ ],
+ "writeProblem_none": [
+  "Loops.Stored",
+  "∀ {env : Env} {salt : List UInt8} {payload : Json}, writeProblem env salt payload = none ↔ Writable env salt payload"
+ ],
+ "Written.commit_member_order": [
+  "Laws.Write",
+  "∀ (H : Hash) (w : Written) {kvs kvs' : List (String × Json)}, w.payload = Json.obj kvs → kvs.Perm kvs' → commitOf H w.salt (Json.obj kvs') = Stored.commit H w.stored"
+ ],
+ "Number.finite_of_inRange": [
+  "Laws.Write",
+  "∀ {n : Number}, n.inRange = true → n.finite = true"
+ ],
+ "writeProblem_nonfinite": [
+  "Laws.Write",
+  "∀ {env : Env} {salt : List UInt8} {n : Number}, env.problem = none → salt.length = 16 → n.finite = false → writeProblem env salt (Json.number n) = some \"number-out-of-range\""
+ ],
+ "writeProblem_range_last": [
+  "Laws.Write",
+  "∀ {env : Env} {salt : List UInt8} {payload : Json}, writeProblem env salt payload = some \"number-out-of-range\" → env.problem = none ∧ salt.length = 16 ∧ payload.keysDistinct = true ∧ payload.inRange = false"
+ ],
+ "occurred_point": [
+  "Laws.Time",
+  "∀ {cs : List Char} {a b : Moment}, ¬'/' ∈ cs → point? cs = some (a, b) → ∃ sp, occurredSpanOf cs = some sp ∧ sp.start = a ∧ sp.stop = some b"
+ ],
+ "occurred_open": [
+  "Laws.Time",
+  "∀ {p : List Char} {a a' : Moment}, ¬'/' ∈ p → point? p = some (a, a') → ∃ sp, occurredSpanOf (p ++ ['/', '.', '.']) = some sp ∧ sp.start = a ∧ sp.stop = none"
+ ],
+ "occurred_interval": [
+  "Laws.Time",
+  "∀ {p q : List Char} {a a' b e : Moment}, ¬'/' ∈ p → ¬'/' ∈ q → q ≠ ['.', '.'] → point? p = some (a, a') → point? q = some (b, e) → a ≤ b → ∃ sp, occurredSpanOf (p ++ '/' :: q) = some sp ∧ sp.start = a ∧ sp.stop = some e"
+ ],
+ "point_le": [
+  "Laws.Time",
+  "∀ {cs : List Char} {a b : Moment}, point? cs = some (a, b) → a ≤ b"
+ ],
+ "occurred_qualified": [
+  "Laws.Time",
+  "∀ {cs : List Char} {q : Char}, isQualifier q = true → ¬'/' ∈ cs → ¬'T' ∈ cs → (∀ (c : Char), cs.getLast? = some c → isQualifier c = false) → occurredSpanOf (cs ++ [q]) = occurredSpanOf cs"
+ ],
+ "occurred_qualified_start": [
+  "Laws.Time",
+  "∀ {p r : List Char} {q : Char}, isQualifier q = true → ¬'/' ∈ p → ¬'T' ∈ p → (∀ (c : Char), p.getLast? = some c → isQualifier c = false) → occurredSpanOf (p ++ [q] ++ '/' :: r) = occurredSpanOf (p ++ '/' :: r)"
+ ],
+ "occurred_qualified_end": [
+  "Laws.Time",
+  "∀ {p r : List Char} {q : Char}, isQualifier q = true → ¬'/' ∈ p → r ≠ ['.', '.'] → ¬'T' ∈ r → (∀ (c : Char), r.getLast? = some c → isQualifier c = false) → occurredSpanOf (p ++ '/' :: (r ++ [q])) = occurredSpanOf (p ++ '/' :: r)"
+ ],
+ "instant_canonical": [
+  "Laws.Time",
+  "∀ {cs : List Char} {m : Moment}, instant? cs = some m → m.Canonical"
+ ],
+ "point_canonical": [
+  "Laws.Time",
+  "∀ {cs : List Char} {a b : Moment}, point? cs = some (a, b) → a.Canonical ∧ b.Canonical"
+ ],
+ "moment_lt_iff_scaled": [
+  "Laws.Time",
+  "∀ {n : Nat} {s1 s2 : Int} {f1 f2 : List Int}, Stripped f1 → Stripped f2 → f1.length ≤ n → f2.length ≤ n → (s1 :: f1 < s2 :: f2 ↔ momentScaled n s1 f1 < momentScaled n s2 f2)"
+ ],
+ "Span.before_irrefl": [
+  "Laws.Time",
+  "∀ (a : Span), ¬a.Before a"
+ ],
+ "Span.before_trans": [
+  "Laws.Time",
+  "∀ {a b c : Span}, a.Before b → b.Before c → a.Before c"
+ ],
+ "Span.before_total": [
+  "Laws.Time",
+  "∀ (a b : Span), a.Before b ∨ a = b ∨ b.Before a"
+ ]
+}

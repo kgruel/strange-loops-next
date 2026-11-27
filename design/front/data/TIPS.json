@@ -1,0 +1,42 @@
+{
+ "observer": [
+  "observer",
+  "Who says it. Today that is the key that signed it, <code>k:…</code>."
+ ],
+ "emitted": [
+  "emitted",
+  "When it was written, in RFC 3339, set by the writer."
+ ],
+ "kind": [
+  "kind",
+  "What sort of record it is. Any word; a source selects by it."
+ ],
+ "of": [
+  "of",
+  "The one thing it is about. Heads are worked out thing by thing."
+ ],
+ "occurred": [
+  "occurred",
+  "When what it describes happened, only as exactly as anyone knows: here a decade, 1960 up to 1970."
+ ],
+ "payload": [
+  "payload",
+  "What was seen. Kept apart from the envelope, so it can be withheld or erased."
+ ],
+ "prev": [
+  "prev",
+  "The records it replaces, inside the same thing."
+ ],
+ "erases": [
+  "erases",
+  "Payloads it removes. The erased record keeps its id and its place."
+ ],
+ "under": [
+  "under",
+  "The grant it acts on. Nothing writes this yet: see <a href=\"#is3\">IS3</a>."
+ ],
+ "id": [
+  "id",
+  "A hash of everything above, written one canonical way. Try it below."
+ ]
+}

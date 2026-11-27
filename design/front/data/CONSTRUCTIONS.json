@@ -1,0 +1,53 @@
+[
+ {
+  "word": "start",
+  "parts": [
+   "emit",
+   "no prev"
+  ],
+  "says": "A new chain. Without <code>of</code>, the record is a root and starts a thing named by its own id."
+ },
+ {
+  "word": "revise",
+  "parts": [
+   "emit",
+   "prev: [x]",
+   "of"
+  ],
+  "says": "Replaces x inside the thing both are of. Leave out <code>of</code> and it is refused, <code>of-missing</code>. Name a record of another thing and it is refused, <code>prev-unrelated</code>."
+ },
+ {
+  "word": "merge",
+  "parts": [
+   "emit",
+   "prev: [x, y]"
+  ],
+  "says": "Naming every head leaves one head, unless another concurrent head remains."
+ },
+ {
+  "word": "erase",
+  "parts": [
+   "emit",
+   "erases: [x]"
+  ],
+  "says": "Any kind may erase. x keeps its id, its signature and its place. Only its payload goes (the protocol calls it the opening)."
+ },
+ {
+  "word": "fork",
+  "parts": [
+   "two records",
+   "one prev"
+  ],
+  "says": "Nobody's verb: a state. The thing has two heads, both shown, and the newer by content order is listed first.",
+  "state": true
+ },
+ {
+  "word": "withhold",
+  "parts": [
+   "hold",
+   "no payload"
+  ],
+  "says": "Not a write at all: a view. The envelope still answers every test on it.",
+  "state": true
+ }
+]

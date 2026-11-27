@@ -1,0 +1,150 @@
+[
+ {
+  "tab": "<code>sets</code> names fields",
+  "rows": [
+   [
+    {
+     "id": "R1",
+     "env": "the first write: no sets",
+     "pay": {
+      "name": "east",
+      "status": "cold",
+      "cone": "6"
+     }
+    }
+   ],
+   [
+    {
+     "id": "R2",
+     "env": "prev R1 · sets name, status",
+     "pay": {
+      "name": "east",
+      "status": "firing"
+     },
+     "head": true
+    }
+   ]
+  ],
+  "read": [
+   [
+    "name",
+    "east",
+    "R2"
+   ],
+   [
+    "status",
+    "firing",
+    "R2"
+   ],
+   [
+    "cone",
+    "6",
+    "R1"
+   ]
+  ],
+  "say": "<b>R2 sets two fields and leaves the rest alone.</b> The cone is still read from R1."
+ },
+ {
+  "tab": "No <code>sets</code> at all",
+  "rows": [
+   [
+    {
+     "id": "R1",
+     "env": "the first write: no sets",
+     "pay": {
+      "name": "east",
+      "status": "cold",
+      "cone": "6"
+     }
+    }
+   ],
+   [
+    {
+     "id": "R2",
+     "env": "prev R1 · no sets: --whole",
+     "pay": {
+      "name": "east",
+      "status": "firing"
+     },
+     "head": true
+    }
+   ]
+  ],
+  "read": [
+   [
+    "name",
+    "east",
+    "R2"
+   ],
+   [
+    "status",
+    "firing",
+    "R2"
+   ],
+   [
+    "cone",
+    "—",
+    null
+   ]
+  ],
+  "say": "<b>R2 is read whole, so it replaces everything.</b> It says nothing about the cone, so the kiln has no cone now."
+ },
+ {
+  "tab": "<code>\"sets\": []</code>",
+  "rows": [
+   [
+    {
+     "id": "R1",
+     "env": "the first write: no sets",
+     "pay": {
+      "name": "east",
+      "status": "cold",
+      "cone": "6"
+     }
+    }
+   ],
+   [
+    {
+     "id": "B",
+     "env": "prev R1 · sets status",
+     "pay": {
+      "status": "firing"
+     }
+    },
+    {
+     "id": "C",
+     "env": "prev R1 · sets cone",
+     "pay": {
+      "cone": "8"
+     }
+    }
+   ],
+   [
+    {
+     "id": "J",
+     "env": "prev B, C · sets []",
+     "pay": {},
+     "head": true
+    }
+   ]
+  ],
+  "read": [
+   [
+    "name",
+    "east",
+    "R1"
+   ],
+   [
+    "status",
+    "firing",
+    "B"
+   ],
+   [
+    "cone",
+    "8",
+    "C"
+   ]
+  ],
+  "say": "<b>B and C each set one field, without having seen each other.</b> J sets nothing. It joins the two heads into one, and both changes stand."
+ }
+]

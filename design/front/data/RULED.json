@@ -1,0 +1,588 @@
+[
+ {
+  "date": "2026-11-25",
+  "head": "Two more stops in the shorthand: every_write fields, and a --sets that leaves out a key it was given",
+  "text": "Two stops in the shorthand: a kind's <code>every_write</code> fields must be stated on every shorthand write, an explicit <code>--sets-nothing</code> excepted (version 2 of the description file), with a count of records in <code>describe</code>; and a stated <code>--sets</code> stops when it leaves out a key the command gives. Neither is standing: <code>emit -</code> and the store refuse nothing",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "ST1: the shorthand is strict",
+  "text": "ST1: the shorthand is strict. With a description, <code>emit</code> stops on a kind it does not name, a lifecycle value in neither list, a reference field holding anything but references of a listed kind, and a comma in a reference or a key; the description loses <code>key_format</code> and <code>search</code>; no <code>name</code> headline once a description exists",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "AD5 amended: the mention is declined, and the import's AD5 work waits",
+  "text": "AD5 amended: the mention in row 2 is declined; the import's AD5 work is deferred and the homelab is not cut over a second time",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "BP1: nine narrow cases, and what was entered is accepted strictly",
+  "text": "BP1: what was entered is accepted strictly. A key that is not text stops the shorthand; a root that is meant keeps its payload; <code>--add-about</code> and <code>--drop-about</code> of one thing is a usage error; the import leaves a bare key beside a twin as entered, makes a list from a comma or a reviewed comma and space, and mentions only what it repaired",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "AD5: the import writes a reference as kind:key where the old store proves it",
+  "text": "AD5: the import writes a reference field as <code>kind:key</code> where the old store proves it: where its twin resolves to the thing it names; in five slip fields the group's map names, with a mention; and as a list where a twin holds several ids. Never a kind's key field. The homelab is imported afresh",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "SD4: loops ls --refers-to finds what refers to a thing",
+  "text": "SD4: <code>loops ls --refers-to &lt;thing&gt;</code> reads the declared reference fields as a fold's <code>is</code> does, yes, no or unknown, across kinds and across a group's stores, and states what it read",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "SD3: reference fields are described, never copied into about",
+  "text": "SD3, option C: a kind's reference fields are described and nothing is copied into <code>about</code>; a mention is stated by the writer",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "SD2: emit stops on a write with no key, or a key that disagrees",
+  "text": "SD2, option A: <code>emit</code> stops before it signs a write with no key, or with a key field that disagrees with its thing's key; <code>--root</code> for a keyless root that is meant",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-24",
+  "head": "SD1: a store describes its kinds in a plain file that enforces nothing",
+  "text": "SD1, option A: a store describes its kinds in a plain <code>.loops/store.json</code> that the CLI uses and no read depends on; it refuses nothing, and becomes records at step 3",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the kinds and references note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-kinds-and-references.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "head": "W3b: the JavaScript stays frozen; new steps are built in Lean and Rust",
+  "text": "W3b: the JavaScript stays frozen, as the rule; new steps are built in Lean and Rust",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the order-of-work note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-order-of-work.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "head": "AD4: references in old payloads become mentions",
+  "text": "AD4: references in the old payloads become mentions of what they name, through one rule for old ids; the payload is cleaned of the fields they came from",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the adoption note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-22-adoption.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "head": "TK13: what a tick covers when you name no cut",
+  "text": "TK13: <code>loops tick &lt;spec&gt;</code> with no cut named covers the records the answer depends on, with everything held under them through <code>prev</code> and <code>under</code>; for a spec that reads things by key, every record of the things it touches; <code>--all</code> covers everything",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the tick record note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-tick-record.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "head": "AD3: two details of the import",
+  "text": "AD3: a fact of a kind the vertex does not name, brought in with <code>--include-unnamed</code>, is a root; the old time is kept to the microsecond",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the adoption note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-22-adoption.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "head": "AD1: how a store name is bound",
+  "text": "AD1: a store name is bound in a per-user list, in an optional list kept with a group of stores, or by <code>--store &lt;name&gt;=&lt;dir&gt;</code> on the command; a name bound to nothing refuses the whole read (<code>store-unknown</code>)",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the adoption note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-22-adoption.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-23",
+  "head": "AD2: the import's eight choices, and four more",
+  "text": "AD2: the import's eight choices as recommended, and four more: no observer mention for an empty observer; the old store's row order where it keeps no arrival number; a fact without its key is a root; a kind the vertex does not name is left out unless asked for",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "The adoption note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-22-adoption.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-22",
+  "head": "Step 4, ticks, is closed",
+  "text": "Step 4 (ticks) meets its exit criterion and is closed",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-22",
+  "head": "TK12: loops tick --check exits 0 only for same",
+  "text": "TK12: <code>loops tick --check</code> exits 0 only for <code>same</code>",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "The tick record note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-tick-record.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-22",
+  "head": "TK10: seven details of loops tick --check",
+  "text": "TK10, seven details of <code>loops tick --check</code>, each as recommended: an erased payload is not read from old bytes; a covered eraser the tick ignores is not a tick at once; under newer rules the check tests only what no version changes, and a result's hash only for its spelling; a result no fold could give is <code>differs</code>; <code>rules</code> is a positive whole number as text; a spec this binary cannot read is <code>cannot check</code>",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the tick record note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-tick-record.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-22",
+  "head": "TK11: a write against a base names the base's live records",
+  "text": "TK11, option C: a write against a base names the base's live records together with what is under them in the store, and says how many it named that the base did not hold",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "The tick record note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-tick-record.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "TK1 to TK9: the tick record",
+  "text": "The tick record, TK1 to TK9: an ordinary record of kind <code>tick</code>; it carries its result and the result's hash; it carries its spec and the spec's hash; <code>covers</code> lists every record folded; <code>withheld</code> lists those read without a payload; a spec reads a tick by the payload reading; a verb checks and no store refuses a tick; the window field is <code>env.when</code>; a member <code>rules</code> bound into the spec's hash",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the tick record note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-tick-record.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "W1 to W6: the order of work",
+  "text": "The order of work, W1 to W6: an adoption step after ticks, its CLI pieces beside the tick work; a cache of checked segments in that step; the JavaScript frozen as a trial for step 4; one refusal per input inside the repository, single faults in the protocol text; the mutant check stays; <code>out/</code> stays committed",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the order-of-work note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-order-of-work.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "PV1 to PV7: how payload values are read",
+  "text": "Payload values, PV1 to PV7: the reading is stated in the model; <code>value</code> and <code>n</code> are ordinary fields; <code>present</code> means written; a list reads as a set under <code>is</code>, <code>not</code> and <code>by</code>; a list is never a number",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ],
+   [
+    "the payload values note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-21-payload-values.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "A result hash gets its own prefix, res:",
+  "text": "A result hash has its own prefix, <code>res:</code>; the codec's other choices confirmed",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "Only a choice that changes bytes or answers comes to you",
+  "text": "Only a choice that changes bytes or answers comes to Kyle; other implementer choices stand unless he objects",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "The 20 built keyed-fold choices, confirmed",
+  "text": "The 20 built keyed-fold choices confirmed",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "Edges: three classes, and no change to the envelope",
+  "text": "Edges: three classes, no change to the envelope; an edge's payload holds <code>rel</code>, <code>from</code>, <code>to</code> and <code>state</code>",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-21",
+  "head": "Issue #10 closed, with no strict \"after\" operator",
+  "text": "Issue #10 closed with no strict \"after\" operator",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-20",
+  "head": "Step 2 is closed",
+  "text": "Step 2 meets its exit criterion and is closed",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-20",
+  "head": "A verb reading an unchecked store answers, then is refused store-not-clean",
+  "text": "A verb that answers from a store that does not check answers and is then refused <code>store-not-clean</code>",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-20",
+  "head": "The cut",
+  "text": "The cut: a cut is a part closed downward over <code>prev</code>; \"as of T\" is down; a content tick folds a set named outright; ids without <code>shown</code> in the result; a window is a <code>where</code>; <code>emit</code> copies <code>occurred</code>; the changeset path can ask for the filler; the filler takes a base",
+  "where": [
+   [
+    "The cut note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-15-the-cut.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-20",
+  "head": "The result codec puts no tag on an integer",
+  "text": "The result codec carries no tag on an integer",
+  "where": [
+   [
+    "The cut note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-15-the-cut.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-15",
+  "head": "loops of shows values",
+  "text": "<code>loops of</code> shows values; <code>--values</code>; an emit of a held thing sets the fields it names",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-15",
+  "head": "A keyed collect's limit counts things",
+  "text": "A keyed collect's <code>limit</code> counts things, each listed whole",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-14",
+  "head": "Rule B: a keyed slot reads the envelope from the heads",
+  "text": "A slot following <code>keys</code> reads the envelope from the heads (\"Rule B\"); every emit carries the thing's whole <code>about</code>; the anchor names every live record",
+  "where": [
+   [
+    "The declared-keys note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-11-declared-keys.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-13",
+  "head": "\"follow\": \"keys\"",
+  "text": "<code>\"follow\": \"keys\"</code>, its result, how the other slots read a keyed thing, the laws and the writer",
+  "where": [
+   [
+    "The declared-keys note",
+    "https://projects.gruel.world/strange-loops/decisions/note-2026-11-11-declared-keys.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-13",
+  "head": "A writer refuses an under target it does not hold",
+  "text": "A writer refuses an <code>under</code> target it does not hold",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-11",
+  "head": "D7: a separate, versioned result codec",
+  "text": "D7: a separate, versioned result codec with integers as decimal text",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-11",
+  "head": "by: how grouping is spelled and counted",
+  "text": "<code>by</code>: its spelling, text keys, <code>ungrouped</code>, a record in several groups, <code>limit</code> per group",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-11",
+  "head": "follow on count, sum, min and max",
+  "text": "<code>follow</code> on count, sum, min and max; the caching reader's law is step 4's first",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-11",
+  "head": "One new envelope code, envelope-not-object",
+  "text": "Envelope shapes: one new code, <code>envelope-not-object</code>",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-11",
+  "head": "The slice law is witnessed",
+  "text": "The slice law is <i>witnessed</i>; a writer's tool fills in the anchor",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-10",
+  "head": "D8: of names a record's one thing, and about only mentions",
+  "text": "D8: <code>of</code> names a record's one thing; <code>about</code> only mentions; <code>sets</code> declares keys; natural keys; no conflict declared by the core; undeclared keys refused progressively",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-10",
+  "head": "Withheld and erased are one state to a fold",
+  "text": "Withheld and erased are one state to a fold",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-10",
+  "head": "The order of the steps",
+  "text": "The order: step 2 with D8, then step 4, then step 3 with step 5",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "2026-11-10",
+  "head": "D1 to D6, as recommended",
+  "text": "D1 to D6, as their recommendations",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ },
+ {
+  "date": "Step 1",
+  "head": "R1 to R6; numbers are binary64",
+  "text": "R1 to R6; binary64 by Option A",
+  "where": [
+   [
+    "Changelog",
+    "https://projects.gruel.world/strange-loops/decisions/changelog.html"
+   ]
+  ]
+ }
+]

@@ -1,0 +1,39 @@
+[
+ {
+  "name": "the model",
+  "what": "<code>lake exe gen</code> computes protocol-vector answers. The theorem files separately prove the listed laws.",
+  "checker": false,
+  "except": [],
+  "ops": null
+ },
+ {
+  "name": "the JS implementation",
+  "what": "<code>interop/js/check.mjs</code> checks the earlier fixtures and standards. JavaScript does not run tick (W3).",
+  "checker": true,
+  "except": [
+   "tick"
+  ],
+  "ops": null
+ },
+ {
+  "name": "the Rust implementation",
+  "what": "The Rust workspace checks the earlier fixture families, the external standards, and all tick vectors, including making a claim and checking it against a local holding.",
+  "checker": false,
+  "except": [],
+  "ops": {
+   "tick": [
+    "hash",
+    "domains",
+    "window",
+    "write-payload",
+    "payload",
+    "payload-text",
+    "members",
+    "read-ticks",
+    "fields",
+    "make-and-check",
+    "check-tick"
+   ]
+  }
+ }
+]

@@ -1,0 +1,8 @@
+{
+ "invariance": "=",
+ "round-trip": "↺",
+ "refinement": "?",
+ "order": "<",
+ "exactness": "⇔",
+ "limit": "!"
+}

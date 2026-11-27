@@ -1,0 +1,30 @@
+[
+ [
+  "Recovery",
+  "ID6"
+ ],
+ [
+  "Where a person's keys are kept",
+  "ID3"
+ ],
+ [
+  "What stays erasable",
+  "ID7"
+ ],
+ [
+  "Names",
+  "ID8"
+ ],
+ [
+  "How the team's root is used",
+  "SW2"
+ ],
+ [
+  "A description two stewards changed apart",
+  "SW7"
+ ],
+ [
+  "How records travel in git: now an outbox for each place that writes",
+  "SL6"
+ ]
+]

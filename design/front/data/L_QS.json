@@ -1,0 +1,1212 @@
+[
+ {
+  "k": "arrival",
+  "q": "What if records arrive late, out of order, or twice?",
+  "tally": {
+   "invariance": 17,
+   "exactness": 1,
+   "limit": 1
+  },
+  "note": "Twice is different for a count or a sum: delivering records again moves them. That is a limit; <a href=\"#q-limits\">where the guarantees stop</a> says who accounts for it.",
+  "rows": [
+   {
+    "id": "law-incremental-batch",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether records are folded in parts or all at once</span>, and <span class=\"inv\">the state</span> stays.",
+    "scope": "Proved for Count and LatestBy. Sum, Min and Max are step folds, for which it holds by construction; folds over heads inherit it from LatestBy's state (<a class=\"lawref\" href=\"#law-heads-late\"><code>heads.late</code></a>).",
+    "names": [
+     "incremental = batch"
+    ]
+   },
+   {
+    "id": "law-count-perm",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the arrival order</span>, and <span class=\"inv\">the count</span> stays.",
+    "scope": null,
+    "names": [
+     "count.perm"
+    ]
+   },
+   {
+    "id": "law-latest-by-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">every thing's state (its heads and winner)</span> stays.",
+    "scope": "Within one store an id names one record.",
+    "names": [
+     "latest-by.set"
+    ]
+   },
+   {
+    "id": "law-latest-by-repeats",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">how many times a record is delivered</span>, and <span class=\"inv\">the state</span> stays.",
+    "scope": "Within one store an id names one record.",
+    "names": [
+     "latest-by.repeats"
+    ]
+   },
+   {
+    "id": "law-latest-by-converge",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which way two places sync</span>, and <span class=\"inv\">the state both reach</span> stays.",
+    "scope": null,
+    "names": [
+     "latest-by.converge"
+    ]
+   },
+   {
+    "id": "law-latest-set-latest-repeats",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">Latest's whole-reader heads and winner</span> stay.",
+    "scope": null,
+    "names": [
+     "latest.set",
+     "latest.repeats"
+    ]
+   },
+   {
+    "id": "law-sum-perm",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the arrival order</span>, and <span class=\"inv\">the sum</span> stays.",
+    "scope": "The model, JS and Rust use unbounded integer sums. A future bounded port must refuse overflow with sum-overflow, never wrap.",
+    "names": [
+     "sum.perm"
+    ]
+   },
+   {
+    "id": "law-extrema-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">arrival order and repeats</span>, and <span class=\"inv\">the min or the max</span> stays.",
+    "scope": null,
+    "names": [
+     "extrema.set"
+    ]
+   },
+   {
+    "id": "law-input-distinct",
+    "shape": "exactness",
+    "s": "The read path hands each id over once. <code>dedup</code> leaves each id once. Where an id names one record, deduplication keeps the same records.",
+    "scope": "Only <code>dedup</code> is proved; a fold called directly on a list with repeats counts them.",
+    "names": [
+     "input.distinct"
+    ]
+   },
+   {
+    "id": "law-input-union",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which place is read first</span>, and <span class=\"inv\">the union</span> stays.",
+    "scope": null,
+    "names": [
+     "input.union"
+    ]
+   },
+   {
+    "id": "law-acc-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order, for any step that commutes</span>, and <span class=\"inv\">the state</span> stays.",
+    "scope": null,
+    "names": [
+     "acc.set"
+    ]
+   },
+   {
+    "id": "law-acc-late",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a late record, not yet folded, is folded onto the cached state or the whole set refolded</span>, and <span class=\"inv\">the new state</span> stays.",
+    "scope": null,
+    "names": [
+     "acc.late"
+    ]
+   },
+   {
+    "id": "law-heads-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">how the records arrive, the set kept</span>, and <span class=\"inv\">any answer worked out from the heads</span> stays.",
+    "scope": null,
+    "names": [
+     "heads.set"
+    ]
+   },
+   {
+    "id": "law-heads-late",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a late record is folded onto the cached heads or the whole set refolded</span>, and <span class=\"inv\">any answer worked out from the new heads</span> stays.",
+    "scope": null,
+    "names": [
+     "heads.late"
+    ]
+   },
+   {
+    "id": "law-select-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">the split into read and unread</span> stays.",
+    "scope": "Each id is handed over once (<a class=\"lawref\" href=\"#law-input-distinct\"><code>input.distinct</code></a>).",
+    "names": [
+     "select.set"
+    ]
+   },
+   {
+    "id": "law-admit-late",
+    "shape": "limit",
+    "s": "Admission isn't monotone in arrival: a record admitted while its <code>prev</code> target is unknown is refused when the target arrives of another thing, and what it superseded is current again. No step from the admitted records' per-thing state can follow that.",
+    "scope": "A conformant writer never emits such a record (<code>prev-unknown</code>, <code>prev-unrelated</code>). A reader that caches state across arrivals keeps the records such a revision supersedes, not only the heads (<a class=\"lawref\" href=\"#law-heads-late\"><code>heads.late</code></a>).",
+    "names": [
+     "admit.late"
+    ]
+   },
+   {
+    "id": "law-admit-grows",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a record no held record names in <code>prev</code> is admitted onto the cached state or the whole set readmitted</span>, and <span class=\"inv\">every earlier admission, and each thing's state, stepped by the arrival when it is admitted and of that thing</span> stays.",
+    "scope": "This is the condition <a class=\"lawref\" href=\"#law-admit-late\"><code>admit.late</code></a> needs: only the arrival of a record some held <code>prev</code> already names can retract an admission.",
+    "names": [
+     "admit.grows"
+    ]
+   },
+   {
+    "id": "law-spec-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">every slot of every spec</span> stays.",
+    "scope": "Each id is handed over once (<a class=\"lawref\" href=\"#law-input-distinct\"><code>input.distinct</code></a>).",
+    "names": [
+     "spec.set"
+    ]
+   },
+   {
+    "id": "law-by-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order the records arrive in</span>, and <span class=\"inv\">every group of a slot with <code>by</code>, its keys, its <code>unread</code> and its <code>ungrouped</code></span> stays.",
+    "scope": "The set of groups a record joins is a function of that record alone. Each group is the slot without <code>by</code> run over the whole held set, so it rests on <a class=\"lawref\" href=\"#law-acc-set\"><code>acc.set</code></a> without <code>follow</code> and on <a class=\"lawref\" href=\"#law-heads-set\"><code>heads.set</code></a> with it.",
+    "names": [
+     "by.set"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "current",
+  "q": "Which record is current, and what if two disagree?",
+  "tally": {
+   "order": 4,
+   "exactness": 13,
+   "invariance": 2
+  },
+  "note": null,
+  "rows": [
+   {
+    "id": "law-latest-by-order",
+    "shape": "order",
+    "s": "The winner is a head: nothing about its thing names it in <code>prev</code>. It is newer than every other head by content order: span, then <code>emitted</code>, then id.",
+    "scope": null,
+    "names": [
+     "latest-by.order"
+    ]
+   },
+   {
+    "id": "law-content-order",
+    "shape": "order",
+    "s": "Any two records with different ids order one way: by span, then <code>emitted</code>, then id. Never by how a time is spelled.",
+    "scope": null,
+    "names": [
+     "content order"
+    ]
+   },
+   {
+    "id": "law-heads-whole-view",
+    "shape": "exactness",
+    "s": "Whole-reader heads combine every thing's heads, once per id, in content order.",
+    "scope": null,
+    "names": [
+     "heads.whole-view"
+    ]
+   },
+   {
+    "id": "law-latest-newest",
+    "shape": "order",
+    "s": "Latest chooses the newest whole-reader head. Its other heads stay in content order.",
+    "scope": null,
+    "names": [
+     "latest.newest"
+    ]
+   },
+   {
+    "id": "law-latest-one-thing",
+    "shape": "exactness",
+    "s": "Latest equals the previous global LatestBy state on one-thing input.",
+    "scope": "<span class=\"holds\">Holds when</span> every record is of the same thing.",
+    "names": [
+     "latest.one-thing"
+    ]
+   },
+   {
+    "id": "law-admit-set",
+    "shape": "exactness",
+    "s": "A record is refused exactly when it isn't entitled to its <code>prev</code>, and that depends only on the set.",
+    "scope": null,
+    "names": [
+     "admit.set"
+    ]
+   },
+   {
+    "id": "law-admit-no-cross",
+    "shape": "exactness",
+    "s": "Every held record an admitted record's <code>prev</code> names is of the same thing, and may be replaced by it: <code>prev</code> never crosses things.",
+    "scope": "A <code>prev</code> naming a record the reader doesn't hold is admitted: the reader can't judge it. A reader checks neither <code>of-missing</code> nor roots: a record with <code>prev</code> and no <code>of</code> is of its own id, so a held target is of another thing. A writer refuses a <code>prev</code> naming a record it doesn't hold (<code>prev-unknown</code>); a reader that lacks it admits the record.",
+    "names": [
+     "admit.no-cross"
+    ]
+   },
+   {
+    "id": "law-thing-one",
+    "shape": "exactness",
+    "s": "A record is of exactly one thing: what its <code>of</code> names, read as written, or without <code>of</code> its own id. A thing's heads are records of it, so a record heads at most one thing.",
+    "scope": "<code>of</code> is never resolved through another record, so a record's thing is a fact of its own envelope.",
+    "names": [
+     "thing.one"
+    ]
+   },
+   {
+    "id": "law-thing-local",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the records not of this thing, once records are settled and admitted</span>, and <span class=\"inv\">this thing's state</span> stays.",
+    "scope": "Admission and erasure can read records not of this thing, so this starts after them.",
+    "names": [
+     "thing.local"
+    ]
+   },
+   {
+    "id": "law-thing-mentions",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">what records mention in <code>about</code></span>, and <span class=\"inv\">the things and each thing's heads</span> stay.",
+    "scope": "Each head comes back with its new <code>about</code>. <code>where</code> and <code>collect</code> still read <code>about</code>, so their answers can change.",
+    "names": [
+     "thing.mentions"
+    ]
+   },
+   {
+    "id": "law-spec-follow",
+    "shape": "exactness",
+    "s": "Count, sum, min and max that follow <code>prev</code> fold every current record and nothing else: the whole-reader heads, each id once. They choose heads as latest-by does: <code>from</code> and the envelope tests choose, the payload tests filter.",
+    "scope": "The answer depends only on the set held, through each thing's heads (<a class=\"lawref\" href=\"#law-heads-set\"><code>heads.set</code></a>), never through the commuting step. Every head of a forked thing counts. Count counts an erased or withheld head by its envelope; sum, min and max count it unread.",
+    "names": [
+     "spec.follow"
+    ]
+   },
+   {
+    "id": "law-keyed-live",
+    "shape": "exactness",
+    "s": "A setter of a key is live for it when no record above it over <code>prev</code> sets the key. Every record sets the envelope, so live for the envelope is a head. A record is live exactly when it is live for some key, the envelope among them.",
+    "scope": "Above is reached through the records held and admitted; a <code>prev</code> naming a record not held reaches nothing, and only which records are held decides it. A record with no <code>sets</code> is read whole and sets every key; <code>\"sets\": []</code> sets none. So every head is live, a pure join too, and a record read whole is live until a record read whole is above it. An erased or withheld record keeps its envelope and still sets its keys.",
+    "names": [
+     "keyed.live"
+    ]
+   },
+   {
+    "id": "law-keyed-fold",
+    "shape": "exactness",
+    "s": "A latest-by that follows <code>keys</code> gives each thing an entry for every key some live record declares and no other, each holding exactly that key's live setters, records read whole among them; its live records read whole; and its heads.",
+    "scope": "A pure join is listed only among the heads. For a thing whose records are all read whole there is no key, and the records read whole are the heads <code>\"follow\": \"prev\"</code> gives. The answer depends only on the set held. It lists ids and shown states, not values, and declares no conflict between two setters of one key.",
+    "names": [
+     "keyed.fold"
+    ]
+   },
+   {
+    "id": "law-keyed-slots",
+    "shape": "exactness",
+    "s": "Count, sum, min, max and collect that follow <code>keys</code> read things. Count counts each selected thing once, however many of its heads are chosen. Sum, min and max read the field from its one live setter. Collect lists exactly the selected things' live records, a pure-join head among them; its <code>limit</code> counts things, each listed whole.",
+    "scope": "A thing is selected as <a class=\"lawref\" href=\"#law-keyed-select\"><code>keyed.select</code></a> selects one. With no live setter of the field, or two or more, also holding the same number, or one whose payload is not held or holds no safe whole number there, the thing is unread to sum, min and max: the core compares no values. A thing whose tests are unknown is unread, and each thing at most once in a slot. A thing forked across records read whole counts once, where <code>\"follow\": \"prev\"</code> counts each head. A collect with a limit lists every live record of at most that many things, those whose newest live records are newest, and no record of the rest.",
+    "names": [
+     "keyed.slots"
+    ]
+   },
+   {
+    "id": "law-keyed-whole-read",
+    "shape": "exactness",
+    "s": "When every record is read whole and every thing has one head, a count, sum, min, max or collect that follows <code>keys</code> gives what the same slot following <code>prev</code> gives, grouped or not.",
+    "scope": "A thing's live records are then its one head, each field's live setter is that head, and its envelope is that head's. Latest-by is outside: following <code>keys</code> it gives each thing's keyed state.",
+    "names": [
+     "keyed.whole-read"
+    ]
+   },
+   {
+    "id": "law-by-after-admission",
+    "shape": "exactness",
+    "s": "Settling, admission and the whole-reader heads are worked out once, over everything held, before any group. Each group is the unmodified slot over all of it, with its selection narrowed to the group.",
+    "scope": "A group never settles, admits or finds heads on its own: an eraser or a successor in another group still counts, and a <code>prev</code> across things is refused whichever group the refused record would join.",
+    "names": [
+     "by.after-admission"
+    ]
+   },
+   {
+    "id": "law-spec-after-supersession",
+    "shape": "exactness",
+    "s": "A slot over heads returns only records that remain heads of at least one thing. Each returned record passes <code>from</code> and every test.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes. A record heads at most one thing. Under a view, each thing keeps the same heads, and each head shows only what the view shows.",
+    "names": [
+     "spec.after-supersession"
+    ]
+   },
+   {
+    "id": "law-window-heads",
+    "shape": "exactness",
+    "s": "An envelope window filters each thing’s existing heads. A count following prev applies its window and other tests to the heads of the entire supplied pool.",
+    "scope": null,
+    "names": [
+     "window.heads"
+    ]
+   },
+   {
+    "id": "law-occurred-order",
+    "shape": "order",
+    "s": "Spans order by start, then end, an open end last, with no ties: any two stores that order by it agree.",
+    "scope": null,
+    "names": [
+     "occurred.order"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "withheld",
+  "q": "What if a reader doesn't hold every payload?",
+  "tally": {
+   "invariance": 17,
+   "refinement": 4,
+   "exactness": 9
+  },
+  "note": null,
+  "rows": [
+   {
+    "id": "law-view-no-resurrection",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the set of heads, by id</span> stays.",
+    "scope": "Each head comes back in the view's form. A record superseded within a thing is never current there.",
+    "names": [
+     "view.no-resurrection"
+    ]
+   },
+   {
+    "id": "law-view-refines",
+    "shape": "refinement",
+    "s": "Hide payloads and a <code>where</code> answer stays, or becomes unknown.",
+    "scope": null,
+    "names": [
+     "view.refines"
+    ]
+   },
+   {
+    "id": "law-result-unread",
+    "shape": "refinement",
+    "s": "A fold does not guess. It counts the records whose test is unknown and the selected records it cannot read.",
+    "scope": "Count can read every selected record. Latest-by counts each head once when its payload tests are unknown, after the source and envelope tests select it. Collect counts each unknown record once, before its limit. It counts heads when it follows replacements, and all records otherwise. Count, sum, min and max that follow replacements count each unknown chosen head once, as latest-by does. Max over heads counts each head whose <code>n</code> field lacks a readable safe whole value. Numeric folds count hidden, missing, nonnumeric, nonwhole and unsafe whole values as unread.",
+    "names": [
+     "result.unread"
+    ]
+   },
+   {
+    "id": "law-result-full",
+    "shape": "refinement",
+    "s": "When every test answers and every covered record is readable to the fold, unread is zero. The result equals the selected fold.",
+    "scope": "A payload that is here but lacks the field, or holds it as text, isn't readable to a numeric fold.",
+    "names": [
+     "result.full"
+    ]
+   },
+   {
+    "id": "law-settle-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which place holds which form</span>, and <span class=\"inv\">what the reader keeps (one record per id)</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the forms of one id agree: the same envelope, and the same payload wherever it is held.",
+    "names": [
+     "settle.set"
+    ]
+   },
+   {
+    "id": "law-settle-keeps",
+    "shape": "exactness",
+    "s": "A payload any place holds is kept, unless it is erased.",
+    "scope": null,
+    "names": [
+     "settle.keeps"
+    ]
+   },
+   {
+    "id": "law-settle-erased",
+    "shape": "exactness",
+    "s": "Once a record naming it in <code>erases</code> is held, every form of its target is erased.",
+    "scope": null,
+    "names": [
+     "settle.erased"
+    ]
+   },
+   {
+    "id": "law-thing-slice",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds everything, or only a slice for this thing</span>, and <span class=\"inv\">this thing's state, after settling and admission</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes; the forms of one id agree: the same envelope, and the same payload wherever it is held. This carries <a class=\"lawref\" href=\"#law-thing-local\"><code>thing.local</code></a> back across settling and admission, which read one hop out: the <code>erases</code> of other records, and the thing of each held <code>prev</code> target. The proof reads only the envelopes of the erasing and the named records, so a sender may withhold their payloads. Neither addition can be dropped: without the erasing record a slice reads a payload the whole has erased, and without the named record it admits a revision the whole refuses. A slot or spec that reads several things needs a slice for each.",
+    "names": [
+     "thing.slice"
+    ]
+   },
+   {
+    "id": "law-keyed-witnessed",
+    "shape": "exactness",
+    "s": "A reader holding part of a thing's records reads each record it holds as live for a key, or not, as a reader of all of them does, exactly when the part is witnessed for the key: every held setter the whole reads as dead has a setter of the key above it, through held records.",
+    "scope": "The envelope is one of the keys, so the same holds of heads. A part that is witnessed for every key and holds the thing's live records gives its whole keyed state (<a class=\"lawref\" href=\"#law-keyed-fold\"><code>keyed.fold</code></a>). The law has no premise: it says exactly which parts read rightly, and the laws after it give ways to be such a part. Holding less never makes a live record read as dead; what a part can get wrong is to read a replaced record as live, because the record that replaced it, or the path up to that record, is not held. This is about a part read alone: added to an older holding, a part that was witnessed need not stay so.",
+    "names": [
+     "keyed.witnessed"
+    ]
+   },
+   {
+    "id": "law-keyed-convex",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds every record of a thing, or a part that holds its live records and every record between two records of the part</span>, and <span class=\"inv\">the thing's keyed state</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. Such a part is witnessed (<a class=\"lawref\" href=\"#law-keyed-witnessed\"><code>keyed.witnessed</code></a>): a dead setter has a live setter above it, and the part holds the path between them. It is one way to be witnessed and not the least: a part can be witnessed and not convex, when a later setter names the dead one directly. On an ordinary history the convex part is nearly every record since the oldest live one.",
+    "names": [
+     "keyed.convex"
+    ]
+   },
+   {
+    "id": "law-keyed-anchored",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds every record of a thing, or only its live records, when every record names every live record under it</span>, and <span class=\"inv\">the thing's keyed state: each key's live setters, the live records read whole, and the heads</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. The names are what the D8c writer's rule leaves behind: an emit names in <code>prev</code>, beside what it builds on, every live record of the thing its writer holds. Every record sets the envelope, so every two records share a key. Then each dead setter is named by the live setter above it, and the live records are witnessed with nothing between them (<a class=\"lawref\" href=\"#law-keyed-witnessed\"><code>keyed.witnessed</code></a>). The rule gives such names only to a holding that is closed, one that holds what the writers of its records held; a holder missing a record keeps as live a record it cannot see replaced, and reads wrongly from its own live records. The rule over payload keys alone gives the payload keys, and not the heads (<a class=\"lawref\" href=\"#law-keyed-heads\"><code>keyed.heads</code></a>).",
+    "names": [
+     "keyed.anchored"
+    ]
+   },
+   {
+    "id": "law-keyed-heads",
+    "shape": "exactness",
+    "s": "With anchored names, the live records of a thing read alone give its heads, and every live record is a head or is named by one.",
+    "scope": "<span class=\"holds\">Holds when</span> no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. A head is live for the envelope, which every record sets (<a class=\"lawref\" href=\"#law-keyed-live\"><code>keyed.live</code></a>), so this is <a class=\"lawref\" href=\"#law-keyed-anchored\"><code>keyed.anchored</code></a> at that key. The heads list the slice: a reader that holds a thing's heads knows every other live record by name. With the rule over payload keys alone it fails: a record that sets <code>title</code> under two that set <code>status</code> is named by neither, and the live records read alone take it for a head.",
+    "names": [
+     "keyed.heads"
+    ]
+   },
+   {
+    "id": "law-keyed-cut",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds a part closed downward of a closed holding whose writers followed the rule, or only that part's live records</span>, and <span class=\"inv\">what the part reads: each key's live setters, and the heads</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes; the forms of one id agree: the same envelope, and the same payload wherever it is held; no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. A part is closed downward when it holds every held record one of its records names in <code>prev</code>. Such a part is a state the holding could have been in: it reads a record as live for a key exactly when no setter of the key in the part is above it in the whole, with nothing missing between them. It also holds what the writers of its records held, because a writer names every record it holds that is live there and every other record it holds is under one of those. So the writer's rule carries to it and <a class=\"lawref\" href=\"#law-keyed-anchored\"><code>keyed.anchored</code></a> applies. The premise is the rule, over what each writer held. Anchored names in the whole would not do: they are about what is live now, and a holding can have them while a past of it does not. Behind settling and admission, such a part holds what each of its records names in <code>prev</code>, so it holds the target a record is refused for and refuses what the whole refuses: with every form of the records of a thing it holds, and what erases them, <a class=\"lawref\" href=\"#law-keyed-slice\"><code>keyed.slice</code></a> and <a class=\"lawref\" href=\"#law-keyed-spec-slice\"><code>keyed.spec-slice</code></a> apply to it with nothing asked about admission. A cut is such a part, or a slice of one.",
+    "names": [
+     "keyed.cut"
+    ]
+   },
+   {
+    "id": "law-keyed-base",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a writer writes from everything its store holds, or against a base: a part of it that holds what the writers of its records held</span>, and <span class=\"inv\">that the store's names are anchored, so its live records read alone read every key as it does</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. An emit against a base names the records of the base that are live in the base. That is the emit a holder of exactly the base would have written, whatever the base is. The writer's rule has three parts: a writer names only what it holds, it names every record it holds that is live there, and it holds what the writers of its records held. The first two are the emit's. The third is the base's: it is a holding. A part closed downward of a closed holding is one (<a class=\"lawref\" href=\"#law-keyed-cut\"><code>keyed.cut</code></a>), and for that case the premise is that <code>prev</code> has no cycle. Then the store with the emit is closed and its writers followed the rule, so <a class=\"lawref\" href=\"#law-keyed-anchored\"><code>keyed.anchored</code></a> applies to it. The base need not be closed downward itself: a part of a part closed downward that holds every record live in it will do, because it names what a holder of the closed part would name and nothing outside it. A thing's live records at a cut, alone, are such a base. A record live in the base and replaced in the store is named all the same: the emit then stands beside what replaced it as a second head, and a key both set shows as a conflict, which is what happened. An emit can name more than the base's live records: when what it adds is already under one of its names, the same records are above every record of the store, so the whole store reads every key as it would without the added names. Naming the live records of the base's closure in the store, and not of the bare base, is that, and the closure is a part closed downward. A base that is not closed breaks it: with a record that sets two keys, a second that sets one of them over it, and a base of the second alone, an emit of that key names the second and not the first, which is still live for its other key and is now under the emit unnamed; the live records read alone read the first as a live setter of the emit's key.",
+    "names": [
+     "keyed.base"
+    ]
+   },
+   {
+    "id": "law-cut-prefix",
+    "shape": "exactness",
+    "s": "Every prefix, the records emitted before a time, is closed downward exactly when no record names a record with a later <code>emitted</code>.",
+    "scope": "A time names a prefix, and a cut is a part closed downward (<a class=\"lawref\" href=\"#law-keyed-cut\"><code>keyed.cut</code></a>). Clocks disagree, so a record can name one emitted later by its writer's clock, and then some prefix holds a record without what it names. Two parts closed downward stand beside any part. <em>Down</em> is the part with every held record under it: the least part closed downward that holds it. <em>Held back</em> is the records of the part with every held record under them in it: the greatest part closed downward inside it. At a time, a record is held back exactly when it and everything held under it were emitted before it, so held back is the prefix of another clock, a record's own <code>emitted</code> or the latest under it, which is what a writer that never emits earlier than what it names would have written. A prefix that is not closed downward reads wrongly: of three records in a line, the middle one emitted by a clock five seconds fast, the prefix at two seconds holds the last, which replaced the first, and reads the first as live, because the path between them goes through the record it lacks. Down at that time holds all three. As of a time is down (ruled 2026-11-20).",
+    "names": [
+     "cut.prefix"
+    ]
+   },
+   {
+    "id": "law-keyed-slice",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds everything, or a witnessed part that holds every form of the thing's live records and what erases them</span>, and <span class=\"inv\">the thing's keyed state, after settling and admission</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes; the forms of one id agree: the same envelope, and the same payload wherever it is held; no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. This carries <a class=\"lawref\" href=\"#law-keyed-witnessed\"><code>keyed.witnessed</code></a> back across settling and admission. For each record of the thing the part holds at all, it holds every form and every record that erases it, and it refuses the record when the whole does. With anchored names (<a class=\"lawref\" href=\"#law-keyed-anchored\"><code>keyed.anchored</code></a>) the forms of the live records and what erases them are enough; that case is the one that needs <code>prev</code> to have no cycle. Nothing is owed for the <code>prev</code> targets of a record the whole admits: admission asks only about the targets held, so any part admits it. A record the whole refuses is admitted by a part that lacks the target it is refused for. Here it differs from <a class=\"lawref\" href=\"#law-thing-slice\"><code>thing.slice</code></a>, which sends the targets. Under <code>keys</code> a target's envelope still sets its keys, so a target held without its witness can read as a live setter; a whole slice of the thing, which holds every record of it, gives the keyed state too. Without the eraser a part shows a payload the whole has erased.",
+    "names": [
+     "keyed.slice"
+    ]
+   },
+   {
+    "id": "law-view-no-resurrection-things",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the admitted records and each thing's heads by id</span> stay.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes. Every record comes back in the view's form; a record superseded in a thing is never current there.",
+    "names": [
+     "view.no-resurrection (things)"
+    ]
+   },
+   {
+    "id": "law-view-refines-where",
+    "shape": "refinement",
+    "s": "Under a view, a test and a <code>where</code> map keep their answer, or it becomes unknown.",
+    "scope": null,
+    "names": [
+     "view.refines (where)"
+    ]
+   },
+   {
+    "id": "law-spec-select",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which payloads a reader holds</span>, and <span class=\"inv\">the set of records a spec's <code>from</code> takes</span> stays.",
+    "scope": "The selection holds exactly the input records the spec takes. Each comes back in the view's form. A <code>where</code> test on a payload can still answer unknown under a view (<a class=\"lawref\" href=\"#law-view-refines\"><code>view.refines</code></a>).",
+    "names": [
+     "spec.select"
+    ]
+   },
+   {
+    "id": "law-keyed-by",
+    "shape": "exactness",
+    "s": "A slot with <code>by</code> that follows <code>keys</code> groups things. A payload key is read from each live setter of the field; an envelope key from each chosen head. Every selected thing, or one whose tests are unknown, is exactly one of grouped, ungrouped or unread.",
+    "scope": "Each distinct member key across those lists gives one group. A live setter whose payload is not held makes a payload key unread; with no setter the thing is ungrouped. An envelope key is never unread: the envelope is read from the heads, so a later head moves a thing between groups, a forked thing is in the group of each chosen head once, and a pure-join head settles them. Each group is the slot without <code>by</code> over its things.",
+    "names": [
+     "keyed.by"
+    ]
+   },
+   {
+    "id": "law-by-accounting",
+    "shape": "exactness",
+    "s": "Every record a slot with <code>by</code> selects, or whose <code>where</code> is unknown, is exactly one of grouped, ungrouped or unread. The groups hold each grouped record once per key.",
+    "scope": "The group sizes add up to memberships, not records: a record mentioning two projects is in both. When every selected record has at most one key they add up to records: always for kind and observer, and for a payload field with at most one distinct key per record. A group exists only where something was selected into it.",
+    "names": [
+     "by.accounting"
+    ]
+   },
+   {
+    "id": "law-by-partition",
+    "shape": "exactness",
+    "s": "A grouped count's groups, <code>ungrouped</code> and <code>unread</code> add up to the value and unread of the same count without <code>by</code>, when every selected record has at most one key.",
+    "scope": "Kind and observer always give one key. A list field or a prefixed about can give several. Otherwise the group values add up to the keys of the selected records.",
+    "names": [
+     "by.partition"
+    ]
+   },
+   {
+    "id": "law-spec-slice",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds everything, or only a slice for this spec</span>, and <span class=\"inv\">every slot of the spec: its values, its current records with what is shown of each, and its unread counts</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes; the forms of one id agree: the same envelope, and the same payload wherever it is held. <a class=\"lawref\" href=\"#law-thing-slice\"><code>thing.slice</code></a> answers for one thing. A spec takes records by kind, by mention and by thing, so the records it takes need not be whole things, and two more kinds of record matter. A taken record is current only when no admitted record of its thing replaces it, and the replacing record may be one the spec does not take. That record replaces only when it is admitted, and admission reads the thing of each of its held <code>prev</code> targets. Admission reads what is held, not what is admitted, so nothing further out is read. The proof reads only the envelopes of everything but the taken records. Neither new kind can be dropped: without the successor a slice shows a record the whole has replaced, and without the successor's other target it admits a successor the whole refuses. So the records a spec takes are not by themselves enough to answer it. A slot that follows <code>keys</code>, of any fold type, is outside this law: it reads live setters the spec does not take. The slice for one keyed thing is <a class=\"lawref\" href=\"#law-keyed-slice\"><code>keyed.slice</code></a>, and <a class=\"lawref\" href=\"#law-keyed-spec-slice\"><code>keyed.spec-slice</code></a> answers a spec with such a slot.",
+    "names": [
+     "spec.slice"
+    ]
+   },
+   {
+    "id": "law-keyed-spec-slice",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether a reader holds everything, or a spec slice with a cover of every thing the spec could select</span>, and <span class=\"inv\">every slot of the spec, the slots that follow <code>keys</code> among them</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the store's rule for who may replace whom reads only envelopes; the forms of one id agree: the same envelope, and the same payload wherever it is held; no record held is above itself over <code>prev</code>; real ids give this, since an id is a hash of an envelope that holds its <code>prev</code>, and the model's records do not. A slot that follows <code>keys</code> reads each thing it selects by its live setters, records the spec need not take, so <a class=\"lawref\" href=\"#law-spec-slice\"><code>spec.slice</code></a> is not enough for it. A part covers a thing when its folded records of the thing are the whole's, hold the thing's live records, and are witnessed for every key (<a class=\"lawref\" href=\"#law-keyed-witnessed\"><code>keyed.witnessed</code></a>); it then reads the thing's heads, payload tests, setters, live records and group keys as the whole does. A thing need not be covered when neither reader can select it: the part folds no record of it the spec takes, and the whole has no head of it the spec takes. The cover alone answers a spec whose slots all follow <code>keys</code>. A part of the forms covers a thing as <a class=\"lawref\" href=\"#law-keyed-slice\"><code>keyed.slice</code></a> says, and with anchored names by the forms of its live records and what erases them; that case is the one that needs <code>prev</code> to have no cycle. A spec slice can bring, as a target, a record of a covered thing that the whole refuses; the part then holds what that record names in <code>prev</code> and so refuses it too, or it admits the record and reads the keys it sets. The law asks for what erases any record the part holds of a covered thing, a little more than a keyed slot reads.",
+    "names": [
+     "keyed.spec-slice"
+    ]
+   },
+   {
+    "id": "law-tick-inputs",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which holder replays the claim</span>, and <span class=\"inv\">the canonical result bytes</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the forms of one id agree: the same envelope, and the same payload wherever it is held. Forms are jointly consistent. Both holders have a form for every covered id and local access to each required opening.",
+    "names": [
+     "tick.inputs"
+    ]
+   },
+   {
+    "id": "law-tick-withheld",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">which form a holder reads for a withheld id</span>, and <span class=\"inv\">every slot of the claim</span> stays.",
+    "scope": "<span class=\"holds\">Holds when</span> the two forms have the same envelope; the forms of one id agree: the same envelope, and the same payload wherever it is held. An exchange needs only the shared envelope and membership in withheld. Adding a further copy also uses consistency of the original holding and the presence of the original form.",
+    "names": [
+     "tick.withheld"
+    ]
+   },
+   {
+    "id": "law-tick-level",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the forms outside the cover</span>, and <span class=\"inv\">the claim when the ordered list of covered forms is unchanged</span> stays.",
+    "scope": "A covered tick contributes one record. Appending any forms outside the cover preserves every result slot.",
+    "names": [
+     "tick.level"
+    ]
+   },
+   {
+    "id": "law-result-shown",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">what is shown of each record a result lists: its payload held, withheld or erased</span>, and <span class=\"inv\">the canonical result's text, bytes, preimage and hash, for any hash</span> stay.",
+    "scope": "The canonical result lists each record by its id alone. A reading still says what its reader holds of each. A value read from a payload, such as a payload test or a sum, can still differ between readers; that is a different result, not a different spelling of one.",
+    "names": [
+     "result.shown"
+    ]
+   },
+   {
+    "id": "law-record-erasure",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether the payload's opening is kept</span>, and <span class=\"inv\">the id</span> stays.",
+    "scope": null,
+    "names": [
+     "record.erasure"
+    ]
+   },
+   {
+    "id": "law-record-commit",
+    "shape": "exactness",
+    "s": "A record's own salt and payload open its commitment.",
+    "scope": null,
+    "names": [
+     "record.commit"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "spelling",
+  "q": "What if the same thing is written two ways?",
+  "tally": {
+   "exactness": 4,
+   "invariance": 6,
+   "order": 1
+  },
+  "note": "These laws cover set order and repeats in about, prev and erases, and leaving out an absent of. They cover object member order and calendar-date spellings of the same occurred span. Each accepted instant has one spelling. They also cover test order and batch draft order. They promise no other spelling invariance.",
+  "rows": [
+   {
+    "id": "law-instant-unique",
+    "shape": "exactness",
+    "s": "Two accepted instant texts with the same moment are equal.",
+    "scope": "<span class=\"holds\">Holds when</span> the actual instant reader accepts the text and returns the stated moment. The premises use the actual instant? parser on each String. The proof derives calendar and clock bounds from successful parsing. It assumes no parser injectivity.",
+    "names": [
+     "instant.unique"
+    ]
+   },
+   {
+    "id": "law-where-time",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">an accepted envelope time or test time, while keeping its parsed span</span>, and <span class=\"inv\">the answer</span> stays.",
+    "scope": "An instant has one accepted spelling. Date claims can retain the same span with different qualifiers. A time in a payload remains text.",
+    "names": [
+     "where.time"
+    ]
+   },
+   {
+    "id": "law-where-set",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order of a <code>where</code> map's tests</span>, and <span class=\"inv\">its answer</span> stays.",
+    "scope": null,
+    "names": [
+     "where.set"
+    ]
+   },
+   {
+    "id": "law-batch-meaning",
+    "shape": "exactness",
+    "s": "An acyclic batch has at most one meaning. Any two satisfying assignments of ids to its labels agree.",
+    "scope": "<span class=\"holds\">Holds when</span> the batch is acyclic: its labels can be ranked so that a draft uses only labels ranked below its own. A label may stand in <code>about</code>, <code>of</code>, <code>prev</code> or <code>under</code>, and each counts toward acyclicity. Vectors check resolver answers across draft rotations. The uniqueness theorem does not prove resolver correctness.",
+    "names": [
+     "batch.meaning"
+    ]
+   },
+   {
+    "id": "law-record-sets",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order of, and repeats in, <code>about</code>, <code>prev</code>, <code>erases</code> or <code>sets</code></span>, and <span class=\"inv\">the id</span> stays.",
+    "scope": null,
+    "names": [
+     "record.sets"
+    ]
+   },
+   {
+    "id": "law-record-member-order",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order of an object's members</span>, and <span class=\"inv\">its canonical bytes</span> stay.",
+    "scope": "<span class=\"holds\">Holds when</span> the object's member names are distinct.",
+    "names": [
+     "record.member-order"
+    ]
+   },
+   {
+    "id": "law-utf-16-order",
+    "shape": "order",
+    "s": "Any two distinct strings order one way, by UTF-16 code units.",
+    "scope": null,
+    "names": [
+     "UTF-16 order"
+    ]
+   },
+   {
+    "id": "law-write-member-order",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the order of a written payload's members</span>, and <span class=\"inv\">its commitment</span> stays.",
+    "scope": null,
+    "names": [
+     "write.member-order"
+    ]
+   },
+   {
+    "id": "law-occurred-span",
+    "shape": "exactness",
+    "s": "Each accepted point gives its grammar-defined span, alone or open-ended. Two points form an interval when the second starts no earlier. Spans never end before their start.",
+    "scope": "Which texts are points is the grammar itself, pinned by vectors, not proved.",
+    "names": [
+     "occurred.span"
+    ]
+   },
+   {
+    "id": "law-occurred-qualifier",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">a qualifier on a date, <code>?</code>, <code>~</code> or <code>%</code></span>, and <span class=\"inv\">the span</span> stays.",
+    "scope": "Instants take no qualifier.",
+    "names": [
+     "occurred.qualifier"
+    ]
+   },
+   {
+    "id": "law-occurred-moment",
+    "shape": "exactness",
+    "s": "A parsed moment contains whole seconds and a fraction without trailing zeros. List comparison equals exact decimal comparison.",
+    "scope": "<span class=\"holds\">Holds when</span> the actual instant reader accepts the text and returns the stated moment. The comparison theorem takes two stripped fractions and a scale at least as long as both. Accepted instant fractions already have canonical spelling.",
+    "names": [
+     "occurred.moment"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "tests",
+  "q": "What does a test on a record answer?",
+  "tally": {
+   "exactness": 10,
+   "order": 1
+  },
+  "note": null,
+  "rows": [
+   {
+    "id": "law-payload-read",
+    "shape": "exactness",
+    "s": "A stored opening supplies the top-level fields of its payload. Reading depends only on that payload. A held non-object supplies no fields.",
+    "scope": "Lookup in an object reads the value written under that name. Every member retained from a list can be named by an equality argument. An erased opening gives the erased view.",
+    "names": [
+     "payload.read"
+    ]
+   },
+   {
+    "id": "law-numeric-safe-whole",
+    "shape": "exactness",
+    "s": "Numeric slots read written safe-whole values only when the payload is here. Missing fields, lists and other values without a safe whole count as unread.",
+    "scope": "An unreadable field leaves a sum as it was. Min and Max read a record exactly when its <code>n</code> is a held safe whole number.",
+    "names": [
+     "numeric.safe-whole"
+    ]
+   },
+   {
+    "id": "law-where-complements",
+    "shape": "order",
+    "s": "Where a test answers, <code>not</code> complements <code>is</code>; <code>absent</code> complements <code>present</code>. With a held safe whole value and a numeric bound, exactly one of <code>at-least</code> and <code>below</code> holds. Present times obey the corresponding time law.",
+    "scope": "On a payload the reader doesn't hold, a payload test answers unknown, and so does its complement.",
+    "names": [
+     "where.complements"
+    ]
+   },
+   {
+    "id": "law-where-typed",
+    "shape": "exactness",
+    "s": "A test is accepted exactly when its operator and argument fit its field, and renders back as it was written.",
+    "scope": "Numeric arguments and bounds are safe-whole. Lists satisfy neither bound. Integral decimals and exponents normalize to integers before parsing.",
+    "names": [
+     "where.typed"
+    ]
+   },
+   {
+    "id": "law-where-fields",
+    "shape": "exactness",
+    "s": "<code>kind</code> and <code>observer</code> read as their text; <code>about</code>, <code>of</code>, <code>prev</code>, <code>under</code> and <code>erases</code> as their members, <code>of</code> as written and absent on a root; <code>emitted</code> as its instant.",
+    "scope": "A held payload field is present exactly when written. Lists test typed membership, including when they have no nameable members. <code>occurred</code> reads as its span (<a class=\"lawref\" href=\"#law-where-time\"><code>where.time</code></a>).",
+    "names": [
+     "where.fields"
+    ]
+   },
+   {
+    "id": "law-where-total",
+    "shape": "exactness",
+    "s": "A test answers for every record whose payload is here, and an envelope test for every record at all.",
+    "scope": null,
+    "names": [
+     "where.total"
+    ]
+   },
+   {
+    "id": "law-spec-from-thing",
+    "shape": "exactness",
+    "s": "<code>from</code>'s <code>of</code> takes exactly the records of the thing, a root by its own id. <code>from</code>'s <code>about</code> takes exactly the records that mention it, as written.",
+    "scope": null,
+    "names": [
+     "spec.from-thing"
+    ]
+   },
+   {
+    "id": "law-keyed-select",
+    "shape": "exactness",
+    "s": "Heads choose, each alone: a thing is kept when <code>from</code> and the envelope tests choose one of its heads and its payload tests hold of the thing, with its whole keyed state. A payload test is asked of every live setter of its field; one answer from all of them is the answer.",
+    "scope": "Two setters that answer differently, or one whose payload is not held, make the test unknown, and the thing is unread once. With no setter the field is absent, as a missing field in a held payload is. A record with <code>sets</code> is never asked about a key it does not declare. A declared null is present and an omitted field is absent. Each list is tested at its setter. The core compares test answers, never payload values.",
+    "names": [
+     "keyed.select"
+    ]
+   },
+   {
+    "id": "law-window-span",
+    "shape": "exactness",
+    "s": "The window field reads the stated occurrence span, or the point at the emitted instant when occurred is absent.",
+    "scope": null,
+    "names": [
+     "window.span"
+    ]
+   },
+   {
+    "id": "law-tick-record",
+    "shape": "exactness",
+    "s": "A held tick opening gives the rules version and both hashes as text, each id list as a field with text members, and the spec and result as present fields without a scalar value.",
+    "scope": "The writer omits an empty withheld list. The ordinary payload projection gives these fields for any envelope, salt and hash function.",
+    "names": [
+     "tick.record"
+    ]
+   },
+   {
+    "id": "law-tick-made",
+    "shape": "exactness",
+    "s": "A tick made with a fitting spec checks same on the writer's holding, including after appending outside forms that erase no covered id.",
+    "scope": "The check reads the serialized current-version payload under any hash giving 32 bytes on its two preimages. The reference SHA-256 supplies both widths by proof.",
+    "names": [
+     "tick.made"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "refused",
+  "q": "What is refused, and how is it said?",
+  "tally": {
+   "exactness": 11,
+   "invariance": 1
+  },
+  "note": null,
+  "rows": [
+   {
+    "id": "law-batch-refuse",
+    "shape": "exactness",
+    "s": "Duplicate labels, missing labels and cycles are refused, a label in <code>under</code> among them. Drafts must pass write checks. Each prev target must be held, and so must each under target. An of naming a held record must name a root. Each held prev target must be of the record's thing.",
+    "scope": null,
+    "names": [
+     "batch.refuse"
+    ]
+   },
+   {
+    "id": "law-batch-refuse-order",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the draft order and the order each stage finds its refusals in</span>, and <span class=\"inv\">the refusal reported</span> stays.",
+    "scope": "Across the batch: shape, then labels, then writing, then <code>prev-unknown</code>, then <code>under-unknown</code>, then <code>of-not-root</code>, then <code>prev-unrelated</code>. Raw shape checks all envelope keys, then that every envelope is an object, before any draft value, label or salt decode. The shape theorems permit arbitrary values, member reorderings and draft orders. Writing's priority is proved from the refusal set. Stage order is by construction, pinned by raw-input rotations.",
+    "names": [
+     "batch.refuse-order"
+    ]
+   },
+   {
+    "id": "law-lens-refuse",
+    "shape": "exactness",
+    "s": "Malformed text, empty section ids and repeated section ids are refused.",
+    "scope": null,
+    "names": [
+     "lens.refuse"
+    ]
+   },
+   {
+    "id": "law-lens-base-distinct",
+    "shape": "exactness",
+    "s": "A base that repeats a section id is refused with <code>base-id-duplicate</code>, before the text is read and whatever the text says.",
+    "scope": "This is the public reader, <code>read</code>. What it accepts is the raw edit over distinct base ids, so <a class=\"lawref\" href=\"#law-lens-put-get\"><code>lens.put-get</code></a> then needs no promise about the base from the caller. The raw <code>lookup</code> still takes the first section with an id, unchecked.",
+    "names": [
+     "lens.base-distinct"
+    ]
+   },
+   {
+    "id": "law-record-keys",
+    "shape": "exactness",
+    "s": "<code>sets</code> holds key names, and absent and empty differ: the canonical envelope writes an empty <code>sets</code> as <code>[]</code>, so it is not the envelope without one. An envelope the writer accepts declares only non-empty key names, or it is refused with <code>sets-not-keys</code>, after <code>erases-not-record-id</code> and before <code>of-missing</code>.",
+    "scope": "<code>sets</code> names top-level payload keys. Nothing compares it with the payload, so a declared key the payload lacks is written, and the envelope stays checkable without its payload. A latest-by that follows <code>keys</code> reads it (<a class=\"lawref\" href=\"#law-keyed-live\"><code>keyed.live</code></a>); no other fold, spec or lens does.",
+    "names": [
+     "record.keys"
+    ]
+   },
+   {
+    "id": "law-record-of",
+    "shape": "exactness",
+    "s": "Only a root leaves <code>of</code> out: an envelope the writer accepts with <code>prev</code> states <code>of</code>, or it is refused with <code>of-missing</code>.",
+    "scope": "<code>of</code> holds one typed reference, a record id or a natural key, and is left out when absent, so a record without it keeps its bytes and id.",
+    "names": [
+     "record.of"
+    ]
+   },
+   {
+    "id": "law-record-shape",
+    "shape": "exactness",
+    "s": "Every envelope shape has a named refusal. An envelope that is not an object is refused with <code>envelope-not-object</code>, after any unknown key and before every value. A required field left out, or a field of the wrong JSON type, is refused with that field's own code, in its place. A salt that is not base32hex text is refused with <code>salt-not-16-bytes</code>.",
+    "scope": "Proved: the reader reads such a field as empty text, an envelope holding it is refused, and no accepted or stored record holds it, though it can be hashed on the way to a refusal. Pinned by the vectors: which code it gets and its place in the order, and the order of the shape stage. A repeated envelope member name is malformed input, with no code.",
+    "names": [
+     "record.shape"
+    ]
+   },
+   {
+    "id": "law-record-unicode",
+    "shape": "exactness",
+    "s": "Text is Unicode scalar values. UTF-16 code units read as text exactly when their surrogates pair; a lone surrogate is no text, and nothing is put in its place.",
+    "scope": "No string the model canonicalizes or hashes holds a lone surrogate. A payload text that is JSON but holds one, in a string or a member name, is refused with <code>string-not-unicode</code>: after raw shape, before every value check. Text that is not JSON has no refusal code.",
+    "names": [
+     "record.unicode"
+    ]
+   },
+   {
+    "id": "law-record-refuse",
+    "shape": "exactness",
+    "s": "Writing refuses a bad envelope, an invalid salt length, a repeated member name, or a nonfinite or out-of-range number. Every number's magnitude must be at most 2<sup>53</sup> − 1, whole or not.",
+    "scope": "Raw unknown envelope keys refuse first, then an envelope that is not an object (<a class=\"lawref\" href=\"#law-record-shape\"><code>record.shape</code></a>), then a lone surrogate in a text payload (<a class=\"lawref\" href=\"#law-record-unicode\"><code>record.unicode</code></a>), then these in order. A record input that lists several envelopes or payloads is answered by its first of each.",
+    "names": [
+     "record.refuse"
+    ]
+   },
+   {
+    "id": "law-write-checked",
+    "shape": "exactness",
+    "s": "<code>write</code> succeeds exactly when every check passes, and what it returns carries the proof.",
+    "scope": null,
+    "names": [
+     "write.checked"
+    ]
+   },
+   {
+    "id": "law-write-overflow",
+    "shape": "exactness",
+    "s": "A number past binary64's range is refused by the writer's number check as <code>number-out-of-range</code>, and that check speaks last: only when the envelope, the salt and the member names pass.",
+    "scope": "The number stays a number until that check; no reader refuses it earlier under another name. A spec refuses it where it refuses any number out of range. A reader's own records must hold finite numbers.",
+    "names": [
+     "write.overflow"
+    ]
+   },
+   {
+    "id": "law-occurred-refuse",
+    "shape": "exactness",
+    "s": "A text the reader doesn't accept is refused with <code>occurred-not-span</code>, never guessed at.",
+    "scope": null,
+    "names": [
+     "occurred.refuse"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "text",
+  "q": "What survives a trip through text and back?",
+  "tally": {
+   "round-trip": 10,
+   "order": 1,
+   "exactness": 6,
+   "invariance": 2
+  },
+  "note": null,
+  "rows": [
+   {
+    "id": "law-id-digest",
+    "shape": "round-trip",
+    "s": "An id's digest has exactly 32 bytes. Reading these bytes gives the same id. Two ids have the same text only when they are equal.",
+    "scope": "The model keeps every record id and reference below 2<sup>256</sup>. Reading any 32 bytes gives an id below 2<sup>256</sup>. Writing that id back gives the same 32 bytes. The model's SHA-256 returns 32 bytes. With the model's SHA-256, an id written from bytes equals the id written from the number. The model does not derive fold records from these hashes.",
+    "names": [
+     "id.digest"
+    ]
+   },
+   {
+    "id": "law-base32-canonical",
+    "shape": "round-trip",
+    "s": "The base32hex decoder accepts exactly the encoder image. Decoding encoded bytes recovers those bytes. Equal encoded texts have equal bytes.",
+    "scope": "The encoder uses lowercase base32hex without padding characters. The decoder rejects nonzero unused bits. The fixed-width reader also requires the stated byte count. These results hold for every finite byte list and text, without a hash assumption.",
+    "names": [
+     "base32.canonical"
+    ]
+   },
+   {
+    "id": "law-id-text-order",
+    "shape": "order",
+    "s": "Actual String lexical order on id text equals numeric digest order.",
+    "scope": "Both inputs have type RecordId. This type bounds each id below 2^256 and gives each digest exactly 32 bytes. The theorem uses Lean's existing String order, not a separate text-order relation. JS UTF-16 order and Rust byte order agree with Lean String order on ASCII; canonical id text is ASCII by construction.",
+    "names": [
+     "id.text-order"
+    ]
+   },
+   {
+    "id": "law-instant-round-trip",
+    "shape": "round-trip",
+    "s": "Parse then render recovers the original accepted instant text, character for character.",
+    "scope": "<span class=\"holds\">Holds when</span> the actual instant parser accepts the text and returns these numeric fields. The premise uses the actual instantParts? parser. The renderer writes its numeric calendar and clock fields and its fraction. It does not retain the input text.",
+    "names": [
+     "instant.round-trip"
+    ]
+   },
+   {
+    "id": "law-spec-parse",
+    "shape": "round-trip",
+    "s": "An accepted spec's parsed form parses back to itself, and the parser gives exactly the specs that fit.",
+    "scope": null,
+    "names": [
+     "spec.parse"
+    ]
+   },
+   {
+    "id": "law-spec-hash",
+    "shape": "exactness",
+    "s": "Two fitting parsed specs have equal preimages exactly when their versions agree and they differ only in the order of slots, fields within a where, and operators within a field. Such specs have equal hashes and give equal result bytes on every input.",
+    "scope": "<span class=\"holds\">Holds when</span> the spec names each slot once, as every spec the parser accepts does. For arbitrary JSON members the preimage determines the version and JCS text. The result equality holds for every common admission rule. The proofs assume no property of the hash function.",
+    "names": [
+     "spec.hash"
+    ]
+   },
+   {
+    "id": "law-spec-no-commit",
+    "shape": "exactness",
+    "s": "Byte 17 of the spec preimage is v. A record commitment hashes a 16-byte salt followed by JSON, whose first byte cannot be v.",
+    "scope": null,
+    "names": [
+     "spec.no-commit"
+    ]
+   },
+   {
+    "id": "law-spec-no-result",
+    "shape": "exactness",
+    "s": "Spec and result preimages differ at byte seven for every version, spec member and result.",
+    "scope": null,
+    "names": [
+     "spec.no-result"
+    ]
+   },
+   {
+    "id": "law-tick-canonical",
+    "shape": "round-trip",
+    "s": "A fitting written payload reads back under its own rules in spec slot order, with listed ids shown here. Every successful common read excludes repeated names throughout. Equal JCS texts of finite accepted inputs have equal wire values, including array positions and scalar tokens.",
+    "scope": "<span class=\"holds\">Holds when</span> the JSON values have finite numbers throughout, as JCS requires; the spec names each slot once, as every spec the parser accepts does. The writer requires two 32-byte digests, strictly increasing id lists, every withheld id covered and distinct names in the spec and result. Typed payload reads preserve the input text. Reconstructing it from raw members also requires a known result label: the stated version is at most the reader's.",
+    "names": [
+     "tick.canonical"
+    ]
+   },
+   {
+    "id": "law-result-exact",
+    "shape": "round-trip",
+    "s": "An integer of any size is written as its decimal digits, with <code>-</code> before a negative one, and is never rounded or capped. The codec's reader accepts a text exactly when it is the text of an integer, and reads it as that integer.",
+    "scope": "No integer in a canonical result is a JSON number, so binary64 never touches it: a sum past 2<sup>53</sup> keeps every digit. The reader takes no other spelling of an integer: not <code>-0</code>, not a leading zero, not <code>+</code>. An integer stands only at <code>value</code>, <code>unread</code> and <code>ungrouped</code>, so the position tells it from text.",
+    "names": [
+     "result.exact"
+    ]
+   },
+   {
+    "id": "law-result-canonical",
+    "shape": "exactness",
+    "s": "Two runs of one spec, over any records and under any rule for who may replace whom, have the same canonical text, bytes and preimage of the hash exactly when their results agree once what is shown is set aside.",
+    "scope": "<span class=\"holds\">Holds when</span> the object's member names are distinct; the spec names each slot once, as every spec the parser accepts does. So the bytes lose <code>shown</code> and nothing else: every slot, a list's order, every count, id, thing, key and group key are in them. This result proof uses injectivity on the JSON the result codec writes: <code>null</code>, text, arrays, and objects whose members are in UTF-16 order, each named once. A count and a sum that hold the same number write the same JSON, so the bytes say which fold only together with the spec. The hash is a parameter: that different preimages hash apart is SHA-256's to give.",
+    "names": [
+     "result.canonical"
+    ]
+   },
+   {
+    "id": "law-result-no-commit",
+    "shape": "exactness",
+    "s": "A result hash's preimage is never a 16-byte salt followed by the canonical bytes of a JSON value, which is what a record's commitment hashes. So no record commits to a result hash's preimage, whatever its salt and payload.",
+    "scope": "The label <code>loops/result-hash/v1:</code> is 21 bytes, so the preimage's 17th byte is <code>h</code>, and no canonical JSON text starts with <code>h</code>. The text prefixes also differ (<code>res:</code> for results, <code>h:</code> for commitments), and the label keeps the preimages apart. A 16-byte label would not keep them apart.",
+    "names": [
+     "result.no-commit"
+    ]
+   },
+   {
+    "id": "law-lens-escaping",
+    "shape": "round-trip",
+    "s": "Any body survives rendering and parsing, backslashes and all.",
+    "scope": "<span class=\"holds\">Holds when</span> the section id is nonempty.",
+    "names": [
+     "lens.escaping"
+    ]
+   },
+   {
+    "id": "law-lens-round-trip",
+    "shape": "round-trip",
+    "s": "Render, then parse, and you get back what you rendered.",
+    "scope": "<span class=\"holds\">Holds when</span> section ids are nonempty and distinct.",
+    "names": [
+     "lens.round-trip"
+    ]
+   },
+   {
+    "id": "law-lens-no-op",
+    "shape": "round-trip",
+    "s": "Parse an unedited render and there is nothing to apply.",
+    "scope": "<span class=\"holds\">Holds when</span> section ids are nonempty and distinct.",
+    "names": [
+     "lens.no-op"
+    ]
+   },
+   {
+    "id": "law-lens-put-get",
+    "shape": "round-trip",
+    "s": "An edit that keeps exactly the base's sections, in the same order, applies exactly.",
+    "scope": "<span class=\"holds\">Holds when</span> the base's section ids are distinct.",
+    "names": [
+     "lens.put-get"
+    ]
+   },
+   {
+    "id": "law-lens-nothing-dropped",
+    "shape": "exactness",
+    "s": "Every section is unchanged, accepted or reported; every dropped one is reported.",
+    "scope": null,
+    "names": [
+     "lens.nothing-dropped"
+    ]
+   },
+   {
+    "id": "law-lens-absence-not-edit",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">the text by dropping a section</span>, and <span class=\"inv\">that section of the state</span> stays.",
+    "scope": "Absence is never an edit; the other sections' accepted edits still apply.",
+    "names": [
+     "lens.absence-not-edit"
+    ]
+   },
+   {
+    "id": "law-normal-form",
+    "shape": "invariance",
+    "s": "Change <span class=\"var\">whether text that is already normal is normalized again</span>, and <span class=\"inv\">the text</span> stays.",
+    "scope": null,
+    "names": [
+     "normal form"
+    ]
+   }
+  ]
+ },
+ {
+  "k": "limits",
+  "q": "Where do the guarantees stop?",
+  "tally": {
+   "limit": 3
+  },
+  "note": null,
+  "rows": [
+   {
+    "id": "law-count-repeats",
+    "shape": "limit",
+    "s": "Deliver the whole set twice and each record is counted again: the count doubles. Any record delivered again is counted again. That is why the read path hands each id over once (<a class=\"lawref\" href=\"#law-input-distinct\"><code>input.distinct</code></a>).",
+    "scope": null,
+    "names": [
+     "count.repeats"
+    ]
+   },
+   {
+    "id": "law-sum-repeats",
+    "shape": "limit",
+    "s": "For every numeric projection, delivering the list twice doubles the sum. Each readable value is added once per delivery. That is why the read path hands each id over once (<a class=\"lawref\" href=\"#law-input-distinct\"><code>input.distinct</code></a>).",
+    "scope": null,
+    "names": [
+     "sum.repeats"
+    ]
+   },
+   {
+    "id": "law-heads-why",
+    "shape": "limit",
+    "s": "Max's scalar state cannot maintain the maximum over changing heads. Folds over heads therefore keep LatestBy's state.",
+    "scope": null,
+    "names": [
+     "heads.why"
+    ]
+   }
+  ]
+ }
+]

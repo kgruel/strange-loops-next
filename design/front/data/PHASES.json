@@ -1,0 +1,30 @@
+[
+ [
+  0,
+  "Rosa writes a record. It lands on the ground and never changes."
+ ],
+ [
+  1300,
+  "A store holds it, as one member of a set."
+ ],
+ [
+  2500,
+  "A view settles what this reader holds."
+ ],
+ [
+  3700,
+  "A fold works out the state: what is current, and how many."
+ ],
+ [
+  4900,
+  "A tick fixes that answer at a moment, so others can cite it."
+ ],
+ [
+  6100,
+  "A lens renders the answer as text people read."
+ ],
+ [
+  7300,
+  "Someone edits the text. The edit comes back down as a new record."
+ ]
+]

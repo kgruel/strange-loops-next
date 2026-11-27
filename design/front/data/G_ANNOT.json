@@ -1,0 +1,182 @@
+{
+ "members": {
+  "version": [
+   "version",
+   "1 or 2. Version 2 adds every_write."
+  ],
+  "note": [
+   "note",
+   "Words for a reader, on the store or on a kind."
+  ],
+  "kinds": [
+   "kinds",
+   "The kinds the store describes, by name. The shorthand stops a write of any kind not named here."
+  ],
+  "kiln": [
+   "kiln",
+   "A thing with a key. loops emit kiln name=east writes of kiln:east."
+  ],
+  "potter": [
+   "potter",
+   "A thing with a key, and nothing more said about it."
+  ],
+  "decision": [
+   "decision",
+   "Prose, revised whole. Its key field is slug, and the words go to text."
+  ],
+  "edge": [
+   "edge",
+   "No key: an edge thing is named in full with --of, as edge:vents-into:east:west."
+  ],
+  "key": [
+   "key",
+   "The text field that names the thing: a kiln's name gives kiln:east. Leave it out for events and for things you name with --of."
+  ],
+  "headline": [
+   "headline",
+   "The text field shown as the thing's one-line label. Without it, the key field is used. text is the field a trailing message is written to."
+  ],
+  "refs": [
+   "refs",
+   "The fields that point at other things, each with the kinds it may name. An empty list allows any kind and record ids too."
+  ],
+  "keeper": [
+   "keeper",
+   "A reference field. It may name a potter, and nothing else."
+  ],
+  "evidence": [
+   "evidence",
+   "A reference field with an empty list, so it may name any kind, and record ids too: a firing has no other name."
+  ],
+  "governs": [
+   "governs",
+   "A reference field that may name kilns."
+  ],
+  "from": [
+   "from",
+   "A reference field of an edge. Its empty list allows any target."
+  ],
+  "to": [
+   "to",
+   "A reference field of an edge. Its empty list allows any target."
+  ],
+  "lifecycle": [
+   "lifecycle",
+   "A field whose values are sorted into active and closed. The shorthand accepts only the listed values, and ls --active hides things whose value is closed."
+  ],
+  "field": [
+   "field",
+   "The payload field the lifecycle reads."
+  ],
+  "active": [
+   "active",
+   "Values that keep a thing in ls --active."
+  ],
+  "closed": [
+   "closed",
+   "Values that hide a thing from ls --active."
+  ],
+  "preview": [
+   "preview",
+   "The columns ls kiln: shows for the kind's things. Events have no names to list by, so pick their columns with --fields."
+  ],
+  "every_write": [
+   "every_write",
+   "Fields that every shorthand write of the kind must state."
+  ]
+ },
+ "spec": {
+  "vertex": [
+   "vertex",
+   "The name you read it by: loops read overview."
+  ],
+  "from": [
+   "from",
+   "Chooses records. Each entry names a store, and may narrow by kind, of or about. The stores named are read together as one set, and a record is taken when any source takes it."
+  ],
+  "store": [
+   "store",
+   "A store from the group list. The name . means the current store."
+  ],
+  "kind": [
+   "kind",
+   "Narrows a source to these kinds, as a list. The key is kind, and kinds is an error."
+  ],
+  "fold": [
+   "fold",
+   "Names the answers you want. Each answer is a slot, and each slot has exactly one fold type."
+  ],
+  "kilns": [
+   "kilns",
+   "A slot: each kiln's current state."
+  ],
+  "latest-by": [
+   "latest-by",
+   "Each thing's current state. It must say follow, and by isn't allowed on it."
+  ],
+  "follow": [
+   "follow",
+   "keys reads each thing once, field by field from its live setters. prev reads each head as written. Without follow, a slot reads every record, replaced or not, which is right for events."
+  ],
+  "where": [
+   "where",
+   "A map from a field to tests, and every test must hold. A source doesn't keep its kinds to its own store, so each slot narrows here."
+  ],
+  "env.kind": [
+   "env.kind",
+   "An envelope field. Envelope fields start env., and payload fields are named plainly."
+  ],
+  "is": [
+   "is",
+   "Holds when the field equals the value, or a list holds it."
+  ],
+  "kilns_by_status": [
+   "kilns_by_status",
+   "A slot: how many kilns have each status."
+  ],
+  "count": [
+   "count",
+   "How many."
+  ],
+  "by": [
+   "by",
+   "Groups the slot's answer by a payload field, env.kind, env.observer or env.about:<kind>. A list field puts a record in a group for each member."
+  ],
+  "firings": [
+   "firings",
+   "A slot: how many firings."
+  ],
+  "hottest": [
+   "hottest",
+   "A slot: the hottest cone fired."
+  ],
+  "max": [
+   "max",
+   "The largest value of a field. sum, min and max read whole numbers only."
+  ],
+  "this_week": [
+   "this_week",
+   "A slot: one week's firings, newest first."
+  ],
+  "collect": [
+   "collect",
+   "The records themselves, newest first, at most limit of them. --values lists them under heads."
+  ],
+  "limit": [
+   "limit",
+   "At most this many. On a collect that follows keys, it counts things, each listed whole."
+  ],
+  "env.when": [
+   "env.when",
+   "The time a record is ordered by: occurred if stated, else emitted. It tests, and doesn't group."
+  ],
+  "at-least": [
+   "at-least",
+   "A whole number, or a time, at or over this. A window includes its lower bound."
+  ],
+  "below": [
+   "below",
+   "A whole number, or a time, under this. A window leaves out its upper bound."
+  ]
+ }
+}

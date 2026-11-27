@@ -1,0 +1,48 @@
+[
+ [
+  "IS1",
+  "IS4",
+  "IS1 changes what a grant holds, so what IS4 writes"
+ ],
+ [
+  "IS3",
+  "IS4",
+  "IS4's store comes from under (IS3)"
+ ],
+ [
+  "IS3",
+  "IS8",
+  "under IS3 every record ends at one anchor"
+ ],
+ [
+  "IS3",
+  "IS9",
+  "under IS3 a record counts in one store only"
+ ],
+ [
+  "IS5",
+  "IS6",
+  "IS5's end is an explicit cut"
+ ],
+ [
+  "IS8",
+  "IS6",
+  "IS8's continuing store is an explicit cut"
+ ],
+ [
+  "IS2",
+  "IS11",
+  "B needs IS2's reading ruled and built first"
+ ],
+ [
+  "IS10",
+  "IS11",
+  "B needs IS10 ruled and built first"
+ ],
+ [
+  "IS7",
+  "IS5",
+  "who may end a grant",
+  true
+ ]
+]

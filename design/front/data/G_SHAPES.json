@@ -1,0 +1,32 @@
+[
+ {
+  "name": "A kiln",
+  "shape": 0,
+  "ex": "kiln:east"
+ },
+ {
+  "name": "A potter",
+  "shape": 0,
+  "ex": "potter:ada"
+ },
+ {
+  "name": "A decision",
+  "shape": 0,
+  "ex": "decision:slow-cool"
+ },
+ {
+  "name": "A firing",
+  "shape": 1,
+  "ex": "r:hnqjpebh…"
+ },
+ {
+  "name": "A note of something seen",
+  "shape": 1,
+  "ex": "r:…, its own id"
+ },
+ {
+  "name": "One kiln venting into another",
+  "shape": 2,
+  "ex": "edge:vents-into:east:west"
+ }
+]

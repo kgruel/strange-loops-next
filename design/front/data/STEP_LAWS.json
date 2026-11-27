@@ -1,0 +1,36 @@
+[
+ [
+  "write.checked"
+ ],
+ [
+  "thing.one",
+  "latest-by.order"
+ ],
+ [
+  "heads.set",
+  "latest-by.converge"
+ ],
+ [
+  "heads.set"
+ ],
+ [
+  "record.erasure",
+  "settle.erased"
+ ],
+ [
+  "input.union",
+  "spec.set"
+ ],
+ [
+  "view.no-resurrection",
+  "result.unread"
+ ],
+ [
+  "tick.inputs",
+  "tick.made"
+ ],
+ [
+  "lens.round-trip",
+  "lens.absence-not-edit"
+ ]
+]

@@ -1,0 +1,120 @@
+[
+ {
+  "group": "Envelope",
+  "note": "Checked in this order. A field left out, or of the wrong JSON type, gets its own code.",
+  "codes": [
+   "envelope-field-unknown",
+   "envelope-not-object",
+   "kind-empty",
+   "observer-not-typed",
+   "emitted-not-rfc3339",
+   "occurred-not-span",
+   "about-not-typed",
+   "of-not-typed",
+   "prev-not-record-id",
+   "under-not-record-id",
+   "erases-not-record-id",
+   "sets-not-keys",
+   "of-missing"
+  ]
+ },
+ {
+  "group": "Text",
+  "note": "Any string, anywhere in a record.",
+  "codes": [
+   "string-not-unicode"
+  ]
+ },
+ {
+  "group": "Writing",
+  "note": "While a record is written one canonical way.",
+  "codes": [
+   "salt-not-16-bytes",
+   "member-duplicate",
+   "number-out-of-range"
+  ]
+ },
+ {
+  "group": "Batch",
+  "note": "Shape, then labels, then writing, then prev-unknown, then under-unknown, then of-not-root, then prev-unrelated.",
+  "codes": [
+   "envelope-field-unknown",
+   "envelope-not-object",
+   "label-duplicate",
+   "label-unknown",
+   "label-cycle",
+   "prev-unknown",
+   "under-unknown",
+   "of-not-root",
+   "prev-unrelated"
+  ]
+ },
+ {
+  "group": "Tick check",
+  "note": "Before a tick's payload is read.",
+  "codes": [
+   "tick-kind",
+   "tick-withheld-erased"
+  ]
+ },
+ {
+  "group": "Tick payload",
+  "note": "What a tick record says.",
+  "codes": [
+   "tick-hash-invalid",
+   "tick-id-duplicate",
+   "tick-id-invalid",
+   "tick-ids-not-array",
+   "tick-ids-unsorted",
+   "tick-member-duplicate",
+   "tick-member-missing",
+   "tick-member-unknown",
+   "tick-not-object",
+   "tick-result-hash-mismatch",
+   "tick-result-invalid",
+   "tick-rules-invalid",
+   "tick-spec-hash-mismatch",
+   "tick-spec-noncanonical",
+   "tick-spec-not-object",
+   "tick-withheld-empty",
+   "tick-withheld-outside"
+  ]
+ },
+ {
+  "group": "Spec",
+  "note": "In the grammar's check order.",
+  "codes": [
+   "member-duplicate",
+   "spec-not-object",
+   "unknown-key",
+   "vertex-missing",
+   "vertex-invalid",
+   "from-missing",
+   "from-invalid",
+   "fold-invalid",
+   "fold-type",
+   "follow-missing",
+   "follow-invalid",
+   "limit-invalid",
+   "by-invalid",
+   "fold-argument",
+   "where-invalid"
+  ]
+ },
+ {
+  "group": "Lens",
+  "note": "Rendering a base.",
+  "codes": [
+   "base-id-duplicate"
+  ]
+ },
+ {
+  "group": "Not pinned yet",
+  "note": "Named, with no test vector yet.",
+  "codes": [
+   "prev-not-permitted",
+   "sum-overflow"
+  ],
+  "unpinned": true
+ }
+]

@@ -1,0 +1,22 @@
+[
+ {
+  "k": "Absence isn't visible.",
+  "v": "A reader that lacks a successor can see its predecessor as current. It cannot count records it does not know exist. The laws promise convergence, not freshness."
+ },
+ {
+  "k": "Torn reads.",
+  "v": "A reader must not see half a changeset. The planned place closes each changeset through atomic rename. Readers ignore a partial last line."
+ },
+ {
+  "k": "Time is the writer's word.",
+  "v": "Content order breaks ties by claimed times, so a skewed clock picks a fork's winner. Every head of a fork is still shown."
+ },
+ {
+  "k": "Trust is step 3.",
+  "v": "Fold laws do not check signatures or standing. They require an admitted record set in which each id names one record."
+ },
+ {
+  "k": "A checkpoint is a set.",
+  "v": "\"Since\" means segments not yet seen, not an offset, or a late segment is missed."
+ }
+]

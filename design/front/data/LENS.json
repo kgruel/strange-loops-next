@@ -1,0 +1,37 @@
+[
+ {
+  "k": "all",
+  "t": "Every law",
+  "say": "Every law, from the ground up. Pick a gap above to see only the laws it leaves out."
+ },
+ {
+  "k": "novec",
+  "t": "No vector file of its own",
+  "col": "v",
+  "say": "No vector file cites or names these laws. Each is pinned by its proof alone, or by a whole family of vectors, as <code>protocol/laws.md</code> says in its own words."
+ },
+ {
+  "k": "one",
+  "t": "One vector file",
+  "col": "v",
+  "say": "A single vector pins each of these laws. That is one input and one answer: the law is pinned at one point."
+ },
+ {
+  "k": "nojs",
+  "t": "Not run by JavaScript",
+  "col": "js",
+  "say": "These laws have vectors, and JavaScript runs none of them. All of them are tick vectors, which JavaScript does not run (W3). The model and Rust run every one."
+ },
+ {
+  "k": "differ",
+  "t": "The two lists differ",
+  "col": "a",
+  "say": "<code>protocol/laws.md</code> cites a set of vectors for each law, and each vector names the laws it pins. For these laws the two lists differ. − counts files cited that don't name the law; + counts files naming it that aren't cited."
+ },
+ {
+  "k": "bc",
+  "t": "Held by construction",
+  "col": "t",
+  "say": "No theorem names these laws. They hold because of how the code is built, and their vectors pin them."
+ }
+]

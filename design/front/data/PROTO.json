@@ -1,0 +1,27 @@
+{
+ "count": {
+  "add": "every"
+ },
+ "current": {
+  "supersede": "any",
+  "winner": "newest",
+  "keys": {
+   "span": true,
+   "emitted": true,
+   "id": true
+  }
+ },
+ "withheld": {
+  "hidden": "supersedes",
+  "unread": "count"
+ },
+ "id": {
+  "sets": "set",
+  "members": "sorted",
+  "covers": "commit"
+ },
+ "text": {
+  "escape": "both",
+  "absent": "keep"
+ }
+}
