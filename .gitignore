@@ -1,3 +1,4 @@
 model/.lake/
 rust/target/
 __pycache__/
+out/
