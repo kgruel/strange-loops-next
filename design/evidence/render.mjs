@@ -26,10 +26,27 @@ export function vectorEvidence(row, { cited, naming }) {
   };
 }
 
+// Both evidence views draw the same proof graph, with their own card anchors.
+export function proofMapData({ data, rows, layers, edges }, idOf = anchor) {
+  const connected = new Set(edges.flatMap(([a, b]) => [a, b]));
+  return {
+    layers,
+    nodes: rows.filter((r) => connected.has(r.key)).map((r) => {
+      const law = data.laws[r.key];
+      return {
+        id: idOf(r.key), label: r.names.length > 1 ? `${r.names[0]} …` : r.key,
+        layer: law.layer, shape: law.shape, sentence: sentence(law),
+      };
+    }),
+    edges: edges.map(([a, b, via]) => [idOf(a), idOf(b), via]),
+    alone: rows.filter((r) => !connected.has(r.key)),
+  };
+}
+
 export function renderEvidence(root) {
   const read = (...p) => readFileSync(join(root, "design", "evidence", ...p), "utf8");
   const joined = joinLaws(root);
-  const { data, rows, graph, layers, resolved, cited, runBy, edges, restsOn, carries, via, tried, unpremised, scopeOf } = joined;
+  const { data, rows, graph, layers, resolved, cited, runBy, restsOn, carries, via, tried, unpremised, scopeOf } = joined;
   const law = (k) => data.laws[k];
   const label = (r) => r.names.join(", ");
   const lawLink = (k) => `<a class="lawref" href="#${anchor(k)}"><code>${esc(k)}</code></a>`;
@@ -119,16 +136,8 @@ export function renderEvidence(root) {
     `<th scope="col" title="laws its proofs rest on / laws resting on it">rests / carries</th></tr></thead>\n      <tbody>\n${coverRows}      </tbody>\n    </table></div></div>\n`;
 
   // What rests on what: the laws joined by a proof, laid out when the page is built.
-  const connected = new Set(edges.flat());
-  const alone = rows.filter((r) => !connected.has(r.key));
-  const mapData = {
-    layers,
-    nodes: rows.filter((r) => connected.has(r.key)).map((r) => ({
-      id: anchor(r.key), label: r.names.length > 1 ? `${r.names[0]} …` : r.key, layer: law(r.key).layer,
-      shape: law(r.key).shape, sentence: sentence(law(r.key)),
-    })),
-    edges: edges.map(([a, b, v]) => [anchor(a), anchor(b), v]),
-  };
+  const mapData = proofMapData(joined);
+  const { alone } = mapData;
   const mapSvg = layoutMap(mapData);
   const mapNotes = Object.fromEntries(mapData.nodes.map((m) => [m.id, { label: m.label, sentence: m.sentence }]));
   const aloneNote = `    <p class="note">${alone.length} laws stand alone: their proofs use no other law's theorem. ${alone.map((r) => lawLink(r.key)).join(" ")}</p>\n`;

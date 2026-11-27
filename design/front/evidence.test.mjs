@@ -40,6 +40,13 @@ test("the evidence counts agree with the cards, vector inventory, implementation
   });
 });
 
+test("the proof map uses the front page's size and node height", () => {
+  assert.match(svg, /^<svg viewBox="0 0 967 1424" width="100%" style="--w:967px"/);
+  const nodes = [...svg.matchAll(/<a class="node\b[^>]*>.*?<\/a>/g)];
+  assert.equal(nodes.length, data.get("E_COUNTS").connected);
+  for (const [node] of nodes) assert.match(node, /<rect\b[^>]*\bheight="28"/);
+});
+
 test("map links and labels name each connected law, and each edge names its proof", () => {
   const id = new Map(laws.map((law) => [law.k, `ev-${law.s}`]));
   const connected = laws.filter((law) => law.ro.length || law.ca.length);

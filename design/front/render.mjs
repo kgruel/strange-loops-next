@@ -50,9 +50,7 @@ export const GENERATED = new Map([
   ["DEC_EDGES", (root, m) => onMap(root, "DEC_EDGES", m)],
   ...["LAWS", "L_SHAPES", "L_QS", "L_UNLESS", "L_NOPROMISE", "L_SIMPL", "L_BOUND", "L_VEC"]
     .map((name) => [name, (root, m) => m.laws[name]]),
-  // The prototype SVG uses dimensions absent from the repository layout.
-  // E_MAP stays in data/; its nodes and edges are checked against E_LAWS.
-  ...["E_REPO", "E_LAYERS", "E_SHAPES", "E_IMPL", "E_NOT", "E_COUNTS", "E_T", "E_LAWS"]
+  ...["E_REPO", "E_LAYERS", "E_SHAPES", "E_IMPL", "E_NOT", "E_COUNTS", "E_T", "E_LAWS", "E_MAP"]
     .map((name) => [name, (root, m) => m.evidence[name]]),
   ...["STATUS", "NOUN_GROUPS", "NOUNS", "VERBS", "CONSTRUCTIONS", "LAYERS", "MATRIX", "REFUSALS", "PROVENANCE"]
     .map((name) => [name, (root, m) => m.grammar.constants[name]]),

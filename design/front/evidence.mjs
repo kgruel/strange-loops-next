@@ -1,7 +1,14 @@
-// The front page's evidence cards in protocol table order.
-import { theoremName, theoremStatement, vectorEvidence } from "../evidence/render.mjs";
+// The front page's evidence cards in protocol table order, and the map of their proofs.
+import { layoutMap } from "../evidence/layout.mjs";
+import { proofMapData, theoremName, theoremStatement, vectorEvidence } from "../evidence/render.mjs";
 import { joinLaws, REPO, sentence } from "../laws/join.mjs";
 import { inline, slug } from "../protocol.mjs";
+
+// The front map's label metrics and spacing. The current rows wrap the same from 851 to 864.
+const mapSizes = {
+  characterWidth: 7.3, nodePadding: 22, nodeHeight: 28, bandGap: 22,
+  leftGutter: 100, maxRowWidth: 860, labelX: 11, labelY: 18.5,
+};
 
 export function readEvidence(root) {
   const joined = joinLaws(root);
@@ -44,5 +51,6 @@ export function readEvidence(root) {
     },
     E_T: theorems,
     E_LAWS: laws,
+    E_MAP: layoutMap(proofMapData(joined, (key) => `ev-${slug(key)}`), mapSizes),
   };
 }
