@@ -232,11 +232,11 @@ export function frontRewrite(root, documents, rewriteLink) {
     if (/^https?:/i.test(url)) return url;
     if (url.startsWith("../rethink/")) return url.slice(3);
     const [path, fragment = ""] = url.split("#");
-    if (path === "" || path === "index.html") {
+    if (path === "" || path === documents.get(SOURCE)) {
       const entry = fragment.match(/^(is\d+)-/);
       if (entry) return "#" + entry[1];
       if (HERE[fragment]) return "#" + HERE[fragment];
-      return "decisions/" + (fragment ? "#" + fragment : "");
+      return "decisions/" + documents.get(SOURCE) + (fragment ? "#" + fragment : "");
     }
     return "decisions/" + url;
   };
@@ -340,7 +340,7 @@ ${around.deferred.map((d) => `        <div><div class="dw">${d.what}</div><div c
     </div>
   </section>
 
-  <footer class="end"><div class="wrap"><span>Built from <code>DECISIONS.md</code> in the repository.</span><a href="decisions/">The decisions file, as written</a></div></footer>
+  <footer class="end"><div class="wrap"><span>Built from <code>DECISIONS.md</code> in the repository.</span><a href="decisions/decisions.html">The decisions file, as written</a></div></footer>
 </main>
 `;
 }

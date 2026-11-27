@@ -37,15 +37,16 @@ export function header(current, sections) {
 
 // The document: the register's styles before the page's own, its script (register.js) before
 // the page's scripts.
-export function documentOf(root, { head, css, body, scripts }) {
+export function documentOf(root, { head, css, body, scripts, canonical }) {
   const register = readFileSync(join(root, "design", "register.css"), "utf8");
   const shared = readFileSync(join(root, "design", "register.js"), "utf8");
+  const indexing = canonical ? `<link rel="canonical" href="${canonical}">` : '<meta name="robots" content="noindex, nofollow">';
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
+${indexing}
 ${head}<style>
 ${register}
 ${css}</style>

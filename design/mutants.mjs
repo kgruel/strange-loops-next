@@ -97,6 +97,10 @@ const MUTANTS = [
     swap("#is3", "#ev-no-such-law")],
   ["an incoming link to a missing front-page noun", "design/rethink/top.html",
     (s) => s + '<a href="../#n-no-such-noun">Noun</a>\n'],
+  ["a nested view using a root-relative prefix", "design/build.mjs",
+    swap("frontPage(root, { view, depth: 1 })", 'frontPage(root, { view, depth: view === "guide" ? 0 : 1 })')],
+  ["an llms.txt link to a missing repository file", "design/build.mjs",
+    swap('["README.md", "Records in', '["missing-readme.md", "Records in')],
 ];
 
 // What the build can't know, and why.
