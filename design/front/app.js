@@ -900,7 +900,7 @@ const G_BOOK_NOTES = /*data:G_BOOK_NOTES*/;
     filter();
   })();
 
-  route();
+  document.addEventListener("DOMContentLoaded", route, { once: true });
 })();
 
 
@@ -2139,6 +2139,7 @@ const E_MAP = /*data:E_MAP*/;
     return false;
   }
   addEventListener("hashchange", () => fromHash(true));
-  if (!fromHash(true)) select(BY.get("record.sets") || LAWS[0], false);
+  if (!fromHash(false)) select(BY.get("record.sets") || LAWS[0], false);
+  else document.addEventListener("DOMContentLoaded", () => fromHash(true), { once: true });
 })();
 

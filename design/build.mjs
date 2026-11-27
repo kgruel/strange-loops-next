@@ -5,18 +5,15 @@
 //
 // The fragment is what the artifact host wraps in its own document; the full
 // document carries that wrapper's reset (base.css) so the page renders the
-// same on strangeloops.dev. The other pages are built on
-// design/page.mjs and have no artifact mirror. No dependencies.
+// same on strangeloops.dev. The front page and working documents have no
+// artifact mirror. No dependencies.
 
-import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderDecisions } from "./decisions/render.mjs";
-import { renderEvidence } from "./evidence/render.mjs";
 import { frontPage } from "./front/render.mjs";
-import { renderGrammar } from "./grammar/render.mjs";
 import { fill } from "./page.mjs";
-import { renderLaws } from "./laws/render.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const src = join(root, "design", "rethink");
@@ -78,9 +75,6 @@ const outputs = at >= 0
   ? [[args[at + 1], fragment]]
   : [[frontFile, front.html],
      [join(root, "out", "rethink", "index.html"), full],
-     [join(root, "out", "grammar", "index.html"), renderGrammar(root)],
-     [join(root, "out", "laws", "index.html"), renderLaws(root)],
-     [join(root, "out", "evidence", "index.html"), renderEvidence(root)],
      ...renderDecisions(root)];
 
 // Check the assembled pages before writing any of them. Rethink's own hash
@@ -99,8 +93,6 @@ if (at < 0) {
       ids.push(...front.ids);
       links.push(...front.links);
     }
-    if (file === join(root, "out", "grammar", "index.html"))
-      links.push(...[...text.matchAll(/"(law-[a-z0-9-]+)"/g)].map((m) => `../laws/#${m[1]}`));
     pages.set(file, { ids: new Set(ids), links: new Set(links.map((href) => href.replaceAll("&quot;", '"').replaceAll("&amp;", "&"))) });
   }
   for (const [file, , sources] of outputs) {
@@ -130,6 +122,14 @@ for (const [file, text] of outputs) {
 
 // A removed or renamed note must also disappear from the files the site syncs.
 if (at < 0) {
+  // An incremental build may still have the standalone pages from an older build.
+  const out = join(root, "out");
+  for (const entry of readdirSync(out, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !["grammar", "laws", "evidence"].includes(entry.name)) continue;
+    const retired = join(out, entry.name);
+    rmSync(join(retired, "index.html"), { force: true });
+    if (!readdirSync(retired).length) rmdirSync(retired);
+  }
   const dir = join(root, "out", "decisions");
   const built = new Set(outputs.map(([file]) => file));
   for (const name of readdirSync(dir)) {

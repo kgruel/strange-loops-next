@@ -17,12 +17,12 @@ The long design notes are in [notes/](notes/).
 
 | Path | Holds |
 |---|---|
-| `model/` | Lean 4: executable model (`Loops/`) and proofs (`Laws/`). `gen` writes protocol vectors. `proofs` writes the laws page's proof graph. |
+| `model/` | Lean 4: executable model (`Loops/`) and proofs (`Laws/`). `gen` writes protocol vectors. `proofs` writes the evidence view's proof graph. |
 | `vectors/` | Model-written protocol fixtures and independent standards data. Every implementation checks all families. |
 | `protocol/` | the normative prose; [`protocol/record.md`](protocol/record.md) is layer 0, [`protocol/spec.md`](protocol/spec.md) the spec's grammar, [`protocol/lens.md`](protocol/lens.md) the lens contract, [`protocol/laws.md`](protocol/laws.md) indexes each law, its theorem and its vectors |
 | `interop/js/` | Independent JS writer (`loops.mjs`) and readers. Reader modules: `fold`, `where`, `spec`, `realm`, `scenario`, `lens`, `batch`. |
-| `design/` | Page sources. `front/` holds the front page. `rethink/` holds the design and ledger. `grammar/` holds words and the walk. `laws/` holds law metadata. `evidence/` shows evidence. `decisions/` renders the working documents. |
-| `out/index.html`, `out/rethink/`, `out/grammar/`, `out/laws/`, `out/evidence/`, `out/decisions/` | the pages, written by `node design/build.mjs`, never by hand. They are not kept in the repository: the build writes them when a merge is published |
+| `design/` | Page sources. `front/` builds the five views at the site's root, with the walk, law and proof data in `grammar/`, `laws/` and `evidence/`. `rethink/` holds the design and ledger. `decisions/` renders the working documents. |
+| `out/index.html`, `out/rethink/`, `out/decisions/` | the pages, written by `node design/build.mjs`, never by hand. They are not kept in the repository: the build writes them when a merge is published |
 
 `rust/` contains the implemented pure core and fixture evaluator; see [`rust/PORTING.md`](rust/PORTING.md).
 It also holds the first product slice: a directory place and the `loops` CLI, for one person; see [`rust/PLACE.md`](rust/PLACE.md).
@@ -78,7 +78,7 @@ CI rejects manual edits to model-generated files. Then:
 node interop/js/check.mjs vectors   # the JS implementation passes every vector
 ```
 
-## The design page
+## The design pages
 
 The build writes the front page from `design/front/` to `out/index.html`, with its typefaces in `out/fonts/`.
 Its five views bring the grammar, decisions, guide, laws and evidence together at the site's root.
@@ -91,54 +91,43 @@ Shared files are `styles.css`, `app.js`, `head.html` and `top.html`. Edit those,
 node design/build.mjs       # writes the pages under out/, which git ignores
 ```
 
-Four more pages share a shell (`design/page.mjs`, `design/register.css`).
-Grammar, laws and evidence read the protocol through `design/protocol.mjs`.
+The front page reads the protocol through `design/protocol.mjs`.
 
-* `design/grammar/`: the protocol's nouns, verbs and layers. `words.json` holds its words.
-  The build refuses unknown law names and refusal codes that differ from vector metadata. Its walk is `vectors/scenario/01-decision`, which the model
-  writes; `walk.json` holds only its narration and layout.
-* `design/laws/`: `laws.json` assigns each law a sentence, shape and reader question.
-  The build refuses missing questions and questions with no laws.
-  Demos let readers try selected laws.
-  `join.mjs` joins protocol rows, printed theorem statements, cited vectors and proof dependencies. That last join is
-  `design/laws/proofs.json`, written by `lake exe proofs` from the checked
-  proofs; CI regenerates it as it does the vectors. `lake exe boundaries` writes
-  `design/laws/boundaries.json`: some laws asked with their premise and
-  without it, the model checking that the premise matters. These aren't
-  vectors, since several of their inputs are ones the protocol never
-  produces. Each case appears on its law's Try card or a separate card.
-  The build refuses cases without cards.
-  Try cards label records A, B, C by writing time.
-  `shapes.mjs` draws each figure; cards retain the model's answers for the shown variants.
-  The build rejects missing sentences, unresolved theorem names, missing vectors and unknown law names.
-  It also rejects proof dependencies on higher layers.
-  `premises.mjs` reads theorem hypotheses and checks their metadata declarations.
-  Premises appear page-wide, under "Holds when", or as the law's subject in the premise vocabulary.
-  The build also rejects declared premises absent from the law's theorems. That names the premise; what it
-  quantifies over is still wording.
-* `design/evidence/`: the same joins for implementers and maintainers.
-  Cards show theorems, vectors, implementation coverage and proof dependencies.
-  The page also shows a coverage table and proof map, laid out by `design/evidence/layout.mjs`.
-  Law cards share anchors (`#law-<name>`) across pages.
-  The build rejects links between these pages without matching anchors.
-* `design/decisions/` renders the decisions, roadmap, changelog and every Markdown file in `notes/`.
-  The build checks repository paths and links to headings in the generated pages.
+* The grammar view gets its words from `design/front/grammar.json`. The build checks
+  the laws they name and the refusal codes the vectors pin. The recipe in
+  `design/front/walk.json` tells the story of `vectors/scenario/01-decision`.
+  `design/grammar/render.mjs` checks its records and steps against that vector.
+  The law chips still read the names cited in `design/grammar/words.json` and
+  `design/grammar/walk.json`. The law join reads its layers from `words.json`.
+* In `design/laws/`, `laws.json` gives each law a sentence, shape and reader question.
+  `join.mjs` joins the protocol rows to theorem statements, vectors and proof dependencies.
+  The build refuses a missing sentence, an unanswered question, an unresolved theorem or
+  vector, and a proof that rests on a higher layer. The bench lets a reader change a
+  rule and run the vectors again.
+  `lake exe proofs` writes `proofs.json` from the checked proofs.
+  `premises.mjs` reads the theorem hypotheses and checks which premises belong
+  to each law. `lake exe boundaries` writes `boundaries.json`. Its cases show
+  what the model answers with a premise and what changes when it is taken away.
+* The evidence view shows the theorems, vectors and implementations behind each law.
+  `design/evidence/layout.mjs` lays out the proof map. Each law has a row at
+  `#law-<name>` and an evidence card at `#ev-<name>`.
+* The guide reads `GUIDE.md`. The decisions view reads the open questions in
+  `DECISIONS.md` and links to the working documents under `/decisions/`.
+  `design/decisions/` renders the decisions, roadmap, changelog, guide and every
+  Markdown file in `notes/`. The build checks repository paths and links into
+  the pages, including the places the front page draws when it opens.
 
 `node design/mutants.mjs` applies plausible wrong edits to source copies.
 It requires build refusal except for an explicit, shrink-only survivor list with reasons. CI runs
 it.
 
-The grammar and laws pages load Motion, a pinned CDN library.
-They publish only at `https://strangeloops.dev/grammar/` and `/laws/`, without artifact mirrors.
-The site sync publishes evidence at `/evidence/` and the working documents at `/decisions/`.
-
 CI builds every page twice and fails if the two builds differ. The pages are built again from `main` when a merge is published, so a hosted page is the build of a commit and can be made again from it. To publish:
 
 * **The site:** in the `projects.gruel.world` repository, `npm run sync:strange-loops`
   snapshots the pages built from the checked-out commit (run `node design/build.mjs` first), then push its
-  `main`. It is served unlisted, with `noindex`, at
-  `https://strangeloops.dev/rethink/`. Addresses under
-  `projects.gruel.world/strange-loops/` redirect there.
+  `main`. The site is served unlisted, with `noindex`, at
+  `https://strangeloops.dev/`. The design walk is at `/rethink/`. Addresses under
+  `projects.gruel.world/strange-loops/` redirect to the walk.
 * **The claude.ai artifact** is a mirror.
   `node design/build.mjs --fragment <file>` writes the fragment without a document wrapper; the host adds one.
   Republish that file to the same artifact URL.

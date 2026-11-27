@@ -6,8 +6,10 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { rewriteLink } from "../decisions/links.mjs";
 import { fill } from "../page.mjs";
+import { LE } from "./bench.mjs";
 import { decisionsView, frontRewrite, readAround, readDecisions } from "./decisions.mjs";
 import { readEvidence } from "./evidence.mjs";
 import { readGrammar } from "./grammar.mjs";
@@ -62,6 +64,43 @@ export const GENERATED = new Map([
   ["SHAPE", (root, m) => Object.fromEntries(m.laws.L_SHAPES.map(({ k, mark }) => [k, mark]))],
 ]);
 
+// The cases the bench uses to demonstrate each law. Check the vector's own
+// attribution before presenting its records as an example of that law.
+function checkBench(vectors, rules) {
+  const laws = {
+    count: { three: "count.perm", twice: "count.repeats" },
+    latest: { fork: "latest-by.set", chain: "latest-by.set", late: "latest-by.set", merge: "latest-by.set",
+      emitted: "latest-by.order", id: "latest-by.order", span: "latest-by.order", repeats: "latest-by.repeats" },
+    view: { withheld: "view.no-resurrection", erased: "view.no-resurrection", max: "result.unread" },
+    record: { sets: "record.sets", members: "record.member-order", erasure: "record.erasure" },
+    lens: { round: "lens.round-trip", escape: "lens.escaping", edit: "lens.put-get", drop: "lens.absence-not-edit" },
+  };
+  for (const [group, cases] of Object.entries(laws)) for (const [name, law] of Object.entries(cases)) {
+    const v = vectors[group][name];
+    if (!v?.laws.includes(law)) throw new Error(`front bench: ${group}/${name} needs a vector naming ${law}`);
+    if (v.envs) for (const env of v.envs) {
+      if (LE.canonical(LE.envJson(env, rules.id)) !== v.expect.env_canonical)
+        throw new Error(`front bench: an envelope in ${v.file} differs from the model's canonical spelling`);
+    }
+    if (!v.orders) continue;
+    const records = new Map();
+    for (const order of v.orders) for (const r of order) {
+      if (!r.emitted.endsWith("Z")) throw new Error(`front bench: ${v.file} needs UTC writing times`);
+      if (records.has(r.id) && !isDeepStrictEqual(r, records.get(r.id)))
+        throw new Error(`front bench: ${v.file} changes record ${r.id} across deliveries`);
+      records.set(r.id, r);
+    }
+    // Only the repeats case varies how many copies of each record arrive.
+    const ids = (order) => {
+      const labels = order.map((r) => r.id);
+      return (law === "latest-by.repeats" ? [...new Set(labels)] : labels).sort();
+    };
+    const first = ids(v.orders[0]);
+    for (const order of v.orders.slice(1)) if (!isDeepStrictEqual(ids(order), first))
+      throw new Error(`front bench: ${v.file} changes the records across deliveries`);
+  }
+}
+
 export function frontData(root, model = decisions(root)) {
   const dir = join(root, "design", "front", "data");
   const data = new Map();
@@ -81,6 +120,7 @@ export function frontData(root, model = decisions(root)) {
     laws: readLaws(root, walk.STEP_LAWS.flat()),
   };
   for (const [name, make] of GENERATED) data.set(name, make(root, sources));
+  checkBench(data.get("L_VEC"), data.get("PROTO"));
   return data;
 }
 
@@ -156,6 +196,12 @@ ${body}</body>
 </html>
 `;
   const links = [...data.values()].flatMap((value) => [...dataLinks(value)]);
+  // The law directory links every row to its evidence, including standalone
+  // laws. Evidence in turn links back to each model-supplied premise case.
+  for (const { rows } of data.get("L_QS")) for (const { id } of rows)
+    links.push("#ev-" + id.replace(/^law-/, ""));
+  for (const { pr } of data.get("E_LAWS")) if (pr)
+    links.push("#prem-" + pr.replace(/[^a-z0-9]+/gi, "-").toLowerCase());
   const fontFiles = new Set(["fonts/LICENSES.md"]);
   for (const [, , path] of fonts.matchAll(/url\(\s*(["']?)(.*?)\1\s*\)/gi)) {
     if (!/^fonts\/[^/\\]+\.woff2$/.test(path)) throw new Error(`front: expected a font file in fonts.css, got ${path}`);

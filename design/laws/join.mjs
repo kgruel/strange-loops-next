@@ -1,8 +1,8 @@
 // The laws, joined: each law's sentence, shape and question (laws.json, ours to write) to
 // what the protocol says of it (protocol/laws.md), what proves it (the proof graph
-// `lake exe proofs` writes, proofs.json) and what pins it (the vectors). Two pages are built
-// on this: the laws page says what is guaranteed, the evidence page why. Every join is
-// checked here, so a law, question, theorem, vector or edge either page can't place fails
+// `lake exe proofs` writes, proofs.json) and what pins it (the vectors). The front page uses
+// this for both the laws and their evidence. Every join is
+// checked here, so a law, question, theorem, vector or edge the views can't place fails
 // the build.
 
 import { readFileSync } from "node:fs";
@@ -14,7 +14,7 @@ import { checkPremises } from "./premises.mjs";
 export const REPO = "https://github.com/kgruel/strange-loops-next/blob/main";
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-// A law's place on either page: the laws page holds its sentence there, the evidence page its card.
+// A law's row in the directory.
 export const anchor = (k) => `law-${slug(k)}`;
 
 // `verb` is "stay" for a `stays` that is plural ("the admitted records and each thing's heads"),
@@ -125,13 +125,12 @@ export function joinLaws(root) {
   const via = new Map(edges.map(([a, b, v]) => [`${a}\u0000${b}`, v.map((t) => t.replace(/^Loops\./, "")).join(" → ")]));
   for (const [a, b] of edges) { restsOn.get(a).push(b); carries.get(b).push(a); }
 
-  // A demo or a premise case names its law as vectors do; both pages place it by the law's row.
+  // Grammar chips and premise cases name laws as vectors do.
   const keyOf = (name, what) => (rows.find((r) => r.names.includes(name)) ?? fail(`${what}: no law ${name}`)).key;
   // Without the premise: the model's answer with a law's premise and without it, written by
   // lake exe boundaries, which checks the first keeps the law and the second differs.
   const bounds = JSON.parse(read("boundaries.json")).cases;
-  const tried = new Map(data.demos.map((d) => [keyOf(d.law, "demo"), d.law]));
   const unpremised = new Map(bounds.map((c) => [keyOf(c.law, "boundaries"), c.law]));
 
-  return { data, rows, notes, premises, scopeOf, files, graph, layers, fail, resolved, cited, naming, nameOf, runBy, edges, restsOn, carries, via, keyOf, bounds, tried, unpremised };
+  return { data, rows, notes, premises, scopeOf, files, graph, layers, fail, resolved, cited, naming, nameOf, runBy, edges, restsOn, carries, via, keyOf, bounds, unpremised };
 }

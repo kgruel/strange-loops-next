@@ -22,7 +22,7 @@ export const PAGES = [
 
 export function header(current, sections) {
   const pages = PAGES.map((p) =>
-    `<a class="page" href="../${p.id}/"${p.id === current ? ' aria-current="page"' : ""}>${p.name}</a>`).join("");
+    `<a class="page" href="../#${p.id}"${p.id === current ? ' aria-current="page"' : ""}>${p.name}</a>`).join("");
   const seg = sections.map(([id, name]) => `<a href="#${id}">${name}</a>`).join("");
   return `<header class="top">
   <div class="wrap top-row">

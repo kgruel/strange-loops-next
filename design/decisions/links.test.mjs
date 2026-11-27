@@ -20,6 +20,18 @@ test("destinations are relative to the Markdown source, including sibling and pa
   for (const url of ["#local", "https://example.org/a?b=2&c=3#d", "http://example.org"]) assert.equal(rewrite(url), url);
 });
 
+test("standalone page links keep their place on the front page", () => {
+  for (const view of ["grammar", "laws", "evidence"])
+    assert.equal(rewrite(`../${view}/`), `../#${view}`);
+  for (const [old, place] of [
+    ["../grammar/#noun-record", "n-record"], ["../laws/#law-record-erasure", "law-record-erasure"],
+    ["../laws/#q-limits", "q-limits"], ["../laws/#h-q-limits", "h-q-limits"],
+    ["../laws/#without-lens-put-get", "prem-lens-put-get"], ["../evidence/#law-record-erasure", "ev-record-erasure"],
+    ["../out/laws/index.html#law-record-erasure", "law-record-erasure"],
+  ]) assert.equal(rewrite(old), "../#" + place);
+  assert.throws(() => rewrite("../laws/#rotor"), /no matching front-page anchor/);
+});
+
 test("a missing or out-of-repository path gives the source line and original link", () => {
   assert.throws(() => rewrite("lost.md#topic"), /notes\/retained-boundaries.md:12: link lost.md#topic: repository path does not exist/);
   for (const url of ["../../other", "javascript:alert(1)", "//other.example/file", "/root", "%zz"])
@@ -46,7 +58,8 @@ test("a new note gets its own page, navigation and checked fragments, and disapp
   assert.equal(result.status, 0, result.stderr);
   const published = join(work, "out/decisions/note-A note.html");
   assert.match(readFileSync(published, "utf8"), /href="note-A%20note.html" aria-current="page">New note/);
-  for (const href of ["#absent", "../ROADMAP.md#absent", "../design/rethink/sections/15-horizons.html#absent"]) {
+  for (const href of ["#absent", "../ROADMAP.md#absent", "../design/rethink/sections/15-horizons.html#absent",
+    "../laws/#law-no-such-law", "../grammar/#noun-no-such-noun", "../evidence/#law-no-such-law"]) {
     writeFileSync(note, `# New note\n\n[missing](${href})`);
     result = build();
     assert.notEqual(result.status, 0);
