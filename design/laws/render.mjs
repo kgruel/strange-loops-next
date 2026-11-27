@@ -15,6 +15,15 @@ const short = (s, n = 22) => (s.length > n ? `${s.slice(0, n - 8)}…${s.slice(-
 // A sentence as an attribute: its marks dropped, its quotes escaped.
 const plain = (html) => esc(html.replace(/<[^>]+>/g, "")).replace(/"/g, "&quot;");
 
+export const unlessSaid = (premises) => `Unless a law says otherwise, ${premises.pageWide.join(", and ")}.`;
+
+export function lawNotes({ notes, fail }, heading) {
+  return (notes[heading] ?? fail(`laws.md has no notes under ${heading}`)).map((bullet) => {
+    const m = bullet.match(/^\*\*(.+?)\*\*\s*(.*)$/);
+    return m ? { k: inline(m[1]), v: inline(m[2]) } : { k: "", v: inline(bullet) };
+  });
+}
+
 export function renderLaws(root) {
   const read = (...p) => readFileSync(join(root, "design", "laws", ...p), "utf8");
   const { data, rows, notes, files, layers, fail, keyOf, bounds, tried, unpremised, premises, scopeOf } = joinLaws(root);
@@ -305,11 +314,9 @@ export function renderLaws(root) {
       `  </div>\n</section>\n`;
   };
 
-  const bullets = (heading) => (notes[heading] ?? fail(`laws.md has no notes under ${heading}`)).map((b) => {
-    const m = b.match(/^\*\*(.+?)\*\*\s*(.*)$/);
-    return m ? `      <div class="row"><div class="row-k wide"><b>${inline(m[1])}</b></div><div class="row-v"><p>${inline(m[2])}</p></div></div>\n`
-      : `      <div class="row is-full"><div class="row-v"><p>${inline(b)}</p></div></div>\n`;
-  }).join("");
+  const bullets = (heading) => lawNotes({ notes, fail }, heading).map(({ k, v }) => k
+    ? `      <div class="row"><div class="row-k wide"><b>${k}</b></div><div class="row-v"><p>${v}</p></div></div>\n`
+    : `      <div class="row is-full"><div class="row-v"><p>${v}</p></div></div>\n`).join("");
 
   const top = header("laws", [["sentence", "Sentence"], ["overview", "Overview"], ["questions", "Questions"], ["stop", "Edges"]]);
   let body = read("page.html");
@@ -319,7 +326,7 @@ export function renderLaws(root) {
   for (const c of bounds) if (!asked.includes(`data-boundary="${esc(c.law)}"`)) fail(`boundaries.json: ${c.law} is on no card; every case must be shown`);
   for (const [name, value] of Object.entries({
     header: top, lede, opening, filters, overview, "shape-key": shapeKey, "question-index": questionIndex, questions: asked,
-    "unless-said": `  <p class="note">Unless a law says otherwise, ${premises.pageWide.join(", and ")}.</p>\n`,
+    "unless-said": `  <p class="note">${unlessSaid(premises)}</p>\n`,
     "no-promise": bullets("What these laws don't promise"), simplifications: bullets("Simplifications in the model"),
   })) body = fill(body, name, value);
 

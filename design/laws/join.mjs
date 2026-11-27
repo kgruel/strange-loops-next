@@ -133,5 +133,5 @@ export function joinLaws(root) {
   const tried = new Map(data.demos.map((d) => [keyOf(d.law, "demo"), d.law]));
   const unpremised = new Map(bounds.map((c) => [keyOf(c.law, "boundaries"), c.law]));
 
-  return { data, rows, notes, premises, scopeOf, files, graph, layers, fail, resolved, cited, naming, runBy, edges, restsOn, carries, via, keyOf, bounds, tried, unpremised };
+  return { data, rows, notes, premises, scopeOf, files, graph, layers, fail, resolved, cited, naming, nameOf, runBy, edges, restsOn, carries, via, keyOf, bounds, tried, unpremised };
 }

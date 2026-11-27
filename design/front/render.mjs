@@ -10,6 +10,7 @@ import { rewriteLink } from "../decisions/links.mjs";
 import { fill } from "../page.mjs";
 import { decisionsView, frontRewrite, readAround, readDecisions } from "./decisions.mjs";
 import { readEvidence } from "./evidence.mjs";
+import { readLaws } from "./laws.mjs";
 
 // The working documents the decisions pages render, as design/decisions/render.mjs names them.
 function documents(root) {
@@ -44,6 +45,8 @@ export const GENERATED = new Map([
   ["POS", (root, m) => onMap(root, "POS", m)],
   ["ISSHORT", (root, m) => onMap(root, "ISSHORT", m)],
   ["DEC_EDGES", (root, m) => onMap(root, "DEC_EDGES", m)],
+  ...["LAWS", "L_SHAPES", "L_QS", "L_UNLESS", "L_NOPROMISE", "L_SIMPL", "L_BOUND", "L_VEC"]
+    .map((name) => [name, (root, m) => m.laws[name]]),
   // The prototype SVG uses dimensions absent from the repository layout.
   // E_MAP stays in data/; its nodes and edges are checked against E_LAWS.
   ...["E_REPO", "E_LAYERS", "E_SHAPES", "E_IMPL", "E_NOT", "E_COUNTS", "E_T", "E_LAWS"]
@@ -59,7 +62,7 @@ export function frontData(root, model = decisions(root)) {
     if (GENERATED.has(name)) throw new Error(`front: ${name} is generated, so data/${f} must go`);
     data.set(name, JSON.parse(readFileSync(join(dir, f), "utf8")));
   }
-  const sources = { ...model, evidence: readEvidence(root) };
+  const sources = { ...model, evidence: readEvidence(root), laws: readLaws(root) };
   for (const [name, make] of GENERATED) data.set(name, make(root, sources));
   return data;
 }

@@ -1,6 +1,0 @@
-[
- "The model stores each id as a natural number. The digest laws require each id to be less than 2^256. This bound applies to a record's id and each id that it references. The protocol supplies the bound through its 32-byte SHA-256 digests. A number is not a hash of the record's envelope, so nothing in the model keeps a record's <code>prev</code> from naming itself or a record above it. The keyed slice laws that need <code>prev</code> to have no cycle state it as a premise (<code>NoCycle</code>); a real id gives it, since it is a hash of an envelope that holds its <code>prev</code>. The model does not derive fold records from stored records. No theorem connects a fold record's times to the checks on a stored record's envelope.",
- "The model projects a stored opening to all its written top-level fields. Every name, including <code>value</code> and <code>n</code>, is looked up in the same list.",
- "Fold records carry time text and its parsed values (<code>Stamp</code>, <code>Claim</code>). Their other envelope fields are direct inputs, not fields parsed from an envelope.",
- "Text is a list of lines; splitting a file into lines is outside the model."
-]

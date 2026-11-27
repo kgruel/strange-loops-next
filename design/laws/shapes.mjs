@@ -31,7 +31,7 @@ const R = 22;                       // a record's square
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const decode = (s) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
-const plain = (html) => decode(html.replace(/<sup>(.*?)<\/sup>/g, "^$1").replace(/<[^>]+>/g, ""));
+export const plain = (html, exponent = "^$1") => decode(html.replace(/<sup>(.*?)<\/sup>/g, exponent).replace(/<[^>]+>/g, ""));
 const n = (v) => String(Math.round(v * 10) / 10);
 
 // ---- words ---------------------------------------------------------------------------------
