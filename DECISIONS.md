@@ -20,25 +20,25 @@ Every earlier entry is ruled.
 - The strict shorthand, ST1: ruled in direction on 2026-11-24 and settled in the room; with it a mention declined and the import's AD5 work deferred. It is the last section of the same note.
 - Two more stops in the shorthand, asked for in the first issues filed from a store being rebuilt: a field every write of a kind must state (`every_write`), and a stated `--sets` that leaves out a key given. Ruled on 2026-11-25 after a round in the room, and built. They were never entries here; the record is in the changelog under that date.
 
-Below: [what is being prepared](#being-prepared), [what you deferred](#deferred-by-you) and [what is ruled](#ruled). Nothing waits to be confirmed: under your ruling of 2026-11-21 an implementer choice comes here only when it changes bytes or answers.
+Below: [what is being prepared](#being-prepared), [what is deferred](#deferred) and [what is ruled](#ruled). Nothing waits to be confirmed: under Kyle's ruling of 2026-11-21 an implementer choice comes here only when it changes bytes or answers.
 
 ## Identity and standing: IS1 to IS11
 
-**Put on 2026-11-24.** These come from [the walk](notes/2026-11-24-identity-walk.md), written at your request in four parts and then put to margins, Neon and Astra, who were asked where it is wrong. Part five of the note is what they broke and what replaces it. Each entry below is as it reads after that review, and names the draft entry and the items of part five it comes from. All four reviewers said the round had converged.
+**Put on 2026-11-24.** These come from [the walk](notes/2026-11-24-identity-walk.md), written at Kyle's request in four parts and then put to margins, Neon and Astra, who were asked where it is wrong. Part five of the note is what they broke and what replaces it. Each entry below is as it reads after that review, and names the draft entry and the items of part five it comes from. All four reviewers said the round had converged.
 
-They take as given what you said during the walk, none of which was a ruling: anybody can emit; records travel as git objects without pull requests; standing decides what is canonical; the steward is a lineage for the team, with grants from it.
+They take as given what Kyle said during the walk, none of which was a ruling: anybody can emit; records travel as git objects without pull requests; standing decides what is canonical; the steward is a lineage for the team, with grants from it.
 
 "Today" in these examples is the `loops` binary built from main at `c483cb9`. Every "today" answer was run in a scratch store with invented names. Where something is proposed and cannot be run, it says so.
 
 **What needs ruling first.** IS1, IS2, IS3 and IS11 are what a trial needs. The rest are needed before the first store that is kept.
 
-**What is not here.** Leanings that change no bytes and no answers stay in the note and stand unless you object: recovery (ID6), where a person's keys are kept (ID3), what stays erasable (ID7), names (ID8), how the team's root is used (SW2), a description two stewards changed apart (SW7), and how records travel in git (SL6, now an outbox for each place that writes). Four questions are left open on purpose and listed in section 22 of the note.
+**What is not here.** Leanings that change no bytes and no answers stay in the note and stand unless Kyle objects: recovery (ID6), where a person's keys are kept (ID3), what stays erasable (ID7), names (ID8), how the team's root is used (SW2), a description two stewards changed apart (SW7), and how records travel in git (SL6, now an outbox for each place that writes). Four questions are left open on purpose and listed in section 22 of the note.
 
 ### IS1: what "more standing" means
 
 *From SL1. Nobody in the review broke it.*
 
-**Question.** You said a director or a lead has more standing than a junior developer. More of what?
+**Question.** Kyle said a director or a lead has more standing than a junior developer. More of what?
 
 **Example, run today.** A lead wrote a decision and a junior then wrote over it:
 
@@ -244,7 +244,7 @@ Under A the second lead cannot end the first, and the first can end the second. 
 
 ### IS11: the trial, on keys or on lineages
 
-*From items 10 and 22 of part five. Argued both ways in the review, and left to you.*
+*From items 10 and 22 of part five. Argued both ways in the review, and left to Kyle.*
 
 **Question.** The trial is on stores declared disposable. Either way it has a store anchor and grants as records. Is an observer in it a key, as today, or a lineage?
 
@@ -259,20 +259,20 @@ Under A the second lead cannot end the first, and the first can end the second. 
 
 ## Being prepared
 
-Nothing here needs you yet. It is listed so that you know what is coming.
+Nothing here needs a ruling yet. It is listed so that a reader knows what is coming.
 
 **Numbers stored as text**, with the import ([W1](notes/2026-11-21-order-of-work.md#w1-an-adoption-step-before-standing-and-sharing)). [TK6](notes/2026-11-21-tick-record.md#tk6-what-a-spec-reads-of-a-tick) shows one use for it.
 
-## Deferred by you
+## Deferred
 
 Not asked now. Each comes back when its step does.
 
-- **A strict store's policy for an emit behind what the store holds:** warn, fail, or let it through as a conflict. You raised it on 2026-11-20 and left it for step 3. margins-claude's answer is recorded in [the cut note](notes/2026-11-15-the-cut.md), section 8.
-- **Refusing an undeclared payload key in a strict store.** Step 3. You ruled on 2026-11-10 that refusal is progressive.
+- **A strict store's policy for an emit behind what the store holds:** warn, fail, or let it through as a conflict. Kyle raised it on 2026-11-20 and left it for step 3. margins-claude's answer is recorded in [the cut note](notes/2026-11-15-the-cut.md), section 8.
+- **Refusing an undeclared payload key in a strict store.** Step 3. Kyle ruled on 2026-11-10 that refusal is progressive.
 - **A top-N across groups.** 2026-11-11: "a later discussion".
 - **What the old tool's `combine` and `discover` vertices did.** 2026-11-20: they wait until they are wanted.
 - **The provenance export mapping,** W3C PROV or PREMIS.
-- **The import writing a reference as `kind:key` (AD5), and a second cutover of the homelab.** 2026-11-24: deferred until a store is picked from by its reference fields; then built into a fresh group that is not cut over. Row 2 of AD5 comes back to you before it is built ([the kinds and references note](notes/2026-11-24-kinds-and-references.md#st1-the-shorthand-is-strict-and-the-description-says-what-it-allows)).
+- **The import writing a reference as `kind:key` (AD5), and a second cutover of the homelab.** 2026-11-24: deferred until a store is picked from by its reference fields; then built into a fresh group that is not cut over. Row 2 of AD5 comes back to Kyle before it is built ([the kinds and references note](notes/2026-11-24-kinds-and-references.md#st1-the-shorthand-is-strict-and-the-description-says-what-it-allows)).
 
 ## Ruled
 

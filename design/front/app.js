@@ -26,15 +26,13 @@ const WALK_TEXT = /*data:WALK_TEXT*/;
 // The decisions waiting on Kyle, from DECISIONS.md (IS1 to IS11, put 2026-11-24).
 // Examples marked `run` were run with the loops binary at c483cb9; their output is verbatim.
 const DEC = /*data:DEC*/;
+const DEC_AT = /*data:DEC_AT*/;
 
 // What depends on what, read from the entries' own words.
 const DEC_EDGES = /*data:DEC_EDGES*/;
 
-const LEANINGS = /*data:LEANINGS*/;
 
-const LEFT_OPEN = /*data:LEFT_OPEN*/;
 
-const DEFERRED = /*data:DEFERRED*/;
 
 // Review notes: where the prototype departs from the live page, or the live page disagrees with itself.
 const NOTES = /*data:NOTES*/;
@@ -441,7 +439,12 @@ const G_BOOK = {
         `<div><span class="rl">id</span><div class="idline"><span class="idv ${flash ? "flash" : ""}">${r.id}</span><span class="verdict ${same ? "" : "changed"}">${same ? "same id" : "a new id"}</span></div></div>`;
       $$("[data-lab=word]").forEach((b) => (b.disabled = st.erased));
     }
-    const MSG = /*data:MSG*/;
+    const MSG = {
+      swap: () => `You wrote <code>prev</code> as [${st.swapped ? "C, B" : "B, C"}]. Written canonically it is still [B, C], so the id stays. ${lawChip("record.sets")}`,
+      erase: () => `The payload is gone. The commitment to it stays in the record, so the id, the signature and every record that cites M still hold. ${lawChip("record.erasure")}`,
+      word: () => st.changed ? `One word changed the payload, so its commitment changed, and so did the id. This is a different record.` : `Back to the original word, and the original id.`,
+      reset: () => `Back to record M as it was written.`,
+    };
     $$("[data-lab]").forEach((b) => b.addEventListener("click", async () => {
       const k = b.dataset.lab;
       if (k === "swap") st.swapped = !st.swapped;
@@ -824,19 +827,21 @@ const G_BOOK = {
   function updateTray() {
     const n = Object.keys(leans).length, tray = $("#tray");
     tray.classList.toggle("show", current === "decisions" && n > 0);
-    $("#traytxt").innerHTML = `${n} of 11 marked <small>· kept in this browser only</small>`;
+    $("#traytxt").innerHTML = `${n} of ${DEC.length} marked <small>· kept in this browser only</small>`;
     $$(".depmap .nd").forEach((g) => g.classList.toggle("lean", !!leans[g.dataset.id]));
   }
+  const decNote = (x) => `<p class="after">${x.label ? `<b>${x.label}.</b> ` : ""}${x.text}</p>`;
   (function decisions() {
     $("#starthere").innerHTML = DEC.filter((d) => d.trial).map((d) => `<a class="sh" href="#${d.id.toLowerCase()}"><span class="isid">${d.id}</span><b>${d.title}</b></a>`).join("");
     $("#decs").innerHTML = DEC.map((d) => `<article class="sheet dec" id="${d.id.toLowerCase()}">` +
       `<div class="dh"><span class="isid">${d.id}</span>${d.trial ? '<span class="trialtag">Needed for the trial</span>' : ""}<span class="lean-state" data-ls="${d.id}"></span></div>` +
       `<h3>${d.title}</h3><p class="ask">${d.ask}</p>` +
-      `<div class="egbox"><span class="lbl">Example</span><p>${d.eg}</p>${d.run ? `<details><summary>What the binary printed at c483cb9</summary><pre>${esc(d.run)}</pre></details>` : ""}</div>` +
-      `<div class="opts">${d.options.map((o) => `<div class="opt ${o.rec ? "rec" : ""} ${o.implied ? "implied" : ""}" data-d="${d.id}" data-k="${esc(o.k)}"><span class="ok">${o.k}</span><div>` +
-        (o.rec || o.implied || o.recBy ? `<span class="recby">${o.implied ? "Not argued in the entry" : o.recBy ? (o.rec ? "Recommended by " : "") + o.recBy : "Recommended"}</span>` : "") +
+      `<div class="egbox"><span class="lbl">Example</span><p>${d.eg}</p>${d.run ? `<details><summary>What the binary printed at ${DEC_AT}</summary><pre>${esc(d.run)}</pre></details>` : ""}</div>` +
+      d.before.map(decNote).join("") +
+      `<div class="opts">${d.options.map((o) => `<div class="opt ${o.rec ? "rec" : ""}" data-d="${d.id}" data-k="${esc(o.k)}"><span class="ok">${o.k}</span><div>` +
+        (o.label ? `<span class="recby">${o.label}</span>` : "") +
         `<p class="oc">${o.choice}</p><p class="ocost"><b>Cost</b>${o.cost}</p></div><div class="oside"><button class="leanbtn" aria-pressed="false">I lean this way</button></div></div>`).join("")}</div>` +
-      (d.after ? `<p class="after">${d.after}</p>` : "") +
+      d.after.map(decNote).join("") +
       `<div class="meta"><span><b>What it changes</b>${d.changes}</span><span><b>Source</b>${d.from}</span></div></article>`).join("");
     const paint = () => {
       $$(".opt").forEach((o) => { const on = leans[o.dataset.d] === o.dataset.k; o.classList.toggle("leaned", on); $(".leanbtn", o).setAttribute("aria-pressed", on); $(".leanbtn", o).textContent = on ? "You lean this way" : "I lean this way"; });
@@ -892,7 +897,7 @@ const G_BOOK = {
         const mine = edgeEls.filter((e) => e.a === id || e.b === id);
         mine.forEach((e) => e.p.classList.add("hl"));
         mine.forEach((e) => $(`.nd[data-id="${e.a === id ? e.b : e.a}"]`, svg).classList.add("hl"));
-        cap.innerHTML = mine.length ? mine.map((e) => `<b>${e.a} → ${e.b}</b> ${e.why}${e.soft ? " (my reading)" : ""}`).join(" · ") : `${id} stands alone.`;
+        cap.innerHTML = mine.length ? mine.map((e) => `<b>${e.a} → ${e.b}</b> ${e.why}${e.soft ? " (a reading, not stated in the entry)" : ""}`).join(" · ") : `${id} stands alone.`;
       };
       const leave = () => { $$(".hl", svg).forEach((e) => e.classList.remove("hl")); cap.textContent = capDef; };
       g.addEventListener("mouseenter", enter); g.addEventListener("focus", enter);
@@ -903,20 +908,13 @@ const G_BOOK = {
     const tx = sv("text", { x: 100, y: 14, class: "svgm", "font-size": "11", "text-anchor": "middle" }, svg); tx.textContent = "rule first";
     const tx2 = sv("text", { x: 380, y: 14, class: "svgm", "font-size": "11", "text-anchor": "middle" }, svg); tx2.textContent = "then";
     const tx3 = sv("text", { x: 660, y: 14, class: "svgm", "font-size": "11", "text-anchor": "middle" }, svg); tx3.textContent = "last";
-    $("#deplist").innerHTML = DEC_EDGES.map(([a, b, why, soft]) => `<li><a href="#${a.toLowerCase()}">${a}</a> → <a href="#${b.toLowerCase()}">${b}</a>: ${why}${soft ? " (my reading)" : ""}.</li>`).join("");
+    $("#deplist").innerHTML = DEC_EDGES.map(([a, b, why, soft]) => `<li><a href="#${a.toLowerCase()}">${a}</a> → <a href="#${b.toLowerCase()}">${b}</a>: ${why}${soft ? " (a reading, not stated in the entry)" : ""}.</li>`).join("");
     updateTray();
-
-    // Around the questions
-    $("#given").innerHTML =
-      `<div><h3>Taken as given</h3><p>What you said during the walk. None of it was a ruling.</p><ul><li>Anybody can emit.</li><li>Records travel as git objects, without pull requests.</li><li>Standing decides what is canonical.</li><li>The steward is a lineage for the team, with grants from it.</li></ul></div>` +
-      `<div><h3>Stands unless you object</h3><p>Leanings that change no bytes and no answers. They stay in the note.</p><ul>${LEANINGS.map(([w, id]) => `<li>${w} <code>${id}</code></li>`).join("")}</ul></div>` +
-      `<div><h3>Left open on purpose</h3><p>Section 22 of <a href="https://projects.gruel.world/strange-loops/decisions/note-2026-11-24-identity-walk.html">the identity walk</a>.</p><ul>${LEFT_OPEN.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
-    $("#defer").innerHTML = DEFERRED.map((d) => `<div><div class="dw">${d.what}</div><div class="dd"><b>${d.when}</b>${d.said}</div></div>`).join("");
 
     // Ruled log
     const logs = $("#logs"), lq = $("#logq"), more = $("#logmore"), lc = $("#logcount");
     let all = false;
-    logs.innerHTML = RULED.map((r) => `<li><span class="ld">${r.date.replace(/^2026-/, "")}</span><div><div class="lh">${esc(r.head)}</div><div class="lt">${r.text}.</div>${r.where.length ? `<div class="lw">${r.where.map(([l, u]) => `<a href="${esc(u)}">${esc(l)} ↗</a>`).join("")}</div>` : ""}</div></li>`).join("");
+    logs.innerHTML = RULED.map((r) => `<li><span class="ld">${r.date.replace(/^2026-/, "")}</span><div><div class="lh">${r.head}</div>${r.text ? `<div class="lt">${r.text}</div>` : ""}${r.where.length ? `<div class="lw">${r.where.join("")}</div>` : ""}</div></li>`).join("");
     const items = $$("li", logs);
     const filter = () => {
       const v = lq.value.trim().toLowerCase();
@@ -2124,7 +2122,19 @@ const E_MAP = /*data:E_MAP*/;
   ].map(([n, w, l], i) => `<li style="--i:${i}"><span class="ecn">${n}</span><span class="ecw">${w}</span><span class="ecl">${l}</span></li>`).join("");
 
   /* ---------- the gaps ---------- */
-  const LENS = /*data:LENS*/;
+  const LENS = [
+    { k: "all", t: "Every law", say: "Every law, from the ground up. Pick a gap above to see only the laws it leaves out.", has: () => true },
+    { k: "novec", t: "No vector file of its own", col: "v", has: (l) => filesOf(l).length === 0,
+      say: "No vector file cites or names these laws. Each is pinned by its proof alone, or by a whole family of vectors, as <code>protocol/laws.md</code> says in its own words." },
+    { k: "one", t: "One vector file", col: "v", has: (l) => filesOf(l).length === 1,
+      say: "A single vector pins each of these laws. That is one input and one answer: the law is pinned at one point." },
+    { k: "nojs", t: "Not run by JavaScript", col: "js", has: (l) => filesOf(l).length > 0 && !(l.ru[jsIdx] > 0),
+      say: "These laws have vectors, and JavaScript runs none of them. All of them are tick vectors, which JavaScript doesn't run (W3 on the Decisions page). The model and Rust run every one." },
+    { k: "differ", t: "The two lists differ", col: "a", has: (l) => l.un.length > 0 || l.ex.length > 0,
+      say: "<code>protocol/laws.md</code> cites a set of vectors for each law, and each vector names the laws it pins. For these laws the two lists differ. − counts files cited that don't name the law; + counts files naming it that aren't cited." },
+    { k: "bc", t: "Held by construction", col: "t", has: (l) => !l.th.length && l.bc,
+      say: "No theorem names these laws. They hold because of how the code is built, and their vectors pin them." },
+  ];
   LENS.forEach((x) => { x.n = LAWS.filter(x.has).length; });
   const proved = LAWS.filter((l) => l.th.length).length, built = LAWS.filter((l) => !l.th.length && l.bc).length;
   $("#ethin-sum").innerHTML = `Lean has checked a proof of ${proved} laws, and ${built} hold by construction. The model and Rust run every one of these laws' vectors. A law in a gap here may well hold; it just has less behind it, and that is where to add evidence first.`;

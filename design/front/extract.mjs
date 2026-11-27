@@ -18,8 +18,12 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 
 const here = dirname(fileURLToPath(import.meta.url));
+// The repository is the page's source now: app.js and shell.html have been edited here,
+// and some constants are generated. Running this again would overwrite that work, so it
+// asks to be told twice.
 const source = process.argv[2];
-if (!source) throw new Error("usage: node design/front/extract.mjs <saved-artifact.html>");
+if (!source || process.argv[3] !== "--overwrite")
+  throw new Error("usage: node design/front/extract.mjs <saved-artifact.html> --overwrite   (replaces app.js, shell.html, styles.css and data/)");
 const text = readFileSync(source, "utf8");
 
 // The host wraps the page in its own document. The page starts at its <title>.
@@ -67,6 +71,9 @@ for (const m of js.matchAll(/^[ \t]*(?:const|let|var)\s+([A-Z][A-Z0-9_]{2,})\s*=
   const to = end(at);
   let value;
   try { value = vm.runInNewContext("(" + js.slice(at, to) + ")"); } catch { continue; }
+  // JSON drops a function without complaint, so look for one before trusting the round trip.
+  const plain = (v) => v === null || ["string", "number", "boolean"].includes(typeof v) || (typeof v === "object" && Object.values(v).every(plain));
+  if (!plain(value)) continue;
   const json = JSON.stringify(value);
   if (js[to] !== ";" || JSON.stringify(JSON.parse(json)) !== json) continue;
   if (data.has(name)) throw new Error(`constant ${name} is defined twice`);
