@@ -121,8 +121,8 @@ export function renderGrammar(root) {
 // The walk: its narration and layout are walk.json's, and everything it shows of the protocol
 // (records, heads, winner, counts, what is erased or withheld, the lens edit) is the
 // scenario vector the model wrote. The two must name the same records and steps.
-function walkOf(root, walk) {
-  const v = vectorFiles(root).get(walk.vector);
+export function walkOf(root, walk, files = vectorFiles(root)) {
+  const v = files.get(walk.vector);
   if (!v) throw new Error(`grammar: no vector ${walk.vector}`);
   const fail = (m) => { throw new Error(`grammar: walk: ${m}`); };
   const recs = v.input.records;

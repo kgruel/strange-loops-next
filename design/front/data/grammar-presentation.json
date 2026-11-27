@@ -1,0 +1,92 @@
+{
+  "PHASES": [
+    [
+      0,
+      "Rosa writes a record. It lands on the ground and never changes."
+    ],
+    [
+      1300,
+      "A store holds it, as one member of a set."
+    ],
+    [
+      2500,
+      "A view settles what this reader holds."
+    ],
+    [
+      3700,
+      "A fold works out the state: what is current, and how many."
+    ],
+    [
+      4900,
+      "A tick fixes that answer at a moment, so others can cite it."
+    ],
+    [
+      6100,
+      "A lens renders the answer as text people read."
+    ],
+    [
+      7300,
+      "Someone edits the text. The edit comes back down as a new record."
+    ]
+  ],
+  "ICON_PLAY": "<svg viewBox=\"0 0 16 16\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M4.5 3.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L5.4 2.7a.6.6 0 0 0-.9.5Z\"/></svg>",
+  "TIPS": {
+    "observer": [
+      "observer",
+      "Who says it. Today that is the key that signed it, <code>k:…</code>."
+    ],
+    "emitted": [
+      "emitted",
+      "When it was written, in RFC 3339, set by the writer."
+    ],
+    "kind": [
+      "kind",
+      "What sort of record it is. Any word; a source selects by it."
+    ],
+    "of": [
+      "of",
+      "The one thing it is about. Heads are worked out thing by thing."
+    ],
+    "occurred": [
+      "occurred",
+      "When what it describes happened, only as exactly as anyone knows: here a decade, 1960 up to 1970."
+    ],
+    "payload": [
+      "payload",
+      "What was seen. Kept apart from the envelope, so it can be withheld or erased."
+    ],
+    "prev": [
+      "prev",
+      "The records it replaces, inside the same thing."
+    ],
+    "erases": [
+      "erases",
+      "Payloads it removes. The erased record keeps its id and its place."
+    ],
+    "under": [
+      "under",
+      "The grant it acts on. Nothing writes this yet: see <a href=\"#is3\">IS3</a>."
+    ],
+    "id": [
+      "id",
+      "A hash of everything above, written one canonical way. Try it below."
+    ]
+  },
+  "SALT": "a1b2c3d4e5f60718",
+  "LGIST": [
+    "the ground, kept for good",
+    "a set of records",
+    "what one reader holds",
+    "worked out from the set",
+    "a result at a moment",
+    "for an audience"
+  ],
+  "REBUILD": [
+    "",
+    "Copied again from any other place that holds the records. A store is a set, so any complete copy is the same store.",
+    "Settled again from what this reader holds.",
+    "Folded again from the set. The same records give the same slots, in any order.",
+    "Worked out again from the records it covers. Anyone who holds them gets the same tick.",
+    "Rendered again from its base by the lens. The same base gives the same text."
+  ]
+}

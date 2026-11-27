@@ -5,11 +5,11 @@ import { anchor, joinLaws, sentence } from "../laws/join.mjs";
 import { lawNotes, unlessSaid } from "../laws/render.mjs";
 import { plain } from "../laws/shapes.mjs";
 
-function grammarChips(root, { data, keyOf, nameOf }) {
+function grammarChips(root, { data, keyOf, nameOf }, extraNames) {
   const read = (path) => JSON.parse(readFileSync(join(root, "design", path), "utf8"));
   const { nouns, verbs } = read("grammar/words.json");
   const { steps } = read("grammar/walk.json");
-  const names = new Set([...nouns, ...verbs, ...steps].flatMap((entry) => entry.laws));
+  const names = new Set([...nouns, ...verbs, ...steps].flatMap((entry) => entry.laws).concat(extraNames));
   // A popover takes plain text. Keep the exponent legible when dropping its HTML.
   const exponent = (_, n) => /^\d+$/.test(n) ? n.replace(/\d/g, (d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d]) : "^" + n;
   return Object.fromEntries([...names].map((name) => {
@@ -71,7 +71,7 @@ function benchVector(path, files) {
   return { file, laws, input, expect };
 }
 
-export function readLaws(root) {
+export function readLaws(root, grammarWalkLaws = []) {
   const joined = joinLaws(root);
   const { data, rows, scopeOf, bounds, keyOf, files } = joined;
   const shapes = Object.entries(data.shapes).map(([k, shape]) => ({
@@ -93,7 +93,7 @@ export function readLaws(root) {
     vectors[group] = Object.fromEntries(Object.entries(cases).map(([name, path]) => [name, benchVector(path, files)]));
   }
   return {
-    LAWS: grammarChips(root, joined),
+    LAWS: grammarChips(root, joined, grammarWalkLaws),
     L_SHAPES: shapes,
     L_QS: questions,
     L_UNLESS: unlessSaid(joined.premises),

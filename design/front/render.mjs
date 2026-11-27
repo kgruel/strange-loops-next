@@ -1,8 +1,8 @@
 // The front page: the prototype's markup, styles and script, with its content put back in.
 // The page began as a prototype in one document. extract.mjs took it apart once; the
-// repository is its source now. Each file under data/ is one constant the script reads,
-// still as the prototype had it. Those in GENERATED are worked out here from the
-// repository's own sources and have no file.
+// repository is its source now. The files under data/ hold constants from the prototype,
+// including the grammar presentation constants grouped in one file. Those in GENERATED
+// are worked out here from the repository's own sources.
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -13,6 +13,7 @@ import { readEvidence } from "./evidence.mjs";
 import { readGrammar } from "./grammar.mjs";
 import { guideConstants, readGuide } from "./guide.mjs";
 import { readLaws } from "./laws.mjs";
+import { readWalk } from "./walk.mjs";
 
 // The working documents the decisions pages render, as design/decisions/render.mjs names them.
 function documents(root) {
@@ -56,6 +57,9 @@ export const GENERATED = new Map([
     .map((name) => [name, (root, m) => m.evidence[name]]),
   ...["STATUS", "NOUN_GROUPS", "NOUNS", "VERBS", "CONSTRUCTIONS", "LAYERS", "MATRIX", "REFUSALS", "PROVENANCE"]
     .map((name) => [name, (root, m) => m.grammar.constants[name]]),
+  ...["WALK", "WALK_TEXT", "STEP_LAWS", "SENTENCE"].map((name) => [name, (root, m) => m.walk[name]]),
+  ["LNAME", (root, m) => [...m.grammar.constants.LAYERS].reverse().map(({ name }) => name)],
+  ["SHAPE", (root, m) => Object.fromEntries(m.laws.L_SHAPES.map(({ k, mark }) => [k, mark]))],
 ]);
 
 export function frontData(root, model = decisions(root)) {
@@ -63,11 +67,19 @@ export function frontData(root, model = decisions(root)) {
   const data = new Map();
   for (const f of readdirSync(dir).sort()) {
     if (!f.endsWith(".json")) throw new Error(`front: ${f} is not a data file`);
-    const name = f.slice(0, -5);
-    if (GENERATED.has(name)) throw new Error(`front: ${name} is generated, so data/${f} must go`);
-    data.set(name, JSON.parse(readFileSync(join(dir, f), "utf8")));
+    const value = JSON.parse(readFileSync(join(dir, f), "utf8"));
+    const entries = f === "grammar-presentation.json" ? Object.entries(value) : [[f.slice(0, -5), value]];
+    for (const [name, constant] of entries) {
+      if (GENERATED.has(name)) throw new Error(`front: ${name} is generated, so remove it from data/${f}`);
+      if (data.has(name)) throw new Error(`front: data/${f} provides ${name} twice`);
+      data.set(name, constant);
+    }
   }
-  const sources = { ...model, guide: model.guide ?? readGuide(root), evidence: readEvidence(root), laws: readLaws(root) };
+  const walk = readWalk(root);
+  const sources = {
+    ...model, walk, guide: model.guide ?? readGuide(root), evidence: readEvidence(root),
+    laws: readLaws(root, walk.STEP_LAWS.flat()),
+  };
   for (const [name, make] of GENERATED) data.set(name, make(root, sources));
   return data;
 }
