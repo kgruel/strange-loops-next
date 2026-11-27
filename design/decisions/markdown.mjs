@@ -21,7 +21,7 @@ const beginsBlock = (s) => !s.trim() || heading.test(s) || marker.test(s) || tab
 
 // Code is opaque, including stars and link-shaped text. Keep the visible text
 // alongside the HTML: titles, navigation labels and heading ids all use it.
-function inline(source, line, rewrite) {
+export function inline(source, line, rewrite) {
   let html = "", plain = "";
   function append(value, markup = escapeHtml(value)) {
     html += markup;
