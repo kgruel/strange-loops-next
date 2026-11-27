@@ -1,20 +1,48 @@
 // The grammar view's words: design/front/grammar.json. The nouns, verbs, constructions,
 // layers, the matrix of which verb acts on which noun, the refusal codes and the status
-// key, in the site's voice. What the view names must be what the protocol names, so the
+// key and board, in the site's voice. What the view names must be what the protocol names, so the
 // checks the grammar page made are made here: every law cited is a law in
 // protocol/laws.md, every status is in the key, the refusal codes are exactly those the
 // vectors pin apart from the ones marked not pinned yet, and the matrix names real words.
+// The board and notes can only point at decisions that are still open.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { lawTable, vectorCodes, vectorFiles } from "../protocol.mjs";
-import { Word, word } from "./decisions.mjs";
+import { readDecisions, Word, word } from "./decisions.mjs";
 
 const FAMILIES = ["write", "read", "text", "any"];
+const DECISION_LINK = /<a\b[^<>]*?\shref\s*=\s*(?:(["'])#(is\d+)\1|#(is\d+)(?=[\s>]))/gi;
 
-export function readGrammar(root) {
+function checkNotes(value, where, checkDecision) {
+  if (value === null || typeof value !== "object") return;
+  const item = value.word ?? value.name ?? value.noun ?? value.text ??
+    (typeof value.group === "string" ? value.group : where);
+  for (const [key, child] of Object.entries(value)) {
+    if (key === "note" && typeof child === "string") {
+      for (const [, , quoted, unquoted] of child.matchAll(DECISION_LINK))
+        checkDecision(`${item} note`, (quoted ?? unquoted).toUpperCase(), "reword the note and remove the link");
+    } else checkNotes(child, `${item}.${key}`, checkDecision);
+  }
+}
+
+export function readGrammar(root, openEntries = readDecisions(root, (_source, _line, href) => href).entries) {
   const g = JSON.parse(readFileSync(join(root, "design", "front", "grammar.json"), "utf8"));
   const fail = (why) => { throw new Error(`front grammar: ${why}`); };
+
+  const openIds = new Set(openEntries.map(({ id }) => id));
+  const checkDecision = (item, id, action) => {
+    if (!openIds.has(id)) fail(`${item} names ${id}, which is not open in DECISIONS.md. If it was ruled, ${action}.`);
+  };
+  const nouns = new Set(g.nouns.map((n) => n.word)), verbs = new Set(g.verbs.map((v) => v.word));
+  for (const column of ["designed", "open", "planned"]) {
+    if (!Array.isArray(g.board?.[column])) fail(`the board needs a list for ${column}`);
+    for (const { noun, text, decisions = [] } of g.board[column]) {
+      if (noun && !nouns.has(noun)) fail(`board item ${noun} names a noun that does not exist`);
+      for (const id of decisions) checkDecision(`board item ${noun ?? text}`, id, "move the item to another column and remove the reference");
+    }
+  }
+  checkNotes(g, "grammar", checkDecision);
 
   const laws = new Set(lawTable(root).rows.flatMap((r) => r.names));
   for (const w of [...g.nouns, ...g.verbs]) {
@@ -24,7 +52,6 @@ export function readGrammar(root) {
   for (const w of [...g.nouns, ...g.verbs, ...g.layers])
     if (!g.status[w.status]) fail(`unknown status ${w.status} on ${w.word ?? w.name}`);
 
-  const nouns = new Set(g.nouns.map((n) => n.word)), verbs = new Set(g.verbs.map((v) => v.word));
   if (nouns.size !== g.nouns.length || verbs.size !== g.verbs.length) fail("a noun or a verb is entered twice");
   for (const n of g.nouns) if (!g.groups[n.group]) fail(`${n.word} is in group ${n.group}, which does not exist`);
   for (const l of g.layers) if (!nouns.has(l.word)) fail(`layer ${l.name} points at ${l.word}, which is not a noun`);
@@ -54,7 +81,7 @@ export function readGrammar(root) {
   return {
     constants: {
       STATUS: g.status, NOUN_GROUPS: g.groups, NOUNS: g.nouns, VERBS: g.verbs, CONSTRUCTIONS: g.constructions,
-      LAYERS: g.layers, MATRIX: g.matrix, REFUSALS: g.refusals, PROVENANCE: g.provenance,
+      LAYERS: g.layers, MATRIX: g.matrix, REFUSALS: g.refusals, PROVENANCE: g.provenance, BOARD: g.board,
     },
     intro: `          <p class="secintro">This page names the parts, ${word(n)} ${s(n, "noun", "nouns")} and ${word(v)} ${s(v, "verb", "verbs")}, after showing them at work on one family recipe.</p>\n`,
     nounsHeading: `        <h2 class="sec">${Word(n)} ${s(n, "noun", "nouns, each")} with one job.</h2>\n`,

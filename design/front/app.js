@@ -4,6 +4,7 @@ const RULED = /*data:RULED*/;
 // Hand-written words: the grammar's nouns, verbs, layers and walk, in the site's voice.
 
 const STATUS = /*data:STATUS*/;
+const BOARD = /*data:BOARD*/;
 
 const NOUN_GROUPS = /*data:NOUN_GROUPS*/;
 
@@ -774,11 +775,17 @@ const G_BOOK_NOTES = /*data:G_BOOK_NOTES*/;
   (function board() {
     const nounLink = (n) => `<a class="nv" href="#n-${n.word}">${n.word}</a>`;
     const verbLink = (v) => `<a class="nv" href="#verbs">${v.word}</a>`;
+    const items = (column) => BOARD[column].map(({ text, noun, decisions }) => {
+      const label = noun ? nounLink({ word: noun }) : esc(text);
+      if (!decisions?.length) return label;
+      const links = decisions.map((id) => `<a href="#${id.toLowerCase()}">${id}</a>`);
+      return `${label}: ${links.join(", ")}`;
+    });
     const cols = [
       { k: "proved", items: [`<b>Nouns</b>`, ...NOUNS.filter((n) => n.status === "proved").map(nounLink), `<b>Verbs</b>`, ...VERBS.filter((v) => v.status === "proved").map(verbLink)] },
-      { k: "designed", items: [...VERBS.filter((v) => v.status === "designed").map((v) => `${verbLink(v)}: edits become records`), `Naming a vertex by its spec's hash`, `When a vertex ticks`] },
-      { k: "open", items: [...NOUNS.filter((n) => n.status === "open").map((n) => `${nounLink(n)}: <a href="#is3">IS3</a>, <a href="#is4">IS4</a>, <a href="#is5">IS5</a>, <a href="#is7">IS7</a>`), `What an observer names: <a href="#is10">IS10</a>, <a href="#is11">IS11</a>`] },
-      { k: "planned", items: [`Emitting accepted edits (the lens)`, `Views shaped for an audience (render)`, `Tick boundaries, markers and the runner`, `Lineages, key bindings and standing, in step 3`, `Standing as part of admit, in step 3`] },
+      { k: "designed", items: [...VERBS.filter((v) => v.status === "designed").map((v) => `${verbLink(v)}: edits become records`), ...items("designed")] },
+      { k: "open", items: items("open") },
+      { k: "planned", items: items("planned") },
     ];
     const SAY = { proved: STATUS.proved.says, designed: STATUS.designed.says, open: STATUS.open.says, planned: "Named in an entry, and neither designed nor built." };
     $("#boardcols").innerHTML = cols.map((c) => `<div class="col ${c.k}"><h3>${c.k === "planned" ? "Planned" : chip(c.k)}<span class="c">${c.items.filter((x) => !x.startsWith("<b>")).length}</span></h3><p>${SAY[c.k]}</p><ul>${c.items.map((x) => `<li${x.startsWith("<b>") ? ' class="hd"' : ""}>${x}</li>`).join("")}</ul></div>`).join("");

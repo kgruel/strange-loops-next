@@ -16,6 +16,23 @@
    "says": "Waiting on a ruling. See Decisions."
   }
  },
+ "board": {
+  "designed": [
+   { "text": "Naming a vertex by its spec's hash" },
+   { "text": "When a vertex ticks" }
+  ],
+  "open": [
+   { "noun": "grant", "decisions": ["IS3", "IS4", "IS5", "IS7"] },
+   { "text": "What an observer names", "decisions": ["IS10", "IS11"] }
+  ],
+  "planned": [
+   { "text": "Emitting accepted edits (the lens)" },
+   { "text": "Views shaped for an audience (render)" },
+   { "text": "Tick boundaries, markers and the runner" },
+   { "text": "Lineages, key bindings and standing, in step 3" },
+   { "text": "Standing as part of admit, in step 3" }
+  ]
+ },
  "groups": [
   {
    "name": "The ground",

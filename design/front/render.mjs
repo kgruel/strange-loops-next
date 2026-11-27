@@ -26,7 +26,9 @@ function documents(root) {
 // What the decisions and grammar views show, read once.
 function decisions(root) {
   const rewrite = frontRewrite(root, documents(root), rewriteLink);
-  return { open: readDecisions(root, rewrite), around: readAround(root, rewrite), grammar: readGrammar(root) };
+  const open = readDecisions(root, rewrite);
+  const grammar = readGrammar(root, open.entries);
+  return { open, around: readAround(root, rewrite), grammar };
 }
 
 // The map of which question depends on which is drawn by hand: a short name and a place
@@ -53,7 +55,7 @@ export const GENERATED = new Map([
     .map((name) => [name, (root, m) => m.laws[name]]),
   ...["E_REPO", "E_LAYERS", "E_SHAPES", "E_IMPL", "E_NOT", "E_COUNTS", "E_T", "E_LAWS", "E_MAP"]
     .map((name) => [name, (root, m) => m.evidence[name]]),
-  ...["STATUS", "NOUN_GROUPS", "NOUNS", "VERBS", "CONSTRUCTIONS", "LAYERS", "MATRIX", "REFUSALS", "PROVENANCE"]
+  ...["STATUS", "NOUN_GROUPS", "NOUNS", "VERBS", "CONSTRUCTIONS", "LAYERS", "MATRIX", "REFUSALS", "PROVENANCE", "BOARD"]
     .map((name) => [name, (root, m) => m.grammar.constants[name]]),
   ...["WALK", "WALK_TEXT", "STEP_LAWS", "SENTENCE"].map((name) => [name, (root, m) => m.walk[name]]),
   ["LNAME", (root, m) => [...m.grammar.constants.LAYERS].reverse().map(({ name }) => name)],
